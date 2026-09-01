@@ -241,15 +241,15 @@ export class DrillEngine {
   announce(type) {
     const c = this.char;
     if (type === "audio_choice") {
-      soundAndFX.speak(c.char);
+      soundAndFX.speakPriority(c.char, { kind: "char", priority: 1 });
     } else if (type === "image_choice") {
-      soundAndFX.speak(``);
+      soundAndFX.speakPriority("", { kind: "char", priority: 1 });
     } else if (type === "similar_pick") {
-      soundAndFX.speak(`${c.pinyin}`);
+      soundAndFX.speakPriority(c.pinyin, { kind: "char", priority: 1 });
     } else if (type === "word_fill" || type === "sentence_fill") {
-      soundAndFX.speak(``);
+      soundAndFX.speakPriority("", { kind: "char", priority: 1 });
     } else {
-      soundAndFX.speak(`“${c.char}”`);
+      soundAndFX.speakPriority(c.char, { kind: "char", priority: 1 });
     }
   }
 
@@ -265,7 +265,7 @@ export class DrillEngine {
     if (replay) {
       replay.addEventListener("click", () => {
         soundAndFX.playPop();
-        soundAndFX.speak(this.char.char);
+        soundAndFX.speakPriority(this.char.char, { kind: "char", priority: 1 });
       });
     }
 
@@ -312,7 +312,7 @@ export class DrillEngine {
 
     const anchor = this.mount.querySelector("#combo-badge-anchor");
     if (anchor) {
-      const labels = ["Good!  ", "Great!  []", "Perfect!  []"];
+      const labels = ["Good! ", "Great! ", "Perfect! "];
       const label = this.combo >= 3 ? labels[2] : labels[this.combo - 1] || labels[0];
       anchor.innerHTML = `<span class="animate-combo text-amber-300">${label}</span>`;
     }
