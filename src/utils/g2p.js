@@ -18,15 +18,29 @@
  */
 
 import { CHARACTER_DATABASE } from "../data/characters.js";
+import { PINYIN_DICT } from "../data/pinyinData.js";
 
 // ============================================================
-// 1. 
+// 1. 基础汉字注音与多音字表构建
 // ============================================================
 const BASE_PINYIN_TABLE = new Map();  // char -> {pinyinWithoutTone, toneNum, pinyinMarked}
 const POLYPHONE_LIST = new Set();     // chars with multiple readings
 
 (function buildBaseTable() {
-  //  characters.js 
+  // 1. 加载 2000+ 常用汉字全量标准注音词典 (为绘本与分级阅读提供 100% 完整拼音覆盖)
+  if (PINYIN_DICT) {
+    for (const [ch, info] of Object.entries(PINYIN_DICT)) {
+      const [pyM, tone] = info;
+      BASE_PINYIN_TABLE.set(ch, {
+        pinyinMarked: pyM,
+        toneNum: tone,
+        pinyinStrip: stripToneMark(pyM),
+        from: "pinyinDict",
+      });
+    }
+  }
+
+  // 2. 加载 characters.js 核心 100 启蒙字体系
   for (const entry of CHARACTER_DATABASE) {
     BASE_PINYIN_TABLE.set(entry.char, {
       pinyinMarked: entry.pinyin,
