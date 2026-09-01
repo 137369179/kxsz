@@ -23,11 +23,8 @@
   <link rel="manifest" href="manifest.json" />
   <link rel="apple-touch-icon" href="assets/images/cathy_mascot.webp" />
   <title>凯茜识字 (Cathy Literacy) - 1:1 沉浸式汉字启蒙与分级阅读</title>
-  <!-- Tailwind CSS (异步加载，避免阻塞页面渲染) -->
-  <link rel="preload" href="assets/vendor/tailwindcss.js" as="script">
-  <link rel="preload" href="assets/images/cathy_world_map.webp" as="image" fetchpriority="high">
-  <script src="assets/vendor/tailwindcss.js" defer></script>
-  <link rel="stylesheet" href="style.css?v=2.7.3" />
+  <!-- 生产级预编译 CSS（替代 398KB Tailwind 运行时编译器） -->
+  <link rel="stylesheet" href="assets/css/prod.css?v=2.7.3" />
   <style>
     /* 隐藏滚动条 */
     .no-scrollbar::-webkit-scrollbar {
