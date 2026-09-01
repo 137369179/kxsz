@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8" />
+  <title>stroke engine test</title>
+</head>
+<body>
+  <div id="result">pending</div>
+  <canvas id="cv" width="340" height="340"></canvas>
+  <script type="module">
+    import { CHARACTER_DATABASE } from "./src/data/characters.js";
+    import { HANZI_STROKES } from "./src/data/hanzi_strokes.js";
+    import { HanziEngine } from "./src/utils/hanziEngine.js";
+
+    const result = document.getElementById("result");
+    try {
+      // 取一个第三阶段（本轮新增）的字
+      const char = CHARACTER_DATABASE.find((c) => c.stage === 3) || CHARACTER_DATABASE[0];
+      const sd = HANZI_STROKES[char.char];
+      if (!sd) throw new Error("stroke data null for " + char.char);
+      const canvas = document.getElementById("cv");
+      const engine = new HanziEngine(canvas, char, () => {}, {}, sd);
+      const ok = engine.strokes.length > 0 && engine.strokes.length === char.strokeCount;
+      result.textContent = ok
+        ? `OK char=${char.char} pinyin=${char.pinyin} radical=${char.radical} emoji=${char.emoji} charType=${char.charType} mechanism=${char.mechanism} strokes=${engine.strokes.length}`
+        : `FAIL strokes=${engine.strokes.length} expected=${char.strokeCount}`;
+      engine.destroy();
+    } catch (e) {
+      result.textContent = "ERR " + (e && e.message ? e.message : e);
+    }
+  </script>
+</body>
+</html>

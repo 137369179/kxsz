@@ -1,0 +1,33 @@
+export const STROKES_29 = [
+  { id: "s1", name: "横", pinyin: "héng", shape: "一", desc: "从左向右直拉" },
+  { id: "s2", name: "竖", pinyin: "shù", shape: "丨", desc: "从上向下直写" },
+  { id: "s3", name: "撇", pinyin: "piě", shape: "丿", desc: "向左下斜出，轻收" },
+  { id: "s4", name: "捺", pinyin: "nà", shape: "乀", desc: "向右下斜出，重按轻收" },
+  { id: "s5", name: "点", pinyin: "diǎn", shape: "丶", desc: "从左上向右下顿笔" },
+  { id: "s6", name: "提", pinyin: "tí", shape: "㇀", desc: "从左下向右上挑出" },
+  { id: "s7", name: "横折", pinyin: "héng zhé", shape: "𠃍", desc: "先横后竖，转折顿笔" },
+  { id: "s8", name: "横撇", pinyin: "héng piě", shape: "㇇", desc: "先横后撇" },
+  { id: "s9", name: "横钩", pinyin: "héng gōu", shape: "乛", desc: "横到末端向左下出钩" },
+  { id: "s10", name: "竖折", pinyin: "shù zhé", shape: "𠃊", desc: "先竖后横" },
+  { id: "s11", name: "竖弯", pinyin: "shù wān", shape: "㇄", desc: "竖下圆转弯向右" },
+  { id: "s12", name: "竖提", pinyin: "shù tí", shape: "𠄌", desc: "向下竖，末端向右上提" },
+  { id: "s13", name: "竖钩", pinyin: "shù gōu", shape: "亅", desc: "向下竖，末端向左上出钩" },
+  { id: "s14", name: "撇点", pinyin: "piě diǎn", shape: "𡿨", desc: "先撇后点" },
+  { id: "s15", name: "撇折", pinyin: "piě zhé", shape: "𠃋", desc: "先撇后折(横)" },
+  { id: "s16", name: "斜钩", pinyin: "xié gōu", shape: "㇂", desc: "向右下长斜，向上出钩" },
+  { id: "s17", name: "弯钩", pinyin: "wān gōu", shape: "㇁", desc: "微弯向下，向左上出钩" },
+  { id: "s18", name: "卧钩", pinyin: "wò gōu", shape: "㇃", desc: "平卧微弯，向左上出钩" },
+  { id: "s19", name: "横折钩", pinyin: "héng zhé gōu", shape: "𠃌", desc: "先横后竖，向左上出钩" },
+  { id: "s20", name: "横折提", pinyin: "héng zhé tí", shape: "㇊", desc: "横折后向右上提出" },
+  { id: "s21", name: "横折弯", pinyin: "héng zhé wān", shape: "㇍", desc: "横折后圆转弯向右" },
+  { id: "s22", name: "横撇弯钩", pinyin: "héng piě wān gōu", shape: "㇌", desc: "横撇接弯钩" },
+  { id: "s23", name: "竖折折钩", pinyin: "shù zhé zhé gōu", shape: "𠄎", desc: "竖折再折后出钩" },
+  { id: "s24", name: "竖弯钩", pinyin: "shù wān gōu", shape: "乚", desc: "竖弯向右，向上出钩" },
+  { id: "s25", name: "横折弯钩", pinyin: "héng zhé wān gōu", shape: "㇈", desc: "横折再弯向右出钩" },
+  { id: "s26", name: "横折折撇", pinyin: "héng zhé zhé piě", shape: "㇋", desc: "连续两折后向左撇" },
+  { id: "s27", name: "横折折折钩", pinyin: "héng zhé zhé zhé gōu", shape: "𠄏", desc: "多折后向左出钩" },
+  { id: "s28", name: "竖折撇", pinyin: "shù zhé piě", shape: "ㄣ", desc: "竖折后向左撇出" },
+  { id: "s29", name: "横撇竖折", pinyin: "héng piě shù zhé", shape: "𠄔", desc: "组合复杂折画" }
+];
+
+export const STROKES_29_DATABASE = STROKES_29;

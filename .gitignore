@@ -1,0 +1,16 @@
+# Voice server cache (binary TTS output)
+tools/cache/
+
+# Debug / patch scripts (temporary)
+patch_*.py
+fix_*.py
+recover_files.py
+find_emojis.py
+replace_icons.py
+strip_emojis*.py
+
+# Build artifacts
+*.log
+.DS_Store
+.env
+node_modules/

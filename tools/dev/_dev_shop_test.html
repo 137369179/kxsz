@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8" />
+  <title>shop module test</title>
+</head>
+<body style="margin:0">
+  <div id="test-out" style="padding:8px;font:bold 12px monospace">pending</div>
+  <div id="game-app-viewport" style="position:relative;width:1024px;height:640px;overflow:hidden"></div>
+  <script type="module">
+    import { RewardModule } from "./src/components/RewardModule.js";
+    import { ebbinghausManager } from "./src/utils/ebbinghaus.js";
+    import { getShopData } from "./src/utils/rewardEngine.js";
+
+    const out = document.getElementById("test-out");
+    const report = [];
+    try {
+      // ---- 造数据：600 星币，学 1 个字（避免触发大量勋章弹窗）----
+      const p = ebbinghausManager.progress;
+      p.coins = 600;
+      p.charRecords = {};
+      ebbinghausManager.completeCharacter("char_001"); // +10 币 → 610
+      const coinsAfterLearn = p.coins;
+
+      const host = document.getElementById("game-app-viewport");
+      const mod = new RewardModule(host);
+      mod.activeTab = "shop";
+      mod.render();
+
+      let html = host.innerHTML;
+      report.push([
+        coinsAfterLearn === 610,
+        html.includes("魔法商店"),
+        getShopData().avatars.length === 6,
+        getShopData().frames.length === 5
+      ]);
+
+      // ---- 购买独角兽(200) → 410；神龙(500)买不起；买金框(150)→260 并装备 ----
+      const buyUnicorn = ebbinghausManager.purchase("av_unicorn");
+      const coinsAfterUnicorn = p.coins; // 立即快照，避免后续扣费干扰断言
+      const buyDragon = ebbinghausManager.purchase("av_dragon");
+      ebbinghausManager.equipAvatar("🦄");
+      const buyGoldFrame = ebbinghausManager.purchase("frame_gold");
+      const equipFrameOk = ebbinghausManager.equipFrame("frame_gold");
+
+      report.push([
+        buyUnicorn.ok && coinsAfterUnicorn === 410,
+        buyDragon.ok === false && buyDragon.reason === "poor",
+        buyGoldFrame.ok && p.coins === 260 && equipFrameOk && p.shop.equippedFrame === "frame_gold",
+        p.shop.owned.join(",") === "av_unicorn,frame_gold"
+      ]);
+
+      // ---- 重渲染商店：独角兽"使用中"、神龙显示价格且置灰、金框装备、星币 260 ----
+      mod.render();
+      html = host.innerHTML;
+      const sd = getShopData();
+      const unicorn = sd.avatars.find((a) => a.id === "av_unicorn");
+      const dragon = sd.avatars.find((a) => a.id === "av_dragon");
+      const gold = sd.frames.find((f) => f.id === "frame_gold");
+      report.push([
+        html.includes("使用中") && html.includes("🪙 260"),
+        unicorn.owned && unicorn.equipped,
+        !dragon.owned && !dragon.affordable && html.includes("🪙 500"),
+        gold.owned && gold.equipped && sd.equippedFrame === "frame_gold"
+      ]);
+
+      // ---- 免费商品恒 owned；重复购买已被 isOwned 拦截 ----
+      report.push([
+        ebbinghausManager.isOwned("av_cathy"),
+        ebbinghausManager.isOwned("frame_none"),
+        ebbinghausManager.purchase("frame_none").ok === false,
+        ebbinghausManager.purchase("av_unicorn").ok === false
+      ]);
+
+      const flat = report.map((r) => r.map((v) => (v === true ? "✓" : v === false ? "✗" : v)).join(" | "));
+      out.textContent = "SHOP-TEST-DONE " + flat.join("  ||  ");
+    } catch (e) {
+      out.textContent = "SHOP-TEST-ERR " + (e && e.message ? e.message : e);
+    }
+  </script>
+</body>
+</html>

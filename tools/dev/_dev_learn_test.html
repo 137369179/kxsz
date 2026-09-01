@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <title>开发冒烟：触发学习流</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="assets/images/cathy_mascot.jpg" />
+  <script src="assets/vendor/tailwindcss.js"></script>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="bg-slate-950 text-amber-950 overflow-hidden select-none m-0 p-0 w-screen h-screen flex items-center justify-center">
+  <div id="game-app-viewport" class="relative w-full h-full max-w-7xl max-h-[768px] aspect-[16/9] bg-sky-400 overflow-hidden shadow-2xl rounded-none sm:rounded-3xl border-0 sm:border-4 sm:border-amber-300"></div>
+
+  <script type="module">
+    import { CHARACTER_DATABASE } from "./src/data/characters.js";
+    import { MapModule } from "./src/components/MapModule.js";
+    import { LearnModule } from "./src/components/LearnModule.js";
+    import { soundAndFX } from "./src/utils/soundEngine.js";
+
+    // 通过 ?step=1..5 控制进入哪一步
+    const step = parseInt(new URLSearchParams(location.search).get('step') || '1', 10);
+    const idx = parseInt(new URLSearchParams(location.search).get('char') || '2', 10); // 月
+    const charData = CHARACTER_DATABASE[idx] || CHARACTER_DATABASE[0];
+
+    const container = document.getElementById('game-app-viewport');
+    // 初始化 Audio（user-gesture 不存在就略）
+    document.addEventListener('click', () => soundAndFX.init(), { once: true });
+
+    const module = new LearnModule(
+      container,
+      charData,
+      () => console.log('[done]'),
+      () => console.log('[back]')
+    );
+    module.currentStep = step;
+    module.render();
+  </script>
+</body>
+</html>

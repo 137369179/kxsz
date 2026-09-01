@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#FF6B00" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="assets/images/cathy_mascot.jpg" />
+  <title>凯茜识字 (Cathy Literacy) - 1:1 沉浸式汉字启蒙与分级阅读</title>
+  <!-- Tailwind CSS (本地预下载，避免 CDN 阻塞 module 加载) -->
+  <script src="assets/vendor/tailwindcss.js"></script>
+  <link rel="stylesheet" href="style.css?v=2.5.0" />
+  <style>
+    /* 隐藏滚动条 */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-amber-950 overflow-hidden select-none m-0 p-0 w-screen h-screen flex items-center justify-center">
+
+  <!-- 16:9 横屏游戏全屏主视口 -->
+  <div id="game-app-viewport" class="relative w-full h-full max-w-7xl max-h-[768px] aspect-[16/9] bg-sky-400 overflow-hidden shadow-2xl rounded-none sm:rounded-3xl border-0 sm:border-4 sm:border-amber-300">
+    <!-- 动态模块（横向大地图、五步学习流、绘本馆、游乐场、字卡库、家长中心）由 app.js 注入 -->
+  </div>
+
+  <!-- 移动端竖屏旋转提示遮罩 -->
+  <div id="orientation-rotate-prompt" class="fixed inset-0 z-[999] bg-slate-950/95 backdrop-blur-xl flex flex-col items-center justify-center p-6 text-center text-white select-none hidden">
+    <div class="w-24 h-24 mb-6 flex items-center justify-center text-6xl animate-rotate-phone">
+      📱
+    </div>
+    <h2 class="text-2xl font-black text-amber-300 mb-2">请旋转手机横屏体验</h2>
+    <p class="text-xs text-white/70 max-w-xs leading-relaxed font-bold">
+      《凯茜识字》专为 16:9 沉浸式游戏世界设计，横过来看更精彩哦～
+    </p>
+    <button id="btn-dismiss-rotate-prompt" class="mt-8 bg-white/20 hover:bg-white/30 text-white/90 text-xs font-black px-6 py-2 rounded-full border border-white/30 transition-all">
+      保持竖屏体验
+    </button>
+  </div>
+
+  <!-- 核心逻辑脚本 (带版本防缓存) -->
+  <script type="module" src="src/app.js?v=2.6.0"></script>
+
+  <!-- PWA Service Worker 注册与自动热更新 -->
+  <script>
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("./sw.js?v=2.6.0").then((reg) => {
+          reg.update();
+        }).catch((err) => {
+          console.log("ServiceWorker registration skipped:", err);
+        });
+      });
+    }
+  </script>
+</body>
+</html>

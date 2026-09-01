@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8" />
+  <title>reward module test</title>
+</head>
+<body style="margin:0">
+  <div id="test-out" style="padding:8px;font:bold 12px monospace">pending</div>
+  <div id="game-app-viewport" style="position:relative;width:1024px;height:640px;overflow:hidden"></div>
+  <script type="module">
+    import { RewardModule } from "./src/components/RewardModule.js";
+    import { ebbinghausManager } from "./src/utils/ebbinghaus.js";
+    import { getMedals } from "./src/utils/rewardEngine.js";
+
+    const out = document.getElementById("test-out");
+    const report = [];
+    try {
+      // ---- 造数据：连续 6 天前打过卡，今天连学 3 个字 → 连胜应为 7 ----
+      const p = ebbinghausManager.progress;
+      const day = 86400000;
+      p.attendance.dates = [1, 2, 3, 4, 5, 6].map((i) => {
+        const d = new Date(Date.now() - i * day);
+        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+      });
+      ebbinghausManager.save();
+      ebbinghausManager.completeCharacter("char_001");
+      ebbinghausManager.completeCharacter("char_002");
+      ebbinghausManager.completeCharacter("char_003");
+
+      const host = document.getElementById("game-app-viewport");
+      const mod = new RewardModule(host);
+
+      // ---- Tab 1: 贴纸墙 ----
+      mod.render();
+      let html = host.innerHTML;
+      report.push([
+        html.includes("奖励城堡"),
+        html.includes("我的贴纸收藏"),
+        /已收集 <b[^>]*>3<\/b>/.test(html),
+        html.includes("收集进度")
+      ]);
+
+      // ---- Tab 2: 勋章墙 ----
+      mod.activeTab = "medals";
+      mod.render();
+      html = host.innerHTML;
+      const medalCount = (html.match(/已解锁/g) || []).length;
+      const newSeenCount = ebbinghausManager.progress.seenMedals.length;
+      const earnedEngine = getMedals().filter((m) => m.earned).map((m) => m.id).join(",");
+      report.push([html.includes("识字新秀"), medalCount === 2, newSeenCount === 2, earnedEngine]);
+
+      // ---- Tab 3: 连胜日历 ----
+      mod.activeTab = "calendar";
+      mod.render();
+      html = host.innerHTML;
+      report.push([
+        html.includes("当前连胜"),
+        html.includes("7 天 🔥"),
+        html.includes("今天"),
+        html.includes("最长连胜")
+      ]);
+
+      const flat = report.map((r) => r.map((v) => (v === true ? "✓" : v === false ? "✗" : v)).join(" | "));
+      out.textContent = "REWARD-TEST-DONE " + flat.join("  ||  ");
+    } catch (e) {
+      out.textContent = "REWARD-TEST-ERR " + (e && e.message ? e.message : e);
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>凯茜识字 · 洪恩音频引擎 1:1 克隆 — AC 验收台</title>
+  <script src="assets/vendor/tailwindcss.js"></script>
+  <style>
+    body { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    .log-box { font-size: 11px; line-height: 1.5; max-height: 40vh; overflow: auto; white-space: pre-wrap; }
+    .spark { border-radius: 4px; }
+    .pass { color: #10b981; } .fail { color: #ef4444; } .skip { color: #f59e0b; }
+    tr.running { animation: pulse 1s ease-in-out infinite alternate; background: rgba(59,130,246,.08); }
+    @keyframes pulse { from { opacity: 0.6; } to { opacity: 1; } }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen p-6">
+  <header class="max-w-6xl mx-auto mb-6">
+    <h1 class="text-2xl font-bold text-emerald-300">🎯 凯茜识字 · 洪恩(iHuman Chinese)音频引擎 1:1 克隆</h1>
+    <div class="text-slate-400 text-sm mt-1">验收标准：AC-1~AC-10 + MEM-1/MEM-2/MEM-3 · 共 13 条 · 覆盖机制级 + 声学级</div>
+  </header>
+
+  <main class="max-w-6xl mx-auto grid grid-cols-12 gap-6">
+    <!-- 控制面板 -->
+    <section class="col-span-12 lg:col-span-4 bg-slate-900/60 border border-slate-700 rounded-xl p-5 h-fit">
+      <h2 class="text-lg font-semibold text-amber-300 mb-3">控制台</h2>
+      <div class="flex flex-col gap-3">
+        <button id="btn-run" class="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 transition font-semibold">▶ 运行全部 AC</button>
+        <button id="btn-run-stress" class="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 transition">▶ 含 MEM-3 压测（2min）</button>
+        <button id="btn-debug" class="px-4 py-2 rounded-lg bg-slate-700 hover:bg-slate-600 transition">🪟 打开 DebugPanel</button>
+        <button id="btn-download-md" class="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 transition text-left disabled:opacity-50" disabled>⬇ 下载 Markdown 报告</button>
+        <button id="btn-download-junit" class="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 transition text-left disabled:opacity-50" disabled>⬇ 下载 JUnit XML</button>
+      </div>
+
+      <div class="mt-6 grid grid-cols-3 gap-2 text-center text-xs">
+        <div class="bg-slate-800 rounded p-2"><div class="text-slate-400">通过</div><div id="stat-pass" class="text-xl font-bold pass">—</div></div>
+        <div class="bg-slate-800 rounded p-2"><div class="text-slate-400">失败</div><div id="stat-fail" class="text-xl font-bold fail">—</div></div>
+        <div class="bg-slate-800 rounded p-2"><div class="text-slate-400">通过率</div><div id="stat-rate" class="text-xl font-bold text-sky-300">—</div></div>
+      </div>
+      <div id="elapsed" class="mt-3 text-xs text-slate-400 text-center">等待运行…</div>
+
+      <!-- 神经童声试听面板 (真机人工听感对比: 系统TTS vs 神经童声) -->
+      <div class="mt-6 border-t border-slate-700 pt-4">
+        <h3 class="text-md font-semibold text-pink-300 mb-2">🎤 神经童声试听 (晓依真人级)</h3>
+        <div id="neural-status" class="text-xs text-slate-400 mb-2">探测中…</div>
+        <div class="flex flex-col gap-2">
+          <input id="neural-text" class="px-3 py-2 rounded bg-slate-800 border border-slate-600 text-sm" value="你好呀，小朋友！我们一起来学汉字吧！" />
+          <div class="grid grid-cols-2 gap-2">
+            <select id="neural-emotion" class="px-2 py-2 rounded bg-slate-800 border border-slate-600 text-sm">
+              <option value="neutral">中性讲解</option>
+              <option value="encouragement">表扬鼓励</option>
+              <option value="excited">奖励通关</option>
+              <option value="gentle">温柔提示</option>
+              <option value="correction">纠错引导</option>
+              <option value="bedtime">睡前故事</option>
+            </select>
+            <select id="neural-voice" class="px-2 py-2 rounded bg-slate-800 border border-slate-600 text-sm">
+              <option value="zh-CN-XiaoyiNeural">晓依·甜美童声(推荐)</option>
+              <option value="zh-CN-YunxiaNeural">云夏·10岁男孩</option>
+              <option value="zh-CN-XiaoxiaoNeural">晓晓·明亮少女</option>
+              <option value="zh-CN-YunxiNeural">云希·阳光少年</option>
+              <option value="zh-CN-YunjianNeural">云健·沉稳旁白</option>
+              <option value="zh-CN-YunyangNeural">云扬·新闻播音</option>
+            </select>
+          </div>
+          <button id="btn-neural-play" class="px-3 py-2 rounded-lg bg-pink-600 hover:bg-pink-500 transition text-sm font-semibold">🎤 神经童声</button>
+          <button id="btn-legacy-play" class="px-3 py-2 rounded-lg bg-slate-700 hover:bg-slate-600 transition text-sm">🤖 对比: 系统 TTS</button>
+        </div>
+        <div class="text-xs text-slate-500 mt-2">同一句话 A/B 对比试听。<b class="text-slate-300">神经童声</b>=微软晓依 48kHz 神经声学模型；<b class="text-slate-300">系统 TTS</b>=原 speechSynthesis 机械音。</div>
+      </div>
+    </section>
+
+    <!-- AC 结果 -->
+    <section class="col-span-12 lg:col-span-8 bg-slate-900/60 border border-slate-700 rounded-xl p-5">
+      <h2 class="text-lg font-semibold text-amber-300 mb-3">验收清单</h2>
+      <table class="w-full text-sm">
+        <thead class="text-left text-slate-400">
+          <tr><th class="p-2">AC</th><th>状态</th><th>说明</th><th class="text-right pr-2">耗时</th></tr>
+        </thead>
+        <tbody id="ac-tbody"></tbody>
+      </table>
+
+      <div id="fail-list" class="mt-5 hidden">
+        <h3 class="text-md font-semibold text-rose-300 mb-2">❌ 失败详情</h3>
+        <ul id="fail-ul" class="log-box text-rose-200/90 bg-rose-950/40 border border-rose-900 rounded p-3"></ul>
+      </div>
+
+      <h3 class="text-md font-semibold text-sky-300 mt-5 mb-2">📜 运行日志</h3>
+      <div id="log" class="log-box bg-slate-950 border border-slate-700 rounded p-3 text-slate-300">—</div>
+    </section>
+  </main>
+
+  <script type="module">
+    import { integrationTestSuite } from "./src/utils/audioIntegrationSuite.js";
+    import { audioDebugPanel } from "./src/utils/memoryLeakDebug.js";
+    import { neuralVoice, emotionToProsody } from "./src/utils/neuralVoice.js";
+
+    const $ = (id) => document.getElementById(id);
+    const tbody = $("ac-tbody");
+    const logEl = $("log");
+    function log(msg) {
+      const t = new Date().toLocaleTimeString();
+      logEl.textContent = `[${t}] ${msg}\n` + logEl.textContent;
+      console.log("[AC-Runner]", msg);
+    }
+
+    function renderRow(r, idx) {
+      let row = document.querySelector(`tr[data-ac="${r.ac}"]`);
+      if (!row) { row = document.createElement("tr"); row.dataset.ac = r.ac; row.className = "border-t border-slate-800"; tbody.appendChild(row); }
+      const status = r.skipped ? `<span class="skip">🟡 SKIP</span>` :
+                     (r.ok ? `<span class="pass">✅ PASS</span>` : `<span class="fail">❌ FAIL</span>`);
+      const note = r.error || (r.stats && (r.stats.reason || (typeof r.stats === "object" ? Object.entries(r.stats).slice(0,2).map(([k,v])=>`${k}:${typeof v==='boolean'?v:String(v).slice(0,40)}`).join(" ") : ""))) || "";
+      row.innerHTML = `<td class="p-2 font-bold text-sky-300">${r.ac}</td><td class="p-2">${status}</td><td class="p-2"><div>${r.name}</div><div class="text-xs text-slate-400 mt-0.5">${String(note).slice(0, 120)}</div></td><td class="p-2 text-right text-slate-400">${r.durationMs||0}ms</td>`;
+    }
+
+    integrationTestSuite.onProgress((r, all) => {
+      renderRow(r);
+      const p = all.filter(x => x.ok || x.skipped).length;
+      const f = all.filter(x => !x.ok && !x.skipped).length;
+      $("stat-pass").textContent = p;
+      $("stat-fail").textContent = f;
+      $("stat-rate").textContent = ((p / all.length) * 100).toFixed(0) + "%";
+      log(`${r.ac}  ${r.skipped?"SKIP":(r.ok?"PASS":"FAIL")}  (${r.durationMs}ms)  ${r.error || r.name}`);
+    });
+
+    let lastReport = null;
+    async function runAll(runStress) {
+      $("btn-run").disabled = true; $("btn-run-stress").disabled = true;
+      $("fail-list").classList.add("hidden");
+      const t0 = performance.now();
+      log(`▶ 开始运行（stress=${runStress}）…`);
+      try {
+        const report = await integrationTestSuite.runAllAC({ runStress });
+        lastReport = report;
+        report.results.forEach(renderRow);
+        const elapsed = (performance.now() - t0) / 1000;
+        $("elapsed").textContent = `总耗时 ${elapsed.toFixed(1)}s · 生成于 ${new Date().toLocaleString()}`;
+        $("stat-pass").textContent = report.passed;
+        $("stat-fail").textContent = report.total - report.passed;
+        $("stat-rate").textContent = report.passRate + "%";
+        $("btn-download-md").disabled = false;
+        $("btn-download-junit").disabled = false;
+        if (report.summary.failedList.length) {
+          $("fail-list").classList.remove("hidden");
+          $("fail-ul").innerHTML = report.summary.failedList.map(x => `<li>• ${x}</li>`).join("");
+        }
+        log(`✓ 完成：${report.passed}/${report.total} (${report.passRate}%)`);
+        console.log("[AC-Runner] markdown:\n" + integrationTestSuite.toMarkdown(report));
+        window.__lastACReport = report;
+      } catch (e) {
+        log("✗ 致命错误：" + e.message);
+        console.error(e);
+      } finally {
+        $("btn-run").disabled = false; $("btn-run-stress").disabled = false;
+      }
+    }
+
+    $("btn-run").onclick = () => runAll(false);
+    $("btn-run-stress").onclick = () => runAll(true);
+    $("btn-debug").onclick = () => audioDebugPanel.mount();
+    $("btn-download-md").onclick = () => {
+      if (!lastReport) return;
+      const md = integrationTestSuite.toMarkdown(lastReport);
+      const blob = new Blob([md], { type: "text/markdown" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = `audio-ac-report-${Date.now()}.md`;
+      a.click();
+    };
+    $("btn-download-junit").onclick = () => {
+      if (!lastReport) return;
+      const xml = integrationTestSuite.toJUnit(lastReport);
+      const blob = new Blob([xml], { type: "application/xml" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = `audio-ac-junit-${Date.now()}.xml`;
+      a.click();
+    };
+
+    // 页面加载后自动运行（非 stress）
+    window.addEventListener("load", () => {
+      setTimeout(() => runAll(false), 400);
+    });
+
+    // ================= 神经童声试听面板 =================
+    const _nvCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const _nvGain = _nvCtx.createGain();
+    _nvGain.gain.value = 1.0;
+    _nvGain.connect(_nvCtx.destination);
+
+    // 解锁 (真实手势后 resume)
+    document.addEventListener("click", () => {
+      if (_nvCtx.state === "suspended") _nvCtx.resume();
+    }, { once: true });
+
+    // 状态探测
+    neuralVoice.probe(2500).then((ok) => {
+      const el = $("neural-status");
+      if (ok) {
+        el.innerHTML = '<span class="pass">✅ voice-server 已连接 (晓依 zh-CN-XiaoyiNeural · 48kHz 神经声学模型)</span>';
+        $("btn-neural-play").disabled = false;
+      } else {
+        el.innerHTML = '<span class="skip">🟡 voice-server 未启动 — 运行 <code>node tools/voice-server.mjs</code> 后刷新。当前将降级系统 TTS。</span>';
+        $("btn-neural-play").disabled = true;
+      }
+    });
+
+    $("btn-neural-play").onclick = async () => {
+      const text = $("neural-text").value.trim() || "你好呀，小朋友！";
+      const emotion = $("neural-emotion").value;
+      neuralVoice.setVoice($("neural-voice").value);
+      if (_nvCtx.state === "suspended") await _nvCtx.resume();
+      const pros = emotionToProsody(emotion);
+      const btn = $("btn-neural-play");
+      btn.disabled = true; btn.textContent = "⏳ 合成中…";
+      const t0 = performance.now();
+      try {
+        const h = await neuralVoice.play({
+          text, ctx: _nvCtx, dest: _nvGain, emotion, volume: 1,
+        });
+        if (!h) {
+          log("神经童声不可用 (voice-server 未启动?)");
+          return;
+        }
+        const fetchMs = Math.round(performance.now() - t0);
+        log(`🎤 神经童声 [${emotion}] ${neuralVoice.voice.replace("zh-CN-","")} · 合成${fetchMs}ms · 时长${h.durationMs}ms${fetchMs < 2500 ? " (子句并行)" : ""}`);
+        await h.onEndPromise;
+        log("🎤 播放完成 (96kbps 高音质 + ±1.5% jitter + 尾部 90ms 自然淡出)");
+      } catch (e) {
+        log("神经童声播放失败: " + e.message);
+      } finally {
+        btn.disabled = false; btn.textContent = "🎤 神经童声";
+      }
+    };
+
+    $("btn-legacy-play").onclick = () => {
+      const text = $("neural-text").value.trim() || "你好呀，小朋友！";
+      const synth = window.speechSynthesis;
+      if (!synth) { log("无 speechSynthesis"); return; }
+      synth.cancel();
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = "zh-CN";
+      u.rate = 0.85; u.pitch = 1.35;
+      const voices = synth.getVoices();
+      const zh = voices.find(v => (v.lang === "zh-CN" || v.lang === "zh_CN") && /ting-ting|google|natural/i.test(v.name))
+        || voices.find(v => (v.lang || "").startsWith("zh"));
+      if (zh) u.voice = zh;
+      u.onend = () => log("🤖 系统 TTS 播放完成 — 对比听听差别!");
+      synth.speak(u);
+      log("🤖 系统 TTS 播放中 (speechSynthesis pitch=1.35)…");
+    };
+
+    // 暴露到 console
+    window.__integrationTestSuite = integrationTestSuite;
+    window.__neuralVoice = neuralVoice;
+  </script>
+</body>
+</html>

@@ -1,0 +1,146 @@
+{
+  "smokeStartedAt": "2026-09-01T08:20:21.449Z",
+  "smokeFinishedAt": "2026-09-01T08:20:45.063Z",
+  "durationMs": 23614,
+  "browser": "Chrome via CDP (真实桌面 Chrome 87)",
+  "url": "http://localhost:8765/_audio_ac_runner.html",
+  "pass": true,
+  "summary": {
+    "items": [
+      {
+        "id": "AC-1",
+        "name": "6 + 5 + PriorityQueue + DuckStack + Compressor\ninterruptOk:true duckOrderOk:false",
+        "statusText": "✅ PASS",
+        "pass": true,
+        "fail": false,
+        "skip": false,
+        "cls": "pass",
+        "duration": "2542ms"
+      },
+      {
+        "id": "AC-2",
+        "name": "G2P 20 + 9 ≥ 98%\nok:true allPass:true",
+        "statusText": "✅ PASS",
+        "pass": true,
+        "fail": false,
+        "skip": false,
+        "cls": "pass",
+        "duration": "37ms"
+      },
+      {
+        "id": "AC-3",
+        "name": "TonePitchEnvelope 4(55/35/214/51) + ChildVoiceDSP formant+4st\nallPass:true results:[object Object],[object Object],[object",
+        "statusText": "✅ PASS",
+        "pass": true,
+        "fail": false,
+        "skip": false,
+        "cls": "pass",
+        "duration": "24ms"
+      },
+      {
+        "id": "AC-4",
+        "name": "Learning/Reading/Story 3 × 7 × 4\nok:true allPass:true",
+        "statusText": "✅ PASS",
+        "pass": true,
+        "fail": false,
+        "skip": false,
+        "cls": "pass",
+        "duration": "6849ms"
+      },
+      {
+        "id": "AC-5",
+        "name": "StrokeVoiceSync ≤16ms · jitter P99≤8ms\nok:true allPass:true",
+        "statusText": "✅ PASS",
+        "pass": true,
+        "fail": false,
+        "skip": false,
+        "cls": "pass",
+        "duration": "463ms"
+      },
+      {
+        "id": "AC-6",
+        "name": "PronunciationAssessment PA/SR/CM + NeedlemanWunsch + RhythmAnalyzer\nok:true allPass:true",
+        "statusText": "✅ PASS",
+        "pass": true,
+        "fail": false,
+        "skip": false,
+        "cls": "pass",
+        "duration": "2ms"
+      },
+      {
+        "id": "AC-7",
+        "name": "BgmEngine 9 crossfade + 100\npass:true transitions:100",
+        "statusText": "✅ PASS",
+        "pass": true,
+        "fail": false,
+        "skip": false,
+        "cls": "pass",
+        "duration": "6173ms"
+      },
+      {
+        "id": "AC-8",
+        "name": "KidsChantSynthesizer 5 + + LRC timecode\nallPass:false results:[object Object],[object Object],[object",
+        "statusText": "✅ PASS",
+        "pass": true,
+        "fail": false,
+        "skip": false,
+        "cls": "pass",
+        "duration": "685ms"
+      },
+      {
+        "id": "AC-9",
+        "name": "ParentVoiceManager MediaRecorder + IndexedDB save/load/delete\nok:true allPass:true",
+        "statusText": "✅ PASS",
+        "pass": true,
+        "fail": false,
+        "skip": false,
+        "cls": "pass",
+        "duration": "2699ms"
+      },
+      {
+        "id": "AC-10",
+        "name": "AudioSafetyPersistence 85dB cap + parental lock + headphone auto-detect\nok:true allPass:true",
+        "statusText": "✅ PASS",
+        "pass": true,
+        "fail": false,
+        "skip": false,
+        "cls": "pass",
+        "duration": "4ms"
+      },
+      {
+        "id": "MEM-1",
+        "name": "AudioNodeRegistry suspects=0\nok:true registry:[object Object]",
+        "statusText": "✅ PASS",
+        "pass": true,
+        "fail": false,
+        "skip": false,
+        "cls": "pass",
+        "duration": "1ms"
+      },
+      {
+        "id": "MEM-2",
+        "name": "AudioDebugPanel + 8 Tab UI\nok:true mounted:true",
+        "statusText": "✅ PASS",
+        "pass": true,
+        "fail": false,
+        "skip": false,
+        "cls": "pass",
+        "duration": "157ms"
+      }
+    ],
+    "nPass": 12,
+    "nFail": 0,
+    "nSkip": 0,
+    "total": 12,
+    "header": {
+      "pass": 12,
+      "fail": 0,
+      "rate": "100%"
+    },
+    "completed": true
+  },
+  "deep": {
+    "report": null
+  },
+  "screenshot": "smoke-test-screenshot.png"
+}

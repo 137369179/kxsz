@@ -1,0 +1,532 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    background: #0d1322;
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Comic Sans MS", cursive, sans-serif;
+    color: #3e2723;
+    min-height: 100vh;
+    overflow: hidden;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+}
+
+/* ----------------------------------------------------
+ * 洪恩 1:1 专属高品质儿童游戏视觉 UI 系统 (Game UI Kit)
+ * ---------------------------------------------------- */
+
+/* 1. 经典 3D 糖果/木质多层立体按键 (带 Spring 物理压感) */
+.btn-game-orange {
+  background: linear-gradient(180deg, #FFB03A 0%, #FF6600 50%, #E64A00 100%);
+  box-shadow: 0 6px 0 #A83200, 0 10px 20px rgba(255, 102, 0, 0.45), inset 0 2px 3px rgba(255, 255, 255, 0.7);
+  border: 2px solid #FFF59D;
+  transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.15s;
+}
+.btn-game-orange:hover {
+  filter: brightness(1.08) drop-shadow(0 0 8px rgba(255, 158, 44, 0.6));
+  transform: translateY(-2px);
+}
+.btn-game-orange:active {
+  transform: translateY(4px) scale(0.96);
+  box-shadow: 0 2px 0 #A83200, 0 4px 8px rgba(255, 102, 0, 0.4), inset 0 2px 3px rgba(255, 255, 255, 0.6);
+}
+
+.btn-game-green {
+  background: linear-gradient(180deg, #8EE635 0%, #4CAF50 50%, #2E7D32 100%);
+  box-shadow: 0 6px 0 #1B5E20, 0 10px 20px rgba(76, 175, 80, 0.45), inset 0 2px 3px rgba(255, 255, 255, 0.7);
+  border: 2px solid #DCEDC8;
+  transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.15s;
+}
+.btn-game-green:hover {
+  filter: brightness(1.08) drop-shadow(0 0 8px rgba(124, 216, 40, 0.6));
+  transform: translateY(-2px);
+}
+.btn-game-green:active {
+  transform: translateY(4px) scale(0.96);
+  box-shadow: 0 2px 0 #1B5E20, 0 4px 8px rgba(76, 175, 80, 0.4), inset 0 2px 3px rgba(255, 255, 255, 0.6);
+}
+
+.btn-game-blue {
+  background: linear-gradient(180deg, #64D2FF 0%, #0288D1 50%, #01579B 100%);
+  box-shadow: 0 6px 0 #013A6B, 0 10px 20px rgba(2, 136, 209, 0.45), inset 0 2px 3px rgba(255, 255, 255, 0.7);
+  border: 2px solid #E1F5FE;
+  transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.15s;
+}
+.btn-game-blue:hover {
+  filter: brightness(1.08) drop-shadow(0 0 8px rgba(79, 195, 247, 0.6));
+  transform: translateY(-2px);
+}
+.btn-game-blue:active {
+  transform: translateY(4px) scale(0.96);
+  box-shadow: 0 2px 0 #013A6B, 0 4px 8px rgba(2, 136, 209, 0.4), inset 0 2px 3px rgba(255, 255, 255, 0.6);
+}
+
+.btn-game-purple {
+  background: linear-gradient(180deg, #CE7EE0 0%, #8E24AA 50%, #4A148C 100%);
+  box-shadow: 0 6px 0 #310C5D, 0 10px 20px rgba(142, 36, 170, 0.45), inset 0 2px 3px rgba(255, 255, 255, 0.7);
+  border: 2px solid #F3E5F5;
+  transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.15s;
+}
+.btn-game-purple:hover {
+  filter: brightness(1.08) drop-shadow(0 0 8px rgba(186, 104, 200, 0.6));
+  transform: translateY(-2px);
+}
+.btn-game-purple:active {
+  transform: translateY(4px) scale(0.96);
+  box-shadow: 0 2px 0 #310C5D, 0 4px 8px rgba(142, 36, 170, 0.4), inset 0 2px 3px rgba(255, 255, 255, 0.6);
+}
+
+.btn-game-wood {
+  background: linear-gradient(180deg, #B87333 0%, #82471B 50%, #5E3110 100%);
+  box-shadow: 0 6px 0 #3E1E07, 0 8px 18px rgba(0, 0, 0, 0.5), inset 0 2px 3px rgba(255, 255, 255, 0.4);
+  border: 2px solid #EFEBE9;
+  transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.15s;
+}
+.btn-game-wood:hover {
+  filter: brightness(1.08) drop-shadow(0 0 8px rgba(161, 96, 43, 0.6));
+  transform: translateY(-2px);
+}
+.btn-game-wood:active {
+  transform: translateY(4px) scale(0.96);
+  box-shadow: 0 2px 0 #3E1E07, 0 4px 8px rgba(0, 0, 0, 0.4), inset 0 2px 3px rgba(255, 255, 255, 0.3);
+}
+
+/* 2. 糖果资源胶囊 (Candy Resource Pills) */
+.candy-pill {
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 2px solid rgba(255, 255, 255, 0.65);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.35), inset 0 1px 2px rgba(255, 255, 255, 0.5);
+}
+
+/* 2.1 高级晶莹玻璃金边卡牌 */
+.card-gold-trim {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 248, 225, 0.9) 100%);
+  border: 3px solid #FFD54F;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15), 0 0 15px rgba(255, 213, 79, 0.35);
+  backdrop-filter: blur(10px);
+}
+
+/* 3. 羊皮纸/木纹公告板 (Parchment Card) */
+.parchment-board {
+  background: radial-gradient(circle at 50% 30%, #FFF9E6 0%, #FFF0C2 100%);
+  border: 6px solid #8D4F1E;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45), inset 0 0 25px rgba(181, 101, 29, 0.25);
+}
+
+/* 4. 黄金通关宝箱与光晕 */
+.chest-glow {
+  filter: drop-shadow(0 0 25px rgba(255, 215, 0, 0.85));
+}
+
+/* 5. 动效系统 */
+@keyframes jellySquash {
+  0% { transform: scale(1, 1); }
+  25% { transform: scale(1.28, 0.76); }
+  50% { transform: scale(0.82, 1.25); }
+  70% { transform: scale(1.14, 0.9); }
+  85% { transform: scale(0.96, 1.05); }
+  100% { transform: scale(1, 1); }
+}
+
+@keyframes chestDropBounce {
+  0% { opacity: 0; transform: translateY(-350px) scale(0.5); }
+  45% { opacity: 1; transform: translateY(0) scale(1.35, 0.7); }
+  60% { transform: translateY(-55px) scale(0.85, 1.15); }
+  75% { transform: translateY(0) scale(1.12, 0.9); }
+  88% { transform: translateY(-18px) scale(0.96, 1.04); }
+  100% { transform: translateY(0) scale(1, 1); }
+}
+
+@keyframes stampThud {
+  0% { opacity: 0; transform: scale(3.5) rotate(-25deg); }
+  50% { opacity: 1; transform: scale(0.8) rotate(-4deg); }
+  75% { transform: scale(1.08) rotate(0deg); }
+  100% { opacity: 1; transform: scale(1) rotate(0deg); }
+}
+
+@keyframes radiantSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes dashFlow {
+  to { stroke-dashoffset: -40; }
+}
+
+@keyframes beaconPulse {
+  0%, 100% { opacity: 0.3; transform: scaleX(1); }
+  50% { opacity: 0.9; transform: scaleX(1.45); }
+}
+
+@keyframes bounceSlow {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+}
+
+@keyframes bounceCathy {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-16px) scale(1.08); }
+}
+
+@keyframes comboPop {
+  0% { opacity: 0; transform: scale(0.4) translateY(20px); }
+  40% { opacity: 1; transform: scale(1.4) translateY(-10px); }
+  70% { opacity: 1; transform: scale(1) translateY(-25px); }
+  100% { opacity: 0; transform: scale(0.85) translateY(-55px); }
+}
+
+@keyframes shimmerSweep {
+  0% { transform: translateX(-150%) rotate(25deg); }
+  100% { transform: translateX(250%) rotate(25deg); }
+}
+
+.shimmer-badge {
+  position: relative;
+  overflow: hidden;
+}
+.shimmer-badge::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(60deg, transparent 30%, rgba(255, 255, 255, 0.45) 50%, transparent 70%);
+  animation: shimmerSweep 3.2s infinite ease-in-out;
+  pointer-events: none;
+}
+
+@keyframes glowPulse {
+  0%, 100% { filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.6)); }
+  50% { filter: drop-shadow(0 0 25px rgba(255, 215, 0, 0.95)) drop-shadow(0 0 40px rgba(255, 102, 0, 0.5)); }
+}
+.glow-pulse {
+  animation: glowPulse 2.4s infinite ease-in-out;
+}
+
+@keyframes ambientFloating {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  33% { transform: translateY(-8px) rotate(1deg); }
+  66% { transform: translateY(6px) rotate(-1deg); }
+}
+.ambient-floating {
+  animation: ambientFloating 4.5s infinite ease-in-out;
+}
+
+@keyframes damageFloat {
+  0% { opacity: 1; transform: scale(1.5) translateY(0); }
+  100% { opacity: 0; transform: scale(0.8) translateY(-70px); }
+}
+
+@keyframes pulseGlow {
+  0%, 100% { transform: scale(1); filter: drop-shadow(0 0 10px rgba(255, 179, 0, 0.6)); }
+  50% { transform: scale(1.05); filter: drop-shadow(0 0 25px rgba(255, 179, 0, 1)); }
+}
+
+.animate-jelly { animation: jellySquash 0.65s cubic-bezier(0.25, 1, 0.5, 1); }
+.animate-chest-drop { animation: chestDropBounce 0.9s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+.animate-stamp { animation: stampThud 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+.animate-radiant-spin { animation: radiantSpin 20s linear infinite; }
+.animate-dash-flow { animation: dashFlow 1.2s linear infinite; }
+.animate-beacon { animation: beaconPulse 2s ease-in-out infinite; }
+@keyframes flyCoinArc {
+  0% {
+    opacity: 1;
+    transform: translate(0, 0) scale(1.4);
+  }
+  50% {
+    transform: translate(calc(var(--target-x) * 0.45), calc(var(--target-y) * 0.5 - 60px)) scale(1.2);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--target-x), var(--target-y)) scale(0.6);
+  }
+}
+
+.flying-coin-particle {
+  position: absolute;
+  pointer-events: none;
+  z-index: 100;
+  animation: flyCoinArc 0.75s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+/* 6. 3D 卡片翻转 */
+.perspective-1000 { perspective: 1000px; }
+.preserve-3d { transform-style: preserve-3d; }
+.backface-hidden { backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+.rotate-y-180 { transform: rotateY(180deg); }
+
+/* 7. 打印专属规则 (A4 标准田字格高清矢量纸面直出) */
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 1.5cm;
+  }
+  body, html {
+    background: #FFFFFF !important;
+    color: #000000 !important;
+    overflow: visible !important;
+    width: 100% !important;
+    height: auto !important;
+  }
+  #game-app-viewport {
+    border: none !important;
+    box-shadow: none !important;
+    max-width: 100% !important;
+    max-height: none !important;
+    overflow: visible !important;
+    background: transparent !important;
+  }
+  header, footer, nav, button, .parent-tab-btn, #btn-lock-gate, #btn-trigger-print, .shell-nav-btn {
+    display: none !important;
+  }
+  #printable-worksheet-area {
+    display: block !important;
+    width: 100% !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+}
+
+/* 全局极致体验优化：彻底消灭 Web 感 */
+html, body {
+  overscroll-behavior-y: none; /* 禁止下拉刷新 */
+  overscroll-behavior-x: none;
+  -webkit-touch-callout: none; /* 禁止长按菜单 */
+  -webkit-user-select: none; /* Safari */
+  user-select: none;
+  touch-action: pan-x pan-y; /* 仅允许平移，禁止双击放大 */
+  -webkit-tap-highlight-color: transparent; /* 去除点击高亮 */
+}
+
+/* 游戏化全局按钮基础反馈 (Q弹压感) */
+button, .cursor-pointer {
+  transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.2s !important;
+}
+button:active, .cursor-pointer:active {
+  transform: scale(0.92) !important;
+  filter: brightness(0.9) !important;
+}
+
+/* 提示气泡专用动画 */
+@keyframes floatBubble {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-6px) scale(1.02); }
+}
+.game-tooltip {
+  animation: floatBubble 2.5s ease-in-out infinite;
+}
+
+/* 环境氛围动画 */
+@keyframes riseEmbers {
+  0% { transform: translateY(0) scale(1); opacity: 0; }
+  20% { opacity: 0.8; }
+  100% { transform: translateY(-100px) scale(0.5); opacity: 0; }
+}
+.ember {
+  animation: riseEmbers 3s infinite linear;
+}
+
+@keyframes waterWobble {
+  0%, 100% { border-radius: 40% 60% 60% 40% / 40% 50% 50% 60%; }
+  33% { border-radius: 60% 40% 40% 60% / 50% 60% 40% 50%; }
+  66% { border-radius: 50% 50% 60% 40% / 60% 40% 50% 40%; }
+}
+.water-wobble {
+  animation: waterWobble 4s ease-in-out infinite;
+}
+@keyframes floatRight {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(200vw); }
+}
+
+@keyframes dash {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+.animate-\\[dash_3s_ease-out_forwards\\] {
+  animation: dash 2s ease-out forwards;
+}
+
+/* 旋转屏幕动画引导 */
+@keyframes rotatePhone {
+  0% { transform: rotate(0deg); }
+  25% { transform: rotate(-90deg); }
+  75% { transform: rotate(-90deg); }
+  100% { transform: rotate(0deg); }
+}
+.animate-rotate-phone {
+  animation: rotatePhone 2.6s ease-in-out infinite;
+}
+
+/* ----------------------------------------------------
+ * A4 田字格专业高清矢量打印样式体系 (@media print)
+ * ---------------------------------------------------- */
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 10mm 12mm 10mm 12mm;
+  }
+
+  html, body {
+    background: #ffffff !important;
+    color: #000000 !important;
+    overflow: visible !important;
+    height: auto !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* 隐藏所有游戏化全屏容器、HUD、导航栏、遮罩与音效开关 */
+  #orientation-rotate-prompt,
+  .shell-nav-btn,
+  #shell-btn-sound-toggle,
+  #shell-stars-count,
+  #shell-coins-count,
+  .shell-content > div > div:first-child,
+  .parent-tab-btn,
+  #btn-lock-gate,
+  #btn-trigger-print,
+  #worksheet-filter-bar,
+  footer,
+  header {
+    display: none !important;
+  }
+
+  #game-app-viewport {
+    max-width: 100% !important;
+    max-height: none !important;
+    aspect-ratio: auto !important;
+    border: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
+    overflow: visible !important;
+    position: static !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  /* 打印专用区域铺满白纸并确保黑红线条清晰 */
+  #printable-worksheet-area {
+    display: block !important;
+    width: 100% !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  .tianzige-grid {
+    border: 1.5px solid #dc2626 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .tianzige-mid-line {
+    border-color: #fca5a5 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .page-break {
+    page-break-after: always;
+    break-after: page;
+  }
+}
+
+/* ==============================================================
+   变态级深挖：View Transitions 3D 翻页物理特效 (BookModule)
+============================================================== */
+::view-transition-group(root) {
+  animation-duration: 0.8s;
+  animation-timing-function: cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+/* 向后翻页 (Next Page) */
+html[data-flip-dir="next"] ::view-transition-old(root) {
+  animation: page-flip-out-left 0.8s forwards cubic-bezier(0.25, 1, 0.5, 1);
+  transform-origin: left center;
+  z-index: 2;
+}
+html[data-flip-dir="next"] ::view-transition-new(root) {
+  animation: fade-in-scale 0.8s forwards cubic-bezier(0.25, 1, 0.5, 1);
+  z-index: 1;
+}
+
+/* 向前翻页 (Prev Page) */
+html[data-flip-dir="prev"] ::view-transition-old(root) {
+  animation: fade-out-scale 0.8s forwards cubic-bezier(0.25, 1, 0.5, 1);
+  z-index: 1;
+}
+html[data-flip-dir="prev"] ::view-transition-new(root) {
+  animation: page-flip-in-right 0.8s forwards cubic-bezier(0.25, 1, 0.5, 1);
+  transform-origin: left center;
+  z-index: 2;
+}
+
+@keyframes page-flip-out-left {
+  0% { transform: perspective(2000px) rotateY(0deg); opacity: 1; filter: brightness(1); }
+  100% { transform: perspective(2000px) rotateY(-90deg); opacity: 0; filter: brightness(0.5); }
+}
+@keyframes page-flip-in-right {
+  0% { transform: perspective(2000px) rotateY(-90deg); opacity: 0; filter: brightness(0.5); }
+  100% { transform: perspective(2000px) rotateY(0deg); opacity: 1; filter: brightness(1); }
+}
+@keyframes fade-in-scale {
+  0% { opacity: 0; transform: scale(0.95); }
+  100% { opacity: 1; transform: scale(1); }
+}
+@keyframes fade-out-scale {
+  0% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(0.95); }
+}
+
+/* ==============================================================
+   全栈性能优化实用类 (CSS Performance Utilities)
+   ============================================================== */
+.cv-auto {
+  content-visibility: auto;
+  contain-intrinsic-size: 0 160px;
+}
+
+.cv-auto-large {
+  content-visibility: auto;
+  contain-intrinsic-size: 0 320px;
+}
+
+.gpu-accel {
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  will-change: transform;
+}
+
+.optimize-text {
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.optimize-vector {
+  shape-rendering: geometricPrecision;
+  image-rendering: -webkit-optimize-contrast;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

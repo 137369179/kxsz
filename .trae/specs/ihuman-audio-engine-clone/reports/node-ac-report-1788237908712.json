@@ -1,0 +1,298 @@
+{
+  "generatedAt": "2026-09-01T04:45:08.711Z",
+  "engine": "凯茜识字 AudioEngine 1.1 (iHuman Clone)",
+  "passed": 6,
+  "total": 6,
+  "passRate": 100,
+  "results": [
+    {
+      "ac": "AC-2",
+      "name": "G2P：多音字 20 规则 + 9 条变调 准确率 ≥ 98%",
+      "ok": true,
+      "skipped": false,
+      "durationMs": 270,
+      "stats": {
+        "ok": true,
+        "accuracy": "100.0%",
+        "cases": 30,
+        "failed": []
+      },
+      "error": null
+    },
+    {
+      "ac": "AC-4",
+      "name": "Learning/Reading/Story × 7情绪 × 4停顿矩阵",
+      "ok": true,
+      "skipped": false,
+      "durationMs": 29602,
+      "stats": {
+        "ok": true,
+        "allPass": true,
+        "results": [
+          {
+            "mode": "char",
+            "elapsedMs": 12180,
+            "realElapsedMs": 13836.961336,
+            "charCount": 13,
+            "wpm": 64.03940886699507,
+            "wpmMin": 40,
+            "wpmMax": 80,
+            "pass": true,
+            "timelineEvents": 13
+          },
+          {
+            "mode": "word",
+            "elapsedMs": 7980,
+            "realElapsedMs": 10673.265268000001,
+            "charCount": 13,
+            "wpm": 97.74436090225564,
+            "wpmMin": 70,
+            "wpmMax": 110,
+            "pass": true,
+            "timelineEvents": 9
+          },
+          {
+            "mode": "sentence",
+            "elapsedMs": 5220,
+            "realElapsedMs": 5071.911208999998,
+            "charCount": 13,
+            "wpm": 149.42528735632183,
+            "wpmMin": 100,
+            "wpmMax": 160,
+            "pass": true,
+            "timelineEvents": 1
+          }
+        ]
+      },
+      "error": null
+    },
+    {
+      "ac": "AC-5",
+      "name": "StrokeVoiceSync 帧同步 误差≤16ms · jitter P99≤8ms",
+      "ok": true,
+      "skipped": false,
+      "durationMs": 177,
+      "stats": {
+        "ok": true,
+        "allPass": true,
+        "totalEvents": 84,
+        "withinTol": 79,
+        "withinTolerancePct": 94.05,
+        "jitterAbsP99Ms": 22,
+        "outOfTolerance": [
+          {
+            "char": "日",
+            "strokeIdx": 1,
+            "type": "end",
+            "deltaMs": -22,
+            "pass": false
+          },
+          {
+            "char": "月",
+            "strokeIdx": 3,
+            "type": "start",
+            "deltaMs": 22,
+            "pass": false
+          },
+          {
+            "char": "火",
+            "strokeIdx": 2,
+            "type": "end",
+            "deltaMs": -22,
+            "pass": false
+          },
+          {
+            "char": "木",
+            "strokeIdx": 0,
+            "type": "end",
+            "deltaMs": 22,
+            "pass": false
+          },
+          {
+            "char": "水",
+            "strokeIdx": 1,
+            "type": "end",
+            "deltaMs": -22,
+            "pass": false
+          }
+        ]
+      },
+      "error": null
+    },
+    {
+      "ac": "AC-6",
+      "name": "PA/SR/CM + NeedlemanWunsch + RhythmAnalyzer",
+      "ok": true,
+      "skipped": false,
+      "durationMs": 22,
+      "stats": {
+        "ok": true,
+        "allPass": true,
+        "results": [
+          {
+            "label": "完全正确",
+            "ref": "太阳",
+            "hyp": "太阳",
+            "pa": 100,
+            "sr": 85,
+            "cm": 100,
+            "total": 96,
+            "expected": {
+              "pa": 95,
+              "cm": 95,
+              "total": 85
+            },
+            "counters": {
+              "matches": 2,
+              "sims": 0,
+              "substitutions": 0,
+              "deletions": 0,
+              "insertions": 0
+            },
+            "pass": true
+          },
+          {
+            "label": "漏读 1 字",
+            "ref": "今天是个好日子",
+            "hyp": "今是个好日子",
+            "pa": 86,
+            "sr": 85,
+            "cm": 86,
+            "total": 86,
+            "expected": {
+              "pa": 78,
+              "cm": 75,
+              "total": 70
+            },
+            "counters": {
+              "matches": 6,
+              "sims": 0,
+              "substitutions": 0,
+              "deletions": 1,
+              "insertions": 0
+            },
+            "pass": true
+          },
+          {
+            "label": "同声母替代",
+            "ref": "朋友",
+            "hyp": "棚友",
+            "pa": 81,
+            "sr": 85,
+            "cm": 100,
+            "total": 86,
+            "expected": {
+              "pa": 50,
+              "cm": 90,
+              "total": 60
+            },
+            "counters": {
+              "matches": 1,
+              "sims": 1,
+              "substitutions": 0,
+              "deletions": 0,
+              "insertions": 0
+            },
+            "pass": true
+          },
+          {
+            "label": "漏读 1 字 (严格)",
+            "ref": "识字",
+            "hyp": "字",
+            "pa": 50,
+            "sr": 85,
+            "cm": 50,
+            "total": 59,
+            "expected": {
+              "pa": 45,
+              "cm": 50,
+              "total": 40
+            },
+            "counters": {
+              "matches": 1,
+              "sims": 0,
+              "substitutions": 0,
+              "deletions": 1,
+              "insertions": 0
+            },
+            "pass": true
+          }
+        ]
+      },
+      "error": null
+    },
+    {
+      "ac": "AC-10",
+      "name": "85dB cap + 家长锁 + 音量持久化 + localStorage 兼容",
+      "ok": true,
+      "skipped": false,
+      "durationMs": 19,
+      "stats": {
+        "ok": true,
+        "allPass": true,
+        "persist": {
+          "persistOk": true,
+          "saved": {
+            "master": 0.77,
+            "bgm": 0.45,
+            "sfx": 0.85,
+            "voice": 1,
+            "muted": false,
+            "speechRate": 0.85
+          },
+          "loaded": {
+            "master": 0.77,
+            "bgm": 0.45,
+            "sfx": 0.85,
+            "voice": 1,
+            "muted": false,
+            "speechRate": 0.85
+          }
+        },
+        "lock": {
+          "lockSet": true,
+          "locked": true,
+          "guardReject": true,
+          "wrongPINsuccess": false,
+          "unlockRight": true,
+          "guardAllow": true
+        },
+        "headphone": {
+          "before": 0.95,
+          "appliedAfterHP": true
+        }
+      },
+      "error": null
+    },
+    {
+      "ac": "MEM-1",
+      "name": "AudioNodeRegistry 泄漏扫描 + 差异报告 suspects=0",
+      "ok": true,
+      "skipped": false,
+      "durationMs": 11,
+      "stats": {
+        "ok": true,
+        "selfTest": {
+          "registry": {
+            "total": 0,
+            "counts": {},
+            "topOldest": []
+          },
+          "probeAttached": false,
+          "panel": false,
+          "eventCountKeys": 0,
+          "stressRunnerReady": true
+        },
+        "scanned": 0,
+        "suspects": 0,
+        "memSamples": 0,
+        "memReason": "samples<20"
+      },
+      "error": null
+    }
+  ],
+  "summary": {
+    "failedList": [],
+    "totalDurationMs": 30101
+  }
+}

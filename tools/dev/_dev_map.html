@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <title>开发冒烟：地图渲染</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="assets/images/cathy_mascot.jpg" />
+  <script src="assets/vendor/tailwindcss.js"></script>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="bg-slate-950 text-amber-950 overflow-hidden select-none m-0 p-0 w-screen h-screen flex items-center justify-center">
+  <div id="game-app-viewport" class="relative w-full h-full max-w-7xl max-h-[768px] aspect-[16/9] bg-sky-400 overflow-hidden shadow-2xl rounded-none sm:rounded-3xl border-0 sm:border-4 sm:border-amber-300"></div>
+
+  <script type="module">
+    import { MapModule } from "./src/components/MapModule.js";
+    const container = document.getElementById('game-app-viewport');
+    const map = new MapModule(container, (mode) => console.log('[mode]', mode));
+    map.render();
+  </script>
+</body>
+</html>
