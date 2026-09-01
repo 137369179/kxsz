@@ -17,6 +17,49 @@ import { BaseModule } from "../utils/BaseModule.js";
 import { GAME_ICONS } from "../utils/gameIcons.js";
 import { EVENTS } from "../utils/eventBus.js";
 
+// ------------------------------------------------------------
+// 游乐场玩法增强专属动画样式（3D翻牌 / 飘字 / 倒计时环 / 狂暴 / 连胜）
+// style 标签随模块首次渲染注入一次，不依赖外部 CSS 构建
+// ------------------------------------------------------------
+const PLAY_STYLE_ID = "cathy-play-enhance-css";
+function ensurePlayStyles() {
+  if (typeof document === "undefined" || document.getElementById(PLAY_STYLE_ID)) return;
+  const css = `
+    /* 3D 翻牌（消消乐） */
+    .pf-wrap { perspective: 900px; }
+    .pf-inner { position: relative; width: 100%; height: 100%; transform-style: preserve-3d; transition: transform .45s cubic-bezier(.4,0,.2,1); }
+    .pf-wrap.flipped .pf-inner { transform: rotateY(180deg); }
+    .pf-face { position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; display: flex; align-items: center; justify-content: center; border-radius: 1.25rem; }
+    .pf-front { background: linear-gradient(135deg, #fbbf24, #f97316); }
+    .pf-back { background: linear-gradient(135deg, #8b5cf6, #6366f1); transform: rotateY(180deg); }
+    /* 战斗飘字 */
+    .fx-float { position: absolute; font-family: inherit; animation: fxFloat 1.1s ease-out forwards; pointer-events: none; z-index: 60; font-weight: 900; text-shadow: 0 2px 8px rgba(0,0,0,.5); }
+    @keyframes fxFloat { 0% { opacity:1; transform: translateY(0) scale(.6); } 30% { transform: translateY(-26px) scale(1.25); } 100% { opacity:0; transform: translateY(-70px) scale(.9); } }
+    .fx-pop { animation: fxPop .5s cubic-bezier(.34,1.56,.64,1) both; }
+    @keyframes fxPop { 0% { transform: scale(0); } 70% { transform: scale(1.25); } 100% { transform: scale(1); } }
+    /* 倒计时环 */
+    .timer-ring { width: 72px; height: 72px; border-radius: 50%; display:flex; align-items:center; justify-content:center; position: relative; }
+    .timer-ring::before { content:""; position:absolute; inset:-6px; border-radius:50%; border:4px solid rgba(255,255,255,.25); }
+    .timer-ring.ticking::after { content:""; position:absolute; inset:-6px; border-radius:50%; border:4px solid transparent; animation: ringSpin 1s linear infinite; }
+    @keyframes ringSpin { to { transform: rotate(360deg); } border-color: #fbbf24 transparent transparent transparent; }
+    /* Boss 狂暴 */
+    .boss-rage { animation: bossRage .6s ease-in-out infinite alternate; }
+    @keyframes bossRage { from { transform: scale(1); filter: brightness(1); } to { transform: scale(1.12); filter: brightness(1.45) saturate(1.6); } }
+    /* 回复血条绿光 */
+    .hp-heal { box-shadow: 0 0 18px rgba(52,211,153,.9); }
+    /* 连胜徽章 */
+    .streak-badge { animation: streakGlow 1.2s ease-in-out infinite alternate; }
+    @keyframes streakGlow { from { box-shadow: 0 0 6px rgba(251,191,36,.4); } to { box-shadow: 0 0 22px rgba(251,191,36,.9); } }
+    /* 卡面已学对勾 */
+    .learned-stamp { position: absolute; top:8px; right:8px; z-index:5; }
+  `;
+  const style = document.createElement("style");
+  style.id = PLAY_STYLE_ID;
+  style.textContent = css;
+  document.head.appendChild(style);
+}
+ensurePlayStyles();
+
 function shuffle(arr) {
   const a = [...arr];
   for (let i = a.length - 1; i > 0; i--) {
@@ -70,6 +113,36 @@ function buildOptions(curChar) {
 function buildMatchPairs(count = 4) {
   const chars = pickReviewChars(count);
   return chars.map((c) => ({ char: c.char, pinyin: c.pinyin || "" }));
+}
+
+/** 在容器内生成「飘字」反馈（+伤害 / 连击 / 提示） */
+function spawnFloatingText(container, text, cls = "", opts = {}) {
+  if (typeof document === "undefined" || !container) return null;
+  const el = document.createElement("div");
+  el.className = `fx-float ${cls}`;
+  el.textContent = text;
+  el.style.left = (opts.left ?? "50%") + "%";
+  el.style.top = (opts.top ?? "38") + "%";
+  el.style.transform = "translateX(-50%)";
+  el.style.fontSize = (opts.size ?? 34) + "px";
+  el.style.color = opts.color || "#fbbf24";
+  container.appendChild(el);
+  setTimeout(() => { try { el.remove(); } catch {} }, 1200);
+  return el;
+}
+
+/** 生成有限时间倒计时（返回 stop 函数）。onTick 每秒, onTimeout 结束后 */
+function startCountdown(seconds, onTick, onTimeout) {
+  let remain = seconds;
+  const timer = setInterval(() => {
+    remain -= 1;
+    if (onTick) onTick(remain);
+    if (remain <= 0) {
+      clearInterval(timer);
+      if (onTimeout) onTimeout();
+    }
+  }, 1000);
+  return () => clearInterval(timer);
 }
 
 export class PlayModule extends BaseModule {
@@ -224,6 +297,29 @@ export class PlayModule extends BaseModule {
     let bossHp = 100;
     let targetIndex = 0;
     let roundCorrect = 0; // 本场连续答对（暴击加成展示用）
+    let maxStreak = 0;    // 本场最高连击
+    let stopTimer = null;
+    let roundTimeoutHappened = false; // 每题是否已超时
+
+    const bossDead = () => bossHp <= 0;
+
+    const applyRage = () => {
+      // 血量 < 45% 进入狂暴：Boss 变大发光
+      const avatar = this.container.querySelector("#boss-avatar");
+      const badge = this.container.querySelector("#boss-lv");
+      if (!avatar) return;
+      if (bossHp <= 45) {
+        avatar.classList.add("boss-rage");
+        avatar.style.borderColor = "#f97316";
+        avatar.style.boxShadow = "0 0 90px rgba(249,115,22,1)";
+        if (badge) { badge.textContent = "狂暴首领 Lv.MAX"; badge.style.background = "#f97316"; }
+      } else {
+        avatar.classList.remove("boss-rage");
+        avatar.style.borderColor = "#fff";
+        avatar.style.boxShadow = "0 0 60px rgba(244,63,94,0.8)";
+        if (badge) { badge.textContent = "难字首领 Lv.9"; badge.style.background = "#dc2626"; }
+      }
+    };
 
     const renderRound = () => {
       const curChar = chars[targetIndex % chars.length];
@@ -231,21 +327,22 @@ export class PlayModule extends BaseModule {
       const __pmSpeakerIcon = soundAndFX.isMuted ? GAME_ICONS.speaker("w-5 h-5", true) : GAME_ICONS.speaker("w-5 h-5", false);
       // 动态干扰项：正确字 + confusingChars
       const options = buildOptions(curChar);
+      roundTimeoutHappened = false;
 
       soundAndFX.speakPriority(`消灭怪兽！找出汉字：“${curChar.char}”`, { kind: "sentence", priority: 1 });
 
       this.container.innerHTML = `
-        <div class="relative w-full h-full min-h-[640px] flex flex-col justify-between select-none overflow-hidden bg-gradient-to-b from-slate-950 via-rose-950 to-slate-950 text-white">
+        <div id="boss-arena" class="relative w-full h-full min-h-[640px] flex flex-col justify-between select-none overflow-hidden bg-gradient-to-b from-slate-950 via-rose-950 to-slate-950 text-white">
           
           <!-- 顶部状态栏 -->
           <header class="relative z-30 w-full px-6 py-3 flex items-center justify-between bg-black/50 backdrop-blur-md border-b border-white/20">
             <button id="btn-back-hub" class="btn-game-wood text-white font-black text-xs px-4 py-2 rounded-full flex items-center gap-1.5">
-              <span class="flex items-center">${GAME_ICONS.home()}</span>
+              <span class="flex items-center">${GAME_ICONS.home("w-4 h-4")}</span>
               <span>退出战斗</span>
             </button>
 
             <div class="flex items-center gap-2">
-              <span class="flex items-center">${GAME_ICONS.monster()}</span>
+              <span class="flex items-center">${GAME_ICONS.monster("w-6 h-6")}</span>
               <span class="text-sm font-black text-rose-300">难字歼灭战 · 关卡 Boss</span>
             </div>
 
@@ -254,47 +351,57 @@ export class PlayModule extends BaseModule {
                 ${__pmSpeakerIcon}
               </button>
               <div class="candy-pill flex items-center gap-1.5 text-yellow-300 font-black text-xs px-3 py-1 rounded-full">
-                ${GAME_ICONS.coin()}<span>${__pmProgress.coins}</span>
+                ${GAME_ICONS.coin("w-4 h-4")}<span>${__pmProgress.coins}</span>
               </div>
               <div class="candy-pill flex items-center gap-1.5 text-amber-300 font-black text-xs px-3 py-1 rounded-full">
-                ${GAME_ICONS.star(true)}<span>${__pmProgress.stars}</span>
-              </div>
-              <div class="flex items-center gap-2 bg-black/60 px-4 py-1.5 rounded-full border border-rose-400">
-                <span class="text-xs font-black text-rose-300">Boss 血量:</span>
-                <span id="boss-hp-val" class="text-sm font-black text-yellow-300">${bossHp}%</span>
+                ${GAME_ICONS.star("w-4 h-4", true)}<span>${__pmProgress.stars}</span>
               </div>
             </div>
           </header>
 
           <!-- Boss 战场舞台 -->
-          <main class="relative z-10 flex-1 flex flex-col items-center justify-center p-6 text-center">
+          <main class="relative z-10 flex-1 flex flex-col items-center justify-center p-4 text-center">
             
+            <!-- 顶行：倒计时环 + 连击 -->
+            <div class="w-full max-w-md flex items-center justify-between mb-3">
+              <div class="timer-ring ticking bg-indigo-900/80 border-2 border-indigo-500 text-indigo-100 font-black text-lg shadow-lg" id="boss-timer">
+                <span id="boss-timer-val">6</span>
+                <span class="text-[8px] absolute -bottom-1 left-1/2 -translate-x-1/2 text-indigo-300">秒</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="text-xs font-black text-yellow-300 streak-badge px-3 py-1 rounded-full border border-yellow-300/60 ${roundCorrect > 0 ? "" : "opacity-40"}">
+                  🔥 连击 x${roundCorrect}
+                </span>
+                <span class="text-xs font-black text-amber-200/70">最高 ${maxStreak}</span>
+              </div>
+            </div>
+
             <!-- 血条 -->
-            <div class="w-full max-w-md bg-black/60 h-5 rounded-full overflow-hidden border-2 border-rose-400 mb-6 p-0.5">
+            <div class="w-full max-w-md bg-black/60 h-5 rounded-full overflow-hidden border-2 border-rose-400 mb-4 p-0.5">
               <div id="boss-hp-bar" class="bg-gradient-to-r from-red-600 via-rose-500 to-yellow-400 h-full rounded-full transition-all duration-500 shadow-[0_0_15px_rgba(244,63,94,0.8)]" style="width: ${bossHp}%"></div>
             </div>
 
             <!-- Boss 3D 动画巨兽 -->
-            <div id="boss-avatar" class="relative w-36 h-36 rounded-full bg-gradient-to-tr from-rose-600 via-red-500 to-orange-500 border-4 border-white shadow-[0_0_60px_rgba(244,63,94,0.8)] flex items-center justify-center mb-4 animate-bounce-slow transition-transform">
-              <span class="flex items-center text-white">${GAME_ICONS.monster()}</span>
-              <div class="absolute -top-3 bg-red-600 text-white font-black text-[10px] px-3 py-0.5 rounded-full border border-white">
+            <div id="boss-avatar" class="relative w-32 h-32 rounded-full bg-gradient-to-tr from-rose-600 via-red-500 to-orange-500 border-4 border-white shadow-[0_0_60px_rgba(244,63,94,0.8)] flex items-center justify-center mb-4 animate-bounce-slow transition-all">
+              <span class="flex items-center text-white">${GAME_ICONS.monster("w-16 h-16")}</span>
+              <div id="boss-lv" class="absolute -top-3 bg-red-600 text-white font-black text-[10px] px-3 py-0.5 rounded-full border border-white">
                 难字首领 Lv.9
               </div>
             </div>
 
-            <h2 class="text-xl font-black text-yellow-300 mb-1">
+            <h2 class="text-lg font-black text-yellow-300 mb-1">
               首领怒吼：“谁能认出‘${curChar.char}’（${curChar.pinyin}）字？！”
             </h2>
-            <p class="text-xs text-gray-300 mb-6 font-semibold">
-              点击下方正确的法术水晶字符，释放激光暴击首领！
+            <p class="text-xs text-gray-300 mb-4 font-semibold">
+              <span id="boss-tip-text">点击下方正确的法术水晶字符，释放激光暴击首领！</span>
             </p>
 
             <!-- 攻击法术选项 -->
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 w-full max-w-2xl">
+            <div id="spell-grid" class="grid grid-cols-2 sm:grid-cols-4 gap-3 w-full max-w-2xl">
               ${options
                 .map(
                   (opt) => `
-                <button class="boss-spell-btn h-24 rounded-3xl btn-game-orange text-white font-black text-5xl shadow-2xl active:scale-90 transition-all flex items-center justify-center" data-char="${opt}">
+                <button class="boss-spell-btn h-20 rounded-3xl btn-game-orange text-white font-black text-4xl shadow-2xl active:scale-90 transition-all flex items-center justify-center" data-char="${opt}">
                   ${opt}
                 </button>
               `
@@ -306,13 +413,14 @@ export class PlayModule extends BaseModule {
 
           <!-- 胜利通关模态框 -->
           <div id="boss-win-modal" class="absolute inset-0 bg-black/85 backdrop-blur-md flex flex-col items-center justify-center text-white hidden animate-scale-up z-50">
-            <div class="mb-4 flex items-center justify-center">${GAME_ICONS.trophy()}</div>
+            <div class="mb-4 flex items-center justify-center">${GAME_ICONS.trophy("w-24 h-24")}</div>
             <h2 class="text-3xl font-black text-yellow-300 mb-2">首领已彻底歼灭！</h2>
-            <p class="text-xs text-gray-300 mb-6 font-semibold">你成功攻克了难字堡垒，守护了汉字王国的安宁！</p>
-            <div class="candy-pill rounded-full px-6 py-2 mb-6 text-xs text-yellow-300 font-bold flex items-center gap-2">
-              <span class="flex items-center">${GAME_ICONS.coin()}</span>
-              <span>获得 20 凯茜星币 + 难字封印勋章</span>
+            <p class="text-xs text-gray-300 mb-4 font-semibold">你成功攻克了难字堡垒，守护了汉字王国的安宁！</p>
+            <div class="candy-pill rounded-full px-5 py-2 mb-2 text-xs text-yellow-300 font-bold flex items-center gap-2">
+              <span class="flex items-center">${GAME_ICONS.coin("w-5 h-5")}</span>
+              <span id="boss-win-reward">获得 20 凯茜星币 + 难字封印勋章</span>
             </div>
+            <div id="boss-win-stats" class="text-xs text-gray-400 mb-6 font-semibold"></div>
             <button id="btn-boss-claim" class="btn-game-orange text-white font-black text-base px-10 py-3 rounded-full">
               领取奖励并返回游乐场
             </button>
@@ -323,13 +431,17 @@ export class PlayModule extends BaseModule {
 
       const backBtn = this.container.querySelector("#btn-back-hub");
       const bossBar = this.container.querySelector("#boss-hp-bar");
-      const hpVal = this.container.querySelector("#boss-hp-val");
       const winModal = this.container.querySelector("#boss-win-modal");
       const bossAvatar = this.container.querySelector("#boss-avatar");
       const soundBtn = this.container.querySelector("#btn-boss-sound");
+      const timerEl = this.container.querySelector("#boss-timer");
+      const timerVal = this.container.querySelector("#boss-timer-val");
+      const tipText = this.container.querySelector("#boss-tip-text");
+      const arena = this.container.querySelector("#boss-arena");
 
       if (backBtn) {
         this._on(backBtn, "click", () => {
+          if (stopTimer) stopTimer();
           soundAndFX.playPop();
           this.currentMode = null;
           this.render();
@@ -348,10 +460,39 @@ export class PlayModule extends BaseModule {
 
       let answered = false;
 
+      // ===== 限时倒计时：6 秒未答 → Boss 反扑咬回 8% 血 =====
+      if (stopTimer) stopTimer();
+      const startRoundTimer = () => {
+        let sec = 6;
+        if (timerVal) timerVal.textContent = sec;
+        if (timerEl) timerEl.classList.add("ticking");
+        stopTimer = startCountdown(sec, (remain) => {
+          if (timerVal) timerVal.textContent = Math.max(remain, 0);
+          if (remain <= 2 && timerEl) timerEl.style.borderColor = "#f87171";
+        }, () => {
+          if (answered || bossDead()) return;
+          answered = true;
+          roundTimeoutHappened = true;
+          soundAndFX.playSoftError();
+          if (tipText) tipText.textContent = `⌛ 超时！Boss 反扑咬回 8% 血量…`;
+          // 超时视同答错：标记难字复习失败
+          ebbinghausManager.completeReview(curChar.id, false);
+          roundCorrect = 0;
+          bossHp = Math.min(100, bossHp + 8);
+          if (bossBar) { bossBar.style.width = `${bossHp}%`; bossBar.classList.add("hp-heal"); setTimeout(() => bossBar.classList.remove("hp-heal"), 500); }
+          spawnFloatingText(arena, "Boss 反扑 -8%", "hp", { color: "#f87171", top: 28, size: 22 });
+          if (bossAvatar) { bossAvatar.classList.add("animate-shake"); setTimeout(() => bossAvatar.classList.remove("animate-shake"), 500); }
+          applyRage();
+          this._timeout(() => { answered = false; renderRound(); }, 900);
+        });
+      };
+      startRoundTimer();
+
       this.container.querySelectorAll(".boss-spell-btn").forEach((btn) => {
         this._on(btn, "click", () => {
-          if (answered) return;
+          if (answered || bossDead()) return;
           answered = true;
+          if (stopTimer) stopTimer();
 
           const selected = btn.dataset.char;
           if (selected === curChar.char) {
@@ -361,29 +502,45 @@ export class PlayModule extends BaseModule {
 
             // ===== 艾宾浩斯复习闭环：答对 → 复习成功 =====
             roundCorrect++;
+            maxStreak = Math.max(maxStreak, roundCorrect);
             ebbinghausManager.completeReview(curChar.id, true);
+
+            // ===== 随机暴击：伤害 35/45/55（连击加成暴击率）=====
+            const roll = Math.random();
+            const dmg = roll < 0.3 ? 55 : roll < 0.65 ? 45 : 35;
+            // 连击 ≥3 时保底高伤
+            const finalDmg = roundCorrect >= 3 ? Math.max(dmg, 45) : dmg;
 
             if (bossAvatar) {
               bossAvatar.classList.add("animate-shake", "scale-75", "opacity-80");
+              setTimeout(() => bossAvatar.classList.remove("animate-shake", "scale-75", "opacity-80"), 450);
             }
 
-            bossHp = Math.max(0, bossHp - 35);
+            bossHp = Math.max(0, bossHp - finalDmg);
             if (bossBar) bossBar.style.width = `${bossHp}%`;
-            if (hpVal) hpVal.textContent = `${bossHp}%`;
+            // 飘字：暴击伤害 + 连击
+            spawnFloatingText(arena, `-${finalDmg} 暴击！${finalDmg >= 45 ? "💥" : ""}`, "dmg", { color: finalDmg >= 45 ? "#f97316" : "#fb7185", top: 45, size: finalDmg >= 45 ? 40 : 32 });
+            if (roundCorrect >= 2) spawnFloatingText(arena, `🔥 连击 x${roundCorrect}`, "combo", { color: "#fbbf24", top: 30, size: 22 });
 
-            if (bossHp <= 0) {
+            applyRage();
+
+            if (bossDead()) {
               soundAndFX.playVictoryFanfare();
               soundAndFX.triggerCoinFly(this.container);
-              // 奖励：基础 20 币 + 连击暴击加成（最多再 +10）
-              const bonus = Math.min(roundCorrect * 2, 10);
+              // 奖励：基础 20 币 + 最高连击加成（最多 +12）
+              const bonus = Math.min(maxStreak * 3, 12);
               ebbinghausManager.addCoins(20 + bonus);
               ebbinghausManager.markTodayActive();
+              const rewardEl = this.container.querySelector("#boss-win-reward");
+              const statsEl = this.container.querySelector("#boss-win-stats");
+              if (rewardEl) rewardEl.textContent = `获得 ${20 + bonus} 凯茜星币 + 难字封印勋章`;
+              if (statsEl) statsEl.innerHTML = `最高连击 <b class="text-yellow-300">x${maxStreak}</b> · 每字掌握度 +10`;
               this._timeout(() => {
                 if (winModal) winModal.classList.remove("hidden");
               }, 800);
             } else {
               targetIndex++;
-              this._timeout(renderRound, 800);
+              this._timeout(() => { answered = false; renderRound(); }, 800);
             }
           } else {
             soundAndFX.playSoftError();
@@ -393,11 +550,14 @@ export class PlayModule extends BaseModule {
             roundCorrect = 0;
             ebbinghausManager.completeReview(curChar.id, false);
             bossHp = Math.min(100, bossHp + 5);
-            if (bossBar) bossBar.style.width = `${bossHp}%`;
-            if (hpVal) hpVal.textContent = `${bossHp}%`;
+            if (bossBar) { bossBar.style.width = `${bossHp}%`; bossBar.classList.add("hp-heal"); setTimeout(() => bossBar.classList.remove("hp-heal"), 500); }
+            spawnFloatingText(arena, "答错了 +5% 回血", "miss", { color: "#34d399", top: 42, size: 20 });
+            if (bossAvatar) { bossAvatar.classList.add("animate-shake"); setTimeout(() => bossAvatar.classList.remove("animate-shake"), 450); }
+            applyRage();
             this._timeout(() => {
               btn.classList.remove("animate-shake");
               answered = false;
+              startRoundTimer();
             }, 600);
           }
         });
@@ -405,6 +565,7 @@ export class PlayModule extends BaseModule {
 
       if (claimBtn) {
         this._on(claimBtn, "click", () => {
+          if (stopTimer) stopTimer();
           soundAndFX.playPop();
           this.currentMode = null;
           this.render();
@@ -433,18 +594,23 @@ export class PlayModule extends BaseModule {
 
     let flipped = [];
     let matchedCount = 0;
+    let combo = 0;         // 连续配对连击
+    let maxCombo = 0;
+    let mistakes = 0;      // 失误次数（重置连击）
+    let stopTimer = null;
+    const TIME_LIMIT = 60; // 秒
 
     this.container.innerHTML = `
-      <div class="relative w-full h-full min-h-[640px] flex flex-col justify-between select-none overflow-hidden bg-gradient-to-b from-indigo-950 via-purple-950 to-slate-950 text-white">
+      <div id="match-arena" class="relative w-full h-full min-h-[640px] flex flex-col justify-between select-none overflow-hidden bg-gradient-to-b from-indigo-950 via-purple-950 to-slate-950 text-white">
         
         <header class="relative z-30 w-full px-6 py-3 flex items-center justify-between bg-black/50 backdrop-blur-md border-b border-white/20">
           <button id="btn-match-back" class="btn-game-wood text-white font-black text-xs px-4 py-2 rounded-full flex items-center gap-1.5">
-            <span class="flex items-center">${GAME_ICONS.home()}</span>
+            <span class="flex items-center">${GAME_ICONS.home("w-4 h-4")}</span>
             <span>返回大厅</span>
           </button>
           
           <div class="flex items-center gap-2">
-            <span class="flex items-center">${GAME_ICONS.gem()}</span>
+            <span class="flex items-center">${GAME_ICONS.gem("w-6 h-6")}</span>
             <span class="text-sm font-black text-yellow-300">汉字消消乐 (字音配对)</span>
           </div>
 
@@ -453,10 +619,10 @@ export class PlayModule extends BaseModule {
               ${__pmSpeakerIcon}
             </button>
             <div class="candy-pill flex items-center gap-1.5 text-yellow-300 font-black text-xs px-3 py-1 rounded-full">
-              ${GAME_ICONS.coin()}<span>${__pmProgress.coins}</span>
+              ${GAME_ICONS.coin("w-4 h-4")}<span>${__pmProgress.coins}</span>
             </div>
             <div class="candy-pill flex items-center gap-1.5 text-amber-300 font-black text-xs px-3 py-1 rounded-full">
-              ${GAME_ICONS.star(true)}<span>${__pmProgress.stars}</span>
+              ${GAME_ICONS.star("w-4 h-4", true)}<span>${__pmProgress.stars}</span>
             </div>
             <div class="candy-pill flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-black text-emerald-300">
               <span>已消除: <b id="match-score" class="text-yellow-300 text-sm">0</b> / 4 对</span>
@@ -464,15 +630,38 @@ export class PlayModule extends BaseModule {
           </div>
         </header>
 
-        <main class="relative z-10 flex-1 flex flex-col items-center justify-center p-6">
-          <p class="text-xs text-yellow-200 font-bold mb-4">翻开一张汉字和对应的读音拼音，即可消除得分！</p>
+        <main class="relative z-10 flex-1 flex flex-col items-center justify-center p-4">
+          <!-- 顶行：倒计时 + 连击 -->
+          <div class="w-full max-w-2xl flex items-center justify-between mb-4">
+            <div class="flex items-center gap-2">
+              <div id="match-timer" class="timer-ring ticking bg-black/50 border-2 border-yellow-400 text-yellow-300 font-black text-lg">
+                <span id="match-timer-val">${TIME_LIMIT}</span>
+                <span class="text-[8px] absolute -bottom-1 left-1/2 -translate-x-1/2 text-yellow-200/70">秒</span>
+              </div>
+              <div class="text-left">
+                <div class="text-[10px] text-slate-400 font-bold">限时挑战</div>
+                <div class="text-[10px] text-emerald-300 font-black">剩余时间=金币加成</div>
+              </div>
+            </div>
+            <div class="flex items-center gap-2">
+              <span id="match-combo" class="text-xs font-black text-yellow-300 streak-badge px-3 py-1 rounded-full border border-yellow-300/60 ${combo > 0 ? "" : "opacity-40"}">
+                🔥 Combo x${combo}
+              </span>
+              <span class="text-xs font-black text-amber-200/70">最高 ${maxCombo}</span>
+            </div>
+          </div>
+
+          <p class="text-xs text-yellow-200 font-bold mb-3">翻开一张汉字和对应的读音拼音，即可消除得分！连击不失误能拿高分！</p>
           
-          <div class="grid grid-cols-4 gap-4 w-full max-w-2xl">
+          <div id="match-grid" class="grid grid-cols-4 gap-3 w-full max-w-2xl">
             ${cards
               .map(
                 (c, idx) => `
-              <button class="match-card-btn relative h-28 rounded-3xl btn-game-orange text-white font-black text-3xl shadow-xl transition-all active:scale-95 flex items-center justify-center" data-idx="${idx}" data-match="${c.matchKey}">
-                <span class="card-front-val">${c.val}</span>
+              <button class="match-card-btn pf-wrap w-full h-24 rounded-3xl relative focus:outline-none" data-idx="${idx}" data-match="${c.matchKey}" data-type="${c.type}">
+                <span class="pf-inner block w-full h-full">
+                  <span class="pf-face pf-front">${c.type === "char" ? `<span class="text-4xl">${c.val}</span>` : `<span class="text-lg tracking-widest">${c.val}</span>`}</span>
+                  <span class="pf-face pf-back"><span class="text-3xl text-white/90">？</span></span>
+                </span>
               </button>
             `
               )
@@ -481,11 +670,24 @@ export class PlayModule extends BaseModule {
         </main>
 
         <div id="match-win-modal" class="absolute inset-0 bg-black/85 backdrop-blur-md flex flex-col items-center justify-center text-white hidden animate-scale-up z-50">
-          <div class="mb-4 flex items-center justify-center">${GAME_ICONS.star(true)}</div>
+          <div class="mb-4 flex items-center justify-center">${GAME_ICONS.star("w-20 h-20", true)}</div>
           <h2 class="text-2xl font-black text-yellow-300 mb-2">全部消除完毕！眼疾手快！</h2>
-          <p class="text-xs text-gray-300 mb-6 font-semibold">获得 10 凯茜星币奖励！</p>
+          <p class="text-xs text-gray-300 mb-2 font-semibold">全部配对成功，太棒啦！</p>
+          <div id="match-win-reward" class="candy-pill rounded-full px-5 py-2 mb-6 text-xs text-yellow-300 font-bold flex items-center gap-2">
+            ${GAME_ICONS.coin("w-5 h-5")}<span>获得星币奖励</span>
+          </div>
           <button id="btn-match-claim" class="btn-game-orange text-white font-black text-base px-10 py-3 rounded-full">
             领取奖励并返回
+          </button>
+        </div>
+
+        <div id="match-fail-modal" class="absolute inset-0 bg-black/85 backdrop-blur-md flex flex-col items-center justify-center text-white hidden animate-scale-up z-50">
+          <div class="mb-4 flex items-center justify-center text-6xl">⏰</div>
+          <h2 class="text-2xl font-black text-rose-300 mb-2">时间到！</h2>
+          <p class="text-xs text-gray-300 mb-2 font-semibold">还有 <b id="match-fail-remain" class="text-yellow-300">0</b> 对未消除</p>
+          <p class="text-xs text-gray-400 mb-6 font-semibold">再试一次，连击拿高分！</p>
+          <button id="btn-match-retry" class="btn-game-orange text-white font-black text-base px-10 py-3 rounded-full">
+            🔄 再战一轮
           </button>
         </div>
 
@@ -495,6 +697,7 @@ export class PlayModule extends BaseModule {
     const backBtn = this.container.querySelector("#btn-match-back");
     if (backBtn) {
       this._on(backBtn, "click", () => {
+        if (stopTimer) stopTimer();
         soundAndFX.playPop();
         this.currentMode = null;
         this.render();
@@ -505,55 +708,104 @@ export class PlayModule extends BaseModule {
     if (soundBtn) {
       this._on(soundBtn, "click", () => {
         soundAndFX.toggleMute();
-        const ic = soundAndFX.isMuted ? GAME_ICONS.speaker(true) : GAME_ICONS.speaker(false);
+        const ic = soundAndFX.isMuted ? GAME_ICONS.speaker("w-5 h-5", true) : GAME_ICONS.speaker("w-5 h-5", false);
         soundBtn.innerHTML = ic;
       });
     }
 
     const scoreEl = this.container.querySelector("#match-score");
     const winModal = this.container.querySelector("#match-win-modal");
+    const failModal = this.container.querySelector("#match-fail-modal");
     const claimBtn = this.container.querySelector("#btn-match-claim");
+    const retryBtn = this.container.querySelector("#btn-match-retry");
+    const comboEl = this.container.querySelector("#match-combo");
+    const timerEl = this.container.querySelector("#match-timer");
+    const timerValEl = this.container.querySelector("#match-timer-val");
+    const arena = this.container.querySelector("#match-arena");
+
+    // ===== 限时：T 秒倒计时，超时判负 =====
+    const updateComboUI = () => {
+      if (!comboEl) return;
+      comboEl.textContent = `🔥 Combo x${combo}`;
+      comboEl.classList.toggle("opacity-40", combo <= 0);
+    };
+    if (stopTimer) stopTimer();
+    stopTimer = startCountdown(TIME_LIMIT, (remain) => {
+      if (timerValEl) timerValEl.textContent = Math.max(remain, 0);
+      if (remain <= 10 && timerEl) timerEl.style.borderColor = remain <= 5 ? "#f87171" : "#fbbf24";
+    }, () => {
+      if (matchedCount >= rawPairs.length) return; // 已获胜
+      if (failModal) {
+        const remainEl = failModal.querySelector("#match-fail-remain");
+        if (remainEl) remainEl.textContent = rawPairs.length - matchedCount;
+        failModal.classList.remove("hidden");
+        // 未消除的字标记为难点
+        cards.filter((c) => c.type === "char").forEach((c) => {
+          const rec = CHARACTER_DATABASE.find((x) => x.char === c.matchKey);
+          if (rec) ebbinghausManager.completeReview(rec.id, false);
+        });
+      }
+    });
 
     this.container.querySelectorAll(".match-card-btn").forEach((btn) => {
       this._on(btn, "click", () => {
-        if (btn.classList.contains("opacity-0") || flipped.includes(btn)) return;
+        if (btn.classList.contains("matched") || flipped.includes(btn) || failModal.classList.contains("hidden") === false) return;
 
+        // ===== 3D 翻牌 =====
+        btn.classList.add("flipped");
         soundAndFX.playCardFlip();
-        btn.classList.add("ring-4", "ring-yellow-300", "scale-105");
+        setTimeout(() => btn.querySelector(".pf-front").classList.add("ring-4", "ring-yellow-200"), 200);
+
         flipped.push(btn);
 
         if (flipped.length === 2) {
           const [b1, b2] = flipped;
           if (b1.dataset.match === b2.dataset.match) {
-            // 配对成功
+            // 配对成功 → 连击 +1
             soundAndFX.playSuccessSound();
             soundAndFX.triggerConfetti(this.container);
+            combo++;
+            maxCombo = Math.max(maxCombo, combo);
             matchedCount++;
             if (scoreEl) scoreEl.textContent = matchedCount;
+            updateComboUI();
+            spawnFloatingText(arena, `✓ 配对成功 ${combo >= 2 ? `Combo x${combo}` : ""}`, "match-ok", { color: "#34d399", top: 32, size: 22 });
 
             // ===== 艾宾浩斯复习闭环：配对成功 = 复习成功 =====
             const c = CHARACTER_DATABASE.find((x) => x.char === b1.dataset.match);
             if (c) ebbinghausManager.completeReview(c.id, true);
 
             this._timeout(() => {
-              b1.classList.add("opacity-0", "pointer-events-none");
-              b2.classList.add("opacity-0", "pointer-events-none");
+              b1.classList.add("matched", "opacity-0", "pointer-events-none", "scale-90");
+              b2.classList.add("matched", "opacity-0", "pointer-events-none", "scale-90");
               flipped = [];
 
-              if (matchedCount >= 4) {
+              if (matchedCount >= rawPairs.length) {
                 soundAndFX.playVictoryFanfare();
-                ebbinghausManager.addCoins(10);
+                soundAndFX.triggerCoinFly(this.container);
+                if (stopTimer) stopTimer();
+                // 奖励：基础 10 币 + 连击加成 + 剩余时间加成（每秒 0.2 币）
+                const remainSec = timerValEl ? parseInt(timerValEl.textContent, 10) || 0 : 0;
+                const bonus = Math.min(maxCombo * 2, 8) + Math.min(Math.floor(remainSec / 5), 4);
+                ebbinghausManager.addCoins(10 + bonus);
+                const rewardEl = this.container.querySelector("#match-win-reward");
+                if (rewardEl) rewardEl.innerHTML = `${GAME_ICONS.coin("w-5 h-5")}<span>获得 ${10 + bonus} 凯茜星币 (连击 x${maxCombo} + 剩余时间奖励)</span>`;
                 if (winModal) winModal.classList.remove("hidden");
               }
             }, 500);
           } else {
-            // 配对失败
+            // 配对失败 → 连击清零
             soundAndFX.playSoftError();
+            mistakes++;
+            combo = 0;
+            updateComboUI();
             this._timeout(() => {
-              b1.classList.remove("ring-4", "ring-yellow-300", "scale-105");
-              b2.classList.remove("ring-4", "ring-yellow-300", "scale-105");
+              b1.classList.remove("flipped");
+              b2.classList.remove("flipped");
+              b1.querySelector(".pf-front")?.classList.remove("ring-4", "ring-yellow-200");
+              b2.querySelector(".pf-front")?.classList.remove("ring-4", "ring-yellow-200");
               flipped = [];
-            }, 600);
+            }, 650);
           }
         }
       });
@@ -561,9 +813,17 @@ export class PlayModule extends BaseModule {
 
     if (claimBtn) {
       this._on(claimBtn, "click", () => {
+        if (stopTimer) stopTimer();
         soundAndFX.playPop();
         this.currentMode = null;
         this.render();
+      });
+    }
+
+    if (retryBtn) {
+      this._on(retryBtn, "click", () => {
+        soundAndFX.playPop();
+        this.renderMatchGame();
       });
     }
   }
@@ -576,8 +836,11 @@ export class PlayModule extends BaseModule {
     const __pmSpeakerIcon = soundAndFX.isMuted ? GAME_ICONS.speaker("w-5 h-5", true) : GAME_ICONS.speaker("w-5 h-5", false);
     let p1Score = 0;
     let p2Score = 0;
+    let p1Streak = 0;     // 红队连胜（连续答对）
+    let p2Streak = 0;     // 蓝队（AI）连胜
     let currentRound = 1;
     const totalRounds = 5;
+    let stopTimer = null;
 
     // ===== 动态出题：5 轮从字库（优先待复习）抽取，每轮选项含 confusingChars =====
     const _roundChars = pickReviewChars(totalRounds);
@@ -603,35 +866,47 @@ export class PlayModule extends BaseModule {
       soundAndFX.speakPriority(`抢拍汉字：“${r.char}”`, { kind: "sentence", priority: 1 });
 
       this.container.innerHTML = `
-        <div class="relative w-full h-full min-h-[640px] flex flex-col justify-between select-none overflow-hidden bg-gradient-to-b from-slate-950 via-indigo-950 to-slate-950 text-white">
+        <div id="pk-arena" class="relative w-full h-full min-h-[640px] flex flex-col justify-between select-none overflow-hidden bg-gradient-to-b from-slate-950 via-indigo-950 to-slate-950 text-white">
           
           <header class="relative z-30 w-full px-6 py-3 flex items-center justify-between bg-black/50 backdrop-blur-md border-b border-white/20">
             <button id="btn-pk-back" class="btn-game-wood text-white font-black text-xs px-4 py-2 rounded-full flex items-center gap-1.5">
-              <span class="flex items-center">${GAME_ICONS.home()}</span>
+              <span class="flex items-center">${GAME_ICONS.home("w-4 h-4")}</span>
               <span>退出竞技</span>
             </button>
 
             <div class="flex items-center gap-2 text-yellow-300 font-black text-sm">
-              <span class="flex items-center">${GAME_ICONS.pen()}</span>
+              <span class="flex items-center">${GAME_ICONS.pen("w-6 h-6")}</span>
               <span>对决第 ${currentRound} / ${totalRounds} 局</span>
             </div>
 
             <div class="candy-pill flex items-center gap-4 px-5 py-1.5 rounded-full text-xs font-black">
-              <span class="text-rose-400"> 红队: ${p1Score}</span>
-              <span class="text-cyan-400"> 蓝队: ${p2Score}</span>
+              <span class="text-rose-400"> 红队: ${p1Score}${p1Streak >= 2 ? ` 🔥x${p1Streak}` : ""}</span>
+              <span class="text-cyan-400"> 蓝队: ${p2Score}${p2Streak >= 2 ? ` 🔥x${p2Streak}` : ""}</span>
             </div>
           </header>
 
-          <main class="relative z-10 flex-1 flex flex-col items-center justify-center p-6 text-center">
-            <div class="mb-4 bg-black/60 px-6 py-2 rounded-full border border-yellow-400 text-yellow-300 font-black text-lg animate-pulse">
+          <main class="relative z-10 flex-1 flex flex-col items-center justify-center p-4 text-center">
+            <!-- 顶行：抢答倒计时 -->
+            <div class="flex items-center gap-3 mb-3">
+              <div class="timer-ring ticking bg-black/50 border-2 border-indigo-400 text-indigo-100 font-black text-lg" id="pk-timer">
+                <span id="pk-timer-val">5</span>
+                <span class="text-[8px] absolute -bottom-1 left-1/2 -translate-x-1/2 text-indigo-300">抢答</span>
+              </div>
+              <div class="text-left">
+                <div class="text-[10px] text-slate-400 font-bold">谁先抢拍？</div>
+                <div class="text-[10px] text-indigo-300 font-black">5 秒内选对即夺分</div>
+              </div>
+            </div>
+
+            <div id="pk-prompt" class="mb-3 bg-black/60 px-6 py-2 rounded-full border border-yellow-400 text-yellow-300 font-black text-lg animate-pulse">
                目标字：读音 ${r.pinyin}
             </div>
 
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-5 w-full max-w-2xl">
+            <div id="pk-grid" class="grid grid-cols-2 sm:grid-cols-4 gap-4 w-full max-w-2xl">
               ${r.opts
                 .map(
                   (opt) => `
-                <button class="pk-opt-btn h-28 rounded-3xl btn-game-orange text-white font-black text-5xl shadow-2xl active:scale-90 transition-all flex items-center justify-center" data-char="${opt}">
+                <button class="pk-opt-btn h-24 rounded-3xl btn-game-orange text-white font-black text-5xl shadow-2xl active:scale-90 transition-all flex items-center justify-center" data-char="${opt}">
                   ${opt}
                 </button>
               `
@@ -641,9 +916,13 @@ export class PlayModule extends BaseModule {
           </main>
 
           <div id="pk-win-modal" class="absolute inset-0 bg-black/85 backdrop-blur-md flex flex-col items-center justify-center text-white hidden animate-scale-up z-50">
-            <div class="mb-4 flex items-center justify-center">${GAME_ICONS.trophy()}</div>
+            <div class="mb-4 flex items-center justify-center">${GAME_ICONS.trophy("w-24 h-24")}</div>
             <h2 class="text-3xl font-black text-yellow-300 mb-2">对决大获全胜！</h2>
-            <p class="text-xs text-gray-300 mb-6 font-semibold">最终比分：红队 ${p1Score} - 蓝队 ${p2Score}</p>
+            <p class="text-xs text-gray-300 mb-2 font-semibold">最终比分：红队 ${p1Score} - 蓝队 ${p2Score}</p>
+            <div id="pk-win-crown" class="text-sm font-black text-yellow-300 mb-4"></div>
+            <div id="pk-win-reward" class="candy-pill rounded-full px-5 py-2 mb-6 text-xs text-yellow-300 font-bold flex items-center gap-2">
+              ${GAME_ICONS.coin("w-5 h-5")}<span>获得星币奖励</span>
+            </div>
             <button id="btn-pk-claim" class="btn-game-orange text-white font-black text-base px-10 py-3 rounded-full">
               领取星币返回
             </button>
@@ -655,6 +934,7 @@ export class PlayModule extends BaseModule {
       const backBtn = this.container.querySelector("#btn-pk-back");
       if (backBtn) {
         this._on(backBtn, "click", () => {
+          if (stopTimer) stopTimer();
           soundAndFX.playPop();
           this.currentMode = null;
           this.render();
@@ -665,54 +945,102 @@ export class PlayModule extends BaseModule {
       if (soundBtn) {
         this._on(soundBtn, "click", () => {
           soundAndFX.toggleMute();
-          const ic = soundAndFX.isMuted ? GAME_ICONS.speaker(true) : GAME_ICONS.speaker(false);
+          const ic = soundAndFX.isMuted ? GAME_ICONS.speaker("w-5 h-5", true) : GAME_ICONS.speaker("w-5 h-5", false);
           soundBtn.innerHTML = ic;
         });
       }
 
       const winModal = this.container.querySelector("#pk-win-modal");
       const claimBtn = this.container.querySelector("#btn-pk-claim");
+      const arena = this.container.querySelector("#pk-arena");
+      const timerEl = this.container.querySelector("#pk-timer");
+      const timerValEl = this.container.querySelector("#pk-timer-val");
 
       let answered = false;
+
+      // ===== 抢答倒计时：5 秒未答 → 蓝队（AI）夺 5 分 =====
+      if (stopTimer) stopTimer();
+      const startRoundTimer = () => {
+        let sec = 5;
+        if (timerValEl) timerValEl.textContent = sec;
+        if (timerEl) { timerEl.classList.add("ticking"); timerEl.style.borderColor = ""; }
+        stopTimer = startCountdown(sec, (remain) => {
+          if (timerValEl) timerValEl.textContent = Math.max(remain, 0);
+          if (remain <= 2 && timerEl) timerEl.style.borderColor = "#f87171";
+          if (remain <= 2) soundAndFX.playTick?.();
+        }, () => {
+          if (answered) return;
+          answered = true;
+          // 超时：蓝队 AI 抢拍得 5 分
+          p2Score += 5;
+          p2Streak++;
+          p1Streak = 0;
+          soundAndFX.playSoftError();
+          spawnFloatingText(arena, "⏰ 超时！蓝队夺 5 分", "pk-timeout", { color: "#22d3ee", top: 34, size: 22 });
+          const c = CHARACTER_DATABASE.find((x) => x.char === r.char);
+          if (c) ebbinghausManager.completeReview(c.id, false); // 超时视同复习失败
+          this._timeout(() => { answered = false; nextRound(); }, 900);
+        });
+      };
+
+      const nextRound = () => {
+        if (currentRound < totalRounds) {
+          currentRound++;
+          renderRound();
+        } else {
+          soundAndFX.playVictoryFanfare();
+          const crownEl = this.container.querySelector("#pk-win-crown");
+          const rewardEl = this.container.querySelector("#pk-win-reward");
+          const winner = p1Score > p2Score ? "红队" : p1Score < p2Score ? "蓝队" : "平局";
+          if (crownEl) crownEl.textContent = winner === "红队" ? "👑 红队获得冠军皇冠！" : winner === "蓝队" ? "👑 蓝队获得冠军皇冠！" : "🤝 势均力敌，握手言和！";
+          // 奖励：基础 15 币 + 胜方加成 + 连胜加成
+          let reward = 15;
+          if (p1Score > p2Score) reward += 5 + Math.min(p1Streak * 2, 6);
+          else if (p1Score < p2Score) reward += 2;
+          else reward += 3;
+          ebbinghausManager.addCoins(reward);
+          if (rewardEl) rewardEl.innerHTML = `${GAME_ICONS.coin("w-5 h-5")}<span>获得 ${reward} 凯茜星币 · 红队 ${p1Score} - 蓝队 ${p2Score}</span>`;
+          if (winModal) winModal.classList.remove("hidden");
+        }
+      };
 
       this.container.querySelectorAll(".pk-opt-btn").forEach((btn) => {
         this._on(btn, "click", () => {
           if (answered) return;
           answered = true;
+          if (stopTimer) stopTimer();
 
           const val = btn.dataset.char;
           if (val === r.char) {
             p1Score += 10;
+            p1Streak++;
+            p2Streak = 0;
             soundAndFX.playSuccessSound();
             soundAndFX.triggerConfetti(this.container);
             btn.classList.add("ring-8", "ring-emerald-400");
+            spawnFloatingText(arena, `✓ 红队 +10${p1Streak >= 2 ? ` 🔥连胜 x${p1Streak}` : ""}`, "pk-ok", { color: "#fb7185", top: 34, size: 22 });
             // ===== 艾宾浩斯复习闭环：抢拍正确 = 复习成功 =====
             const c = CHARACTER_DATABASE.find((x) => x.char === r.char);
             if (c) ebbinghausManager.completeReview(c.id, true);
           } else {
             p2Score += 10;
+            p2Streak++;
+            p1Streak = 0;
             soundAndFX.playSoftError();
             btn.classList.add("ring-8", "ring-rose-400");
+            spawnFloatingText(arena, "✗ 蓝队 +10", "pk-miss", { color: "#22d3ee", top: 34, size: 20 });
             // ===== 闭环：抢拍错误 = 标记难字 =====
             const c = CHARACTER_DATABASE.find((x) => x.char === r.char);
             if (c) ebbinghausManager.completeReview(c.id, false);
           }
 
-          this._timeout(() => {
-            if (currentRound < totalRounds) {
-              currentRound++;
-              renderRound();
-            } else {
-              soundAndFX.playVictoryFanfare();
-              ebbinghausManager.addCoins(15);
-              if (winModal) winModal.classList.remove("hidden");
-            }
-          }, 800);
+          this._timeout(() => { answered = false; nextRound(); }, 800);
         });
       });
 
       if (claimBtn) {
         this._on(claimBtn, "click", () => {
+          if (stopTimer) stopTimer();
           soundAndFX.playPop();
           this.currentMode = null;
           this.render();
@@ -728,7 +1056,9 @@ export class PlayModule extends BaseModule {
   // ----------------------------------------------------
   renderIdiomHall() {
     const __pmProgress = ebbinghausManager.progress;
-    const __pmSpeakerIcon = soundAndFX.isMuted ? GAME_ICONS.speaker(true) : GAME_ICONS.speaker(false);
+    const __pmSpeakerIcon = soundAndFX.isMuted ? GAME_ICONS.speaker("w-5 h-5", true) : GAME_ICONS.speaker("w-5 h-5", false);
+    // 已学成语集合（答对记录）
+    const learned = new Set(__pmProgress.learnedIdioms || []);
     const db = (typeof IDIOMS_DATABASE !== "undefined" && IDIOMS_DATABASE.length) ? IDIOMS_DATABASE : [
       { id: "idiom_001", name: "守株待兔", pinyin: "shǒu zhū dài tù", chars: ["守","株","待","兔"], desc: "比喻死守狭隘经验，不知变通，妄想不劳而获", story: "古时候有个农夫在田里干活，忽然一只兔子飞快跑来撞在树桩上死了农夫捡到兔子非常高兴，从此天天坐在树桩旁等待，结果田地荒芜，再也没等到兔子", moral: "做事要脚踏实地努力，不能心存侥幸", gameQuestion: { question: "农夫为什么再也没等到兔子？", options: ["撞树桩是极偶然的巧合，应该靠勤劳劳动", "因为树桩太矮了", "因为兔子跑得太慢了"], correctIndex: 0 } },
       { id: "idiom_002", name: "拔苗助长", pinyin: "bá miáo zhù zhǎng", chars: ["拔","苗","助","长"], desc: "比喻急于求成，违反规律，反而把事情弄糟", story: "古时候有个人嫌禾苗长得太慢，于是把禾苗一棵棵拔高他回家高兴地说：我帮禾苗长高啦！儿子跑到田里一看，禾苗全都枯死了", moral: "万物生长有规律，急于求成往往适得其反", gameQuestion: { question: "禾苗为什么枯死了？", options: ["被拔离土壤，破坏了生长规律", "天气太热了", "禾苗喝了太多水"], correctIndex: 0 } },
@@ -750,15 +1080,21 @@ export class PlayModule extends BaseModule {
           </div>
           <div class="flex items-center gap-2">
             <div class="candy-pill flex items-center gap-1.5 text-yellow-300 font-black text-xs px-3 py-1 rounded-full">
-              ${GAME_ICONS.coin()}<span>${__pmProgress.coins}</span>
+              ${GAME_ICONS.coin("w-4 h-4")}<span>${__pmProgress.coins}</span>
+            </div>
+            <div class="candy-pill flex items-center gap-1.5 text-emerald-300 font-black text-xs px-3 py-1 rounded-full">
+              ✅ <span>已学 <b id="idiom-learned-count" class="text-yellow-300">${learned.size}</b>/${db.length}</span>
             </div>
           </div>
         </header>
 
         <main class="relative z-10 flex-1 p-6 overflow-y-auto no-scrollbar">
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 max-w-5xl mx-auto">
-            ${db.map(item => `
-              <div class="idiom-card bg-white/10 backdrop-blur-md rounded-3xl p-5 border-2 border-emerald-300/40 shadow-xl hover:border-yellow-300 cursor-pointer transition-all hover:scale-105 flex flex-col justify-between" data-idiom-idx="${db.indexOf(item)}">
+            ${db.map(item => {
+              const isLearned = learned.has(item.id || item.name);
+              return `
+              <div class="idiom-card bg-white/10 backdrop-blur-md rounded-3xl p-5 border-2 ${isLearned ? "border-emerald-400/70" : "border-emerald-300/40"} shadow-xl hover:border-yellow-300 cursor-pointer transition-all hover:scale-105 flex flex-col justify-between relative" data-idiom-idx="${db.indexOf(item)}">
+                ${isLearned ? `<span class="learned-stamp w-7 h-7 rounded-full bg-emerald-500 border-2 border-white text-white flex items-center justify-center text-sm shadow-lg">✓</span>` : ""}
                 <div>
                   <div class="flex items-center justify-between mb-2">
                     <span class="text-[11px] font-bold text-emerald-300 tracking-wider">${item.pinyin || ""}</span>
@@ -770,11 +1106,11 @@ export class PlayModule extends BaseModule {
                   <p class="text-xs text-gray-200 leading-relaxed font-semibold">${item.desc || item.meaning || ""}</p>
                 </div>
                 <div class="mt-4 pt-3 border-t border-white/10 flex justify-between items-center">
-                  <span class="text-[10px] text-emerald-400 font-bold">国学启蒙必学</span>
-                  <button class="text-[10px] bg-yellow-400 text-amber-950 font-black px-3 py-1 rounded-full shadow active:scale-90 transition-transform">听故事闯关</button>
+                  <span class="text-[10px] ${isLearned ? "text-emerald-400 font-black" : "text-emerald-400/70 font-bold"}">${isLearned ? "🏅 已掌握" : "国学启蒙必学"}</span>
+                  <button class="text-[10px] ${isLearned ? "bg-emerald-400" : "bg-yellow-400"} text-amber-950 font-black px-3 py-1 rounded-full shadow active:scale-90 transition-transform">${isLearned ? "再次回顾" : "听故事闯关"}</button>
                 </div>
               </div>
-            `).join("")}
+            `;}).join("")}
           </div>
         </main>
       </div>
@@ -958,6 +1294,14 @@ export class PlayModule extends BaseModule {
           soundAndFX.triggerConfetti(this.container);
           soundAndFX.triggerCoinFly(this.container);
           ebbinghausManager.addCoins(8);
+          // 记录该成语已学（返回馆内显示对勾）
+          const id = idiom.id || idiom.name || "";
+          if (id && !ebbinghausManager.progress.learnedIdioms) ebbinghausManager.progress.learnedIdioms = [];
+          if (id && !ebbinghausManager.progress.learnedIdioms.includes(id)) {
+            ebbinghausManager.progress.learnedIdioms.push(id);
+            ebbinghausManager.save();
+            soundAndFX.triggerConfetti(this.container);
+          }
           if (feedback) feedback.innerHTML = '<span class="text-emerald-300 text-base">完全正确！理解力超群！</span>';
           this._timeout(() => { if (winModal) winModal.classList.remove("hidden"); }, 1000);
         } else {
