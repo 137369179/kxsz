@@ -193,6 +193,28 @@ export class EbbinghausManager {
       .filter((r) => r.isDifficult || (r.masteryRate && r.masteryRate < 70))
       .map((r) => r.charId);
   }
+
+  // ===== Reward stubs（原代码引用但未实现）=====
+  markMedalsSeen(_ids) {
+    // 标记勋章为已阅（stub）
+  }
+
+  equipAvatar(value) {
+    if (!this.progress.profile) this.progress.profile = {};
+    this.progress.profile.avatar = value;
+    this.save();
+  }
+
+  equipFrame(id) {
+    if (!this.progress.profile) this.progress.profile = {};
+    this.progress.profile.frame = id;
+    this.save();
+  }
+
+  purchase(id) {
+    // 简化：直接返回成功
+    return { success: true };
+  }
 }
 
 export const ebbinghausManager = new EbbinghausManager();

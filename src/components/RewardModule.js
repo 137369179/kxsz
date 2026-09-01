@@ -49,7 +49,7 @@ export class RewardModule extends BaseModule {
           <div class="relative z-10 flex items-center justify-between gap-4 bg-gradient-to-r from-amber-950/80 via-amber-900/60 to-transparent px-6 py-5">
             <div>
               <h1 class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-b from-yellow-200 to-orange-400 drop-shadow flex items-center gap-2">
-                <span class="flex items-center">${GAME_ICONS.trophy("w-7 h-7")}</span>
+                <span class="flex items-center">${GAME_ICONS.trophy('w-7 h-7')}</span>
                 <span>${profile.name}</span>
               </h1>
               <p class="text-[11px] text-yellow-200/80 font-bold mt-1">凯茜冒险家</p>
@@ -111,6 +111,9 @@ export class RewardModule extends BaseModule {
 
   /**  */
   _renderStickerWall(panel) {
+        const __lockIcon = GAME_ICONS.shieldLock("w-4 h-4");
+    const __sparkleIcon = GAME_ICONS.star("w-4 h-4");
+
     const s = getStickers();
     const ratio = s.total ? Math.round((s.earnedCount / s.total) * 100) : 0;
 
@@ -152,7 +155,7 @@ export class RewardModule extends BaseModule {
                  <div class="grid grid-cols-6 sm:grid-cols-12 gap-2">
                    ${s.upcoming.map((c) => `
                      <div class="flex flex-col items-center p-1.5 rounded-xl bg-white/5 border border-white/10 opacity-60">
-                       <span class="text-lg"><div class=\"w-5 h-5 inline-block align-middle\">${window.Icons.lock}</div></span>
+                       <span class="text-lg"><div class=\"w-5 h-5 inline-block align-middle\">${__lockIcon}</div></span>
                        <span class="text-xs font-black text-white/40">?</span>
                      </div>
                    `).join("")}
@@ -166,6 +169,9 @@ export class RewardModule extends BaseModule {
 
   /**  */
   _renderMedalWall(panel) {
+        const __lockIcon = GAME_ICONS.shieldLock("w-4 h-4");
+    const __trophyIcon = GAME_ICONS.trophy("w-5 h-5");
+
     const medals = getMedals();
 
     panel.innerHTML = `
@@ -176,49 +182,13 @@ export class RewardModule extends BaseModule {
             <!--  SVG 3D  Emoji -->
             <div class="relative flex flex-col items-center justify-center">
               <div class="relative w-24 h-24 ${m.earned ? 'animate-bounce-slow' : 'grayscale opacity-40'}">
-                <svg viewBox="0 0 100 120" class="w-full h-full drop-shadow-[0_10px_10px_rgba(0,0,0,0.5)]">
-                  <defs>
-                    <linearGradient id="ribbonGrad-${m.id}" x1="0" y1="0" x2="1" y2="0">
-                      <stop offset="0%" stop-color="#dc2626" />
-                      <stop offset="50%" stop-color="#ef4444" />
-                      <stop offset="100%" stop-color="#b91c1c" />
-                    </linearGradient>
-                    <radialGradient id="metalGrad-${m.id}" cx="30%" cy="30%" r="70%">
-                      ${m.tier === 'bronze' 
-                        ? '<stop offset="0%" stop-color="#fcd34d" /><stop offset="50%" stop-color="#b45309" /><stop offset="100%" stop-color="#78350f" />'
-                        : m.tier === 'silver'
-                        ? '<stop offset="0%" stop-color="#f8fafc" /><stop offset="50%" stop-color="#94a3b8" /><stop offset="100%" stop-color="#334155" />'
-                        : '<stop offset="0%" stop-color="#fef08a" /><stop offset="50%" stop-color="#eab308" /><stop offset="100%" stop-color="#854d0e" />'
-                      }
-                    </radialGradient>
-                    <radialGradient id="innerGrad-${m.id}" cx="50%" cy="50%" r="50%">
-                      ${m.tier === 'bronze' 
-                        ? '<stop offset="0%" stop-color="#fef3c7" /><stop offset="100%" stop-color="#d97706" />'
-                        : m.tier === 'silver'
-                        ? '<stop offset="0%" stop-color="#ffffff" /><stop offset="100%" stop-color="#cbd5e1" />'
-                        : '<stop offset="0%" stop-color="#fef9c3" /><stop offset="100%" stop-color="#ca8a04" />'
-                      }
-                    </radialGradient>
-                  </defs>
-                  
-                  <!--  (Ribbon) -->
-                  <path d="M 25 0 L 75 0 L 60 30 L 40 30 Z" fill="url(#ribbonGrad-${m.id})" stroke="#7f1d1d" stroke-width="2" />
-                  <path d="M 40 30 L 50 40 L 60 30 Z" fill="#991b1b" />
-                  
-                  <!-- / -->
-                  <path d="M 50 20 L 55 30 L 67 28 L 68 40 L 80 43 L 75 55 L 85 62 L 75 72 L 80 84 L 68 85 L 65 97 L 55 94 L 50 105 L 45 94 L 35 97 L 32 85 L 20 84 L 25 72 L 15 62 L 25 55 L 20 43 L 32 40 L 33 28 L 45 30 Z" fill="url(#metalGrad-${m.id})" stroke="#1e293b" stroke-width="2" stroke-linejoin="round" />
-                  
-                  <!--  -->
-                  <circle cx="50" cy="62" r="30" fill="url(#metalGrad-${m.id})" />
-                  <circle cx="50" cy="62" r="24" fill="url(#innerGrad-${m.id})" stroke="rgba(255,255,255,0.5)" stroke-width="2" />
-                  
-                  <!--  -->
-                  <text x="50" y="73" font-family="sans-serif" font-weight="900" font-size="28" fill="${m.tier === 'bronze' ? '#78350f' : m.tier === 'silver' ? '#334155' : '#854d0e'}" text-anchor="middle" style="text-shadow: 1px 1px 0px rgba(255,255,255,0.8)">
-                    ${m.earned ? m.name.charAt(0) : "<div class=\"w-5 h-5 inline-block align-middle\">${window.Icons.lock}</div>"}
-                  </text>
-                  <!--  -->
-                  <path d="M 28 50 C 35 40 65 40 72 50 C 65 45 35 45 28 50 Z" fill="white" opacity="0.6" />
-                </svg>
+                <div class="w-full h-full rounded-full border-4 shadow-lg flex items-center justify-center overflow-hidden 
+                            ${m.tier === 'bronze' ? 'border-yellow-700 bg-yellow-900' : 
+                              m.tier === 'silver' ? 'border-slate-300 bg-slate-700' : 
+                              m.tier === 'gold' ? 'border-yellow-400 bg-yellow-600' : 
+                              'border-fuchsia-400 bg-gradient-to-tr from-pink-500 to-indigo-500'}">
+                  ${m.earned ? __trophyIcon : `<div class="w-12 h-12">${__lockIcon}</div>`}
+                </div>
               </div>
               ${m.earned ? '<span class="absolute -bottom-2 left-1/2 -translate-x-1/2 text-[10px] bg-white text-amber-700 font-black px-3 py-1 rounded-full shadow-[0_4px_8px_rgba(0,0,0,0.3)] border border-amber-200 z-10"></span>' : ""}
             </div>
@@ -243,6 +213,8 @@ export class RewardModule extends BaseModule {
 
   /**  /  */
   _renderShop(panel) {
+        const __sparkleIcon = GAME_ICONS.star("w-4 h-4");
+
     const shop = getShopData();
 
     const previewCircle = (item, size = "w-16 h-16 text-3xl") => {
@@ -251,7 +223,7 @@ export class RewardModule extends BaseModule {
         item.type === "avatar"
           ? item.icon
             ? `<img src="${item.icon}" class="w-full h-full rounded-full object-cover" />`
-            : `<span class="text-4xl">${item.svg}</span>`
+            : `<div class="w-10 h-10">${GAME_ICONS.cards("w-5 h-5")}</div>`
           : `<span class="text-3xl"></span>`;
       return `<div class="rounded-full bg-amber-50 flex items-center justify-center overflow-hidden ${size} ${frameCls}">${inner}</div>`;
     };
@@ -318,7 +290,7 @@ export class RewardModule extends BaseModule {
           if (item.type === "avatar") ebbinghausManager.equipAvatar(item.value);
           else ebbinghausManager.equipFrame(item.id);
           soundAndFX.playSuccessSound();
-          showGameToast(this.container, `<div class=\"w-5 h-5 inline-block align-middle\">${window.Icons.sparkle}</div> ${item.name}`, "success");
+          showGameToast(this.container, `<div class=\"w-5 h-5 inline-block align-middle\">${__sparkleIcon}</div> ${item.name}`, "success");
         } else {
           const res = ebbinghausManager.purchase(id);
           if (res.ok) {
@@ -341,6 +313,9 @@ export class RewardModule extends BaseModule {
 
   /**  */
   _renderCalendar(panel) {
+        const __sparkleIcon = GAME_ICONS.star("w-4 h-4");
+    const __trophyIcon = GAME_ICONS.trophy("w-5 h-5");
+
     const cal = getCalendar(this.calYear, this.calMonth);
     const monthLabel = `${cal.year}年 ${cal.monthIdx + 1}月`;
 
@@ -351,11 +326,11 @@ export class RewardModule extends BaseModule {
         <div class="grid grid-cols-3 gap-2 mb-4">
           <div class="bg-gradient-to-b from-orange-500/30 to-red-600/20 border border-orange-400/40 rounded-2xl p-3 text-center">
             <div class="text-[10px] text-white/60 font-black">当前连续打卡</div>
-            <div class="text-xl font-black text-orange-300">${cal.current}  <div class=\"w-5 h-5 inline-block align-middle text-orange-500\">${window.Icons.sparkle}</div></div>
+            <div class="text-xl font-black text-orange-300">${cal.current}  <div class=\"w-5 h-5 inline-block align-middle text-orange-500\">${__sparkleIcon}</div></div>
           </div>
           <div class="bg-gradient-to-b from-yellow-500/30 to-amber-600/20 border border-yellow-400/40 rounded-2xl p-3 text-center">
             <div class="text-[10px] text-white/60 font-black">最高连续打卡</div>
-            <div class="text-xl font-black text-yellow-300">${cal.best}  <div class=\"w-6 h-6 inline-block align-middle\">${window.Icons.trophy}</div></div>
+            <div class="text-xl font-black text-yellow-300">${cal.best}  <div class=\"w-6 h-6 inline-block align-middle\">${__trophyIcon}</div></div>
           </div>
           <div class="bg-gradient-to-b from-emerald-500/30 to-teal-600/20 border border-emerald-400/40 rounded-2xl p-3 text-center">
             <div class="text-[10px] text-white/60 font-black">累计打卡天数</div>
@@ -385,7 +360,7 @@ export class RewardModule extends BaseModule {
             return `
               <div class="cal-cell relative h-10 rounded-xl border ${cls} flex flex-col items-center justify-center">
                 <span class="text-xs font-black leading-none">${cell.day}</span>
-                ${cell.active ? '<span class="text-[9px] leading-none mt-0.5"><div class=\"w-5 h-5 inline-block align-middle text-orange-500\">${window.Icons.sparkle}</div></span>' : ""}
+                ${cell.active ? '<span class="text-[9px] leading-none mt-0.5"><div class=\"w-5 h-5 inline-block align-middle text-orange-500\">${__sparkleIcon}</div></span>' : ""}
                 ${cell.isToday ? '<span class="absolute -top-1 left-1/2 -translate-x-1/2 text-[8px] bg-cyan-400 text-cyan-950 font-black px-1.5 rounded-full">今</span>' : ""}
               </div>
             `;
@@ -428,6 +403,7 @@ export class RewardModule extends BaseModule {
 
   /** "" */
   _celebrateNewMedals() {
+    const __trophyIcon = GAME_ICONS.trophy("w-5 h-5");
     const newIds = getNewMedalIds();
     if (newIds.length === 0) return;
 
@@ -435,9 +411,13 @@ export class RewardModule extends BaseModule {
     ebbinghausManager.markMedalsSeen(newIds);
 
     setTimeout(() => {
-      soundAndFX.playVictoryFanfare();
-      soundAndFX.triggerConfetti(this.container);
-      showGameToast(this.container, `<div class=\"w-5 h-5 inline-block align-middle\">${window.Icons.trophy}</div> ${names.join("")}`, "success");
+      try {
+        soundAndFX.playVictoryFanfare();
+        soundAndFX.triggerConfetti(this.container);
+        showGameToast(this.container, `<div class="w-5 h-5 inline-block align-middle">${__trophyIcon}</div> ${names.join("")}`, "success");
+      } catch (e) {
+        // 缓存或实现细节导致的非致命错误，静默忽略
+      }
     }, 500);
   }
 }

@@ -399,7 +399,7 @@ export class LearnModule extends BaseModule {
           </div>
 
           <button id="btn-finish-rec-step" class="mt-4 w-full bg-gradient-to-r from-orange-500 to-amber-500 text-white font-black text-sm py-3 rounded-full shadow-lg border border-white active:scale-95 transition-all flex items-center justify-center gap-2">
-            <span>🎯</span> 去【练】字小游戏 ➔
+            <span>🎯</span> 开启【读】字评测 ➔
           </button>
         </div>
 
@@ -434,8 +434,152 @@ export class LearnModule extends BaseModule {
     }
   }
 
+
   // ----------------------------------------------------------------
-  // STEP 3: 练 (太空飞船射击小游戏)
+  // STEP 3: 读 (智能语音评测)
+  // ----------------------------------------------------------------
+  renderStepRead(stage) {
+    const char = this.charData;
+    
+    // Fallback if pronunciationEval is not globally available yet
+    // Since we'll import it at the top of the file
+    
+    stage.innerHTML = `
+      <div class="relative w-full max-w-4xl h-[480px] bg-gradient-to-b from-blue-900 via-indigo-900 to-slate-950 rounded-3xl overflow-hidden shadow-2xl border-4 border-sky-300 flex items-center justify-between p-8 animate-fade-in select-none">
+        
+        <div class="flex-1 flex flex-col items-center justify-center">
+          <div class="text-xl text-sky-200 font-black tracking-widest mb-6">
+            请大声朗读这个字
+          </div>
+
+          <div class="relative w-48 h-48 rounded-full bg-gradient-to-tr from-sky-400 via-blue-500 to-indigo-600 border-4 border-white shadow-[0_0_60px_rgba(56,189,248,0.8)] flex items-center justify-center text-8xl font-black text-white">
+            ${char.char}
+          </div>
+          
+          <div id="read-score-display" class="mt-8 text-3xl font-black text-yellow-300 opacity-0 transition-opacity">
+            评分: <span id="read-score-num">0</span> 分！
+          </div>
+        </div>
+
+        <div class="w-80 flex flex-col justify-between h-full bg-white/10 backdrop-blur-md rounded-3xl p-6 border-2 border-white/30 text-center">
+          <div>
+            <h3 class="text-sm font-black text-white mb-6">语音评测挑战</h3>
+            <p class="text-xs text-sky-200 mb-8 leading-relaxed">
+              点击下方按钮，对着麦克风大声朗读“<strong class="text-yellow-300 text-base">${char.char}</strong>”。凯茜会为你打分哦！
+            </p>
+            
+            <button id="btn-start-record" class="w-24 h-24 mx-auto rounded-full bg-gradient-to-tr from-rose-400 to-red-500 shadow-[0_10px_20px_rgba(244,63,94,0.6)] flex items-center justify-center border-4 border-white active:scale-90 transition-all hover:scale-105">
+               <div class="w-12 h-12">${window.GAME_ICONS ? window.GAME_ICONS.audio("w-full h-full") : "🎤"}</div>
+            </button>
+            <div id="record-status" class="mt-4 text-xs font-bold text-rose-200">
+              点击开始录音
+            </div>
+          </div>
+
+          <button id="btn-finish-read-step" class="mt-4 w-full bg-gradient-to-r from-blue-500 to-sky-500 text-white font-black text-sm py-3 rounded-full shadow-lg border border-white active:scale-95 transition-all flex items-center justify-center gap-2 opacity-50 pointer-events-none">
+            <span>🚀</span> 去【练】字小游戏 ➔
+          </button>
+        </div>
+
+      </div>
+    `;
+
+    const btnRecord = stage.querySelector("#btn-start-record");
+    const statusTxt = stage.querySelector("#record-status");
+    const finishBtn = stage.querySelector("#btn-finish-read-step");
+    const scoreDisplay = stage.querySelector("#read-score-display");
+    const scoreNum = stage.querySelector("#read-score-num");
+    
+    let isRecording = false;
+
+    this._on(btnRecord, "click", async () => {
+      if (typeof window.pronunciationEval === 'undefined') {
+        import('../utils/pronunciationEval.js').then(m => {
+           window.pronunciationEval = m.pronunciationEval || m.default;
+           this.handleRecordToggle(btnRecord, statusTxt, finishBtn, scoreDisplay, scoreNum);
+        });
+      } else {
+        this.handleRecordToggle(btnRecord, statusTxt, finishBtn, scoreDisplay, scoreNum);
+      }
+    });
+
+    this._on(finishBtn, "click", () => {
+      window.soundAndFX.playPop();
+      this.currentStep = 6;
+      this.render();
+    });
+  }
+
+  async handleRecordToggle(btnRecord, statusTxt, finishBtn, scoreDisplay, scoreNum) {
+    const char = this.charData;
+    const pe = window.pronunciationEval;
+    
+    if (!pe) return;
+
+    if (pe.state === "IDLE" || pe.state === "RESULT" || pe.state === "ERROR") {
+      // Start
+      window.soundAndFX.playPop();
+      statusTxt.textContent = "正在聆听...";
+      statusTxt.classList.replace("text-rose-200", "text-emerald-300");
+      btnRecord.classList.add("animate-pulse", "ring-4", "ring-emerald-400");
+      
+      scoreDisplay.classList.remove("opacity-100");
+      scoreDisplay.classList.add("opacity-0");
+
+      try {
+        await pe.startEvaluation({ text: char.char });
+      } catch (e) {
+        statusTxt.textContent = "麦克风权限失败";
+        btnRecord.classList.remove("animate-pulse", "ring-4", "ring-emerald-400");
+      }
+      
+      // Auto stop after 3 seconds for kids
+      this._timeout(async () => {
+         if (pe.state === "LISTENING") {
+            statusTxt.textContent = "评测中...";
+            btnRecord.classList.remove("animate-pulse", "ring-4", "ring-emerald-400");
+            try {
+               await pe.stopAndEvaluate();
+            } catch (e) {}
+         }
+      }, 3000);
+      
+    }
+    
+    // Listen to events
+    if (!this._evalListenerBound) {
+      this._evalListenerBound = true;
+      window.eventBus.on("AUDIO_EVAL_RESULT", (res) => {
+         if (this.currentStep !== 3) return; // Prevent memory leak cross-screens
+         
+         const score = res.totalScore || 0;
+         scoreNum.textContent = score;
+         scoreDisplay.classList.remove("opacity-0");
+         scoreDisplay.classList.add("opacity-100");
+         
+         statusTxt.textContent = score >= 80 ? "太棒了！发音很准！" : "再试一次吧！";
+         statusTxt.classList.replace("text-emerald-300", "text-yellow-300");
+         
+         if (score >= 60) {
+            window.soundAndFX.playSuccessSound();
+            finishBtn.classList.remove("opacity-50", "pointer-events-none");
+         } else {
+            window.soundAndFX.playEncouragement();
+         }
+         btnRecord.classList.remove("animate-pulse", "ring-4", "ring-emerald-400");
+      });
+      
+      window.eventBus.on("AUDIO_EVAL_ERROR", () => {
+         if (this.currentStep !== 3) return;
+         statusTxt.textContent = "录音失败，点击重试";
+         btnRecord.classList.remove("animate-pulse", "ring-4", "ring-emerald-400");
+      });
+    }
+  }
+
+  // ----------------------------------------------------------------
+  // STEP 4: 练
+ (太空飞船射击小游戏)
   // ----------------------------------------------------------------
   renderStepPractice(stage) {
     const char = this.charData;
@@ -530,14 +674,14 @@ export class LearnModule extends BaseModule {
     if (nextBtn) {
       this._on(nextBtn, "click", () => {
         soundAndFX.playPop();
-        this.currentStep = 4;
+        this.currentStep = 6;
         this.render();
       });
     }
   }
 
   // ----------------------------------------------------------------
-  // STEP 4: 写 (AI 魔法星光毛笔描红 + 倒笔画拦截)
+  // STEP 5: 写 (AI 魔法星光毛笔描红 + 倒笔画拦截)
   // ----------------------------------------------------------------
   renderStepWrite(stage) {
     const char = this.charData;
@@ -598,14 +742,14 @@ export class LearnModule extends BaseModule {
     if (nextBtn) {
       this._on(nextBtn, "click", () => {
         soundAndFX.playPop();
-        this.currentStep = 5;
+        this.currentStep = 6;
         this.render();
       });
     }
   }
 
   // ----------------------------------------------------------------
-  // STEP 5: 测 & 华丽黄金宝箱结算 (Duang! Duang! Duang! 飞星)
+  // STEP 6: 测 & 华丽黄金宝箱结算 (Duang! Duang! Duang! 飞星)
   // ----------------------------------------------------------------
   renderStepTestAndChest(stage) {
     const char = this.charData;
