@@ -811,9 +811,8 @@ class CathyAudioEngine {
       try {
         this.bgmGain.gain.cancelScheduledValues(now);
         this.bgmGain.gain.setValueAtTime(this.bgmGain.gain.value, now);
-        this.bgmGain.gain.linearRampToValueAtTime(0.0001, now + 0.6);
       } catch {}
-      clearTimeout(this.bgmTimer);
+      clearInterval(this.bgmTimer);
       this.bgmTimer = null;
       this._bgmActiveCount = Math.max(0, this._bgmActiveCount - 1);
       eventBus.emit(EVENTS.AUDIO_BGM_CHANGED, { old: oldType, new: newType, transitionMs: 600 });
@@ -837,7 +836,7 @@ class CathyAudioEngine {
     } catch {}
 
     this.bgmTimer = setInterval(() => {
-      if (!this.audioCtx || !this.bgmGain) { clearTimeout(this.bgmTimer); return; }
+      if (!this.audioCtx || !this.bgmGain) { clearInterval(this.bgmTimer); return; }
       const t = this.audioCtx.currentTime;
       const freq = scene.notes[this.bgmStep % scene.notes.length];
       // 五声童趣马林巴: 短促衰减正弦 + 高八度泛音
@@ -862,7 +861,7 @@ class CathyAudioEngine {
   stopBGM() {
     this._switchBGM(null);
     if (this.bgmTimer) {
-      clearTimeout(this.bgmTimer);
+      clearInterval(this.bgmTimer);
       this.bgmTimer = null;
     }
     this.currentBgmType = null;

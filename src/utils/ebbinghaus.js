@@ -14,6 +14,7 @@ export class EbbinghausManager {
     return this.progress;
   }
 
+  loadProgress() {
     let loaded = null;
     try {
       if (typeof localStorage !== "undefined") {
@@ -73,48 +74,6 @@ export class EbbinghausManager {
     }
 
     return defaultState;
-    return {
-      coins: 60,
-      stars: 12,
-      currentIsland: 1,
-      currentLevelIndex: 1,
-      profile: {
-        name: "凯茜小勇士",
-        avatar: "assets/images/cathy_mascot.jpg"
-      },
-      // 学习设置
-      settings: {
-        dailyCharTarget: 3, // 每日学字数
-        enablePlayStep: true, // 是否开启玩环节
-        enableWriteStep: true, // 是否开启写环节
-        eyeProtectionMinutes: 20, // 护眼提醒间隔 (分钟)
-        audioLanguage: "mandarin", // mandarin | cantonese
-        soundEnabled: true
-      },
-      // 汉字掌握进度表 { [charId]: { charId, learnedAt, reviewCount, correctStreak, masteryRate, nextReviewDate, isDifficult } }
-      charRecords: {
-        char_001: {
-          charId: "char_001",
-          learnedAt: Date.now() - 86400000 * 2,
-          reviewCount: 3,
-          correctStreak: 3,
-          masteryRate: 98,
-          nextReviewDate: Date.now() + 86400000 * 4,
-          isDifficult: false
-        }
-      },
-      todayLearnedCount: 1,
-      lastActiveDate: new Date().toDateString(),
-      studyHistory: [
-        { date: "周一", count: 3 },
-        { date: "周二", count: 4 },
-        { date: "周三", count: 3 },
-        { date: "周四", count: 5 },
-        { date: "周五", count: 4 },
-        { date: "周六", count: 6 },
-        { date: "今天", count: 2 }
-      ]
-    };
   }
 
   save() {

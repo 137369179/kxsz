@@ -150,9 +150,13 @@ export class PlayModule extends BaseModule {
     mainEl.querySelectorAll(".mode-card").forEach((card) => {
       this._on(card, "click", () => {
         const mode = card.dataset.mode;
-        this.currentMode = mode;
         soundAndFX.playSuccessSound();
-        this.render();
+        if (mode === "pk") {
+          this._busEmit(EVENTS.SWITCH_MODE, { mode: "pk" });
+        } else {
+          this.currentMode = mode;
+          this.render();
+        }
       });
     });
   }

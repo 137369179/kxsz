@@ -37,6 +37,9 @@ export class LearnModule extends BaseModule {
   render() {
     this.destroy();
 
+    const __lnProgress = ebbinghausManager.progress;
+    const __lnSpeakerIcon = soundAndFX.isMuted ? GAME_ICONS.speaker("w-5 h-5", true) : GAME_ICONS.speaker("w-5 h-5", false);
+
     this.container.innerHTML = `
       <div class="relative w-full h-full min-h-[640px] flex flex-col justify-between select-none overflow-hidden bg-gradient-to-br from-indigo-950 via-purple-950 to-slate-950">
         
