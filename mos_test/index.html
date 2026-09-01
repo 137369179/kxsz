@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>凯茜识字 · MOS 盲测</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;background:linear-gradient(135deg,#0f172a,#312e81);color:#e2e8f0;min-height:100vh;padding:24px 12px}
+  .wrap{max-width:900px;margin:0 auto}
+  h1{text-align:center;font-size:26px;background:linear-gradient(90deg,#fbbf24,#f472b6,#38bdf8);-webkit-background-clip:text;background-clip:text;color:transparent;margin-bottom:8px}
+  .sub{text-align:center;color:#94a3b8;font-size:13px;line-height:1.7;margin-bottom:16px}
+  .progress{max-width:900px;margin:0 auto 20px}
+  .progress .bar{height:8px;background:#1e293b;border-radius:99px;overflow:hidden}
+  .progress .fill{height:100%;background:linear-gradient(90deg,#fbbf24,#f472b6);transition:width .3s}
+  .ptext{display:flex;justify-content:space-between;color:#94a3b8;font-size:12px;margin-bottom:4px}
+  .q{background:rgba(15,23,42,.65);border:1px solid #334155;border-radius:16px;padding:16px;margin-bottom:18px}
+  .qhead{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+  .qnum{font-size:13px;color:#64748b;font-family:monospace}
+  .qscene{font-size:12px;color:#94a3b8}
+  .qtext{font-size:17px;line-height:1.7;color:#f1f5f9;margin-bottom:12px}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  @media(max-width:640px){.grid{grid-template-columns:1fr}}
+  .samp{border:1px solid #334155;background:rgba(30,41,59,.4);border-radius:12px;padding:12px}
+  .samp.playing{border-color:#fbbf24;box-shadow:0 0 0 2px rgba(251,191,36,.2)}
+  .samphead{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+  .letter{font-size:26px;font-weight:800;color:#fbbf24}
+  .playbtn{padding:6px 16px;border:none;border-radius:8px;background:#db2777;color:#fff;font-size:13px;font-weight:600;cursor:pointer}
+  .playbtn:hover{background:#be185d}
+  .playbtn:disabled{opacity:.6;cursor:wait}
+  .dim{display:flex;align-items:center;gap:8px;margin-top:6px}
+  .dim label{width:64px;font-size:12px;color:#94a3b8;flex-shrink:0}
+  .stars{display:flex;gap:2px}
+  .star{font-size:20px;cursor:pointer;color:#475569;user-select:none;transition:transform .12s}
+  .star:hover{transform:scale(1.25)}
+  .star.active{color:#fbbf24}
+  .sval{width:22px;text-align:right;font-size:12px;color:#cbd5e1;font-family:monospace}
+  #submitWrap{max-width:900px;margin:0 auto}
+  #btnSubmit{width:100%;padding:16px;border:none;border-radius:14px;background:linear-gradient(90deg,#10b981,#0ea5e9);color:#fff;font-size:17px;font-weight:700;cursor:pointer;box-shadow:0 4px 20px rgba(16,185,129,.25)}
+  #btnSubmit:disabled{opacity:.4;cursor:not-allowed}
+  .hint{text-align:center;color:#64748b;font-size:12px;margin-top:8px}
+  #result{max-width:900px;margin:30px auto 0;display:none}
+  .card{background:rgba(15,23,42,.65);border:1px solid #334155;border-radius:16px;padding:16px;margin-bottom:16px}
+  .card h3{font-size:15px;margin-bottom:12px}
+  .map{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px}
+  .mapitem{background:#1e293b;border:1px solid #475569;border-radius:10px;padding:12px;text-align:center}
+  .mapitem .l{font-size:30px;font-weight:800;color:#fbbf24}
+  .mapitem .v{font-size:12px;color:#cbd5e1;margin:4px 0}
+  .mapitem .t{font-size:11px;color:#64748b}
+  .mapitem .m{font-size:18px;font-weight:800;color:#f472b6;margin-top:4px}
+  .rankrow{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+  .rankrow .medal{font-size:20px;width:30px;text-align:center}
+  .rankrow .name{flex:1;font-size:14px}
+  .rankrow .score{font-size:20px;font-weight:800;color:#f472b6}
+  .rankbar{height:10px;background:#1e293b;border-radius:99px;overflow:hidden;margin-top:4px}
+  .rankbar .fill{height:100%;background:linear-gradient(90deg,#fbbf24,#f97316);transition:width 1s}
+  .dimrow{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+  .dimrow .dl{width:110px;font-size:12px;color:#94a3b8;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .dimrow .dbar{flex:1;height:14px;background:#1e293b;border-radius:99px;overflow:hidden}
+  .dimrow .dbar .fill{height:100%;background:linear-gradient(90deg,#0ea5e9,#6366f1);transition:width .7s}
+  .dimrow .dv{width:44px;text-align:right;font-size:12px;font-family:monospace;color:#cbd5e1}
+  .sent{background:#1e293b;border:1px solid #334155;border-radius:10px;padding:10px;margin-bottom:8px}
+  .sent .st{font-size:11px;color:#64748b;margin-bottom:4px}
+  .sent .sq{font-size:13px;color:#cbd5e1;margin-bottom:6px}
+  .chips{display:flex;flex-wrap:wrap;gap:6px}
+  .chip{font-size:11px;padding:3px 8px;border-radius:6px;background:#334155;color:#94a3b8}
+  .chip.win{background:rgba(16,185,129,.2);color:#34d399;border:1px solid rgba(16,185,129,.4)}
+  pre{background:#0f172a;border-radius:10px;padding:12px;overflow:auto;font-size:11px;color:#94a3b8;max-height:300px}
+  .footer{text-align:center;color:#475569;font-size:11px;margin:30px 0 10px}
+  .sticker{position:fixed;bottom:12px;right:12px;font-size:11px;padding:6px 12px;border-radius:99px;border:1px solid #334155;background:rgba(15,23,42,.85);color:#64748b;z-index:99}
+  ul.mos-scale{list-style:none;display:flex;gap:8px;justify-content:center;font-size:11px;color:#64748b;margin-bottom:14px;flex-wrap:wrap}
+  ul.mos-scale li{background:#1e293b;border:1px solid #334155;padding:4px 10px;border-radius:99px}
+  .restart{width:100%;padding:12px;border:none;border-radius:12px;background:#334155;color:#cbd5e1;font-size:13px;cursor:pointer}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <h1>🎯 凯茜识字 · 儿童语音 MOS 盲测</h1>
+  <p class="sub">
+    你会按顺序播放 <b>10 组句子</b>，每组 <b>4 个匿名样本 (A/B/C/D)</b>。<br/>
+    给每个样本的 <b>自然度 / 童声感 / 情感 / 总体</b> 打 1-5 分。
+    <br/><span style="color:#fbbf24">整个过程中你不会知道每个样本对应哪种声音方案。</span>
+  </p>
+  <ul class="mos-scale">
+    <li>1 = 很机械/很差</li><li>2 = 明显不自然</li><li>3 = 一般</li><li>4 = 接近真人</li><li>5 = 和真人几乎一样</li>
+  </ul>
+</div>
+
+<div class="progress">
+  <div class="ptext"><span>评测进度</span><span id="progressText">0 / 160 项</span></div>
+  <div class="bar"><div class="fill" id="progressFill" style="width:0%"></div></div>
+</div>
+
+<div class="wrap" id="survey"></div>
+
+<div id="submitWrap">
+  <button id="btnSubmit" disabled>✅ 满分评完 → 查看盲测结果</button>
+  <p class="hint">全部 160 项打完后按钮才可点击。评分后可反复试听对比。</p>
+</div>
+
+<div id="result">
+  <div class="card">
+    <h3>🔐 匿名编号 → 真实声音方案</h3>
+    <div class="map" id="revealMap"></div>
+  </div>
+  <div class="card">
+    <h3>🏆 总体 MOS 排名 (1-5)</h3>
+    <div id="rankList"></div>
+  </div>
+  <div class="card">
+    <h3>📊 分项对比 (自然度 / 童声感 / 情感 / 总体)</h3>
+    <div id="dimCompare"></div>
+  </div>
+  <div class="card">
+    <h3>📝 逐句最佳方案</h3>
+    <div id="perSent"></div>
+  </div>
+  <div class="card">
+    <h3>🔍 原始评分数据</h3>
+    <pre id="rawData"></pre>
+  </div>
+  <button class="restart" onclick="location.reload()">🔄 重新开始本组测试</button>
+</div>
+
+<div class="sticker" id="serverSticker">探测 voice-server…</div>
+<div class="footer">凯茜识字 · 洪恩音频引擎 1:1 克隆 · MOS 双盲听感评测</div>
+
+<script>
+"use strict";
+
+/* ============ 1. 声音方案池 (将被打乱成 A/B/C/D) ============ */
+const VOICE_POOL = [
+  { id:"xiaoyi",   label:"晓依·甜美童声",    voice:"zh-CN-XiaoyiNeural",  tag:"神经 TTS 48kHz" },
+  { id:"yunxia",   label:"云夏·阳光少年",    voice:"zh-CN-YunxiaNeural", tag:"神经 TTS 48kHz" },
+  { id:"xiaoxiao", label:"晓晓·明亮少女",    voice:"zh-CN-XiaoxiaoNeural",tag:"神经 TTS 48kHz" },
+  { id:"legacy",   label:"系统 TTS 基线",    voice:"__LEGACY__",          tag:"speechSynthesis 机械音" },
+];
+
+/* ============ 2. 10 组测试句 (覆盖 6 类教学场景) ============ */
+const SENTENCES = [
+  { t:"你好呀，小朋友！我们一起来学汉字吧！",       e:"neutral",       s:"开场问候" },
+  { t:"太棒啦！你真是太厉害了，这道题全部答对啦！", e:"excited",       s:"通关奖励" },
+  { t:"好样的，做得不错，继续保持哦！",             e:"encouragement", s:"鼓励表扬" },
+  { t:"没关系，再试一次，我们慢慢来，好吗？",       e:"correction",    s:"纠错引导" },
+  { t:"请想一想，找出正确的那个字。",               e:"question",      s:"提问引导" },
+  { t:"跟着我一起念：大，大象的大。",               e:"gentle",        s:"温柔讲解" },
+  { t:"今天我们来认识两个新朋友，它们是天地。",     e:"neutral",       s:"新字引入" },
+  { t:"哪个是雨字呢？快找一找吧！",                 e:"question",      s:"互动找字" },
+  { t:"从前，有一只可爱的小花猫，它最喜欢晒太阳。", e:"bedtime",       s:"睡前故事" },
+  { t:"你已经学会了一百个字啦，真是太棒啦！",       e:"excited",       s:"阶段总结" },
+];
+
+/* 情感 → TTS 韵律参数 */
+const EMOTION_PROSODY = {
+  neutral:       { rate:"+8%",  pitch:"+6%" },
+  excited:       { rate:"+16%", pitch:"+22%" },
+  encouragement: { rate:"+10%", pitch:"+8%" },
+  correction:    { rate:"-6%",  pitch:"+4%" },
+  question:      { rate:"+6%",  pitch:"+14%" },
+  gentle:        { rate:"+2%",  pitch:"+2%" },
+  bedtime:       { rate:"-12%", pitch:"0%" },
+};
+
+const TTS_URL = "http://127.0.0.1:8766";
+
+/* ============ 3. 状态 ============ */
+let mapping = [];   // [{letter, voiceId, voice}]
+let ratings = {};   // "0-A" -> {mos,natural,childlike,emotion}
+let ctx = null;
+let audioEl = null;
+let playing = null;
+
+function shuffle(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+const $ = s => document.querySelector(s);
+
+/* ============ 4. AudioContext 初始化 ============ */
+async function initAudio(){
+  ctx = new (window.AudioContext||window.webkitAudioContext)();
+  audioEl = document.createElement("audio");
+  audioEl.style.display = "none";
+  document.body.appendChild(audioEl);
+  document.addEventListener("pointerdown", () => { if(ctx && ctx.state==="suspended") ctx.resume(); }, { once:true });
+  if (window.speechSynthesis) { window.speechSynthesis.getVoices(); window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices(); }
+}
+
+/* ============ 5. 播放 ============ */
+function stopPlay(){
+  if (playing){
+    const {btn,card} = playing;
+    if (audioEl){ audioEl.pause(); audioEl.src=""; }
+    try{ window.speechSynthesis && window.speechSynthesis.cancel(); }catch(e){}
+    if (btn) btn.disabled = false;
+    if (btn && btn.dataset.txt) btn.textContent = "▶ 播放";
+    if (card) card.classList.remove("playing");
+    playing = null;
+  }
+}
+
+async function playNeural(text, voice, rate, pitch){
+  const url = `${TTS_URL}/tts?text=${encodeURIComponent(text)}&voice=${encodeURIComponent(voice)}&rate=${encodeURIComponent(rate)}&pitch=${encodeURIComponent(pitch)}`;
+  const resp = await fetch(url, { signal: AbortSignal.timeout(20000) });
+  if (!resp.ok) throw new Error("HTTP "+resp.status);
+  const blob = await resp.blob();
+  audioEl.src = URL.createObjectURL(blob);
+  await audioEl.play();
+  return new Promise((resolve,reject)=>{
+    audioEl.onended = () => { URL.revokeObjectURL(audioEl.src); resolve(); };
+    audioEl.onerror = () => reject(new Error("decode-error"));
+  });
+}
+
+function playLegacy(text){
+  return new Promise((resolve,reject)=>{
+    const synth = window.speechSynthesis;
+    if (!synth) return reject(new Error("no-synth"));
+    synth.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = "zh-CN"; u.rate = 0.85; u.pitch = 1.35;
+    const zh = synth.getVoices().find(v=>(v.lang||"").toLowerCase().startsWith("zh"));
+    if (zh) u.voice = zh;
+    u.onend = resolve; u.onerror = reject;
+    synth.speak(u);
+  });
+}
+
+async function playSample(sIdx, letter){
+  const m = mapping.find(x=>x.letter===letter);
+  const S = SENTENCES[sIdx];
+  const key = `${sIdx}-${letter}`;
+  const btn = document.querySelector(`[data-key="${key}"]`);
+  const card = document.querySelector(`[data-samp="${key}"]`);
+  stopPlay();
+
+  if (ctx && ctx.state==="suspended") await ctx.resume();
+  btn.disabled = true;
+  btn.textContent = "⏳ 合成中…";
+  card.classList.add("playing");
+  playing = { btn, card };
+  try{
+    if (m.voice === "__LEGACY__"){
+      await playLegacy(S.t);
+      btn.textContent = "▶ 播放";
+    } else {
+      const p = EMOTION_PROSODY[S.e] || EMOTION_PROSODY.neutral;
+      await playNeural(S.t, m.voice, p.rate, p.pitch);
+      btn.textContent = "▶ 播放";
+    }
+  }catch(e){
+    console.error("play fail", e);
+    btn.textContent = "❌ 需重试";
+    window.speechSynthesis && window.speechSynthesis.cancel();
+    try{ await playLegacy(S.t); }catch(_){}
+  }finally{
+    btn.disabled = false;
+    if (card) card.classList.remove("playing");
+    playing = null;
+  }
+}
+
+/* ============ 6. 渲染问卷 ============ */
+function starRow(label, dim, key){
+  let stars = "";
+  for (let v=1; v<=5; v++) stars += `<span class="star" data-dim="${dim}" data-val="${v}">★</span>`;
+  return `<div class="dim"><label>${label}</label><div class="stars">${stars}</div><span class="sval" data-score="${dim}-${key}">—</span></div>`;
+}
+
+function buildSurvey(){
+  const host = $("#survey");
+  host.innerHTML = "";
+  SENTENCES.forEach((S, sIdx)=>{
+    const q = document.createElement("div");
+    q.className = "q";
+    q.innerHTML = `
+      <div class="qhead"><span class="qnum">Q${sIdx+1}</span><span class="qscene">${S.s}</span></div>
+      <div class="qtext">「${S.t}」</div>
+      <div class="grid" data-grid="${sIdx}"></div>`;
+    const grid = q.querySelector("[data-grid]");
+    mapping.forEach(m=>{
+      const letter = m.letter, key = `${sIdx}-${letter}`;
+      const card = document.createElement("div");
+      card.className = "samp";
+      card.dataset.samp = key;
+      card.innerHTML = `
+        <div class="samphead">
+          <span class="letter">${letter}</span>
+          <button class="playbtn" data-key="${key}" data-txt="▶ 播放">▶ 播放</button>
+        </div>
+        ${starRow("总体 MOS","mos",key)}
+        ${starRow("自然度","natural",key)}
+        ${starRow("童声感","childlike",key)}
+        ${starRow("情感","emotion",key)}`;
+      grid.appendChild(card);
+    });
+    host.appendChild(q);
+  });
+
+  host.querySelectorAll(".playbtn").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      const [sIdx, letter] = btn.dataset.key.split("-");
+      playSample(parseInt(sIdx), letter);
+    });
+  });
+  host.querySelectorAll(".star").forEach(star=>{
+    star.addEventListener("click", ()=>{
+      const key = star.closest(".samp").dataset.samp;
+      const dim = star.dataset.dim;
+      const val = parseInt(star.dataset.val);
+      if (!ratings[key]) ratings[key] = {};
+      ratings[key][dim] = val;
+      const card = star.closest(".samp");
+      card.querySelectorAll(`.star[data-dim="${dim}"]`).forEach(s=>{
+        const on = parseInt(s.dataset.val) <= val;
+        s.classList.toggle("active", on);
+      });
+      card.querySelector(`[data-score="${dim}-${key}"]`).textContent = val;
+      updateProgress();
+    });
+  });
+}
+
+function updateProgress(){
+  const total = SENTENCES.length * mapping.length * 4;
+  let done = 0;
+  Object.values(ratings).forEach(r=>done += Object.keys(r).length);
+  const pct = Math.round(done/total*100);
+  $("#progressFill").style.width = pct+"%";
+  $("#progressText").textContent = `${done} / ${total} 项 (${pct}%)`;
+  const allDone = SENTENCES.every((_,i)=> mapping.every(m=>["mos","natural","childlike","emotion"].every(d=> ratings[`${i}-${m.letter}`]?.[d]!==undefined)));
+  $("#btnSubmit").disabled = !allDone;
+}
+
+/* ============ 7. 结果统计 ============ */
+function compute(){
+  const agg = {};
+  VOICE_POOL.forEach(v=>agg[v.id]={mos:[],natural:[],childlike:[],emotion:[]});
+  SENTENCES.forEach((_,sIdx)=> mapping.forEach(m=>{
+    const r = ratings[`${sIdx}-${m.letter}`];
+    if (!r) return;
+    const a = agg[m.voiceId];
+    a.mos.push(r.mos); a.natural.push(r.natural); a.childlike.push(r.childlike); a.emotion.push(r.emotion);
+  }));
+  const means = {};
+  Object.entries(agg).forEach(([id,d])=>{
+    means[id] = {};
+    Object.entries(d).forEach(([k,arr])=>{
+      means[id][k] = arr.length ? arr.reduce((x,y)=>x+y,0)/arr.length : 0;
+    });
+  });
+  return { means };
+}
+
+function showResults(){
+  const { means } = compute();
+
+  $("#revealMap").innerHTML = mapping.map(m=>{
+    const v = VOICE_POOL.find(x=>x.id===m.voiceId);
+    return `<div class="mapitem"><div class="l">${m.letter}</div><div class="v">${v.label}</div><div class="t">${v.tag}</div><div class="m">MOS ${means[v.id].mos.toFixed(2)}</div></div>`;
+  }).join("");
+
+  const rank = VOICE_POOL.map(v=>({...v, mean:means[v.id].mos})).sort((a,b)=>b.mean-a.mean);
+  const max = Math.max(...rank.map(x=>x.mean));
+  const medals = ["🥇","🥈","🥉","4️⃣"];
+  $("#rankList").innerHTML = rank.map((v,i)=>{
+    const pct = max>0 ? v.mean/max*100 : 0;
+    return `<div class="rankrow"><span class="medal">${medals[i]||"🏅"}</span><span class="name">${v.label} <span style="color:#64748b;font-size:11px">(${v.tag})</span></span><span class="score">${v.mean.toFixed(2)}</span></div>
+    <div class="rankbar" style="margin-bottom:10px"><div class="fill" style="width:${pct}%"></div></div>`;
+  }).join("");
+
+  const dims = [
+    ["mos","🎯 总体 MOS"],["natural","✨ 自然度"],["childlike","🧒 童声感"],["emotion","💫 情感"]
+  ];
+  $("#dimCompare").innerHTML = dims.map(([dk,dl])=>{
+    const rows = VOICE_POOL.map(v=>({...v, val:means[v.id][dk]})).sort((a,b)=>b.val-a.val);
+    return `<div style="margin-bottom:14px"><div style="font-size:13px;color:#cbd5e1;margin-bottom:6px">${dl}</div>
+      ${rows.map(v=>`<div class="dimrow"><span class="dl">${v.label}</span><div class="dbar"><div class="fill" style="width:${v.val/5*100}%"></div></div><span class="dv">${v.val.toFixed(2)}</span></div>`).join("")}
+    </div>`;
+  }).join("");
+
+  $("#perSent").innerHTML = SENTENCES.map((S,sIdx)=>{
+    const per = VOICE_POOL.map(v=>{
+      const m = mapping.find(x=>x.voiceId===v.id);
+      const sc = ratings[`${sIdx}-${m.letter}`]?.mos ?? 0;
+      return { ...v, sc };
+    }).sort((a,b)=>b.sc-a.sc);
+    return `<div class="sent"><div class="st">${S.s}</div><div class="sq">「${S.t}」</div>
+      <div class="chips">${per.map((v,i)=>`<span class="chip${i===0?" win":""}">${v.label} ${v.sc}</span>`).join("")}</div></div>`;
+  }).join("");
+
+  const raw = { timestamp:new Date().toISOString(), mapping, ratings, means };
+  $("#rawData").textContent = JSON.stringify(raw, null, 2);
+
+  $("#result").style.display = "block";
+  $("#result").scrollIntoView({behavior:"smooth"});
+}
+
+/* ============ 8. 启动 ============ */
+async function start(){
+  mapping = shuffle(VOICE_POOL).map((v,i)=>({ letter:String.fromCharCode(65+i), voiceId:v.id, voice:v.voice }));
+  await initAudio();
+  const sticker = $("#serverSticker");
+  try{
+    const r = await fetch(`${TTS_URL}/health`, { signal: AbortSignal.timeout(2500) });
+    if (r.ok){
+      const h = await r.json();
+      sticker.innerHTML = `● voice-server 在线 · 缓存 ${h.cache?.files||0} 条`;
+      sticker.style.borderColor = "rgba(16,185,129,.4)";
+      sticker.style.color = "#34d399";
+    } else throw 0;
+  }catch(e){
+    sticker.innerHTML = "● voice-server 离线，神经样本将回退系统音";
+    sticker.style.borderColor = "rgba(245,158,11,.4)";
+    sticker.style.color = "#f59e0b";
+  }
+  buildSurvey();
+  updateProgress();
+  $("#btnSubmit").addEventListener("click", showResults);
+}
+
+window.addEventListener("load", start);
+</script>
+</body>
+</html>
