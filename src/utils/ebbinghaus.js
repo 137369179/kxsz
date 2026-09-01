@@ -180,6 +180,14 @@ export class EbbinghausManager {
     return this.progress.coins;
   }
 
+  /** 增加星星数量 */
+  addStars(amount = 1) {
+    this.progress.stars = (this.progress.stars || 0) + amount;
+    this.save();
+    eventBus.emit(EVENTS.PROGRESS_CHANGED, { progress: this.progress });
+    return this.progress.stars;
+  }
+
   // 每日签到 — 计算连续天数、奖励星币
   doSignIn() {
     if (this.progress.todaySignedIn) return;
