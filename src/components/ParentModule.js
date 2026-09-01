@@ -144,10 +144,10 @@ export class ParentModule extends BaseModule {
           <!-- 四大标签切换组 -->
           <div class="flex items-center gap-1.5 bg-amber-50 p-1.5 rounded-full border border-amber-200">
             ${[
-              { key: "dashboard", label: "📊 数据罗盘" },
+              { key: "dashboard", label: "数据罗盘" },
               { key: "trophies", label: "🏆 12勋章墙" },
               { key: "print", label: "🖨️ 字帖打印" },
-              { key: "settings", label: "⚙️ 流程设置" }
+              { key: "settings", label: "流程设置" }
             ]
               .map(
                 (tab) => `
@@ -163,7 +163,7 @@ export class ParentModule extends BaseModule {
               .join("")}
 
             <button id="btn-lock-gate" class="text-xs bg-gray-200 hover:bg-gray-300 text-gray-800 font-black px-3 py-1.5 rounded-full shadow-sm ml-1">
-              🔒 锁定
+              锁定
             </button>
           </div>
         </div>
@@ -295,7 +295,7 @@ export class ParentModule extends BaseModule {
         <!-- 4. 教学流程与防沉迷设置 -->
         <div class="bg-white/95 rounded-3xl p-6 shadow-xl border-2 border-amber-200">
           <h2 class="text-base font-black text-amber-950 mb-4 flex items-center gap-2">
-            <span>⚙️</span> 教学闭环与护眼防沉迷设置
+             教学闭环与护眼防沉迷设置
           </h2>
 
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">

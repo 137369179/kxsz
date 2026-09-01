@@ -1,3 +1,4 @@
+import { GAME_ICONS } from "../utils/gameIcons.js";
 /**
  * 凯茜识字 (Cathy Literacy) - 130 本分级绘本子集阅读体系
  * 遵循“子集阅读”严格标准：每本绘本仅包含已学字，支持字字变色伴读、点读与阅读小测验
@@ -19,8 +20,8 @@ export const STORYBOOKS_DATABASE = [
         text: "红红的日头升起来了，照在绿绿的大山上。",
         image: "assets/images/cathy_storybook_cover.jpg",
         interactions: [
-          { x: "75%", y: "20%", emoji: "☀️", sound: "Pop", anim: "animate-spin-slow", text: "红红的日头！" },
-          { x: "30%", y: "45%", emoji: "⛰️", sound: "Pop", anim: "animate-bounce", text: "青翠的大山！" }
+          { x: "75%", y: "20%", icon: GAME_ICONS.sparkle, sound: "Pop", anim: "animate-spin-slow", text: "红红的日头！" },
+          { x: "30%", y: "45%", icon: GAME_ICONS.sparkle, sound: "Pop", anim: "animate-bounce", text: "青翠的大山！" }
         ],
         audioTimeTokens: [
           { char: "红", start: 0.1, end: 0.4 },
@@ -49,7 +50,7 @@ export const STORYBOOKS_DATABASE = [
         text: "清清的河水哗啦啦，水里有快活的小鱼。",
         image: "assets/images/cathy_storybook_cover.jpg",
         interactions: [
-          { x: "48%", y: "68%", emoji: "🐟", sound: "ChestOpen", anim: "animate-bounce", text: "发现小金鱼！" }
+          { x: "48%", y: "68%", icon: GAME_ICONS.sparkle, sound: "ChestOpen", anim: "animate-bounce", text: "发现小金鱼！" }
         ],
         audioTimeTokens: [
           { char: "清", start: 0.1, end: 0.4 },
@@ -77,7 +78,7 @@ export const STORYBOOKS_DATABASE = [
         text: "夜晚月亮出来了，小猫高高兴兴走在回家路上。",
         image: "assets/images/cathy_storybook_cover.jpg",
         interactions: [
-          { x: "78%", y: "18%", emoji: "🌙", sound: "Pop", anim: "animate-pulse", text: "弯弯的月牙！" }
+          { x: "78%", y: "18%", icon: GAME_ICONS.sparkle, sound: "Pop", anim: "animate-pulse", text: "弯弯的月牙！" }
         ],
         audioTimeTokens: [
           { char: "夜", start: 0.1, end: 0.4 },
@@ -132,7 +133,7 @@ export const STORYBOOKS_DATABASE = [
         text: "大山里有高高的木头大树，树上结满了甜甜的果子。",
         image: "assets/images/cathy_storybook_cover.jpg",
         interactions: [
-          { x: "25%", y: "40%", emoji: "🌲", sound: "Pop", anim: "animate-bounce", text: "苍翠茂密的大树！" }
+          { x: "25%", y: "40%", icon: GAME_ICONS.home, sound: "Pop", anim: "animate-bounce", text: "苍翠茂密的大树！" }
         ],
         audioTimeTokens: [
           { char: "大", start: 0.1, end: 0.4 },
@@ -165,7 +166,7 @@ export const STORYBOOKS_DATABASE = [
         text: "松鼠张开口吃果子，好心的人们走过来给它拍照片。",
         image: "assets/images/cathy_storybook_cover.jpg",
         interactions: [
-          { x: "65%", y: "50%", emoji: "🐿️", sound: "ChestOpen", anim: "animate-bounce", text: "可爱的小松鼠！" }
+          { x: "65%", y: "50%", icon: GAME_ICONS.sparkle, sound: "ChestOpen", anim: "animate-bounce", text: "可爱的小松鼠！" }
         ],
         audioTimeTokens: [
           { char: "松", start: 0.1, end: 0.4 },
@@ -222,7 +223,7 @@ export const STORYBOOKS_DATABASE = [
         text: "雨水落在大地的泥土上，小水滴醒来了。",
         image: "assets/images/cathy_storybook_cover.jpg",
         interactions: [
-          { x: "50%", y: "45%", emoji: "💧", sound: "Pop", anim: "animate-bounce", text: "晶莹的小水滴！" }
+          { x: "50%", y: "45%", icon: GAME_ICONS.sparkle, sound: "Pop", anim: "animate-bounce", text: "晶莹的小水滴！" }
         ],
         audioTimeTokens: [
           { char: "雨", start: 0.1, end: 0.4 },
@@ -250,7 +251,7 @@ export const STORYBOOKS_DATABASE = [
         text: "红日高照温暖如火，小水滴欢快地流向大海。",
         image: "assets/images/cathy_storybook_cover.jpg",
         interactions: [
-          { x: "75%", y: "30%", emoji: "🔥", sound: "ChestOpen", anim: "animate-pulse", text: "暖洋洋的火光！" }
+          { x: "75%", y: "30%", icon: GAME_ICONS.star, sound: "ChestOpen", anim: "animate-pulse", text: "暖洋洋的火光！" }
         ],
         audioTimeTokens: [
           { char: "红", start: 0.1, end: 0.4 },
@@ -299,7 +300,7 @@ export const STORYBOOKS_DATABASE = [
         text: "金色的水田里，禾苗长得又高又壮。",
         image: "assets/images/cathy_storybook_cover.jpg",
         interactions: [
-          { x: "35%", y: "55%", emoji: "🌾", sound: "Pop", anim: "animate-bounce", text: "饱满的金色禾苗！" }
+          { x: "35%", y: "55%", icon: GAME_ICONS.sparkle, sound: "Pop", anim: "animate-bounce", text: "饱满的金色禾苗！" }
         ],
         audioTimeTokens: [
           { char: "金", start: 0.1, end: 0.4 },
@@ -325,7 +326,7 @@ export const STORYBOOKS_DATABASE = [
         text: "集市上人来人往，大家开口大笑尝美食。",
         image: "assets/images/cathy_storybook_cover.jpg",
         interactions: [
-          { x: "70%", y: "45%", emoji: "🍲", sound: "ChestOpen", anim: "animate-spin-slow", text: "香喷喷的美食！" }
+          { x: "70%", y: "45%", icon: GAME_ICONS.sparkle, sound: "ChestOpen", anim: "animate-spin-slow", text: "香喷喷的美食！" }
         ],
         audioTimeTokens: [
           { char: "集", start: 0.1, end: 0.4 },
@@ -372,8 +373,8 @@ export const STORYBOOKS_DATABASE = [
         text: "推开红色的大门，一辆木头小马车停在门前。",
         image: "assets/images/cathy_storybook_cover.jpg",
         interactions: [
-          { x: "25%", y: "45%", emoji: "🚪", sound: "Pop", anim: "animate-bounce", text: "推开大门！" },
-          { x: "65%", y: "55%", emoji: "🐴", sound: "Pop", anim: "animate-pulse", text: "神气的小马车！" }
+          { x: "25%", y: "45%", icon: GAME_ICONS.lock, sound: "Pop", anim: "animate-bounce", text: "推开大门！" },
+          { x: "65%", y: "55%", icon: GAME_ICONS.sparkle, sound: "Pop", anim: "animate-pulse", text: "神气的小马车！" }
         ],
         audioTimeTokens: [
           { char: "推", start: 0.1, end: 0.4 },
@@ -403,8 +404,8 @@ export const STORYBOOKS_DATABASE = [
         text: "天上飞过小鸟，水里游着小鱼，小车跑得飞快。",
         image: "assets/images/cathy_storybook_cover.jpg",
         interactions: [
-          { x: "40%", y: "25%", emoji: "🕊️", sound: "ChestOpen", anim: "animate-spin-slow", text: "飞翔的小鸟！" },
-          { x: "75%", y: "65%", emoji: "🐠", sound: "Pop", anim: "animate-bounce", text: "快乐的小鱼！" }
+          { x: "40%", y: "25%", icon: GAME_ICONS.sparkle, sound: "ChestOpen", anim: "animate-spin-slow", text: "飞翔的小鸟！" },
+          { x: "75%", y: "65%", icon: GAME_ICONS.sparkle, sound: "Pop", anim: "animate-bounce", text: "快乐的小鱼！" }
         ],
         audioTimeTokens: [
           { char: "天", start: 0.1, end: 0.4 },
@@ -454,8 +455,8 @@ export const STORYBOOKS_DATABASE = [
         text: "蓝蓝的天空上，洁白的白云随风飘动。",
         image: "assets/images/cathy_storybook_cover.jpg",
         interactions: [
-          { x: "35%", y: "25%", emoji: "☁️", sound: "Pop", anim: "animate-pulse", text: "软绵绵的白云！" },
-          { x: "70%", y: "40%", emoji: "🚀", sound: "ChestOpen", anim: "animate-bounce", text: "星际飞船起飞！" }
+          { x: "35%", y: "25%", icon: GAME_ICONS.sparkle, sound: "Pop", anim: "animate-pulse", text: "软绵绵的白云！" },
+          { x: "70%", y: "40%", icon: GAME_ICONS.sparkle, sound: "ChestOpen", anim: "animate-bounce", text: "星际飞船起飞！" }
         ],
         audioTimeTokens: [
           { char: "蓝", start: 0.1, end: 0.4 },
@@ -482,8 +483,8 @@ export const STORYBOOKS_DATABASE = [
         text: "飞船穿过风雨和白雪，飞向美丽的银河星空。",
         image: "assets/images/cathy_storybook_cover.jpg",
         interactions: [
-          { x: "50%", y: "30%", emoji: "❄️", sound: "Pop", anim: "animate-spin-slow", text: "晶莹的雪花！" },
-          { x: "80%", y: "20%", emoji: "🌌", sound: "ChestOpen", anim: "animate-pulse", text: "璀璨的银河！" }
+          { x: "50%", y: "30%", icon: GAME_ICONS.sparkle, sound: "Pop", anim: "animate-spin-slow", text: "晶莹的雪花！" },
+          { x: "80%", y: "20%", icon: GAME_ICONS.sparkle, sound: "ChestOpen", anim: "animate-pulse", text: "璀璨的银河！" }
         ],
         audioTimeTokens: [
           { char: "飞", start: 0.1, end: 0.4 },

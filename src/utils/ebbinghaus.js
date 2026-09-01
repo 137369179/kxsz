@@ -14,16 +14,65 @@ export class EbbinghausManager {
     return this.progress;
   }
 
-  loadProgress() {
+    let loaded = null;
     try {
       if (typeof localStorage !== "undefined") {
         const raw = localStorage.getItem(STORAGE_KEY);
-        if (raw) return JSON.parse(raw);
+        if (raw) {
+          loaded = JSON.parse(raw);
+        }
       }
     } catch (e) {
       console.warn("读取本地进度失败，使用默认配置", e);
     }
 
+    const defaultState = {
+      coins: 60,
+      stars: 12,
+      currentIsland: 1,
+      currentLevelIndex: 1,
+      profile: {
+        name: "凯茜小勇士",
+        avatar: "assets/images/cathy_mascot.jpg"
+      },
+      settings: {
+        dailyCharTarget: 3,
+        enablePlayStep: true,
+        enableWriteStep: true,
+        eyeProtectionMinutes: 20,
+        audioLanguage: "mandarin",
+        soundEnabled: true
+      },
+      charRecords: {
+        char_001: {
+          charId: "char_001",
+          learnedAt: Date.now() - 86400000 * 2,
+          reviewCount: 3,
+          correctStreak: 3,
+          masteryRate: 98,
+          nextReviewDate: Date.now() + 86400000 * 4,
+          isDifficult: false
+        }
+      },
+      todayLearnedCount: 1,
+      lastActiveDate: new Date().toDateString(),
+      studyHistory: [
+        { date: "周一", count: 3 },
+        { date: "周二", count: 2 },
+        { date: "周三", count: 4 },
+        { date: "周四", count: 1 },
+        { date: "周五", count: 5 },
+        { date: "周六", count: 0 },
+        { date: "周日", count: 0 }
+      ]
+    };
+
+    if (loaded) {
+      // 保证旧版本进度结构也能补充新字段，防止报错
+      return { ...defaultState, ...loaded, settings: { ...defaultState.settings, ...(loaded.settings || {}) }, profile: { ...defaultState.profile, ...(loaded.profile || {}) } };
+    }
+
+    return defaultState;
     return {
       coins: 60,
       stars: 12,

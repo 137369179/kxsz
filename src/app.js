@@ -11,6 +11,7 @@ import { CardModule } from "./components/CardModule.js";
 import { ParentModule } from "./components/ParentModule.js";
 import { RewardModule } from "./components/RewardModule.js";
 import { ReviewModule } from "./components/ReviewModule.js";
+import { PKModule } from "./components/PKModule.js";
 import { soundAndFX } from "./utils/soundEngine.js";
 import { neuralVoice } from "./utils/neuralVoice.js";
 import { CHARACTER_DATABASE } from "./data/characters.js";
@@ -29,6 +30,7 @@ class CathyAppManager {
     this.parentModule = new ParentModule(this.container);
     this.rewardModule = new RewardModule(this.container);
     this.reviewModule = new ReviewModule(this.container);
+    this.pkModule = new PKModule(this.container);
     this.learnModule = null;
 
     this.init();
@@ -58,8 +60,92 @@ class CathyAppManager {
       this.startLearnFlow(charData);
     });
 
+    // 交互增强：全局点击星光特效与键盘无障碍快捷键
+    this._initClickSparkles();
+    this._initKeyboardShortcuts();
+
     // 默认进入世界大地图
     this.switchMode("map");
+  }
+
+  /**
+   * 点击/触摸屏幕生成魔法星光粒子反馈
+   */
+  _initClickSparkles() {
+    const createSparkle = (x, y) => {
+      const colors = ["#FFD700", "#FFA500", "#FF69B4", "#00FFFF", "#7FFF00"];
+      for (let i = 0; i < 4; i++) {
+        const span = document.createElement("span");
+        const angle = (Math.PI * 2 * i) / 4 + (Math.random() - 0.5);
+        const dist = 25 + Math.random() * 20;
+        const targetX = Math.cos(angle) * dist;
+        const targetY = Math.sin(angle) * dist;
+        const color = colors[Math.floor(Math.random() * colors.length)];
+
+        span.textContent = "✦";
+        span.style.cssText = `
+          position: fixed;
+          left: ${x}px;
+          top: ${y}px;
+          color: ${color};
+          font-size: ${14 + Math.random() * 8}px;
+          pointer-events: none;
+          z-index: 9999;
+          transform: translate(-50%, -50%) scale(0.6);
+          transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.4s ease-out;
+          opacity: 1;
+          text-shadow: 0 0 8px ${color};
+        `;
+        document.body.appendChild(span);
+
+        requestAnimationFrame(() => {
+          span.style.transform = `translate(calc(-50% + ${targetX}px), calc(-50% + ${targetY}px)) scale(1.3) rotate(${Math.random() * 90}deg)`;
+          span.style.opacity = "0";
+        });
+
+        setTimeout(() => span.remove(), 420);
+      }
+    };
+
+    window.addEventListener("pointerdown", (e) => {
+      // 仅在主视口内生成点击星光
+      if (e.clientX && e.clientY) {
+        createSparkle(e.clientX, e.clientY);
+      }
+    }, { passive: true });
+  }
+
+  /**
+   * 键盘无障碍交互快捷键 (支持 PC/Mac 外接键盘)
+   */
+  _initKeyboardShortcuts() {
+    window.addEventListener("keydown", (e) => {
+      // Escape: 关闭弹窗或返回大地图
+      if (e.key === "Escape") {
+        const modalBackdrop = document.querySelector("#card-modal-backdrop, #book-finish-modal, #boss-win-modal, #pk-win-modal");
+        if (modalBackdrop && !modalBackdrop.classList.contains("hidden")) {
+          const closeBtn = modalBackdrop.querySelector("#btn-close-modal, #btn-finish-return-shelf, #btn-boss-claim, #btn-pk-claim");
+          if (closeBtn) closeBtn.click();
+        } else if (this.currentMode !== "map") {
+          soundAndFX.playPop();
+          this.switchMode("map");
+        }
+      }
+
+      // 绘本翻页 (左右箭头键 / 空格键)
+      if (this.currentMode === "books" && this.bookModule && this.bookModule.currentBook) {
+        if (e.key === "ArrowRight") {
+          const nextBtn = document.querySelector("#btn-next-page");
+          if (nextBtn) nextBtn.click();
+        } else if (e.key === "ArrowLeft") {
+          const prevBtn = document.querySelector("#btn-prev-page");
+          if (prevBtn) prevBtn.click();
+        } else if (e.key === " " || e.key === "Spacebar") {
+          const karaokeBtn = document.querySelector("#btn-play-karaoke");
+          if (karaokeBtn) karaokeBtn.click();
+        }
+      }
+    });
   }
 
   /**
@@ -118,6 +204,13 @@ class CathyAppManager {
         break;
       case "review":
         this.reviewModule.render();
+        break;
+      case "pk":
+        this.pkModule.render();
+        break;
+      case "idiom":
+        this.playModule.currentMode = "idiom";
+        this.playModule.render();
         break;
       default:
         this.mapModule.render();

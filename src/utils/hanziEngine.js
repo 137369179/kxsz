@@ -18,6 +18,8 @@ export class HanziEngine {
     this.isDrawing = false;
     this.errorWarning = "";
     this.animGuideTimer = null;
+    this.errorTimer = null;
+    this.completeTimer = null;
     this.guideProgress = 0;
 
     this.initCanvasSize();
@@ -52,6 +54,9 @@ export class HanziEngine {
 
   destroy() {
     if (this.animGuideTimer) cancelAnimationFrame(this.animGuideTimer);
+    if (this.errorTimer) clearTimeout(this.errorTimer);
+    if (this.completeTimer) clearTimeout(this.completeTimer);
+
     this.canvas.removeEventListener("mousedown", this.handleStart);
     window.removeEventListener("mousemove", this.handleMove);
     window.removeEventListener("mouseup", this.handleEnd);
@@ -166,7 +171,8 @@ export class HanziEngine {
         soundEngine.playSuccessSound();
         soundEngine.playEncouragement();
         if (this.onComplete) {
-          setTimeout(() => this.onComplete(), 600);
+          if (this.completeTimer) clearTimeout(this.completeTimer);
+          this.completeTimer = setTimeout(() => this.onComplete(), 600);
         }
       }
     } else {
@@ -179,10 +185,11 @@ export class HanziEngine {
   }
 
   triggerError(msg) {
+    if (this.errorTimer) clearTimeout(this.errorTimer);
     this.errorWarning = msg;
     soundEngine.playErrorSound();
     this.render();
-    setTimeout(() => {
+    this.errorTimer = setTimeout(() => {
       this.errorWarning = "";
       this.render();
     }, 2000);

@@ -58,23 +58,35 @@ export class MapModule extends BaseModule {
           </button>
         </div>
 
-        <!-- 4 大地标快捷入口建筑 (游乐场、绘本馆、字卡库、奖励城堡) -->
-        <div class="absolute top-20 right-6 z-20 flex items-center gap-2.5">
-          <button class="map-landmark-btn group bg-white/90 backdrop-blur-md px-3.5 py-1.5 rounded-2xl border-2 border-purple-300 shadow-xl flex items-center gap-1.5 active:scale-95 transition-all" data-mode="play">
+        <!-- 7 大地标快捷入口建筑 (游乐场、绘本馆、字卡库、奖励城堡、竞技场、复习) -->
+        <div class="absolute top-20 right-6 z-20 flex flex-wrap justify-end gap-2.5 max-w-[400px]">
+          <button class="map-landmark-btn group bg-white/90 backdrop-blur-md px-3.5 py-1.5 rounded-2xl border-2 border-purple-300 shadow-xl flex items-center gap-1.5 active:scale-95 transition-all mb-2" data-mode="play">
             <span class="flex items-center group-hover:scale-110 transition-transform">${GAME_ICONS.arcade("w-5 h-5")}</span>
             <span class="text-xs font-black text-purple-950">游乐场</span>
           </button>
-          <button class="map-landmark-btn group bg-white/90 backdrop-blur-md px-3.5 py-1.5 rounded-2xl border-2 border-sky-300 shadow-xl flex items-center gap-1.5 active:scale-95 transition-all" data-mode="books">
+          <button class="map-landmark-btn group bg-white/90 backdrop-blur-md px-3.5 py-1.5 rounded-2xl border-2 border-sky-300 shadow-xl flex items-center gap-1.5 active:scale-95 transition-all mb-2" data-mode="books">
             <span class="flex items-center group-hover:scale-110 transition-transform">${GAME_ICONS.book("w-5 h-5")}</span>
             <span class="text-xs font-black text-sky-950">绘本馆</span>
           </button>
-          <button class="map-landmark-btn group bg-white/90 backdrop-blur-md px-3.5 py-1.5 rounded-2xl border-2 border-amber-300 shadow-xl flex items-center gap-1.5 active:scale-95 transition-all" data-mode="cards">
+          <button class="map-landmark-btn group bg-white/90 backdrop-blur-md px-3.5 py-1.5 rounded-2xl border-2 border-amber-300 shadow-xl flex items-center gap-1.5 active:scale-95 transition-all mb-2" data-mode="cards">
             <span class="flex items-center group-hover:scale-110 transition-transform">${GAME_ICONS.cards("w-5 h-5")}</span>
             <span class="text-xs font-black text-amber-950">字卡库</span>
           </button>
-          <button class="map-landmark-btn group bg-white/90 backdrop-blur-md px-3.5 py-1.5 rounded-2xl border-2 border-rose-300 shadow-xl flex items-center gap-1.5 active:scale-95 transition-all" data-mode="reward">
+          <button class="map-landmark-btn group bg-white/90 backdrop-blur-md px-3.5 py-1.5 rounded-2xl border-2 border-rose-300 shadow-xl flex items-center gap-1.5 active:scale-95 transition-all mb-2" data-mode="reward">
             <span class="flex items-center group-hover:scale-110 transition-transform">${GAME_ICONS.chest("w-5 h-5")}</span>
             <span class="text-xs font-black text-rose-950">奖励城堡</span>
+          </button>
+          <button class="map-landmark-btn group bg-white/90 backdrop-blur-md px-3.5 py-1.5 rounded-2xl border-2 border-indigo-300 shadow-xl flex items-center gap-1.5 active:scale-95 transition-all mb-2" data-mode="pk">
+            <span class="flex items-center group-hover:scale-110 transition-transform">${GAME_ICONS.trophy("w-5 h-5")}</span>
+            <span class="text-xs font-black text-indigo-950">竞技场</span>
+          </button>
+          <button class="map-landmark-btn group bg-white/90 backdrop-blur-md px-3.5 py-1.5 rounded-2xl border-2 border-green-300 shadow-xl flex items-center gap-1.5 active:scale-95 transition-all mb-2" data-mode="idiom">
+            <span class="flex items-center group-hover:scale-110 transition-transform">${GAME_ICONS.book("w-5 h-5")}</span>
+            <span class="text-xs font-black text-green-950">国学馆</span>
+          </button>
+          <button class="map-landmark-btn group bg-white/90 backdrop-blur-md px-3.5 py-1.5 rounded-2xl border-2 border-teal-300 shadow-xl flex items-center gap-1.5 active:scale-95 transition-all" data-mode="review">
+            <span class="flex items-center group-hover:scale-110 transition-transform">${GAME_ICONS.calendar("w-5 h-5")}</span>
+            <span class="text-xs font-black text-teal-950">每日复习</span>
           </button>
         </div>
 

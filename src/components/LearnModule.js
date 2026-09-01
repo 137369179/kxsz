@@ -359,7 +359,7 @@ export class LearnModule extends BaseModule {
           <button id="btn-jelly-char" class="relative group w-48 h-48 rounded-3xl bg-gradient-to-tr from-amber-400 via-orange-500 to-yellow-300 border-4 border-white shadow-[0_0_60px_rgba(255,160,0,0.8)] flex items-center justify-center text-8xl font-black text-white active:scale-90 transition-transform cursor-pointer animate-bounce-cathy">
             ${char.char}
             <div class="absolute -bottom-2 bg-amber-900 text-yellow-200 text-[10px] font-black px-3 py-0.5 rounded-full border border-yellow-400">
-              点击发音 🔊
+              点击发音 ${window.GAME_ICONS ? window.GAME_ICONS.speaker("w-4 h-4 inline-block") : ""}
             </div>
           </button>
 
@@ -386,7 +386,7 @@ export class LearnModule extends BaseModule {
                     <span class="text-xs font-bold text-amber-700">${w.pinyin}</span>
                     <h4 class="text-base font-black text-amber-950">${w.word}</h4>
                   </div>
-                  <span class="text-xl">🔊</span>
+                  <span class="text-xl">${window.GAME_ICONS ? window.GAME_ICONS.speaker("w-4 h-4 inline-block") : ""}</span>
                 </button>
               `
                 )
@@ -394,12 +394,12 @@ export class LearnModule extends BaseModule {
             </div>
 
             <div class="mt-4 p-3 bg-black/40 rounded-2xl border border-white/20 text-xs text-yellow-200 font-semibold leading-relaxed">
-              📝 <span class="text-white font-bold">造句：</span>${char.sentence}
+              ${window.GAME_ICONS ? window.GAME_ICONS.pen("w-4 h-4 inline-block") : ""} <span class="text-white font-bold">造句：</span>${char.sentence}
             </div>
           </div>
 
           <button id="btn-finish-rec-step" class="mt-4 w-full bg-gradient-to-r from-orange-500 to-amber-500 text-white font-black text-sm py-3 rounded-full shadow-lg border border-white active:scale-95 transition-all flex items-center justify-center gap-2">
-            <span>🎯</span> 开启【读】字评测 ➔
+            <span>${window.GAME_ICONS ? window.GAME_ICONS.star("w-4 h-4 inline-block") : ""}</span> 开启【读】字评测 ➔
           </button>
         </div>
 
@@ -477,7 +477,7 @@ export class LearnModule extends BaseModule {
           </div>
 
           <button id="btn-finish-read-step" class="mt-4 w-full bg-gradient-to-r from-blue-500 to-sky-500 text-white font-black text-sm py-3 rounded-full shadow-lg border border-white active:scale-95 transition-all flex items-center justify-center gap-2 opacity-50 pointer-events-none">
-            <span>🚀</span> 去【练】字小游戏 ➔
+            <span>${window.GAME_ICONS ? window.GAME_ICONS.sparkle("w-4 h-4 inline-block") : ""}</span> 去【练】字小游戏 ➔
           </button>
         </div>
 
@@ -578,8 +578,7 @@ export class LearnModule extends BaseModule {
   }
 
   // ----------------------------------------------------------------
-  // STEP 4: 练
- (太空飞船射击小游戏)
+  // STEP 4: 练 — 太空飞船射击小游戏
   // ----------------------------------------------------------------
   renderStepPractice(stage) {
     const char = this.charData;
@@ -593,12 +592,12 @@ export class LearnModule extends BaseModule {
         
         <div class="w-full flex items-center justify-between bg-black/60 px-6 py-2.5 rounded-full border border-white/30 text-white">
           <div class="flex items-center gap-2 text-xs font-black text-yellow-300">
-            <span>🎯 目标字：</span>
+            <span>${window.GAME_ICONS ? window.GAME_ICONS.star("w-4 h-4 inline-block") : ""} 目标字：</span>
             <span class="text-xl text-orange-400 bg-black/50 px-3 py-0.5 rounded-xl border border-orange-500">${char.char}</span>
           </div>
 
           <div class="text-xs font-black text-cyan-300">
-            🚀 命中进度: <span id="game-hit-progress" class="text-yellow-400 text-base font-black">0 / ${targetHits}</span>
+            ${window.GAME_ICONS ? window.GAME_ICONS.sparkle("w-4 h-4 inline-block") : ""} 命中进度: <span id="game-hit-progress" class="text-yellow-400 text-base font-black">0 / ${targetHits}</span>
           </div>
         </div>
 
@@ -619,7 +618,7 @@ export class LearnModule extends BaseModule {
 
         <div class="w-full flex items-center justify-center">
           <div class="text-2xl text-yellow-300 font-black animate-bounce-cathy flex items-center gap-2">
-            <span>🚀 凯茜激光战机准备就绪！</span>
+            <span>${window.GAME_ICONS ? window.GAME_ICONS.sparkle("w-4 h-4 inline-block") : ""} 凯茜激光战机准备就绪！</span>
           </div>
         </div>
 
@@ -703,7 +702,7 @@ export class LearnModule extends BaseModule {
             </span>
             <h3 class="text-lg font-black text-amber-950 mb-2">规范笔顺写好字</h3>
             <p class="text-xs text-gray-600 leading-relaxed font-semibold">
-              ✨ 沿黄色魔法光球滑行，遇到倒笔画系统会自动提示并拦截哦！
+              ${window.GAME_ICONS ? window.GAME_ICONS.sparkle("w-4 h-4 inline-block") : ""} 沿黄色魔法光球滑行，遇到倒笔画系统会自动提示并拦截哦！
             </p>
           </div>
 

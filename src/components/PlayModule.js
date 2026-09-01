@@ -114,7 +114,7 @@ export class PlayModule extends BaseModule {
           <div class="mode-card group bg-white/95 backdrop-blur-md rounded-3xl p-6 shadow-xl border-4 border-blue-200 hover:border-blue-400 cursor-pointer transition-all duration-300 hover:scale-105 flex flex-col justify-between" data-mode="pk">
             <div>
               <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-blue-500 to-cyan-400 text-white flex items-center justify-center shadow-lg mb-4">
-                ${GAME_ICONS.swords("w-8 h-8")}
+                ${GAME_ICONS.pen("w-8 h-8")}
               </div>
               <h3 class="text-lg font-black text-gray-900 group-hover:text-blue-600 transition-colors">双人竞技场</h3>
               <p class="text-xs text-gray-500 mt-1.5 leading-relaxed font-semibold">
@@ -130,7 +130,7 @@ export class PlayModule extends BaseModule {
           <div class="mode-card group bg-white/95 backdrop-blur-md rounded-3xl p-6 shadow-xl border-4 border-emerald-200 hover:border-emerald-400 cursor-pointer transition-all duration-300 hover:scale-105 flex flex-col justify-between" data-mode="idiom">
             <div>
               <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-emerald-500 to-green-400 text-white flex items-center justify-center shadow-lg mb-4">
-                ${GAME_ICONS.scroll("w-8 h-8")}
+                ${GAME_ICONS.book("w-8 h-8")}
               </div>
               <h3 class="text-lg font-black text-gray-900 group-hover:text-emerald-600 transition-colors">成语国学馆</h3>
               <p class="text-xs text-gray-500 mt-1.5 leading-relaxed font-semibold">
@@ -399,7 +399,7 @@ export class PlayModule extends BaseModule {
         </header>
 
         <main class="relative z-10 flex-1 flex flex-col items-center justify-center p-6">
-          <p class="text-xs text-yellow-200 font-bold mb-4">👉 翻开一张汉字和对应的读音拼音，即可消除得分！</p>
+          <p class="text-xs text-yellow-200 font-bold mb-4">翻开一张汉字和对应的读音拼音，即可消除得分！</p>
           
           <div class="grid grid-cols-4 gap-4 w-full max-w-2xl">
             ${cards
@@ -531,7 +531,7 @@ export class PlayModule extends BaseModule {
             </button>
 
             <div class="flex items-center gap-2 text-yellow-300 font-black text-sm">
-              <span class="flex items-center">${GAME_ICONS.swords("w-6 h-6")}</span>
+              <span class="flex items-center">${GAME_ICONS.pen("w-6 h-6")}</span>
               <span>对决第 ${currentRound} / ${totalRounds} 局</span>
             </div>
 
@@ -560,7 +560,7 @@ export class PlayModule extends BaseModule {
           </main>
 
           <div id="pk-win-modal" class="absolute inset-0 bg-black/85 backdrop-blur-md flex flex-col items-center justify-center text-white hidden animate-scale-up z-50">
-            <div class="mb-4 flex items-center justify-center">${GAME_ICONS.crown("w-24 h-24")}</div>
+            <div class="mb-4 flex items-center justify-center">${GAME_ICONS.trophy("w-24 h-24")}</div>
             <h2 class="text-3xl font-black text-yellow-300 mb-2">对决大获全胜！</h2>
             <p class="text-xs text-gray-300 mb-6 font-semibold">最终比分：红队 ${p1Score} - 蓝队 ${p2Score}</p>
             <button id="btn-pk-claim" class="btn-game-orange text-white font-black text-base px-10 py-3 rounded-full">
@@ -652,7 +652,7 @@ export class PlayModule extends BaseModule {
           </button>
           
           <div class="flex items-center gap-2">
-            <span class="flex items-center">${GAME_ICONS.scroll("w-6 h-6")}</span>
+            <span class="flex items-center">${GAME_ICONS.book("w-6 h-6")}</span>
             <span class="text-sm font-black text-yellow-300">成语国学微课堂 (50+ 经典典故)</span>
           </div>
 
@@ -684,14 +684,14 @@ export class PlayModule extends BaseModule {
                 <div>
                   <div class="flex items-center justify-between mb-2">
                     <span class="text-xs font-bold text-emerald-300">${item.pinyin}</span>
-                    <button class="speak-idiom-btn w-7 h-7 rounded-full bg-emerald-500 text-white flex items-center justify-center text-xs shadow active:scale-90">🔊</button>
+                    <button class="speak-idiom-btn w-7 h-7 rounded-full bg-emerald-500 text-white flex items-center justify-center text-xs shadow active:scale-90">${GAME_ICONS.speaker("w-full h-full")}</button>
                   </div>
                   <h3 class="text-2xl font-black text-yellow-300 mb-2">${item.idiom}</h3>
                   <p class="text-xs text-gray-200 leading-relaxed font-semibold">${item.meaning}</p>
                 </div>
                 <div class="mt-4 pt-3 border-t border-white/10 flex justify-between items-center text-[10px] text-emerald-400 font-bold">
                   <span>国学启蒙必学</span>
-                  <span>👉 点击听典故</span>
+                  <span>点击听典故</span>
                 </div>
               </div>
             `

@@ -114,7 +114,7 @@ export class CardModule extends BaseModule {
 
             <!-- 搜索框 (带智能防抖) -->
             <div class="relative w-full sm:w-64">
-              <input id="card-search-input" type="text" value="${this.searchQuery}" placeholder="🔍 搜索汉字或拼音 (如: 日 / ri)" class="w-full bg-amber-50 border-2 border-amber-300 rounded-full px-4 py-1.5 text-xs font-black text-amber-950 focus:outline-none focus:ring-2 focus:ring-orange-400 placeholder:text-amber-400" />
+              <input id="card-search-input" type="text" value="${this.searchQuery}" placeholder="搜索汉字或拼音 (如: 日 / ri)" class="w-full bg-amber-50 border-2 border-amber-300 rounded-full px-4 py-1.5 text-xs font-black text-amber-950 focus:outline-none focus:ring-2 focus:ring-orange-400 placeholder:text-amber-400" />
             </div>
           </div>
 
@@ -147,9 +147,9 @@ export class CardModule extends BaseModule {
             <div class="flex items-center gap-1 bg-amber-50 p-1 rounded-full border border-amber-200">
               ${[
                 { key: "all", label: "全部" },
-                { key: "learned", label: "✨ 已掌握" },
-                { key: "review", label: "🔔 待复习" },
-                { key: "difficult", label: "🔥 难字本" }
+                { key: "learned", label: "已掌握" },
+                { key: "review", label: "待复习" },
+                { key: "difficult", label: "难字本" }
               ]
                 .map(
                   (f) => `

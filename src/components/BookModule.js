@@ -84,7 +84,7 @@ export class BookModule extends BaseModule {
                   第 ${book.level || 1} 阶绘本
                 </div>
                 <div class="absolute bottom-2 right-2 bg-black/60 backdrop-blur-md text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full border border-white/20">
-                  📖 共 ${book.pages ? book.pages.length : 4} 页
+                  共 ${book.pages ? book.pages.length : 4} 页
                 </div>
               </div>
 
@@ -160,7 +160,7 @@ export class BookModule extends BaseModule {
           </button>
           
           <h2 class="text-sm font-black text-amber-950 flex items-center gap-2">
-            <span>📖 ${book.title}</span>
+            <span>${book.title}</span>
             <span class="text-xs text-orange-600 bg-orange-100 px-2 py-0.5 rounded-full font-bold">第 ${this.currentPageIndex + 1} / ${totalPages} 页</span>
           </h2>
 
@@ -237,7 +237,7 @@ export class BookModule extends BaseModule {
           </div>
 
           <button id="btn-next-page" class="btn-game-orange text-white font-black text-xs px-6 py-2.5 rounded-full shadow-lg transition-all active:scale-95">
-            ${this.currentPageIndex === book.pages.length - 1 ? "完成阅读 · 去测验 ➔" : "下一页 ➡️"}
+            ${this.currentPageIndex === book.pages.length - 1 ? "完成阅读 · 去测验 " : "下一页 "}
           </button>
         </div>
 
@@ -269,7 +269,7 @@ export class BookModule extends BaseModule {
         soundAndFX.playPop();
         soundAndFX.playSuccessSound();
         soundAndFX.triggerConfetti(this.container);
-        showGameToast(this.container, `✨ 发现宝藏：${label}`, "success");
+        showGameToast(this.container, `发现宝藏：${label}`, "success");
         if (snd) soundAndFX.speak(snd);
       });
     });
@@ -370,7 +370,7 @@ export class BookModule extends BaseModule {
 
         <!-- 结业胜利弹窗 -->
         <div id="book-finish-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md flex flex-col items-center justify-center text-white hidden animate-scale-up z-50">
-          <div class="mb-4 flex items-center justify-center">${GAME_ICONS.crown("w-24 h-24")}</div>
+          <div class="mb-4 flex items-center justify-center">${GAME_ICONS.trophy("w-24 h-24")}</div>
           <h2 class="text-3xl font-black text-yellow-300 mb-2">恭喜读完《${book.title}》！</h2>
           <p class="text-xs text-gray-300 mb-6 font-semibold">你已经成功掌握了绘本中的全部汉字，阅读能力再上新台阶！</p>
           <div class="candy-pill rounded-full px-6 py-2 mb-6 text-xs text-yellow-300 font-bold flex items-center gap-2">
