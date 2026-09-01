@@ -26,6 +26,52 @@ function shuffle(arr) {
   return a;
 }
 
+// ------------------------------------------------------------
+// 动态取题工具：优先艾宾浩斯待复习/难字，不足则从字库随机，
+// 并按字库的 confusingChars 自动生成干扰选项（游乐场均由此出题）
+// ------------------------------------------------------------
+function pickReviewChars(count = 4) {
+  // 1) 待复习队列（到期 + 难字）优先
+  const dueIds = ebbinghausManager.getDueReviewCharIds();
+  const due = dueIds.map((id) => CHARACTER_DATABASE.find((c) => c.id === id)).filter(Boolean);
+  // 2) 难度加权补充（低掌握度者优先）
+  const rest = CHARACTER_DATABASE.filter((c) => !dueIds.includes(c.id));
+  rest.sort((a, b) => {
+    const ra = ebbinghausManager.progress.charRecords?.[a.id];
+    const rb = ebbinghausManager.progress.charRecords?.[b.id];
+    const sa = ra?.masteryRate ?? 100;
+    const sb = rb?.masteryRate ?? 100;
+    return sa - sb; // 掌握度低者排在前面
+  });
+  const pool = [...due, ...rest];
+  // 去重且不超量
+  const taken = [];
+  const seen = new Set();
+  for (let i = 0; i < pool.length && taken.length < count; i++) {
+    if (seen.has(pool[i].id)) continue;
+    seen.add(pool[i].id);
+    taken.push(pool[i]);
+  }
+  // 字库不足时允许循环补足（实际 50 字 >> count）
+  return taken;
+}
+
+/** 生成一道题的选项：正确字 + 其 confusingChars（不足随机补字库其他字） */
+function buildOptions(curChar) {
+  const distractors = (curChar.confusingChars || []).filter((c) => c !== curChar.char);
+  const pool = [...CHARACTER_DATABASE.filter((c) => c.char !== curChar.char)];
+  for (let i = 0; distractors.length < 3 && i < pool.length; i++) {
+    if (!distractors.includes(pool[i].char)) distractors.push(pool[i].char);
+  }
+  return shuffle([curChar.char, ...distractors.slice(0, 3)]);
+}
+
+/** 从字库生成「字 + 拼音」配对卡（消消乐用） */
+function buildMatchPairs(count = 4) {
+  const chars = pickReviewChars(count);
+  return chars.map((c) => ({ char: c.char, pinyin: c.pinyin || "" }));
+}
+
 export class PlayModule extends BaseModule {
   constructor(container) {
     super(container);
@@ -63,12 +109,12 @@ export class PlayModule extends BaseModule {
         <!-- 顶部游乐场横幅 -->
         <div class="relative w-full h-44 rounded-3xl overflow-hidden shadow-2xl border-4 border-amber-300 mb-6 bg-gradient-to-r from-amber-600 via-orange-500 to-amber-700 flex flex-col justify-end p-6">
           <div class="absolute -right-6 -bottom-6 opacity-20 transform scale-150">
-            ${GAME_ICONS.arcade("w-56 h-56")}
+            ${GAME_ICONS.arcade()}
           </div>
           
           <div class="relative z-10 text-white">
             <div class="flex items-center gap-3 mb-1">
-              <span class="flex items-center">${GAME_ICONS.arcade("w-8 h-8")}</span>
+              <span class="flex items-center">${GAME_ICONS.arcade()}</span>
               <h1 class="text-2xl font-black drop-shadow-md">凯茜游乐场 (全能拓展竞技馆)</h1>
             </div>
             <p class="text-xs text-yellow-200 font-bold">
@@ -84,7 +130,7 @@ export class PlayModule extends BaseModule {
           <div class="mode-card group bg-white/95 backdrop-blur-md rounded-3xl p-6 shadow-xl border-4 border-rose-200 hover:border-rose-400 cursor-pointer transition-all duration-300 hover:scale-105 flex flex-col justify-between" data-mode="boss">
             <div>
               <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-rose-500 to-red-400 text-white flex items-center justify-center shadow-lg mb-4">
-                ${GAME_ICONS.monster("w-8 h-8")}
+                ${GAME_ICONS.monster()}
               </div>
               <h3 class="text-lg font-black text-gray-900 group-hover:text-rose-600 transition-colors">难字歼灭战</h3>
               <p class="text-xs text-gray-500 mt-1.5 leading-relaxed font-semibold">
@@ -100,7 +146,7 @@ export class PlayModule extends BaseModule {
           <div class="mode-card group bg-white/95 backdrop-blur-md rounded-3xl p-6 shadow-xl border-4 border-amber-200 hover:border-amber-400 cursor-pointer transition-all duration-300 hover:scale-105 flex flex-col justify-between" data-mode="match">
             <div>
               <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-amber-500 to-yellow-400 text-white flex items-center justify-center shadow-lg mb-4">
-                ${GAME_ICONS.gem("w-8 h-8")}
+                ${GAME_ICONS.gem()}
               </div>
               <h3 class="text-lg font-black text-gray-900 group-hover:text-amber-600 transition-colors">汉字消消乐</h3>
               <p class="text-xs text-gray-500 mt-1.5 leading-relaxed font-semibold">
@@ -116,7 +162,7 @@ export class PlayModule extends BaseModule {
           <div class="mode-card group bg-white/95 backdrop-blur-md rounded-3xl p-6 shadow-xl border-4 border-blue-200 hover:border-blue-400 cursor-pointer transition-all duration-300 hover:scale-105 flex flex-col justify-between" data-mode="pk">
             <div>
               <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-blue-500 to-cyan-400 text-white flex items-center justify-center shadow-lg mb-4">
-                ${GAME_ICONS.pen("w-8 h-8")}
+                ${GAME_ICONS.pen()}
               </div>
               <h3 class="text-lg font-black text-gray-900 group-hover:text-blue-600 transition-colors">双人竞技场</h3>
               <p class="text-xs text-gray-500 mt-1.5 leading-relaxed font-semibold">
@@ -132,7 +178,7 @@ export class PlayModule extends BaseModule {
           <div class="mode-card group bg-white/95 backdrop-blur-md rounded-3xl p-6 shadow-xl border-4 border-emerald-200 hover:border-emerald-400 cursor-pointer transition-all duration-300 hover:scale-105 flex flex-col justify-between" data-mode="idiom">
             <div>
               <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-emerald-500 to-green-400 text-white flex items-center justify-center shadow-lg mb-4">
-                ${GAME_ICONS.book("w-8 h-8")}
+                ${GAME_ICONS.book()}
               </div>
               <h3 class="text-lg font-black text-gray-900 group-hover:text-emerald-600 transition-colors">成语国学馆</h3>
               <p class="text-xs text-gray-500 mt-1.5 leading-relaxed font-semibold">
@@ -167,21 +213,24 @@ export class PlayModule extends BaseModule {
   // 2. 难字歼灭战 (Boss 战)
   // ----------------------------------------------------
   renderBossBattle() {
-    // 从难字本或字库中筛选题目
-    const diffIds = ebbinghausManager.getDifficultCharIds();
-    let chars = diffIds.map(id => CHARACTER_DATABASE.find(c => c.id === id)).filter(Boolean);
-    if (chars.length < 4) {
-      chars = [...chars, ...CHARACTER_DATABASE.slice(0, 4 - chars.length)];
+    // ===== 动态出题：优先待复习/难字，每次进入题目不同 =====
+    const chars = pickReviewChars(4);
+    if (chars.length === 0) {
+      this.currentMode = null;
+      this.render();
+      return;
     }
 
     let bossHp = 100;
     let targetIndex = 0;
+    let roundCorrect = 0; // 本场连续答对（暴击加成展示用）
 
     const renderRound = () => {
       const curChar = chars[targetIndex % chars.length];
       const __pmProgress = ebbinghausManager.progress;
       const __pmSpeakerIcon = soundAndFX.isMuted ? GAME_ICONS.speaker("w-5 h-5", true) : GAME_ICONS.speaker("w-5 h-5", false);
-      const options = shuffle([curChar.char, ...(curChar.confusingChars || ["木", "日", "月"]).slice(0, 3)]);
+      // 动态干扰项：正确字 + confusingChars
+      const options = buildOptions(curChar);
 
       soundAndFX.speakPriority(`消灭怪兽！找出汉字：“${curChar.char}”`, { kind: "sentence", priority: 1 });
 
@@ -191,12 +240,12 @@ export class PlayModule extends BaseModule {
           <!-- 顶部状态栏 -->
           <header class="relative z-30 w-full px-6 py-3 flex items-center justify-between bg-black/50 backdrop-blur-md border-b border-white/20">
             <button id="btn-back-hub" class="btn-game-wood text-white font-black text-xs px-4 py-2 rounded-full flex items-center gap-1.5">
-              <span class="flex items-center">${GAME_ICONS.home("w-4 h-4")}</span>
+              <span class="flex items-center">${GAME_ICONS.home()}</span>
               <span>退出战斗</span>
             </button>
 
             <div class="flex items-center gap-2">
-              <span class="flex items-center">${GAME_ICONS.monster("w-6 h-6")}</span>
+              <span class="flex items-center">${GAME_ICONS.monster()}</span>
               <span class="text-sm font-black text-rose-300">难字歼灭战 · 关卡 Boss</span>
             </div>
 
@@ -205,10 +254,10 @@ export class PlayModule extends BaseModule {
                 ${__pmSpeakerIcon}
               </button>
               <div class="candy-pill flex items-center gap-1.5 text-yellow-300 font-black text-xs px-3 py-1 rounded-full">
-                ${GAME_ICONS.coin("w-4 h-4")}<span>${__pmProgress.coins}</span>
+                ${GAME_ICONS.coin()}<span>${__pmProgress.coins}</span>
               </div>
               <div class="candy-pill flex items-center gap-1.5 text-amber-300 font-black text-xs px-3 py-1 rounded-full">
-                ${GAME_ICONS.star("w-4 h-4", true)}<span>${__pmProgress.stars}</span>
+                ${GAME_ICONS.star(true)}<span>${__pmProgress.stars}</span>
               </div>
               <div class="flex items-center gap-2 bg-black/60 px-4 py-1.5 rounded-full border border-rose-400">
                 <span class="text-xs font-black text-rose-300">Boss 血量:</span>
@@ -227,7 +276,7 @@ export class PlayModule extends BaseModule {
 
             <!-- Boss 3D 动画巨兽 -->
             <div id="boss-avatar" class="relative w-36 h-36 rounded-full bg-gradient-to-tr from-rose-600 via-red-500 to-orange-500 border-4 border-white shadow-[0_0_60px_rgba(244,63,94,0.8)] flex items-center justify-center mb-4 animate-bounce-slow transition-transform">
-              <span class="flex items-center text-white">${GAME_ICONS.monster("w-20 h-20")}</span>
+              <span class="flex items-center text-white">${GAME_ICONS.monster()}</span>
               <div class="absolute -top-3 bg-red-600 text-white font-black text-[10px] px-3 py-0.5 rounded-full border border-white">
                 难字首领 Lv.9
               </div>
@@ -257,11 +306,11 @@ export class PlayModule extends BaseModule {
 
           <!-- 胜利通关模态框 -->
           <div id="boss-win-modal" class="absolute inset-0 bg-black/85 backdrop-blur-md flex flex-col items-center justify-center text-white hidden animate-scale-up z-50">
-            <div class="mb-4 flex items-center justify-center">${GAME_ICONS.trophy("w-24 h-24")}</div>
+            <div class="mb-4 flex items-center justify-center">${GAME_ICONS.trophy()}</div>
             <h2 class="text-3xl font-black text-yellow-300 mb-2">首领已彻底歼灭！</h2>
             <p class="text-xs text-gray-300 mb-6 font-semibold">你成功攻克了难字堡垒，守护了汉字王国的安宁！</p>
             <div class="candy-pill rounded-full px-6 py-2 mb-6 text-xs text-yellow-300 font-bold flex items-center gap-2">
-              <span class="flex items-center">${GAME_ICONS.coin("w-5 h-5")}</span>
+              <span class="flex items-center">${GAME_ICONS.coin()}</span>
               <span>获得 20 凯茜星币 + 难字封印勋章</span>
             </div>
             <button id="btn-boss-claim" class="btn-game-orange text-white font-black text-base px-10 py-3 rounded-full">
@@ -290,7 +339,7 @@ export class PlayModule extends BaseModule {
       if (soundBtn) {
         this._on(soundBtn, "click", () => {
           soundAndFX.toggleMute();
-          const ic = soundAndFX.isMuted ? GAME_ICONS.speaker("w-5 h-5", true) : GAME_ICONS.speaker("w-5 h-5", false);
+          const ic = soundAndFX.isMuted ? GAME_ICONS.speaker(true) : GAME_ICONS.speaker(false);
           soundBtn.innerHTML = ic;
         });
       }
@@ -310,6 +359,10 @@ export class PlayModule extends BaseModule {
             soundAndFX.speakPriority(curChar.char, { kind: "char", priority: 1 });
             soundAndFX.triggerConfetti(this.container);
 
+            // ===== 艾宾浩斯复习闭环：答对 → 复习成功 =====
+            roundCorrect++;
+            ebbinghausManager.completeReview(curChar.id, true);
+
             if (bossAvatar) {
               bossAvatar.classList.add("animate-shake", "scale-75", "opacity-80");
             }
@@ -321,7 +374,10 @@ export class PlayModule extends BaseModule {
             if (bossHp <= 0) {
               soundAndFX.playVictoryFanfare();
               soundAndFX.triggerCoinFly(this.container);
-              ebbinghausManager.addCoins(20);
+              // 奖励：基础 20 币 + 连击暴击加成（最多再 +10）
+              const bonus = Math.min(roundCorrect * 2, 10);
+              ebbinghausManager.addCoins(20 + bonus);
+              ebbinghausManager.markTodayActive();
               this._timeout(() => {
                 if (winModal) winModal.classList.remove("hidden");
               }, 800);
@@ -333,6 +389,12 @@ export class PlayModule extends BaseModule {
             soundAndFX.playSoftError();
             soundAndFX.speakPriority(`这是“${selected}”字，请释放“${curChar.char}”法术！`, { kind: "sentence", emotion: "correction" });
             btn.classList.add("animate-shake");
+            // ===== 艾宾浩斯闭环：答错 → 标记难字，Boss 回血 =====
+            roundCorrect = 0;
+            ebbinghausManager.completeReview(curChar.id, false);
+            bossHp = Math.min(100, bossHp + 5);
+            if (bossBar) bossBar.style.width = `${bossHp}%`;
+            if (hpVal) hpVal.textContent = `${bossHp}%`;
             this._timeout(() => {
               btn.classList.remove("animate-shake");
               answered = false;
@@ -359,12 +421,8 @@ export class PlayModule extends BaseModule {
   renderMatchGame() {
     const __pmProgress = ebbinghausManager.progress;
     const __pmSpeakerIcon = soundAndFX.isMuted ? GAME_ICONS.speaker("w-5 h-5", true) : GAME_ICONS.speaker("w-5 h-5", false);
-    const rawPairs = [
-      { char: "日", pinyin: "rì" },
-      { char: "月", pinyin: "yuè" },
-      { char: "水", pinyin: "shuǐ" },
-      { char: "山", pinyin: "shān" }
-    ];
+    // ===== 动态出题：从字库（优先待复习）生成 4 组 字-拼音 配对 =====
+    const rawPairs = buildMatchPairs(4);
 
     let cards = [];
     rawPairs.forEach((p, idx) => {
@@ -381,12 +439,12 @@ export class PlayModule extends BaseModule {
         
         <header class="relative z-30 w-full px-6 py-3 flex items-center justify-between bg-black/50 backdrop-blur-md border-b border-white/20">
           <button id="btn-match-back" class="btn-game-wood text-white font-black text-xs px-4 py-2 rounded-full flex items-center gap-1.5">
-            <span class="flex items-center">${GAME_ICONS.home("w-4 h-4")}</span>
+            <span class="flex items-center">${GAME_ICONS.home()}</span>
             <span>返回大厅</span>
           </button>
           
           <div class="flex items-center gap-2">
-            <span class="flex items-center">${GAME_ICONS.gem("w-6 h-6")}</span>
+            <span class="flex items-center">${GAME_ICONS.gem()}</span>
             <span class="text-sm font-black text-yellow-300">汉字消消乐 (字音配对)</span>
           </div>
 
@@ -395,10 +453,10 @@ export class PlayModule extends BaseModule {
               ${__pmSpeakerIcon}
             </button>
             <div class="candy-pill flex items-center gap-1.5 text-yellow-300 font-black text-xs px-3 py-1 rounded-full">
-              ${GAME_ICONS.coin("w-4 h-4")}<span>${__pmProgress.coins}</span>
+              ${GAME_ICONS.coin()}<span>${__pmProgress.coins}</span>
             </div>
             <div class="candy-pill flex items-center gap-1.5 text-amber-300 font-black text-xs px-3 py-1 rounded-full">
-              ${GAME_ICONS.star("w-4 h-4", true)}<span>${__pmProgress.stars}</span>
+              ${GAME_ICONS.star(true)}<span>${__pmProgress.stars}</span>
             </div>
             <div class="candy-pill flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-black text-emerald-300">
               <span>已消除: <b id="match-score" class="text-yellow-300 text-sm">0</b> / 4 对</span>
@@ -423,7 +481,7 @@ export class PlayModule extends BaseModule {
         </main>
 
         <div id="match-win-modal" class="absolute inset-0 bg-black/85 backdrop-blur-md flex flex-col items-center justify-center text-white hidden animate-scale-up z-50">
-          <div class="mb-4 flex items-center justify-center">${GAME_ICONS.star("w-20 h-20", true)}</div>
+          <div class="mb-4 flex items-center justify-center">${GAME_ICONS.star(true)}</div>
           <h2 class="text-2xl font-black text-yellow-300 mb-2">全部消除完毕！眼疾手快！</h2>
           <p class="text-xs text-gray-300 mb-6 font-semibold">获得 10 凯茜星币奖励！</p>
           <button id="btn-match-claim" class="btn-game-orange text-white font-black text-base px-10 py-3 rounded-full">
@@ -447,7 +505,7 @@ export class PlayModule extends BaseModule {
     if (soundBtn) {
       this._on(soundBtn, "click", () => {
         soundAndFX.toggleMute();
-        const ic = soundAndFX.isMuted ? GAME_ICONS.speaker("w-5 h-5", true) : GAME_ICONS.speaker("w-5 h-5", false);
+        const ic = soundAndFX.isMuted ? GAME_ICONS.speaker(true) : GAME_ICONS.speaker(false);
         soundBtn.innerHTML = ic;
       });
     }
@@ -472,6 +530,10 @@ export class PlayModule extends BaseModule {
             soundAndFX.triggerConfetti(this.container);
             matchedCount++;
             if (scoreEl) scoreEl.textContent = matchedCount;
+
+            // ===== 艾宾浩斯复习闭环：配对成功 = 复习成功 =====
+            const c = CHARACTER_DATABASE.find((x) => x.char === b1.dataset.match);
+            if (c) ebbinghausManager.completeReview(c.id, true);
 
             this._timeout(() => {
               b1.classList.add("opacity-0", "pointer-events-none");
@@ -517,13 +579,24 @@ export class PlayModule extends BaseModule {
     let currentRound = 1;
     const totalRounds = 5;
 
-    const roundData = [
+    // ===== 动态出题：5 轮从字库（优先待复习）抽取，每轮选项含 confusingChars =====
+    const _roundChars = pickReviewChars(totalRounds);
+    const roundData = _roundChars.map((c) => ({
+      char: c.char,
+      pinyin: c.pinyin || "",
+      opts: buildOptions(c),
+    }));
+    // 兜底：极端情况下字库不足则回退内置 5 题
+    const FALLBACK_ROUNDS = [
       { char: "日", pinyin: "rì", opts: ["日", "月", "木", "山"] },
       { char: "月", pinyin: "yuè", opts: ["水", "月", "火", "口"] },
       { char: "水", pinyin: "shuǐ", opts: ["水", "木", "人", "山"] },
       { char: "火", pinyin: "huǒ", opts: ["日", "火", "月", "人"] },
-      { char: "山", pinyin: "shān", opts: ["口", "水", "山", "木"] }
+      { char: "山", pinyin: "shān", opts: ["口", "水", "山", "木"] },
     ];
+    for (let i = 0; i < totalRounds; i++) {
+      if (!roundData[i]) roundData[i] = FALLBACK_ROUNDS[i] || FALLBACK_ROUNDS[0];
+    }
 
     const renderRound = () => {
       const r = roundData[(currentRound - 1) % roundData.length];
@@ -534,12 +607,12 @@ export class PlayModule extends BaseModule {
           
           <header class="relative z-30 w-full px-6 py-3 flex items-center justify-between bg-black/50 backdrop-blur-md border-b border-white/20">
             <button id="btn-pk-back" class="btn-game-wood text-white font-black text-xs px-4 py-2 rounded-full flex items-center gap-1.5">
-              <span class="flex items-center">${GAME_ICONS.home("w-4 h-4")}</span>
+              <span class="flex items-center">${GAME_ICONS.home()}</span>
               <span>退出竞技</span>
             </button>
 
             <div class="flex items-center gap-2 text-yellow-300 font-black text-sm">
-              <span class="flex items-center">${GAME_ICONS.pen("w-6 h-6")}</span>
+              <span class="flex items-center">${GAME_ICONS.pen()}</span>
               <span>对决第 ${currentRound} / ${totalRounds} 局</span>
             </div>
 
@@ -568,7 +641,7 @@ export class PlayModule extends BaseModule {
           </main>
 
           <div id="pk-win-modal" class="absolute inset-0 bg-black/85 backdrop-blur-md flex flex-col items-center justify-center text-white hidden animate-scale-up z-50">
-            <div class="mb-4 flex items-center justify-center">${GAME_ICONS.trophy("w-24 h-24")}</div>
+            <div class="mb-4 flex items-center justify-center">${GAME_ICONS.trophy()}</div>
             <h2 class="text-3xl font-black text-yellow-300 mb-2">对决大获全胜！</h2>
             <p class="text-xs text-gray-300 mb-6 font-semibold">最终比分：红队 ${p1Score} - 蓝队 ${p2Score}</p>
             <button id="btn-pk-claim" class="btn-game-orange text-white font-black text-base px-10 py-3 rounded-full">
@@ -592,7 +665,7 @@ export class PlayModule extends BaseModule {
       if (soundBtn) {
         this._on(soundBtn, "click", () => {
           soundAndFX.toggleMute();
-          const ic = soundAndFX.isMuted ? GAME_ICONS.speaker("w-5 h-5", true) : GAME_ICONS.speaker("w-5 h-5", false);
+          const ic = soundAndFX.isMuted ? GAME_ICONS.speaker(true) : GAME_ICONS.speaker(false);
           soundBtn.innerHTML = ic;
         });
       }
@@ -613,10 +686,16 @@ export class PlayModule extends BaseModule {
             soundAndFX.playSuccessSound();
             soundAndFX.triggerConfetti(this.container);
             btn.classList.add("ring-8", "ring-emerald-400");
+            // ===== 艾宾浩斯复习闭环：抢拍正确 = 复习成功 =====
+            const c = CHARACTER_DATABASE.find((x) => x.char === r.char);
+            if (c) ebbinghausManager.completeReview(c.id, true);
           } else {
             p2Score += 10;
             soundAndFX.playSoftError();
             btn.classList.add("ring-8", "ring-rose-400");
+            // ===== 闭环：抢拍错误 = 标记难字 =====
+            const c = CHARACTER_DATABASE.find((x) => x.char === r.char);
+            if (c) ebbinghausManager.completeReview(c.id, false);
           }
 
           this._timeout(() => {
@@ -649,7 +728,7 @@ export class PlayModule extends BaseModule {
   // ----------------------------------------------------
   renderIdiomHall() {
     const __pmProgress = ebbinghausManager.progress;
-    const __pmSpeakerIcon = soundAndFX.isMuted ? GAME_ICONS.speaker("w-5 h-5", true) : GAME_ICONS.speaker("w-5 h-5", false);
+    const __pmSpeakerIcon = soundAndFX.isMuted ? GAME_ICONS.speaker(true) : GAME_ICONS.speaker(false);
     const db = (typeof IDIOMS_DATABASE !== "undefined" && IDIOMS_DATABASE.length) ? IDIOMS_DATABASE : [
       { id: "idiom_001", name: "守株待兔", pinyin: "shǒu zhū dài tù", chars: ["守","株","待","兔"], desc: "比喻死守狭隘经验，不知变通，妄想不劳而获", story: "古时候有个农夫在田里干活，忽然一只兔子飞快跑来撞在树桩上死了农夫捡到兔子非常高兴，从此天天坐在树桩旁等待，结果田地荒芜，再也没等到兔子", moral: "做事要脚踏实地努力，不能心存侥幸", gameQuestion: { question: "农夫为什么再也没等到兔子？", options: ["撞树桩是极偶然的巧合，应该靠勤劳劳动", "因为树桩太矮了", "因为兔子跑得太慢了"], correctIndex: 0 } },
       { id: "idiom_002", name: "拔苗助长", pinyin: "bá miáo zhù zhǎng", chars: ["拔","苗","助","长"], desc: "比喻急于求成，违反规律，反而把事情弄糟", story: "古时候有个人嫌禾苗长得太慢，于是把禾苗一棵棵拔高他回家高兴地说：我帮禾苗长高啦！儿子跑到田里一看，禾苗全都枯死了", moral: "万物生长有规律，急于求成往往适得其反", gameQuestion: { question: "禾苗为什么枯死了？", options: ["被拔离土壤，破坏了生长规律", "天气太热了", "禾苗喝了太多水"], correctIndex: 0 } },
@@ -662,16 +741,16 @@ export class PlayModule extends BaseModule {
         
         <header class="relative z-30 w-full px-6 py-3 flex items-center justify-between bg-black/50 backdrop-blur-md border-b border-white/20">
           <button id="btn-idiom-back" class="btn-game-wood text-white font-black text-xs px-4 py-2 rounded-full flex items-center gap-1.5">
-            <span class="flex items-center">${GAME_ICONS.home("w-4 h-4")}</span>
+            <span class="flex items-center">${GAME_ICONS.home()}</span>
             <span>返回大厅</span>
           </button>
           <div class="flex items-center gap-2">
-            <span class="flex items-center">${GAME_ICONS.book("w-6 h-6")}</span>
+            <span class="flex items-center">${GAME_ICONS.book()}</span>
             <span class="text-sm font-black text-yellow-300">成语国学微课堂</span>
           </div>
           <div class="flex items-center gap-2">
             <div class="candy-pill flex items-center gap-1.5 text-yellow-300 font-black text-xs px-3 py-1 rounded-full">
-              ${GAME_ICONS.coin("w-4 h-4")}<span>${__pmProgress.coins}</span>
+              ${GAME_ICONS.coin()}<span>${__pmProgress.coins}</span>
             </div>
           </div>
         </header>
@@ -734,7 +813,7 @@ export class PlayModule extends BaseModule {
       <div class="relative w-full h-full min-h-[640px] flex flex-col select-none overflow-hidden bg-gradient-to-b from-amber-950 via-orange-950 to-red-950 text-white">
         <header class="relative z-30 w-full px-6 py-3 flex items-center justify-between bg-black/50 backdrop-blur-md border-b border-amber-300/30">
           <button id="btn-story-back" class="btn-game-wood text-white font-black text-xs px-4 py-2 rounded-full flex items-center gap-1.5">
-            <span class="flex items-center">${GAME_ICONS.home("w-4 h-4")}</span>
+            <span class="flex items-center">${GAME_ICONS.home()}</span>
             <span>返回成语馆</span>
           </button>
           <span class="text-sm font-black text-yellow-300">国学故事馆</span>
@@ -754,7 +833,7 @@ export class PlayModule extends BaseModule {
 
           <div class="w-full max-w-2xl bg-white/10 backdrop-blur-md rounded-3xl border-2 border-amber-300/30 p-6 opacity-0 transition-opacity duration-700" id="story-desc" style="transition-delay:1.0s">
             <div class="flex items-center gap-2 mb-3">
-              <span class="flex items-center">${GAME_ICONS.sparkle("w-5 h-5")}</span>
+              <span class="flex items-center">${GAME_ICONS.sparkle()}</span>
               <span class="text-xs font-black text-amber-300 uppercase tracking-wider">成语释义</span>
             </div>
             <p class="text-sm text-white/90 font-bold leading-relaxed">${desc}</p>
@@ -763,11 +842,11 @@ export class PlayModule extends BaseModule {
           <div class="w-full max-w-2xl bg-white/5 backdrop-blur-md rounded-3xl border border-white/15 p-6 opacity-0 transition-opacity duration-700" id="story-body" style="transition-delay:1.3s">
             <div class="flex items-center justify-between mb-4">
               <div class="flex items-center gap-2">
-                <span class="flex items-center">${GAME_ICONS.pen("w-5 h-5")}</span>
+                <span class="flex items-center">${GAME_ICONS.pen()}</span>
                 <span class="text-xs font-black text-emerald-300 uppercase tracking-wider">经典故事</span>
               </div>
               <button id="btn-narrate" class="btn-game-orange text-white font-black text-xs px-4 py-2 rounded-full flex items-center gap-1.5 active:scale-90">
-                <span class="flex items-center">${GAME_ICONS.speaker("w-4 h-4")}</span>
+                <span class="flex items-center">${GAME_ICONS.speaker()}</span>
                 <span>朗读故事</span>
               </button>
             </div>
@@ -777,7 +856,7 @@ export class PlayModule extends BaseModule {
           ${moral ? `
           <div class="w-full max-w-2xl bg-emerald-900/60 rounded-3xl border-2 border-emerald-400/40 p-5 opacity-0 transition-opacity duration-700" id="story-moral" style="transition-delay:1.6s">
             <div class="flex items-center gap-2 mb-2">
-              <span class="flex items-center">${GAME_ICONS.star("w-5 h-5", true)}</span>
+              <span class="flex items-center">${GAME_ICONS.star(true)}</span>
               <span class="text-xs font-black text-emerald-300">道德寓意</span>
             </div>
             <p class="text-sm text-emerald-100 font-bold leading-relaxed">${moral}</p>
@@ -786,7 +865,7 @@ export class PlayModule extends BaseModule {
 
           ${gameQuestion ? `
           <button id="btn-to-quiz" class="mt-2 btn-game-orange text-white font-black text-base px-12 py-4 rounded-full shadow-xl border-2 border-white active:scale-95 transition-transform flex items-center gap-2 opacity-0" style="transition:opacity 0.7s ease;transition-delay:2.0s">
-            <span class="flex items-center">${GAME_ICONS.trophy("w-6 h-6")}</span>
+            <span class="flex items-center">${GAME_ICONS.trophy()}</span>
             <span>我听懂了！来闯关</span>
           </button>
           ` : ""}
@@ -831,7 +910,7 @@ export class PlayModule extends BaseModule {
           </div>
           <div class="bg-white/10 backdrop-blur-md rounded-3xl border-2 border-white/20 p-8 w-full shadow-2xl">
             <div class="flex items-center justify-center gap-2 mb-4">
-              <span class="flex items-center">${GAME_ICONS.trophy("w-8 h-8")}</span>
+              <span class="flex items-center">${GAME_ICONS.trophy()}</span>
               <span class="text-xs font-black bg-amber-400 text-amber-950 px-3 py-1 rounded-full">成语闯关小测验</span>
             </div>
             <h2 class="text-xl font-black text-yellow-300 mb-6 leading-relaxed">${quiz.question}</h2>
@@ -848,11 +927,11 @@ export class PlayModule extends BaseModule {
         </div>
 
         <div id="idiom-win" class="fixed inset-0 bg-black/85 backdrop-blur-xl flex flex-col items-center justify-center z-50 hidden animate-scale-up">
-          <div>${GAME_ICONS.trophy("w-28 h-28")}</div>
+          <div>${GAME_ICONS.trophy()}</div>
           <h2 class="text-3xl font-black text-yellow-300 mt-4 mb-2">答对了！太聪明了！</h2>
           <p class="text-white/70 text-sm font-bold mb-6">你已经掌握了"${name}"的故事！</p>
           <div class="candy-pill px-6 py-2 mb-6 text-yellow-300 font-black flex items-center gap-2">
-            ${GAME_ICONS.coin("w-5 h-5")} 获得 8 凯茜星币
+            ${GAME_ICONS.coin()} 获得 8 凯茜星币
           </div>
           <div class="flex gap-3">
             <button id="btn-win-more" class="btn-game-orange text-white font-black px-8 py-3 rounded-full">再学一个</button>
