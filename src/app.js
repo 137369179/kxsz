@@ -105,8 +105,21 @@ class CathyAppManager extends BaseModule {
     // 默认进入世界大地图
     this.switchMode("map");
 
+    // 移除加载骨架屏
+    this._removeLoader();
+
     // 防沉迷护眼系统 (Eye Protection / Time Limit System)
     this._initAntiAddiction();
+  }
+
+  /** 移除初始加载骨架，显示游戏内容 */
+  _removeLoader() {
+    const loader = document.getElementById("initial-loader");
+    if (loader) {
+      loader.style.transition = "opacity 0.5s ease-out";
+      loader.style.opacity = "0";
+      setTimeout(() => loader.remove(), 500);
+    }
   }
 
   /** 全局监听器统一注册到 _cleanups，模块销毁时自动清理 */
@@ -232,7 +245,7 @@ class CathyAppManager extends BaseModule {
 
     if (soundAndFX) {
       soundAndFX.playEncouragement();
-      soundAndFX.speak("凯茜勇士，你已经探险很久啦！眼睛累了，快休息一下吧！");
+      soundAndFX.speakPriority("凯茜勇士，你已经探险很久啦！眼睛累了，快休息一下吧！", { kind: "sentence", priority: 2 });
     }
 
     // 每秒更新倒计时

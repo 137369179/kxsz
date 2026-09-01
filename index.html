@@ -18,13 +18,13 @@
   <meta name="twitter:description" content="专业儿童汉字启蒙与分级阅读应用" />
   <meta name="twitter:image" content="assets/images/cathy_mascot.webp" />
   <!-- CSP：限制资源加载来源，防止 XSS，允许本地 AI 语音服务与本地开发连接 -->
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' blob:; connect-src 'self' http://localhost:* https://localhost:* http://127.0.0.1:* https://127.0.0.1:*; worker-src 'self' blob:; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'none';">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' blob:; connect-src 'self'; worker-src 'self' blob:; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'none';">
   <link rel="icon" type="image/jpeg" href="assets/images/cathy_mascot.webp" />
   <link rel="manifest" href="manifest.json" />
   <link rel="apple-touch-icon" href="assets/images/cathy_mascot.webp" />
   <title>凯茜识字 (Cathy Literacy) - 1:1 沉浸式汉字启蒙与分级阅读</title>
   <!-- 生产级预编译 CSS（替代 398KB Tailwind 运行时编译器） -->
-  <link rel="stylesheet" href="assets/css/prod.css?v=2.7.3" />
+  <link rel="stylesheet" href="assets/css/prod.css?v=2.7.7" />
   <style>
     /* 隐藏滚动条 */
     .no-scrollbar::-webkit-scrollbar {
@@ -39,7 +39,7 @@
 <body class="bg-slate-950 text-amber-950 overflow-hidden select-none m-0 p-0 w-screen h-screen flex items-center justify-center">
 
   <!-- 16:9 横屏游戏全屏主视口 -->
-  <div id="game-app-viewport" class="relative w-full h-full max-w-7xl max-h-[768px] aspect-[16/9] bg-sky-400 overflow-hidden shadow-2xl rounded-none sm:rounded-3xl border-0 sm:border-4 sm:border-amber-300">
+  <div id="game-app-viewport" class="relative w-screen h-screen bg-sky-400 overflow-hidden">
     <!-- 首屏静态加载骨架 (优化 LCP 与视觉感知) -->
     <div id="initial-loader" class="absolute inset-0 flex flex-col items-center justify-center bg-sky-400 z-50">
       <img src="assets/images/cathy_mascot.webp" alt="凯茜识字" class="w-32 h-32 md:w-48 md:h-48 rounded-full border-4 border-amber-300 shadow-2xl mb-6 object-cover animate-bounce" fetchpriority="high" />
@@ -65,7 +65,7 @@
 
   <!-- 核心逻辑脚本 (带版本防缓存) -->
   <!-- ⚠️ 版本号与 src/utils/version.js 的 APP_VERSION 保持一致，升级时同步修改 -->
-  <script type="module" src="src/app.js?v=2.7.3"></script>
+  <script type="module" src="src/app.js?v=2.7.7"></script>
 
   <!-- 统一版本号注入：从 version.js 读取 APP_VERSION 供运行时与 SW 注册使用 -->
   <script type="module">

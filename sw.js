@@ -1,6 +1,6 @@
 // 版本号单一来源：注册 URL ?v= 由 index.html 从 version.js 注入
-const _ver = new URL(self.location.href).searchParams.get("v") || "2.7.3";
-const CACHE_NAME = `cathy-literacy-v${_ver.replace(/\./g, "-")}`; // 与 src/utils/version.js 的 CACHE_VERSION 对齐
+const _ver = new URL(self.location.href).searchParams.get("v") || "2.7.7";
+const CACHE_NAME = `cathy-literacy-v${_ver.replace(/\./g, "-")}`; // 动态读取版本，避免硬编码（与 version.js 对齐）
 
 // 核心数据文件预缓存列表（install 阶段离线就绪）
 const CORE_ASSETS = [
