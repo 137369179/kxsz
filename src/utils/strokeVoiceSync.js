@@ -5,7 +5,7 @@
  *  - audioCtx.currentTime 
  *  - Plan Ahead:  ""  schedule
  *  - hanziEngine  N  stroke.start   schedule  deltaMs
- *  -  start →  playStrokeSound(pan) end → playPop ()
+ *  -  start   playStrokeSound(pan) end  playPop ()
  *  - AC-5  |deltaMs| ≤ 16ms 10  ×  8  = 80 
  *
  * 
@@ -224,7 +224,7 @@ export class StrokeVoiceSync {
     if (!medians || !medians[idx]) return 0;
     const m = medians[idx];
     const startX = m[0][0];  // 1024 
-    // 0..1024 → -1..+1
+    // 0..1024  -1..+1
     return Math.max(-1, Math.min(1, (startX - 512) / 512));
   }
 

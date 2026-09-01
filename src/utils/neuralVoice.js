@@ -71,23 +71,26 @@ class NeuralVoiceEngine {
     this.batchEnabled = true;
   }
 
-  // ----------  (, ) ----------
-  probe(timeoutMs = 1200) {
+  // ---------- 健康探测与可用性检查 ----------
+  probe(timeoutMs = 800) {
     if (this.available === true) return Promise.resolve(true);
+    if (this.available === false) return Promise.resolve(false);
     if (this._probing) return this._probing;
     this._probing = new Promise((resolve) => {
-      const ctl = typeof AbortController !== "undefined" ? new AbortController() : null;
-      const t = setTimeout(() => { ctl && ctl.abort(); resolve(false); }, timeoutMs);
-      fetch(this.base + "/health", { signal: ctl ? ctl.signal : undefined })
-        .then((r) => { clearTimeout(t); this.available = r.ok; resolve(r.ok); })
-        .catch(() => { clearTimeout(t); this.available = false; resolve(false); })
-        .finally(() => {
-          this._probing = null;
-          if (this.available === false) {
-            // 30s 
-            setTimeout(() => { this.available = null; }, 30000);
-          }
-        });
+      try {
+        const ctl = typeof AbortController !== "undefined" ? new AbortController() : null;
+        const t = setTimeout(() => { ctl && ctl.abort(); this.available = false; resolve(false); }, timeoutMs);
+        fetch(this.base + "/health", { signal: ctl ? ctl.signal : undefined, mode: "cors" })
+          .then((r) => { clearTimeout(t); this.available = r.ok; resolve(r.ok); })
+          .catch(() => { clearTimeout(t); this.available = false; resolve(false); })
+          .finally(() => {
+            this._probing = null;
+          });
+      } catch (e) {
+        this.available = false;
+        this._probing = null;
+        resolve(false);
+      }
     });
     return this._probing;
   }

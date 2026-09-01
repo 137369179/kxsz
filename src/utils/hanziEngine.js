@@ -1,6 +1,6 @@
 /**
  * 凯茜识字 (Cathy Literacy) - AI 笔顺智能描红与纠错引擎
- * 核心功能：SVG 骨架引导、倒笔画即时拦截、笔顺强校验、平滑轨迹插值与粒子结算
+ * 核心功能：SVG 骨架引导倒笔画即时拦截笔顺强校验平滑轨迹插值与粒子结算
  */
 
 import { soundEngine } from "./soundEngine.js";
@@ -21,11 +21,23 @@ export class HanziEngine {
     this.errorTimer = null;
     this.completeTimer = null;
     this.guideProgress = 0;
+    this._resizeObserver = null;
 
     this.initCanvasSize();
     this.bindEvents();
+    this._initResizeObserver();
     this.startGuideAnimation();
     this.render();
+  }
+
+  /** 监听容器尺寸变化，自动重建 canvas 分辨率 */
+  _initResizeObserver() {
+    if (typeof ResizeObserver === "undefined") return;
+    this._resizeObserver = new ResizeObserver(() => {
+      this.initCanvasSize();
+      this.render();
+    });
+    this._resizeObserver.observe(this.canvas.parentElement);
   }
 
   initCanvasSize() {
@@ -56,6 +68,10 @@ export class HanziEngine {
     if (this.animGuideTimer) cancelAnimationFrame(this.animGuideTimer);
     if (this.errorTimer) clearTimeout(this.errorTimer);
     if (this.completeTimer) clearTimeout(this.completeTimer);
+    if (this._resizeObserver) {
+      this._resizeObserver.disconnect();
+      this._resizeObserver = null;
+    }
 
     this.canvas.removeEventListener("mousedown", this.handleStart);
     window.removeEventListener("mousemove", this.handleMove);

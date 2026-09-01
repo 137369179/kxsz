@@ -354,7 +354,7 @@ class AudioDebugPanel {
   _fmtG2P(g) {
     if (!g) return "G2P ";
     const demo = ["","","","","","","",""];
-    const lines = demo.map(s => `<div><b style="color:#ffd166;">${s}</b> → ${g.convert(s).map(p => `${p.phone}:${p.tone}`).join(" ")}</div>`).join("");
+    const lines = demo.map(s => `<div><b style="color:#ffd166;">${s}</b>  ${g.convert(s).map(p => `${p.phone}:${p.tone}`).join(" ")}</div>`).join("");
     return `<div style="line-height:1.7;">${lines}</div>`;
   }
 

@@ -4,14 +4,14 @@
  *  Web Speech API (SpeechRecognition) + WebAudio 
  *  1. MediaRecorder/MediaStream 3s ~ 5s 
  *  2. ASR  window.SpeechRecognition (webkitSpeechRecognition)
- *  3.  G2P  vs  →  Needleman-Wunsch
+ *  3.  G2P  vs    Needleman-Wunsch
  *  4. 
  *      PA  (Pronunciation Accuracy ) —  /  × 100
  *      SR  (Stress & Rhythm )    —  × 100
  *      CM  (Completeness )          — 1 - ( + )/ × 100
  *      TOTAL = PA * 0.55 + SR * 0.25 + CM * 0.20
  *  5.  { substitution|deletion|insertion|tone_error } + 
- *  6. IDLE → LISTENING → EVALUATING → RESULT / ERROR
+ *  6. IDLE  LISTENING  EVALUATING  RESULT / ERROR
  *
  *  /  TTS
  */
@@ -180,7 +180,7 @@ class RhythmAnalyzer {
       }
     }
     const raw = (n === 0) ? 100 : (hit / n) * 100;
-    //  → 
+    //   
     const avgRms = this.peaks.reduce((s, p) => s + p.rms, 0) / Math.max(1, this.peaks.length);
     if (avgRms < 0.05) raw *= 0.8;
     return Math.max(0, Math.min(100, Math.round(raw)));
@@ -259,7 +259,7 @@ export class PronunciationAssessmentEngine {
       recognitionFailed = true;
     }
 
-    //  ASR  () →  +  80%~95% 
+    //  ASR  ()   +  80%~95% 
     if (recognitionFailed || !recognitionResultText) {
       recognitionResultText = this._heuristicMockHypothesis(targetText, rhythm, opts.mode);
     }
@@ -333,7 +333,7 @@ export class PronunciationAssessmentEngine {
     let pctCorrect;
     if (rhythm) {
       const hit = rhythm.peaks.length;
-      //  n  → 
+      //  n   
       const ratio = Math.min(1, hit / Math.max(1, n));
       pctCorrect = 0.6 + 0.4 * Math.max(0, 1 - Math.abs(ratio - 1));
     } else {
@@ -392,7 +392,7 @@ export class PronunciationAssessmentEngine {
       for (let k = 0; k < Nref; k++) expPeaks.push(step * (0.5 + k));
       sr = rhythm.scoreRhythm(expPeaks, elapsedEvalMs);
     } else if (opts.expectedPeaksMs) {
-      //  → 
+      //   
       const diff = Math.abs(Nref - Nhyp);
       sr = Math.max(60, 95 - diff * 12);
     }

@@ -2,12 +2,14 @@
 tools/cache/
 
 # Debug / patch scripts (temporary)
+tools/patches/
 patch_*.py
 fix_*.py
 recover_files.py
 find_emojis.py
 replace_icons.py
 strip_emojis*.py
+enhance_app_js.py
 
 # Build artifacts
 *.log

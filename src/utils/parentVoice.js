@@ -3,10 +3,10 @@
  *  (Task 9: MediaRecorder + IndexedDB)
  *
  * 
- *  1. MediaRecorder getUserMedia → mimeType: webm/opus (AAC )
+ *  1. MediaRecorder getUserMedia  mimeType: webm/opus (AAC )
  *  2. IndexedDB (key: parent_voice_v1) —  triggerType + charId 
  *     record keys: {charId, triggerType:'learn'|'review'|'encourage', durationMs, sizeBytes, createdAt}
- *  3. soundAndFX.speak →  triggerType+char  →  TTS
+ *  3. soundAndFX.speak   triggerType+char    TTS
  *  4. on('beforeunload')  Blob
  */
 
@@ -221,7 +221,7 @@ export class ParentVoiceManager {
   }
 
   /**
-   * TTS  →  fallback  speakPriority
+   * TTS    fallback  speakPriority
    *  Task 4 / soundEngine  speak
    */
   async speakWithParentFallback(text, opts = {}) {
@@ -292,7 +292,7 @@ export class ParentVoiceManager {
           savedRec = await this.stopRecording();
           usedMic = true;
         } catch (e) {
-          // mic  →  mock Blob + 
+          // mic    mock Blob + 
           savedRec = null;
           try { if (this._currentRecording) { await this.stopRecording().catch(()=>null); } } catch {}
         }

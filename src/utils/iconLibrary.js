@@ -1,6 +1,6 @@
 /**
  * 凯茜识字 - 图标库导出
- * 所有SVG已被废弃，统一使用生成的3D游戏资源图片。
+ * 所有SVG已被废弃，统一使用生成的3D游戏资源图片
  */
 
 import { GAME_ICONS } from "./gameIcons.js";

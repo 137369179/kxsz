@@ -5,7 +5,7 @@
  *  (Task 7)
  *   1.  BGM (map/learn/arcade/story/review/battle/victory/night/silence)
  *   2.  (800ms transition)
- *   3. BGM 100  →  bgmTimer  1 ()
+ *   3. BGM 100    bgmTimer  1 ()
  *   4.  BPM  + 
  *  (Task 8)
  *   1. C D E G A 1=C
@@ -34,8 +34,8 @@ const NOTE_HZ = (() => {
   return m;
 })();
 
-/** / +  →  Hz
- *  pentatonic 1=C D E G A → solfège Do Re Mi Sol La
+/** / +    Hz
+ *  pentatonic 1=C D E G A  solfège Do Re Mi Sol La
  */
 const SOLFEGE_TO_SEMITONE = { "1": 0, "2": 2, "3": 4, "4": 5, "5": 7, "6": 9, "7": 11, "0": -1 };
 function solfegeToHz(solfege, base = "C4") {
@@ -84,7 +84,7 @@ export class BgmEngine {
   }
 
   /**
-   * Task 7 AC-7 100  ( 40ms/)  →  bgmTimer  1 ()
+   * Task 7 AC-7 100  ( 40ms/)    bgmTimer  1 ()
    * @returns {Promise<{pass:boolean, activeTimersDuring:number[], finalTimer:number, transitionsDone:number, errors:string[]}>}
    */
   async run_AC_7_stressTest({ transitions = 100, switchIntervalMs = 40 } = {}) {
@@ -393,7 +393,7 @@ export class KidsChantSynthesizer {
   }
 
   /**
-   * Task 8 AC-8 5  →  +  ≥ 10s
+   * Task 8 AC-8 5    +  ≥ 10s
    */
   async run_AC_8_scenario() {
     soundAndFX.init();

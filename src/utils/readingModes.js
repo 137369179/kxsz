@@ -6,9 +6,9 @@
  *  2. Mode-Word     220ms  350ms  (WPM=90)
  *  3. Mode-Sentence  +  (WPM=130)
  *
- *  (emotion → {pitchOffset, rateMul, volume, DSP formantShift, interWordPause})
+ *  (emotion  {pitchOffset, rateMul, volume, DSP formantShift, interWordPause})
  *   neutral       
- *   encouragement  (pitch+10%, rate×0.95, vol+6%, breath↑)
+ *   encouragement  (pitch+10%, rate×0.95, vol+6%, breath)
  *   gentle         (pitch+4%,  rate×0.85, vol-10%)
  *   excited       / (pitch+15%, rate×1.05, vol+12%)
  *   correction     (pitch-2%,  rate×0.85, vol-4%)
@@ -345,7 +345,7 @@ export class ReadingModeController {
    *  WPM  =  / ( - ) × 60000
    */
   async run_AC_4_scenario() {
-    const testText = "小朋友们好，今天我们来学习汉字。";
+    const testText = "小朋友们好，今天我们来学习汉字";
     const testWords = ["小朋友", "今天", "我们", "学习", "汉字", "读书", "写字"];
     const modes = ["char", "word", "sentence"];
     const expected = {

@@ -23,7 +23,15 @@ export const GAME_ICONS = {
   pen: (cls = "w-6 h-6") => `<img src="assets/images/icon_pen.jpg" class="${cls} object-contain rounded-full shadow-md" alt="pen" />`,
   sparkle: (cls = "w-6 h-6") => `<img src="assets/images/icon_sparkle.jpg" class="${cls} object-contain rounded-full shadow-md" alt="sparkle" />`,
   cards: (cls = "w-6 h-6") => `<img src="assets/images/icon_cards.jpg" class="${cls} object-contain rounded-full shadow-md" alt="cards" />`,
-  calendar: (cls = "w-6 h-6") => `<img src="assets/images/icon_calendar.jpg" class="${cls} object-contain rounded-full shadow-md" alt="calendar" />`
+  calendar: (cls = "w-6 h-6") => `<img src="assets/images/icon_calendar.jpg" class="${cls} object-contain rounded-full shadow-md" alt="calendar" />`,
+  crown: (cls = "w-6 h-6") => `<img src="assets/images/icon_trophy.jpg" class="${cls} object-contain rounded-full shadow-md" alt="crown" />`,
+  gem: (cls = "w-6 h-6") => `<img src="assets/images/icon_sparkle.jpg" class="${cls} object-contain rounded-full shadow-md" alt="gem" />`,
+  monster: (cls = "w-6 h-6") => `<img src="assets/images/icon_parent.jpg" class="${cls} object-contain rounded-full shadow-md" alt="monster" />`,
+  reviewBell: (cls = "w-6 h-6") => `<img src="assets/images/icon_book.jpg" class="${cls} object-contain rounded-full shadow-md" alt="review" />`,
+  compass: (cls = "w-6 h-6") => `<img src="assets/images/icon_home.jpg" class="${cls} object-contain rounded-full shadow-md" alt="compass" />`,
+  brush: (cls = "w-6 h-6") => `<img src="assets/images/icon_pen.jpg" class="${cls} object-contain rounded-full shadow-md" alt="brush" />`,
+  scroll: (cls = "w-6 h-6") => `<img src="assets/images/icon_book.jpg" class="${cls} object-contain rounded-full shadow-md" alt="scroll" />`,
+  swords: (cls = "w-6 h-6") => `<img src="assets/images/icon_chest.jpg" class="${cls} object-contain rounded-full shadow-md" alt="swords" />`
 };
 
 export default GAME_ICONS;

@@ -49,7 +49,7 @@ export function computeStreaks(dates) {
 export function buildMonthMatrix(year, monthIdx, activeSet, todayKey) {
   const first = new Date(year, monthIdx, 1);
   const daysInMonth = new Date(year, monthIdx + 1, 0).getDate();
-  // getDay(): 0= → 
+  // getDay(): 0=  
   const lead = (first.getDay() + 6) % 7;
 
   const cells = [];

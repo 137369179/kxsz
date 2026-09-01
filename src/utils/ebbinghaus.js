@@ -2,6 +2,10 @@
  * 凯茜识字 (Cathy Literacy) - 艾宾浩斯遗忘曲线复习调度与学习分析器
  */
 
+import { eventBus, EVENTS } from "./eventBus.js";
+import { storageManager } from "./storageManager.js";
+import { findShopItem } from "../data/shop.js";
+
 const STORAGE_KEY = "CATHY_LITERACY_USER_PROGRESS_V1";
 
 export class EbbinghausManager {
@@ -17,15 +21,13 @@ export class EbbinghausManager {
   loadProgress() {
     let loaded = null;
     try {
-      if (typeof localStorage !== "undefined") {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if (raw) {
-          loaded = JSON.parse(raw);
-        }
-      }
+      const raw = storageManager.getItem(STORAGE_KEY);
+      if (raw) loaded = JSON.parse(raw);
     } catch (e) {
       console.warn("读取本地进度失败，使用默认配置", e);
     }
+
+    const today = new Date().toDateString();
 
     const defaultState = {
       coins: 60,
@@ -37,12 +39,16 @@ export class EbbinghausManager {
         avatar: "assets/images/cathy_mascot.jpg"
       },
       settings: {
-        dailyCharTarget: 3,
+        dailyCharTarget: 5,
         enablePlayStep: true,
         enableWriteStep: true,
         eyeProtectionMinutes: 20,
         audioLanguage: "mandarin",
         soundEnabled: true
+      },
+      shop: {
+        owned: ["av_cathy", "av_fairy", "av_hero", "frame_none"],
+        equippedFrame: "frame_none"
       },
       charRecords: {
         char_001: {
@@ -55,8 +61,11 @@ export class EbbinghausManager {
           isDifficult: false
         }
       },
-      todayLearnedCount: 1,
-      lastActiveDate: new Date().toDateString(),
+      todayLearnedCount: 0,
+      lastActiveDate: today,
+      todaySignedIn: false,
+      signInStreak: 0,
+      lastSignInDate: "",
       studyHistory: [
         { date: "周一", count: 3 },
         { date: "周二", count: 2 },
@@ -69,8 +78,20 @@ export class EbbinghausManager {
     };
 
     if (loaded) {
-      // 保证旧版本进度结构也能补充新字段，防止报错
-      return { ...defaultState, ...loaded, settings: { ...defaultState.settings, ...(loaded.settings || {}) }, profile: { ...defaultState.profile, ...(loaded.profile || {}) } };
+      const merged = {
+        ...defaultState,
+        ...loaded,
+        settings: { ...defaultState.settings, ...(loaded.settings || {}) },
+        profile: { ...defaultState.profile, ...(loaded.profile || {}) },
+        shop: { ...defaultState.shop, ...(loaded.shop || {}) }
+      };
+      // Daily reset: new day → reset today's counters
+      if (merged.lastActiveDate !== today) {
+        merged.lastActiveDate = today;
+        merged.todayLearnedCount = 0;
+        merged.todaySignedIn = false;
+      }
+      return merged;
     }
 
     return defaultState;
@@ -78,9 +99,7 @@ export class EbbinghausManager {
 
   save() {
     try {
-      if (typeof localStorage !== "undefined") {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(this.progress));
-      }
+      storageManager.putJSON(STORAGE_KEY, this.progress);
     } catch (e) {
       console.error("保存进度失败", e);
     }
@@ -89,7 +108,43 @@ export class EbbinghausManager {
   addCoins(amount = 10) {
     this.progress.coins = (this.progress.coins || 0) + amount;
     this.save();
+    eventBus.emit(EVENTS.PROGRESS_CHANGED, { progress: this.progress });
     return this.progress.coins;
+  }
+
+  // 每日签到 — 计算连续天数、奖励星币
+  doSignIn() {
+    if (this.progress.todaySignedIn) return;
+    const today = new Date().toDateString();
+    const lastDate = this.progress.lastSignInDate;
+    const yesterday = new Date(Date.now() - 86400000).toDateString();
+    // Streak: only continues if signed in yesterday
+    if (lastDate === yesterday) {
+      this.progress.signInStreak = (this.progress.signInStreak || 0) + 1;
+    } else if (lastDate !== today) {
+      this.progress.signInStreak = 1;
+    }
+    this.progress.lastSignInDate = today;
+    this.progress.todaySignedIn = true;
+    // Bonus: 5 base + streak bonus
+    const bonus = 5 + Math.min(this.progress.signInStreak - 1, 10);
+    this.addCoins(bonus);
+    this.save();
+    eventBus.emit(EVENTS.PROGRESS_CHANGED, { progress: this.progress });
+    return this.progress.signInStreak;
+  }
+
+  // 记录今日学习了一个新字
+  incrementTodayLearned() {
+    this.progress.todayLearnedCount = (this.progress.todayLearnedCount || 0) + 1;
+    // Update study history (rolling weekly)
+    const days = ["周日","周一","周二","周三","周四","周五","周六"];
+    const todayLabel = days[new Date().getDay()];
+    const hist = this.progress.studyHistory || [];
+    const dayEntry = hist.find(h => h.date === todayLabel);
+    if (dayEntry) dayEntry.count = this.progress.todayLearnedCount;
+    this.save();
+    eventBus.emit(EVENTS.PROGRESS_CHANGED, { progress: this.progress });
   }
 
   // 完成一个汉字的学习
@@ -122,6 +177,7 @@ export class EbbinghausManager {
     this.progress.currentLevelIndex = Math.max(this.progress.currentLevelIndex, Object.keys(this.progress.charRecords).length + 1);
 
     this.save();
+    eventBus.emit(EVENTS.PROGRESS_CHANGED, { progress: this.progress });
     return existing;
   }
 
@@ -202,26 +258,57 @@ export class EbbinghausManager {
       .map((r) => r.charId);
   }
 
-  // ===== Reward stubs（原代码引用但未实现）=====
+  // ===== 装扮商城与道具背包系统 =====
+  isOwned(id) {
+    if (!this.progress.shop) {
+      this.progress.shop = { owned: ["av_cathy", "av_fairy", "av_hero", "frame_none"], equippedFrame: "frame_none" };
+    }
+    const owned = this.progress.shop.owned || [];
+    if (owned.includes(id)) return true;
+    const item = findShopItem ? findShopItem(id) : null;
+    return item ? item.price === 0 : (id === "av_cathy" || id === "frame_none");
+  }
+
   markMedalsSeen(_ids) {
-    // 标记勋章为已阅（stub）
+    // 标记勋章为已阅
   }
 
   equipAvatar(value) {
     if (!this.progress.profile) this.progress.profile = {};
     this.progress.profile.avatar = value;
     this.save();
+    eventBus.emit(EVENTS.PROGRESS_CHANGED, { progress: this.progress });
   }
 
   equipFrame(id) {
+    if (!this.progress.shop) {
+      this.progress.shop = { owned: ["av_cathy", "av_fairy", "av_hero", "frame_none"], equippedFrame: "frame_none" };
+    }
+    this.progress.shop.equippedFrame = id;
     if (!this.progress.profile) this.progress.profile = {};
     this.progress.profile.frame = id;
     this.save();
+    eventBus.emit(EVENTS.PROGRESS_CHANGED, { progress: this.progress });
   }
 
   purchase(id) {
-    // 简化：直接返回成功
-    return { success: true };
+    if (!this.progress.shop) {
+      this.progress.shop = { owned: ["av_cathy", "av_fairy", "av_hero", "frame_none"], equippedFrame: "frame_none" };
+    }
+    if (this.isOwned(id)) return { ok: true, success: true };
+    const item = findShopItem ? findShopItem(id) : null;
+    const price = item ? item.price : 0;
+    if (this.progress.coins < price) {
+      return { ok: false, success: false, reason: "insufficient_coins" };
+    }
+    this.progress.coins -= price;
+    if (!this.progress.shop.owned) this.progress.shop.owned = ["av_cathy", "av_fairy", "av_hero", "frame_none"];
+    if (!this.progress.shop.owned.includes(id)) {
+      this.progress.shop.owned.push(id);
+    }
+    this.save();
+    eventBus.emit(EVENTS.PROGRESS_CHANGED, { progress: this.progress });
+    return { ok: true, success: true };
   }
 }
 

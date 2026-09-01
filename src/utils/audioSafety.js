@@ -8,24 +8,28 @@
  *        - navigator.mediaDevices.addEventListener('devicechange') /
  *        -  clamp masterVol ≤ 0.65
  *        -  > 30min  (health:rest)
- *        -  > 60min →  ≤ 0.45
- *        -  > 0.9 compressor.reduction  10s → 
+ *        -  > 60min   ≤ 0.45
+ *        -  > 0.9 compressor.reduction  10s  
  */
 
 import { soundAndFX } from "./soundEngine.js";
 import { EVENTS, eventBus } from "./eventBus.js";
+import { storageManager } from "./storageManager.js";
 
 const LS_KEY = "cathy_audio_v1";
 const LS_PIN_KEY = "cathy_audio_pin_v1";    // {"pinHash":..., enabledChannels:["bgm","sfx","voice"]}
 
-function lightweightHash(s) {
-  //  ()
-  let h = 0x811c9dc5;
-  for (let i = 0; i < s.length; i++) {
-    h ^= s.charCodeAt(i);
-    h = Math.imul(h, 0x01000193);
+/** 同步轻量散列（FNV-1a + base36），防止 localStorage 明文裸存 PIN */
+function obfuscatePin(pin) {
+  // FNV-1a 64-bit 变体，快且不可逆
+  let h = 0xcbf29ce484222325;
+  const mask = 0xffffffffffffffff;
+  for (let i = 0; i < pin.length; i++) {
+    h ^= pin.charCodeAt(i);
+    h = Math.imul(h, 0x00000100000001B3) & mask;
+    h = (h ^ (h >>> 33)) & mask;
   }
-  return (h >>> 0).toString(16).padStart(8, "0");
+  return "pin:" + h.toString(36);
 }
 
 export class AudioSafetyAndPersistence {
@@ -45,7 +49,7 @@ export class AudioSafetyAndPersistence {
   // ---------------- 10.1  ----------------
   load() {
     try {
-      const raw = localStorage.getItem(LS_KEY);
+      const raw = storageManager.getItem(LS_KEY);
       if (!raw) return null;
       const d = JSON.parse(raw);
       soundAndFX.masterVolume = d.master ?? 1.0;
@@ -70,7 +74,7 @@ export class AudioSafetyAndPersistence {
   save() {
     try {
       const profile = soundAndFX._audioProfile;
-      localStorage.setItem(LS_KEY, JSON.stringify(profile));
+      storageManager.putJSON(LS_KEY, profile);
       eventBus.emit(EVENTS.AUDIO_VOLUME_CHANGED, { channel: "all", profile });
       return profile;
     } catch (e) { return null; }
@@ -83,22 +87,22 @@ export class AudioSafetyAndPersistence {
    * @param {string[]} lockedChannels  "master" | "bgm" | "sfx" | "voice"
    */
   setParentalLock(pin, lockedChannels = ["master", "voice", "bgm", "sfx"]) {
-    const pinHash = lightweightHash(String(pin || ""));
+    const pinHash = obfuscatePin(String(pin || ""));
     const data = { pinHash, lockedChannels, enabled: true };
-    try { localStorage.setItem(LS_PIN_KEY, JSON.stringify(data)); } catch {}
+    try { storageManager.setItem(LS_PIN_KEY, JSON.stringify(data)); } catch {}
     eventBus.emit(EVENTS.AUDIO_PARENT_UNLOCKED, { unlocked: false });
     return true;
   }
 
   unlockParentalLock(pin) {
     try {
-      const raw = localStorage.getItem(LS_PIN_KEY);
+      const raw = storageManager.getItem(LS_PIN_KEY);
       if (!raw) return true;
       const d = JSON.parse(raw);
-      const ok = d.pinHash === lightweightHash(String(pin || ""));
+      const ok = d.pinHash === obfuscatePin(String(pin || ""));
       if (ok) {
         d.enabled = false;
-        localStorage.setItem(LS_PIN_KEY, JSON.stringify(d));
+        storageManager.setItem(LS_PIN_KEY, JSON.stringify(d));
         eventBus.emit(EVENTS.AUDIO_PARENT_UNLOCKED, { unlocked: true });
       }
       return ok;
@@ -107,18 +111,18 @@ export class AudioSafetyAndPersistence {
 
   lockParentalLock() {
     try {
-      const raw = localStorage.getItem(LS_PIN_KEY);
+      const raw = storageManager.getItem(LS_PIN_KEY);
       if (!raw) return false;
       const d = JSON.parse(raw);
       d.enabled = true;
-      localStorage.setItem(LS_PIN_KEY, JSON.stringify(d));
+      storageManager.setItem(LS_PIN_KEY, JSON.stringify(d));
       eventBus.emit(EVENTS.AUDIO_PARENT_UNLOCKED, { unlocked: false });
       return true;
     } catch { return false; }
   }
 
   isParentalLocked() {
-    try { return JSON.parse(localStorage.getItem(LS_PIN_KEY) || '{"enabled":false}').enabled; }
+    try { return JSON.parse(storageManager.getItem(LS_PIN_KEY) || '{"enabled":false}').enabled; }
     catch { return false; }
   }
 
@@ -126,9 +130,14 @@ export class AudioSafetyAndPersistence {
   canAdjustChannel(channel) {
     if (!this.isParentalLocked()) return true;
     try {
-      const d = JSON.parse(localStorage.getItem(LS_PIN_KEY) || '{}');
+      const d = JSON.parse(storageManager.getItem(LS_PIN_KEY) || '{}');
       return !(d.lockedChannels || []).includes(channel);
     } catch { return true; }
+  }
+
+  /** 清除家长锁数据（仅供测试/重置用） */
+  clearParentalLock() {
+    storageManager.removeItem(LS_PIN_KEY);
   }
 
   setVolumeGuarded(channel, value) {
@@ -146,7 +155,7 @@ export class AudioSafetyAndPersistence {
   // ---------------- 10.3  +  ----------------
   /**
    *  enumerateDevices  label label 
-   *   "headphone"/"earpiece"/""/"bluetooth"/"airpod"/"wireless"/"headset" → 
+   *   "headphone"/"earpiece"/""/"bluetooth"/"airpod"/"wireless"/"headset"  
    *  devicechange 
    */
   startDeviceMonitor() {
@@ -209,12 +218,12 @@ export class AudioSafetyAndPersistence {
       this.health.totalPlaytimeMsToday += 1000;
     }
 
-    // b) session > 30min → 
+    // b) session > 30min  
     if (this.health.sessionPlaytimeMs >= 30 * 60 * 1000 &&
         Math.abs(this.health.sessionPlaytimeMs - 30 * 60 * 1000) < 1100) {
-      eventBus.emit("audio:health", { kind: "rest-reminder", playedMin: 30 });
+      eventBus.emit(EVENTS.AUDIO_HEALTH, { kind: "rest-reminder", playedMin: 30 });
     }
-    // c)  > 60min →  clamp master ≤ 0.45
+    // c)  > 60min   clamp master ≤ 0.45
     if (this.health.totalPlaytimeMsToday > 60 * 60 * 1000) {
       if (soundAndFX.masterVolume > 0.45) {
         soundAndFX.setMasterVolume(0.45);
@@ -222,7 +231,7 @@ export class AudioSafetyAndPersistence {
       }
     }
 
-    // d) compressor.reduction  10s  → clamp
+    // d) compressor.reduction  10s   clamp
     if (soundAndFX.compressor) {
       const red = soundAndFX.compressor.reduction.value;
       if (red < -12) {
@@ -237,7 +246,7 @@ export class AudioSafetyAndPersistence {
     }
   }
 
-  // applyDefaultsOrLoaded → 
+  // applyDefaultsOrLoaded  
   async applyDefaultsOrLoaded() {
     this.load();
     this.startDeviceMonitor();
@@ -281,8 +290,8 @@ export class AudioSafetyAndPersistence {
     const appliedAfterHP = soundAndFX.masterVolume <= 0.65;
     soundAndFX.masterVolume = oldVol;
     this.headphonesActive = false;
-    //  PIN 
-    try { localStorage.removeItem(LS_PIN_KEY); } catch {}
+    // 清除 PIN（测试重置）
+    storageManager.removeItem(LS_PIN_KEY);
     this.lockParentalLock = () => true; // reset
 
     const allPass = persistOk && locked && guardReject && wrongPINsuccess === false && unlockRight && guardAllow && appliedAfterHP;

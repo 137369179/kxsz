@@ -2,14 +2,14 @@
  *    DSP  + 4  Pitch 
  *
  *  =  (Childlike Voice Acoustic Modeling)
- *  1.  Formant Shifting (F1↑+150Hz, F2↑+200Hz) — 
+ *  1.  Formant Shifting (F1+150Hz, F2+200Hz) — 
  *  2.  +  Air-Breath  ()
  *  3.  260Hz ( G4±50) +  Pitch 
  *  4. 4   5  (Task3/AC-3   ±5%)
- *     -  55:  (f0 520 → 500 Hz)
- *     -  35:  (f0 340 → 540 Hz F0 )
- *     -  214:  +  +  (f0 360 → 220 → 460 Hz)
- *     -  51:  (f0 560 → 200 Hz)
+ *     -  55:  (f0 520  500 Hz)
+ *     -  35:  (f0 340  540 Hz F0 )
+ *     -  214:  +  +  (f0 360  220  460 Hz)
+ *     -  51:  (f0 560  200 Hz)
  *  5.  15dB  +  60%
  *  6.  ( Chorus )
  *
@@ -19,7 +19,7 @@
 import { soundAndFX } from "./soundEngine.js";
 
 // ============================================================
-// 1.   (5  → Hz )
+// 1.   (5   Hz )
 // ============================================================
 export class TonePitchEnvelope {
   constructor() {
@@ -29,7 +29,7 @@ export class TonePitchEnvelope {
     this.range5 = 1.9;      //  ( 12  + 3 = 15 ≈ 2.83 ->  1.9 )
   }
 
-  /** 5→Hz   [1..5] →  Hz */
+  /** 5Hz   [1..5]   Hz */
   _level(level) {
     // level 5 = basseline*range5^((5-3)/2)
     return this.basselineHz * Math.pow(this.range5, (level - 3) / 2);
@@ -283,7 +283,7 @@ export class ToneSlideSynthesizer {
   }
 
   /**
-   * AC-3 4   →  F0  5  (%)
+   * AC-3 4     F0  5  (%)
    * 55/35/214/51  Hz  ±5%
    */
   async run_AC_3_scenario() {

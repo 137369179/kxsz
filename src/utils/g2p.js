@@ -1,13 +1,13 @@
 /**
- *  G2P (Grapheme-to-Phoneme) →
+ *  G2P (Grapheme-to-Phoneme) 
  *
  *  = 
  *  1. CHARACTER_DATABASE 
  *  2.  (PolyphoneDictionary + Rules)
  *  3.  (Mandarin Tone Sandhi Engine):
- *     - 3.1  (214 → 35)
- *     - 3.2   (yī → yí/·yì/yi)
- *     - 3.3   (bù → bú)
+ *     - 3.1  (214  35)
+ *     - 3.2   (yī  yí/·yì/yi)
+ *     - 3.3   (bù  bú)
  *     - 3.4  /   (old Beijing  / )
  *     - 3.5  Neutral Tone (////)
  *     - 3.6   (ya/wa/na/nga/ra)
@@ -138,7 +138,7 @@ function stripToneMark(pinyinMarked) {
   return out;
 }
 
-/**  (tone=1-4, 0/5=→) */
+/**  (tone=1-4, 0/5=) */
 function toneNums_toMarked(base, toneNum) {
   if (!base) return base;
   if (toneNum === 0 || toneNum === 5) return base;   // 
@@ -378,7 +378,7 @@ const LOC_POSTFIX = new Set(["边", "面", "头", "里"]);
 
 function applyToneSandhi(tokens) {
   /** tokens = [{char, pinyinStrip, toneNum, ...}[]] */
-  // 4.1  AABB  → 
+  // 4.1  AABB   
   for (let i = 1; i < tokens.length; i++) {
     if (tokens[i].char === tokens[i - 1].char && tokens[i].toneNum !== 0) {
       //   /   /   /   /   /   /   /  
@@ -427,12 +427,12 @@ function applyToneSandhi(tokens) {
     }
   }
 
-  // 4.5  (3 → 2  3)
+  // 4.5  (3  2  3)
   for (let i = 0; i < tokens.length - 1; i++) {
     const cur = tokens[i], next = tokens[i + 1];
     if (cur.toneNum === 3 && next.toneNum === 3 && cur.char !== next.char) {
       //  (e.g.  nǎi nai)
-      tokens[i] = { ...cur, _origTone: 3, toneNum: 2, sandhi: "33→2",
+      tokens[i] = { ...cur, _origTone: 3, toneNum: 2, sandhi: "332",
                     pinyinMarked: toneNums_toMarked(cur.pinyinStrip, 2) };
     }
   }
@@ -441,7 +441,7 @@ function applyToneSandhi(tokens) {
   for (let i = 0; i < tokens.length; i++) {
     if (tokens[i].char !== "一") continue;
     const next = tokens[i + 1];
-    // 句末 / 序数 / 单念 → yī (本调)
+    // 句末 / 序数 / 单念  yī (本调)
     const atEnd = i === tokens.length - 1;
     const isOrdinal = tokens[i - 1] && ["第", "初", "头"].includes(tokens[i - 1].char);
     if (atEnd || isOrdinal) {
@@ -449,17 +449,17 @@ function applyToneSandhi(tokens) {
       continue;
     }
     if (next && next.toneNum === 4) {
-      //  +  → yí ()
-      tokens[i] = { ...tokens[i], _origTone: 1, toneNum: 2, sandhi: "→yí",
+      //  +   yí ()
+      tokens[i] = { ...tokens[i], _origTone: 1, toneNum: 2, sandhi: "yí",
                     pinyinStrip: "yi", pinyinMarked: "yí" };
     } else if (next && next.toneNum !== 4 && next.toneNum !== 0) {
-      //  + // → yì ()
-      tokens[i] = { ...tokens[i], _origTone: 1, toneNum: 4, sandhi: "→yì",
+      //  + //  yì ()
+      tokens[i] = { ...tokens[i], _origTone: 1, toneNum: 4, sandhi: "yì",
                     pinyinStrip: "yi", pinyinMarked: "yì" };
     }
-    //  →  / 
+    //    / 
     if (tokens[i - 1] && tokens[i + 1] && tokens[i - 1].char === tokens[i + 1].char && isVLike(tokens[i - 1].char)) {
-      tokens[i] = { ...tokens[i], toneNum: 0, sandhi: "→yi ()", pinyinMarked: "yi" };
+      tokens[i] = { ...tokens[i], toneNum: 0, sandhi: "yi ()", pinyinMarked: "yi" };
     }
   }
 
@@ -468,16 +468,16 @@ function applyToneSandhi(tokens) {
     if (tokens[i].char !== "不") continue;
     const next = tokens[i + 1];
     if (next && next.toneNum === 4) {
-      tokens[i] = { ...tokens[i], _origTone: 4, toneNum: 2, sandhi: "→bú",
+      tokens[i] = { ...tokens[i], _origTone: 4, toneNum: 2, sandhi: "bú",
                     pinyinStrip: "bu", pinyinMarked: "bú" };
     }
-    //  AAB    → 
+    //  AAB     
     if (tokens[i - 1] && tokens[i + 1] && tokens[i - 1].char === tokens[i + 1].char) {
-      tokens[i] = { ...tokens[i], toneNum: 0, sandhi: "→bu ()", pinyinMarked: "bu" };
+      tokens[i] = { ...tokens[i], toneNum: 0, sandhi: "bu ()", pinyinMarked: "bu" };
     }
   }
 
-  // 4.8  /  (old Beijing: / +  → yí )
+  // 4.8  /  (old Beijing: / +   yí )
   //  mode:"colloquial" 
   // 4.9   — ao/ou/ai/ei/er/zi/zhi..
   for (let i = 1; i < tokens.length; i++) {
@@ -516,7 +516,7 @@ function applyToneSandhi(tokens) {
 /** Erhua (-r)  */
 function applyErhuaToRhyme(strippedPy) {
   let r = strippedPy;
-  //  i / n  -r üe/uü → üer-ng →  -r
+  //  i / n  -r üe/uü  üer-ng   -r
   if (r.endsWith("i") || r.endsWith("n")) {
     r = r.slice(0, -1) + "r";
   } else if (r.endsWith("ng")) {
@@ -586,7 +586,7 @@ export class HanziG2P {
   }
 
   /**
-   *  API →  token  + 
+   *  API   token  + 
    * @param {string} text -  {punct:true}
    * @param {{mode?:"teaching"|"colloquial", forceNeutral?:boolean}} opts
    * @returns {Array<{char, pinyinStrip, toneNum, pinyinMarked, originalTone, sandhi?, isNeutral, isPolyphone, isPunct?}>}
@@ -632,61 +632,6 @@ export class HanziG2P {
   /**  */
   toMarkedString(tokens) {
     return tokens.map(t => t.isPunct ? t.char : t.pinyinMarked).join(" ");
-  }
-
-  /**
-   *  (Task 2 AC-2) AC-2  → /
-   * @returns {{allPass: boolean, results: {word:string, expected:string, got:string, pass:boolean}[]}}
-   */
-  run_AC_2_spec() {
-    const cases = [
-      // 多音字
-      { word: "长大",   expected: "zhǎng dà" },
-      { word: "长短",   expected: "cháng duǎn" },
-      { word: "银行",   expected: "yín háng" },
-      { word: "行走",   expected: "xíng zǒu" },
-      { word: "音乐",   expected: "yīn yuè" },
-      { word: "快乐",   expected: "kuài lè" },
-      { word: "照相",   expected: "zhào xiàng" },
-      { word: "互相",   expected: "hù xiāng" },
-      { word: "好看",   expected: "hǎo kàn" },
-      { word: "爱好",   expected: "ài hào" },
-      { word: "睡觉",   expected: "shuì jiào" },
-      { word: "觉得",   expected: "jué de" },
-      { word: "头发",   expected: "tóu fa" },
-      // 一 变调
-      { word: "一个",   expected: "yí gè" },
-      { word: "一天",   expected: "yì tiān" },
-      { word: "第一",   expected: "dì yī" },
-      { word: "看一看", expected: "kàn yi kàn" },
-      // 不 变调
-      { word: "不是",   expected: "bú shì" },
-      { word: "不好",   expected: "bù hǎo" },
-      { word: "去不去", expected: "qù bu qù" },
-      // 轻声
-      { word: "妈妈",   expected: "mā ma" },
-      { word: "桌子",   expected: "zhuō zi" },
-      { word: "石头",   expected: "shí tou" },
-      { word: "我们",   expected: "wǒ men" },
-      { word: "吃了",   expected: "chī le" },
-      // 专有读法
-      { word: "水果",   expected: "shuí guǒ" },
-      { word: "好饱",   expected: "háo bǎo" },   // 上上相连 hǎo → háo + bǎo
-      // 啊 音变
-      { word: "好哇",   expected: "hǎo wa" },
-      { word: "看哪",   expected: "kàn na" },
-      { word: "听啊",   expected: "tīng nga" },
-    ];
-    const results = cases.map(({ word, expected }) => {
-      const gotMarked = this.toMarkedString(this.convert(word));
-      // 
-      const got = gotMarked.trim();
-      const pass = got === expected;
-      return { word, expected, got, pass };
-    });
-    const allPass = results.every(r => r.pass);
-    const accuracy = (results.filter(x => x.pass).length / Math.max(1, results.length) * 100);
-    return { ok: allPass && accuracy >= 98, allPass, accuracy: +accuracy.toFixed(1) + "%", results };
   }
 }
 

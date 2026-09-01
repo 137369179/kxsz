@@ -20,44 +20,47 @@
 export const EVENTS = Object.freeze({
   // 核心路由与流程事件
   SWITCH_MODE: "app:switch-mode",
-  SELECT_CHAR: "app:select-char",
-  START_LEARN: "app:select-char",
+  SELECT_CHAR: "app:select-char",       // 从地图/字卡等入口选中汉字
+  START_LEARN: "app:start-learn",       // 开始五步学习流（与 SELECT_CHAR 区分，避免同名冲突）
   LEARN_FINISH: "app:learn-finish",
   REVIEW_FINISH: "app:review-finish",
+  MODE_ERROR: "app:error",              // 模式渲染异常，payload: { mode, error }
 
-  // 
+  // 状态变更
   PROGRESS_CHANGED: "progress:changed",
   ENERGY_CHANGED: "energy:changed",
   STARS_CHANGED: "stars:changed",
 
-  //  — 
+  // 音频控制
   SOUND_TOGGLE_MUTE: "sound:toggle-mute",
 
-  //  —  / 
-  AUDIO_BUS_STATE_CHANGE: "audio:bus-state-change",  // //  payload: {cause, snapshot}
-  AUDIO_BGM_CHANGED: "audio:bgm-changed",            // BGM  payload: {old, new, transitionMs}
-  AUDIO_VOLUME_CHANGED: "audio:volume-changed",      //  payload: {channel, value, profile}
-  AUDIO_HEADPHONE_DETECTED: "audio:headphone-detected", //  payload: {active, volumeAutoAdjusted}
-  AUDIO_PARENT_UNLOCKED: "audio:parent-unlocked",    //  payload: {unlocked}
+  // 音频总线状态
+  AUDIO_BUS_STATE_CHANGE: "audio:bus-state-change",  // 音频总线状态变化
+  AUDIO_BGM_CHANGED: "audio:bgm-changed",            // BGM 切换
+  AUDIO_VOLUME_CHANGED: "audio:volume-changed",      // 音量调节
+  AUDIO_HEADPHONE_DETECTED: "audio:headphone-detected", // 耳机插入
+  AUDIO_PARENT_UNLOCKED: "audio:parent-unlocked",    // 家长锁状态
+  AUDIO_HEALTH: "audio:health",                      // 健康提示（30min/60min）
 
-  //  —  / 
-  AUDIO_SPEAK_START: "audio:speak-start",            //  payload: {kind, text, emotion}
-  AUDIO_SPEAK_PROGRESS: "audio:speak-progress",      //  payload: {char_index, char, time_ms, total}
-  AUDIO_SPEAK_END: "audio:speak-end",                //  payload: {kind, text, interrupted}
-  AUDIO_QUEUE_INTERRUPT: "audio:queue-interrupt",    //  payload: {high_priority_kind, interrupted_kind}
-  AUDIO_QUEUE_RESUME: "audio:queue-resume",          //  payload: {kind, resumeOffsetMs}
+  // 语音合成
+  AUDIO_SPEAK_START: "audio:speak-start",            // 开始朗读
+  AUDIO_SPEAK_PROGRESS: "audio:speak-progress",      // 朗读进度
+  AUDIO_SPEAK_END: "audio:speak-end",                // 朗读结束
+  AUDIO_QUEUE_INTERRUPT: "audio:queue-interrupt",    // 队列被中断
+  AUDIO_QUEUE_RESUME: "audio:queue-resume",          // 队列恢复
 
-  //  — 
-  AUDIO_STROKE_SYNC: "audio:stroke-sync",            //  payload: {strokeIdx, eventType:'start'|'end', deltaMs, strokeName, strokeType}
+  // 笔顺同步
+  AUDIO_STROKE_SYNC: "audio:stroke-sync",            // 笔顺动画同步事件
 
-  //  — 
-  AUDIO_EVAL_STATE_CHANGE: "audio:eval-state-change", //  payload: {state, prev}
-  AUDIO_EVAL_RESULT: "audio:eval-result",             //  payload: {score, pa, sr, cm, perCharReport, mappingErrors}
-  AUDIO_EVAL_ERROR_CUE: "audio:eval-error-cue",       //  payload: {charIdx, char, errorType, suggestion}
+  // 发音评测
+  AUDIO_EVAL_STATE_CHANGE: "audio:eval-state-change", // 评测状态变化
+  AUDIO_EVAL_RESULT: "audio:eval-result",             // 评测结果（大写兼容旧代码）
+  AUDIO_EVAL_ERROR: "audio:eval-error",               // 评测错误（大写兼容旧代码）
+  AUDIO_EVAL_ERROR_CUE: "audio:eval-error-cue",       // 评测错误提示
 
-  //  — 
-  AUDIO_PARENT_VOICE_SAVED: "audio:parent-voice-saved",   //  payload: {triggerType, durationMs, sizeBytes}
-  AUDIO_PARENT_VOICE_PLAYED: "audio:parent-voice-played", //  payload: {triggerType}
+  // 家长录音
+  AUDIO_PARENT_VOICE_SAVED: "audio:parent-voice-saved",   // 家长录音已保存
+  AUDIO_PARENT_VOICE_PLAYED: "audio:parent-voice-played", // 家长录音已播放
 });
 
 class EventBus {

@@ -866,15 +866,15 @@ export class PlaySceneEngine {
 
 
   // ============================================================================
-  // 深度认知 5：【日】 (破石而出，光芒万丈)
-  // 教育点：“日”代表太阳，字形外框是实体，中间一横是光斑/核心。
-  // 玩法：连续重击敲碎包裹太阳的岩石，每次敲击伴随屏幕震动与碎石飞溅。
+  // 深度认知 5：日 (破石而出，光芒万丈)
+  // 教育点：“日”代表太阳，字形外框是实体，中间一横是光斑/核心
+  // 玩法：连续重击敲碎包裹太阳的岩石，每次敲击伴随屏幕震动与碎石飞溅
   // ============================================================================
   renderEducationalSun() {
     this.mount.innerHTML = `
       <div class="relative w-full h-full bg-slate-950 overflow-hidden select-none touch-none flex flex-col items-center justify-center">
         <div class="absolute top-8 z-30 bg-black/50 text-white font-black text-xs px-4 py-1.5 rounded-full shadow-lg">
-          💡 连续用力点击岩石，砸碎它，释放出太阳！
+           连续用力点击岩石，砸碎它，释放出太阳！
         </div>
 
         <div class="relative flex items-center justify-center mt-10">
@@ -943,9 +943,9 @@ export class PlaySceneEngine {
   }
 
   // ============================================================================
-  // 深度认知 6：【月】 (星月交辉，接星星)
-  // 教育点：“月”字的形状像一弯新月（撇和横折钩），中间两横代表月晕或星光。
-  // 玩法：拖拽底部的“新月舟”接住天上掉下来的两颗流星，流星落入月中化作两横。
+  // 深度认知 6：月 (星月交辉，接星星)
+  // 教育点：“月”字的形状像一弯新月（撇和横折钩），中间两横代表月晕或星光
+  // 玩法：拖拽底部的“新月舟”接住天上掉下来的两颗流星，流星落入月中化作两横
   // ============================================================================
   renderEducationalMoon() {
     this.mount.innerHTML = `
@@ -956,12 +956,12 @@ export class PlaySceneEngine {
            <div class="absolute top-40 left-[-50%] w-80 h-24 bg-white rounded-full blur-3xl animate-[floatRight_35s_linear_infinite]" style="animation-delay: -10s"></div>
         </div>
         <div class="absolute top-8 z-30 bg-black/50 text-white font-black text-xs px-4 py-1.5 rounded-full shadow-lg">
-          💡 左右拖动新月，接住掉落的 2 颗流星！
+           左右拖动新月，接住掉落的 2 颗流星！
         </div>
 
         <!-- 掉落的流星 -->
-        <div id="star-1" class="absolute top-0 w-8 h-8 text-2xl filter drop-shadow-[0_0_10px_rgba(253,224,71,1)] z-10 transition-transform">⭐</div>
-        <div id="star-2" class="absolute -top-20 w-8 h-8 text-2xl filter drop-shadow-[0_0_10px_rgba(253,224,71,1)] z-10 transition-transform">⭐</div>
+        <div id="star-1" class="absolute top-0 w-8 h-8 text-2xl filter drop-shadow-[0_0_10px_rgba(253,224,71,1)] z-10 transition-transform"></div>
+        <div id="star-2" class="absolute -top-20 w-8 h-8 text-2xl filter drop-shadow-[0_0_10px_rgba(253,224,71,1)] z-10 transition-transform"></div>
 
         <!-- 新月舟 (模拟月的外框：撇 + 横折钩) -->
         <div id="moon-boat" class="absolute bottom-20 w-32 h-32 bg-transparent border-[12px] border-yellow-200 border-t-transparent border-r-transparent rounded-bl-full shadow-[-10px_10px_20px_rgba(253,224,71,0.4)] flex flex-col items-center justify-center gap-2 cursor-ew-resize z-20">
@@ -1066,15 +1066,15 @@ export class PlaySceneEngine {
   }
 
   // ============================================================================
-  // 深度认知 7：【水】 (水球弹射，水花飞溅)
-  // 教育点：“水”字是中间一道水流，两边是溅起的水花。
-  // 玩法：向后拉动水球（弹弓物理），松手射爆在墙上，四溅的水花直接形成“水”字。
+  // 深度认知 7：水 (水球弹射，水花飞溅)
+  // 教育点：“水”字是中间一道水流，两边是溅起的水花
+  // 玩法：向后拉动水球（弹弓物理），松手射爆在墙上，四溅的水花直接形成“水”字
   // ============================================================================
   renderEducationalWater() {
     this.mount.innerHTML = `
       <div class="relative w-full h-full bg-slate-200 overflow-hidden select-none touch-none flex flex-col items-center">
         <div class="absolute top-8 z-30 bg-black/50 text-white font-black text-xs px-4 py-1.5 rounded-full shadow-lg">
-          💡 往下长按拖拽水球，像弹弓一样把它射向墙壁！
+           往下长按拖拽水球，像弹弓一样把它射向墙壁！
         </div>
 
         <!-- 墙面水渍 (初始隐藏)，精准的“水”字书法形态 -->
