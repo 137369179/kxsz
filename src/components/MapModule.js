@@ -1,6 +1,6 @@
 /**
  * 凯茜识字 (Cathy Literacy) - 1:1 横屏无缝大地图 (Landscape World Map)
- * 纯正游戏化沉浸式界面：横向惯性拖拽漫游、3D浮岛关卡节点、凯茜全动态伴学、三大岛屿与地标建筑
+ * 纯正游戏化沉浸式界面：横向惯性拖拽漫游3D浮岛关卡节点凯茜全动态伴学三大岛屿与地标建筑
  */
 
 import { CHARACTER_DATABASE } from "../data/characters.js";
@@ -28,10 +28,11 @@ export class MapModule extends BaseModule {
     const islandChars = allChars.filter((c) => (c.stage || 1) === this.currentIsland);
     const displayChars = islandChars.length > 0 ? islandChars : allChars.slice(0, 20);
 
-    const mainEl = mountGameShell(this.container, {
+    const { content: mainEl, destroy: destroyShell } = mountGameShell(this.container, {
       activeMode: "map",
       heading: "凯茜识字世界大地图"
     });
+    this._addCleanup(destroyShell);
 
     mainEl.innerHTML = `
       <div class="relative w-full h-full min-h-[640px] flex flex-col justify-between overflow-hidden select-none bg-sky-300">
@@ -58,7 +59,7 @@ export class MapModule extends BaseModule {
           </button>
         </div>
 
-        <!-- 7 大地标快捷入口建筑 (游乐场、绘本馆、字卡库、奖励城堡、竞技场、复习) -->
+        <!-- 7 大地标快捷入口建筑 (游乐场绘本馆字卡库奖励城堡竞技场复习) -->
         <div class="absolute top-20 right-6 z-20 flex flex-wrap justify-end gap-2.5 max-w-[400px]">
           <button class="map-landmark-btn group bg-white/90 backdrop-blur-md px-3.5 py-1.5 rounded-2xl border-2 border-purple-300 shadow-xl flex items-center gap-1.5 active:scale-95 transition-all mb-2" data-mode="play">
             <span class="flex items-center group-hover:scale-110 transition-transform">${GAME_ICONS.arcade("w-5 h-5")}</span>
@@ -179,6 +180,40 @@ export class MapModule extends BaseModule {
           <span>直达最新生字</span>
         </button>
 
+        <!-- 4. 左下角每日签到 + 学习数据罗盘 -->
+        <div class="absolute bottom-6 left-6 z-30 flex flex-col gap-2">
+          
+          <!-- 每日签到徽章 -->
+          <button id="btn-daily-signin" class="group bg-gradient-to-r from-rose-500 via-pink-500 to-fuchsia-500 text-white font-black text-xs px-4 py-2.5 rounded-2xl shadow-xl border-2 border-white/50 active:scale-95 transition-all flex items-center gap-2 ${progress.todaySignedIn ? 'opacity-70 cursor-not-allowed' : 'animate-bounce-slow'}">
+            <span class="flex items-center">${GAME_ICONS.calendar("w-5 h-5")}</span>
+            <div class="flex flex-col items-start">
+              <span>${progress.todaySignedIn ? '今日已签到' : '每日签到领奖励'}</span>
+              <span class="text-[9px] text-white/80 font-bold">连续 ${progress.signInStreak || 0} 天</span>
+            </div>
+            ${!progress.todaySignedIn ? `<span class="bg-yellow-400 text-amber-900 text-[9px] font-black px-1.5 py-0.5 rounded-full ml-1">+5</span>` : ''}
+          </button>
+
+          <!-- 今日目标进度 -->
+          <div class="bg-black/60 backdrop-blur-md rounded-2xl px-4 py-2.5 border border-white/20 shadow-xl">
+            <div class="flex items-center justify-between mb-1.5">
+              <span class="text-[10px] font-black text-amber-300">今日目标</span>
+              <span class="text-[10px] text-white/60">${Math.min(progress.todayLearnedCount || 0, 5)} / 5 个字</span>
+            </div>
+            <div class="w-36 h-2 bg-white/20 rounded-full overflow-hidden">
+              <div class="h-full bg-gradient-to-r from-amber-400 to-orange-500 rounded-full transition-all duration-700" style="width:${Math.min(((progress.todayLearnedCount || 0) / 5) * 100, 100)}%"></div>
+            </div>
+          </div>
+
+          <!-- 总学习进度 -->
+          <div class="bg-black/60 backdrop-blur-md rounded-2xl px-4 py-2 border border-white/20 shadow-xl flex items-center gap-3">
+            <span class="flex items-center">${GAME_ICONS.sparkle("w-5 h-5")}</span>
+            <div>
+              <div class="text-[10px] text-white/60 font-bold">已学 <b class="text-amber-300">${Object.keys(progress.charRecords || {}).length}</b> / ${CHARACTER_DATABASE.length} 字</div>
+              <div class="text-[10px] text-white/60 font-bold">星币 <b class="text-yellow-300">${progress.coins}</b> · 星星 <b class="text-amber-300">${progress.stars}</b></div>
+            </div>
+          </div>
+        </div>
+
       </div>
     `;
 
@@ -234,6 +269,21 @@ export class MapModule extends BaseModule {
       });
     });
 
+    // 每日签到
+    const signinBtn = mainEl.querySelector("#btn-daily-signin");
+    if (signinBtn) {
+      this._on(signinBtn, "click", () => {
+        if (ebbinghausManager.progress.todaySignedIn) return;
+        soundAndFX.playSuccessSound();
+        soundAndFX.triggerConfetti(this.container);
+        soundAndFX.triggerCoinFly(this.container);
+        ebbinghausManager.doSignIn();
+        showGameToast(this.container, "签到成功！获得 5 星币！连续打卡中...", "success");
+        // Re-render to update the button state
+        this._timeout(() => this.render(), 1500);
+      });
+    }
+
     // 快捷直达
     const quickBtn = mainEl.querySelector("#btn-quick-target-char");
     if (quickBtn) {
@@ -275,12 +325,13 @@ export class MapModule extends BaseModule {
         viewport.scrollLeft = scrollLeft - walk;
       });
 
-      // 触摸事件 (移动端与平板)
+      // 触摸事件 (移动端与平板) — passive:false 确保 preventDefault 生效
       this._on(viewport, "touchstart", (e) => {
+        e.preventDefault();
         isDown = true;
         startX = e.touches[0].pageX - viewport.offsetLeft;
         scrollLeft = viewport.scrollLeft;
-      }, { passive: true });
+      }, { passive: false });
 
       this._on(viewport, "touchend", () => {
         isDown = false;
@@ -288,10 +339,11 @@ export class MapModule extends BaseModule {
 
       this._on(viewport, "touchmove", (e) => {
         if (!isDown) return;
+        e.preventDefault();
         const x = e.touches[0].pageX - viewport.offsetLeft;
         const walk = (x - startX) * 1.5;
         viewport.scrollLeft = scrollLeft - walk;
-      }, { passive: true });
+      }, { passive: false });
     }
   }
 }

@@ -1,10 +1,10 @@
 /**
  * 凯茜识字 (Cathy Literacy) - 顶级趣味游乐场与竞技复习馆
  * 核心王牌特色：
- *  1. 【难字歼灭战】针对艾宾浩斯遗忘曲线薄弱字，挑战动态血条 Boss 巨兽，法术暴击与金币礼炮结算
- *  2. 【汉字消消乐】字音字形 3D 翻牌连击对对碰 (Combo 连击音效)
- *  3. 【双人对决竞技场】红蓝双人/人机抢拍答题，实时比分榜与胜利皇冠加冕
- *  4. 【成语国学馆】经典成语国学微课、生动典故与趣味测验
+ *  1. 难字歼灭战针对艾宾浩斯遗忘曲线薄弱字，挑战动态血条 Boss 巨兽，法术暴击与金币礼炮结算
+ *  2. 汉字消消乐字音字形 3D 翻牌连击对对碰 (Combo 连击音效)
+ *  3. 双人对决竞技场红蓝双人/人机抢拍答题，实时比分榜与胜利皇冠加冕
+ *  4. 成语国学馆经典成语国学微课生动典故与趣味测验
  *  5. 全量采用 BaseModule 生命周期管理与 100% 纯矢量 3D 游戏资产
  */
 
@@ -15,6 +15,7 @@ import { soundAndFX } from "../utils/soundEngine.js";
 import { mountGameShell, showGameToast } from "./SharedShell.js";
 import { BaseModule } from "../utils/BaseModule.js";
 import { GAME_ICONS } from "../utils/gameIcons.js";
+import { EVENTS } from "../utils/eventBus.js";
 
 function shuffle(arr) {
   const a = [...arr];
@@ -50,10 +51,11 @@ export class PlayModule extends BaseModule {
   // 1. 游乐场大厅
   // ----------------------------------------------------
   renderHub() {
-    const mainEl = mountGameShell(this.container, {
+    const { content: mainEl, destroy: destroyShell } = mountGameShell(this.container, {
       activeMode: "play",
       heading: "凯茜游乐场"
     });
+    this._addCleanup(destroyShell);
 
     mainEl.innerHTML = `
       <div class="relative w-full max-w-5xl mx-auto flex flex-col select-none animate-fade-in pb-8">
@@ -70,7 +72,7 @@ export class PlayModule extends BaseModule {
               <h1 class="text-2xl font-black drop-shadow-md">凯茜游乐场 (全能拓展竞技馆)</h1>
             </div>
             <p class="text-xs text-yellow-200 font-bold">
-              趣味游戏化巩固复习，消灭生字怪兽、双人对决、国学成语，赢取海量凯茜星币！
+              趣味游戏化巩固复习，消灭生字怪兽双人对决国学成语，赢取海量凯茜星币！
             </p>
           </div>
         </div>
@@ -102,7 +104,7 @@ export class PlayModule extends BaseModule {
               </div>
               <h3 class="text-lg font-black text-gray-900 group-hover:text-amber-600 transition-colors">汉字消消乐</h3>
               <p class="text-xs text-gray-500 mt-1.5 leading-relaxed font-semibold">
-                听音辨形，拼音与汉字 3D 翻转对对碰快速消除。
+                听音辨形，拼音与汉字 3D 翻转对对碰快速消除
               </p>
             </div>
             <button class="mt-4 bg-gradient-to-r from-amber-500 to-yellow-500 text-white text-xs font-black py-2.5 rounded-full shadow-md active:scale-95 transition-transform flex items-center justify-center gap-1.5">
@@ -134,7 +136,7 @@ export class PlayModule extends BaseModule {
               </div>
               <h3 class="text-lg font-black text-gray-900 group-hover:text-emerald-600 transition-colors">成语国学馆</h3>
               <p class="text-xs text-gray-500 mt-1.5 leading-relaxed font-semibold">
-                50+ 经典成语趣味微课堂、生动典故与互动小问答。
+                50+ 经典成语趣味微课堂生动典故与互动小问答
               </p>
             </div>
             <button class="mt-4 bg-gradient-to-r from-emerald-500 to-green-500 text-white text-xs font-black py-2.5 rounded-full shadow-md active:scale-95 transition-transform flex items-center justify-center gap-1.5">
@@ -235,7 +237,7 @@ export class PlayModule extends BaseModule {
               首领怒吼：“谁能认出‘${curChar.char}’（${curChar.pinyin}）字？！”
             </h2>
             <p class="text-xs text-gray-300 mb-6 font-semibold">
-              ✨ 点击下方正确的法术水晶字符，释放激光暴击首领！
+              点击下方正确的法术水晶字符，释放激光暴击首领！
             </p>
 
             <!-- 攻击法术选项 -->
@@ -540,14 +542,14 @@ export class PlayModule extends BaseModule {
             </div>
 
             <div class="candy-pill flex items-center gap-4 px-5 py-1.5 rounded-full text-xs font-black">
-              <span class="text-rose-400">🔴 红队: ${p1Score}</span>
-              <span class="text-cyan-400">🔵 蓝队: ${p2Score}</span>
+              <span class="text-rose-400"> 红队: ${p1Score}</span>
+              <span class="text-cyan-400"> 蓝队: ${p2Score}</span>
             </div>
           </header>
 
           <main class="relative z-10 flex-1 flex flex-col items-center justify-center p-6 text-center">
             <div class="mb-4 bg-black/60 px-6 py-2 rounded-full border border-yellow-400 text-yellow-300 font-black text-lg animate-pulse">
-              🎯 目标字：读音 ${r.pinyin}
+               目标字：读音 ${r.pinyin}
             </div>
 
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-5 w-full max-w-2xl">
@@ -641,68 +643,59 @@ export class PlayModule extends BaseModule {
   }
 
   // ----------------------------------------------------
-  // 5. 成语国学馆 (Idiom Hall)
+  // 5. 成语国学馆 (Idiom Hall) — 深度沉浸版
   // ----------------------------------------------------
   renderIdiomHall() {
     const __pmProgress = ebbinghausManager.progress;
     const __pmSpeakerIcon = soundAndFX.isMuted ? GAME_ICONS.speaker("w-5 h-5", true) : GAME_ICONS.speaker("w-5 h-5", false);
+    const db = (typeof IDIOMS_DATABASE !== "undefined" && IDIOMS_DATABASE.length) ? IDIOMS_DATABASE : [
+      { id: "idiom_001", name: "守株待兔", pinyin: "shǒu zhū dài tù", chars: ["守","株","待","兔"], desc: "比喻死守狭隘经验，不知变通，妄想不劳而获", story: "古时候有个农夫在田里干活，忽然一只兔子飞快跑来撞在树桩上死了农夫捡到兔子非常高兴，从此天天坐在树桩旁等待，结果田地荒芜，再也没等到兔子", moral: "做事要脚踏实地努力，不能心存侥幸", gameQuestion: { question: "农夫为什么再也没等到兔子？", options: ["撞树桩是极偶然的巧合，应该靠勤劳劳动", "因为树桩太矮了", "因为兔子跑得太慢了"], correctIndex: 0 } },
+      { id: "idiom_002", name: "拔苗助长", pinyin: "bá miáo zhù zhǎng", chars: ["拔","苗","助","长"], desc: "比喻急于求成，违反规律，反而把事情弄糟", story: "古时候有个人嫌禾苗长得太慢，于是把禾苗一棵棵拔高他回家高兴地说：我帮禾苗长高啦！儿子跑到田里一看，禾苗全都枯死了", moral: "万物生长有规律，急于求成往往适得其反", gameQuestion: { question: "禾苗为什么枯死了？", options: ["被拔离土壤，破坏了生长规律", "天气太热了", "禾苗喝了太多水"], correctIndex: 0 } },
+      { id: "idiom_003", name: "亡羊补牢", pinyin: "wáng yáng bǔ láo", chars: ["亡","羊","补","牢"], desc: "比喻出了问题后想办法补救，还不算太晚", story: "从前有个牧羊人，羊圈破了个洞，邻居劝他修好，他没听果然，第二天少了一只羊他赶忙修好羊圈，从此再没丢过羊", moral: "犯了错误要及时改正，亡羊补牢，为时未晚", gameQuestion: { question: "牧羊人后来修好羊圈，结果如何？", options: ["再也没有丢过羊", "又丢了很多羊", "羊圈又坏了"], correctIndex: 0 } },
+      { id: "idiom_004", name: "画龙点睛", pinyin: "huà lóng diǎn jīng", chars: ["画","龙","点","睛"], desc: "比喻在关键处着墨，使内容更加传神生动", story: "古代画师张僧繇画了四条龙，却不肯点上眼睛人们苦苦请求，他终于给两条龙点了眼睛顿时电闪雷鸣，那两条龙破壁飞上天去了！", moral: "在关键处用力，能让整件事情焕然一新", gameQuestion: { question: "张僧繇给龙点睛后发生了什么？", options: ["电闪雷鸣，龙破壁飞走了", "画作变得更美了", "画师获得了奖赏"], correctIndex: 0 } }
+    ];
+
     this.container.innerHTML = `
-      <div class="relative w-full h-full min-h-[640px] flex flex-col justify-between select-none overflow-hidden bg-gradient-to-b from-emerald-950 via-teal-950 to-slate-950 text-white">
+      <div class="relative w-full h-full min-h-[640px] flex flex-col select-none overflow-hidden bg-gradient-to-b from-emerald-950 via-teal-950 to-slate-950 text-white">
         
         <header class="relative z-30 w-full px-6 py-3 flex items-center justify-between bg-black/50 backdrop-blur-md border-b border-white/20">
           <button id="btn-idiom-back" class="btn-game-wood text-white font-black text-xs px-4 py-2 rounded-full flex items-center gap-1.5">
             <span class="flex items-center">${GAME_ICONS.home("w-4 h-4")}</span>
             <span>返回大厅</span>
           </button>
-          
           <div class="flex items-center gap-2">
             <span class="flex items-center">${GAME_ICONS.book("w-6 h-6")}</span>
-            <span class="text-sm font-black text-yellow-300">成语国学微课堂 (50+ 经典典故)</span>
+            <span class="text-sm font-black text-yellow-300">成语国学微课堂</span>
           </div>
-
           <div class="flex items-center gap-2">
-            <button id="btn-idiom-sound" class="w-10 h-10 bg-black/40 backdrop-blur-md rounded-full text-white flex items-center justify-center hover:bg-black/60 transition-transform active:scale-90 border border-white/30 shadow-lg" title="声音开关">
-              ${__pmSpeakerIcon}
-            </button>
             <div class="candy-pill flex items-center gap-1.5 text-yellow-300 font-black text-xs px-3 py-1 rounded-full">
               ${GAME_ICONS.coin("w-4 h-4")}<span>${__pmProgress.coins}</span>
-            </div>
-            <div class="candy-pill flex items-center gap-1.5 text-amber-300 font-black text-xs px-3 py-1 rounded-full">
-              ${GAME_ICONS.star("w-4 h-4", true)}<span>${__pmProgress.stars}</span>
             </div>
           </div>
         </header>
 
         <main class="relative z-10 flex-1 p-6 overflow-y-auto no-scrollbar">
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 max-w-5xl mx-auto">
-            ${(IDIOMS_DATABASE || [
-              { idiom: "一心一意", pinyin: "yī xīn yī yì", meaning: "形容心思专一，全心全意做好一件事。" },
-              { idiom: "日新月异", pinyin: "rì xīn yuè yì", meaning: "每天每月都有新的变化，形容进步发展极其迅速。" },
-              { idiom: "水落石出", pinyin: "shuǐ luò shí chū", meaning: "水退下去，石头露出来。比喻真相彻底大白。" },
-              { idiom: "山清水秀", pinyin: "shān qīng shuǐ xiù", meaning: "山峦青翠，水色秀丽，形容风景十分优美。" },
-              { idiom: "春暖花开", pinyin: "chūn nuǎn huā kāi", meaning: "春天阳光温暖，百花盛开，形容大好春光。" },
-              { idiom: "画龙点睛", pinyin: "huà lóng diǎn jīng", meaning: "在关键处点缀一笔，使内容更加传神生动。" }
-            ]).map(
-              (item) => `
-              <div class="idiom-card bg-white/10 backdrop-blur-md rounded-3xl p-5 border-2 border-emerald-300/40 shadow-xl hover:border-emerald-300 cursor-pointer transition-all hover:scale-105 flex flex-col justify-between" data-idiom="${item.idiom}">
+            ${db.map(item => `
+              <div class="idiom-card bg-white/10 backdrop-blur-md rounded-3xl p-5 border-2 border-emerald-300/40 shadow-xl hover:border-yellow-300 cursor-pointer transition-all hover:scale-105 flex flex-col justify-between" data-idiom-idx="${db.indexOf(item)}">
                 <div>
                   <div class="flex items-center justify-between mb-2">
-                    <span class="text-xs font-bold text-emerald-300">${item.pinyin}</span>
-                    <button class="speak-idiom-btn w-7 h-7 rounded-full bg-emerald-500 text-white flex items-center justify-center text-xs shadow active:scale-90">${GAME_ICONS.speaker("w-full h-full")}</button>
+                    <span class="text-[11px] font-bold text-emerald-300 tracking-wider">${item.pinyin || ""}</span>
+                    <div class="flex gap-1">
+                      ${(item.chars || Array.from(item.name || "")).map(c => `<span class="w-6 h-6 bg-yellow-400/20 border border-yellow-300/50 rounded-md text-yellow-300 font-black text-xs flex items-center justify-center">${c}</span>`).join("")}
+                    </div>
                   </div>
-                  <h3 class="text-2xl font-black text-yellow-300 mb-2">${item.idiom}</h3>
-                  <p class="text-xs text-gray-200 leading-relaxed font-semibold">${item.meaning}</p>
+                  <h3 class="text-2xl font-black text-yellow-300 mb-2 tracking-widest">${item.name || item.idiom || ""}</h3>
+                  <p class="text-xs text-gray-200 leading-relaxed font-semibold">${item.desc || item.meaning || ""}</p>
                 </div>
-                <div class="mt-4 pt-3 border-t border-white/10 flex justify-between items-center text-[10px] text-emerald-400 font-bold">
-                  <span>国学启蒙必学</span>
-                  <span>点击听典故</span>
+                <div class="mt-4 pt-3 border-t border-white/10 flex justify-between items-center">
+                  <span class="text-[10px] text-emerald-400 font-bold">国学启蒙必学</span>
+                  <button class="text-[10px] bg-yellow-400 text-amber-950 font-black px-3 py-1 rounded-full shadow active:scale-90 transition-transform">听故事闯关</button>
                 </div>
               </div>
-            `
-            ).join("")}
+            `).join("")}
           </div>
         </main>
-
       </div>
     `;
 
@@ -715,22 +708,187 @@ export class PlayModule extends BaseModule {
       });
     }
 
-    const soundBtn = this.container.querySelector("#btn-idiom-sound");
-    if (soundBtn) {
-      this._on(soundBtn, "click", () => {
-        soundAndFX.toggleMute();
-        const ic = soundAndFX.isMuted ? GAME_ICONS.speaker("w-5 h-5", true) : GAME_ICONS.speaker("w-5 h-5", false);
-        soundBtn.innerHTML = ic;
-      });
-    }
-
     this.container.querySelectorAll(".idiom-card").forEach((card) => {
       this._on(card, "click", () => {
-        const idiom = card.dataset.idiom;
-        const item = (IDIOMS_DATABASE || []).find((i) => i.idiom === idiom) || { idiom, meaning: "" };
-        soundAndFX.playPop();
-        soundAndFX.speak(`${item.idiom}。${item.meaning}`);
+        const idx = parseInt(card.dataset.idiomIdx, 10);
+        if (!isNaN(idx) && db[idx]) {
+          soundAndFX.playPop();
+          this._renderIdiomStory(db[idx], db);
+        }
       });
     });
+  }
+
+  _renderIdiomStory(idiom, db) {
+    const name = idiom.name || idiom.idiom || "";
+    const pinyin = idiom.pinyin || "";
+    const desc = idiom.desc || idiom.meaning || "";
+    const story = idiom.story || desc;
+    const moral = idiom.moral || "";
+    const chars = idiom.chars || Array.from(name);
+    const gameQuestion = idiom.gameQuestion || null;
+
+    this.container.innerHTML = `
+      <div class="relative w-full h-full min-h-[640px] flex flex-col select-none overflow-hidden bg-gradient-to-b from-amber-950 via-orange-950 to-red-950 text-white">
+        <header class="relative z-30 w-full px-6 py-3 flex items-center justify-between bg-black/50 backdrop-blur-md border-b border-amber-300/30">
+          <button id="btn-story-back" class="btn-game-wood text-white font-black text-xs px-4 py-2 rounded-full flex items-center gap-1.5">
+            <span class="flex items-center">${GAME_ICONS.home("w-4 h-4")}</span>
+            <span>返回成语馆</span>
+          </button>
+          <span class="text-sm font-black text-yellow-300">国学故事馆</span>
+          <div class="w-24"></div>
+        </header>
+
+        <main class="flex-1 overflow-y-auto no-scrollbar p-6 flex flex-col items-center gap-5">
+          <div class="flex items-center justify-center gap-3 mt-2">
+            ${chars.map((c, i) => `
+              <div class="idiom-char-anim w-20 h-20 rounded-2xl bg-gradient-to-br from-yellow-300 to-amber-500 border-4 border-white shadow-[0_0_30px_rgba(255,215,0,0.6)] flex items-center justify-center opacity-0 scale-50" style="transition:all 0.5s ease;transition-delay:${i*200}ms">
+                <span class="text-4xl font-black text-amber-950">${c}</span>
+              </div>
+            `).join("")}
+          </div>
+
+          <p class="text-lg text-amber-300 font-bold tracking-widest opacity-0 transition-opacity duration-700" id="story-pinyin" style="transition-delay:0.8s">${pinyin}</p>
+
+          <div class="w-full max-w-2xl bg-white/10 backdrop-blur-md rounded-3xl border-2 border-amber-300/30 p-6 opacity-0 transition-opacity duration-700" id="story-desc" style="transition-delay:1.0s">
+            <div class="flex items-center gap-2 mb-3">
+              <span class="flex items-center">${GAME_ICONS.sparkle("w-5 h-5")}</span>
+              <span class="text-xs font-black text-amber-300 uppercase tracking-wider">成语释义</span>
+            </div>
+            <p class="text-sm text-white/90 font-bold leading-relaxed">${desc}</p>
+          </div>
+
+          <div class="w-full max-w-2xl bg-white/5 backdrop-blur-md rounded-3xl border border-white/15 p-6 opacity-0 transition-opacity duration-700" id="story-body" style="transition-delay:1.3s">
+            <div class="flex items-center justify-between mb-4">
+              <div class="flex items-center gap-2">
+                <span class="flex items-center">${GAME_ICONS.pen("w-5 h-5")}</span>
+                <span class="text-xs font-black text-emerald-300 uppercase tracking-wider">经典故事</span>
+              </div>
+              <button id="btn-narrate" class="btn-game-orange text-white font-black text-xs px-4 py-2 rounded-full flex items-center gap-1.5 active:scale-90">
+                <span class="flex items-center">${GAME_ICONS.speaker("w-4 h-4")}</span>
+                <span>朗读故事</span>
+              </button>
+            </div>
+            <p class="text-sm text-white/80 font-semibold leading-loose">${story}</p>
+          </div>
+
+          ${moral ? `
+          <div class="w-full max-w-2xl bg-emerald-900/60 rounded-3xl border-2 border-emerald-400/40 p-5 opacity-0 transition-opacity duration-700" id="story-moral" style="transition-delay:1.6s">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="flex items-center">${GAME_ICONS.star("w-5 h-5", true)}</span>
+              <span class="text-xs font-black text-emerald-300">道德寓意</span>
+            </div>
+            <p class="text-sm text-emerald-100 font-bold leading-relaxed">${moral}</p>
+          </div>
+          ` : ""}
+
+          ${gameQuestion ? `
+          <button id="btn-to-quiz" class="mt-2 btn-game-orange text-white font-black text-base px-12 py-4 rounded-full shadow-xl border-2 border-white active:scale-95 transition-transform flex items-center gap-2 opacity-0" style="transition:opacity 0.7s ease;transition-delay:2.0s">
+            <span class="flex items-center">${GAME_ICONS.trophy("w-6 h-6")}</span>
+            <span>我听懂了！来闯关</span>
+          </button>
+          ` : ""}
+        </main>
+      </div>
+    `;
+
+    // Animate in
+    this._timeout(() => {
+      this.container.querySelectorAll(".idiom-char-anim").forEach(el => {
+        el.style.opacity = "1";
+        el.style.transform = "scale(1)";
+      });
+      ["#story-pinyin","#story-desc","#story-body","#story-moral","#btn-to-quiz"].forEach(sel => {
+        const el = this.container.querySelector(sel);
+        if (el) el.style.opacity = "1";
+      });
+      soundAndFX.speak(`${name}${desc}`);
+    }, 80);
+
+    const backBtn = this.container.querySelector("#btn-story-back");
+    if (backBtn) this._on(backBtn, "click", () => { soundAndFX.playPop(); this.renderIdiomHall(); });
+
+    const narrateBtn = this.container.querySelector("#btn-narrate");
+    if (narrateBtn) this._on(narrateBtn, "click", () => { soundAndFX.playPop(); soundAndFX.speak(story); });
+
+    const quizBtn = this.container.querySelector("#btn-to-quiz");
+    if (quizBtn && gameQuestion) this._on(quizBtn, "click", () => { soundAndFX.playPop(); this._renderIdiomQuiz(idiom); });
+  }
+
+  _renderIdiomQuiz(idiom) {
+    const name = idiom.name || idiom.idiom || "";
+    const quiz = idiom.gameQuestion;
+    const chars = idiom.chars || Array.from(name);
+    let answered = false;
+
+    this.container.innerHTML = `
+      <div class="relative w-full h-full min-h-[640px] flex flex-col items-center justify-center select-none bg-gradient-to-b from-purple-950 via-indigo-950 to-purple-900 text-white p-6">
+        <div class="w-full max-w-xl flex flex-col items-center text-center animate-scale-up">
+          <div class="flex items-center gap-2 mb-6">
+            ${chars.map(c => `<div class="w-14 h-14 rounded-xl bg-gradient-to-br from-yellow-300 to-amber-500 border-2 border-white shadow-lg flex items-center justify-center"><span class="text-2xl font-black text-amber-950">${c}</span></div>`).join("")}
+          </div>
+          <div class="bg-white/10 backdrop-blur-md rounded-3xl border-2 border-white/20 p-8 w-full shadow-2xl">
+            <div class="flex items-center justify-center gap-2 mb-4">
+              <span class="flex items-center">${GAME_ICONS.trophy("w-8 h-8")}</span>
+              <span class="text-xs font-black bg-amber-400 text-amber-950 px-3 py-1 rounded-full">成语闯关小测验</span>
+            </div>
+            <h2 class="text-xl font-black text-yellow-300 mb-6 leading-relaxed">${quiz.question}</h2>
+            <div class="flex flex-col gap-3">
+              ${quiz.options.map((opt, idx) => `
+                <button class="idiom-opt text-left p-4 rounded-2xl bg-white/10 hover:bg-white/20 border-2 border-white/20 text-white font-black text-sm shadow active:scale-95 transition-all flex items-center gap-3" data-idx="${idx}">
+                  <span class="w-7 h-7 rounded-full border-2 border-amber-300 flex items-center justify-center text-xs text-amber-300 font-bold flex-shrink-0">${String.fromCharCode(65+idx)}</span>
+                  <span>${opt}</span>
+                </button>
+              `).join("")}
+            </div>
+            <div id="quiz-feedback" class="mt-4 h-8 text-sm font-black"></div>
+          </div>
+        </div>
+
+        <div id="idiom-win" class="fixed inset-0 bg-black/85 backdrop-blur-xl flex flex-col items-center justify-center z-50 hidden animate-scale-up">
+          <div>${GAME_ICONS.trophy("w-28 h-28")}</div>
+          <h2 class="text-3xl font-black text-yellow-300 mt-4 mb-2">答对了！太聪明了！</h2>
+          <p class="text-white/70 text-sm font-bold mb-6">你已经掌握了"${name}"的故事！</p>
+          <div class="candy-pill px-6 py-2 mb-6 text-yellow-300 font-black flex items-center gap-2">
+            ${GAME_ICONS.coin("w-5 h-5")} 获得 8 凯茜星币
+          </div>
+          <div class="flex gap-3">
+            <button id="btn-win-more" class="btn-game-orange text-white font-black px-8 py-3 rounded-full">再学一个</button>
+            <button id="btn-win-home" class="btn-game-wood text-white font-black px-8 py-3 rounded-full">返回大厅</button>
+          </div>
+        </div>
+      </div>
+    `;
+
+    const feedback = this.container.querySelector("#quiz-feedback");
+    const winModal = this.container.querySelector("#idiom-win");
+
+    this.container.querySelectorAll(".idiom-opt").forEach(btn => {
+      this._on(btn, "click", () => {
+        if (answered) return;
+        answered = true;
+        const idx = parseInt(btn.dataset.idx, 10);
+        if (idx === quiz.correctIndex) {
+          btn.classList.add("ring-4", "ring-emerald-400", "bg-emerald-500/30");
+          soundAndFX.playSuccessSound();
+          soundAndFX.triggerConfetti(this.container);
+          soundAndFX.triggerCoinFly(this.container);
+          ebbinghausManager.addCoins(8);
+          if (feedback) feedback.innerHTML = '<span class="text-emerald-300 text-base">完全正确！理解力超群！</span>';
+          this._timeout(() => { if (winModal) winModal.classList.remove("hidden"); }, 1000);
+        } else {
+          btn.classList.add("animate-shake", "ring-4", "ring-rose-400");
+          soundAndFX.playSoftError();
+          if (feedback) feedback.innerHTML = `<span class="text-rose-300">再想想哦，正确答案是 ${String.fromCharCode(65 + quiz.correctIndex)}</span>`;
+          this._timeout(() => { btn.classList.remove("animate-shake"); answered = false; }, 800);
+        }
+      });
+    });
+
+    const winMoreBtn = this.container.querySelector("#btn-win-more");
+    if (winMoreBtn) this._on(winMoreBtn, "click", () => { soundAndFX.playPop(); this.renderIdiomHall(); });
+
+    const winHomeBtn = this.container.querySelector("#btn-win-home");
+    if (winHomeBtn) this._on(winHomeBtn, "click", () => { soundAndFX.playPop(); this.currentMode = null; this.render(); });
   }
 }

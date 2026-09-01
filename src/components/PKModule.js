@@ -48,11 +48,11 @@ export class PKModule extends BaseModule {
         </div>
 
         <!-- Header: Health Bars -->
-        <div class="relative z-10 w-full p-6 flex items-center justify-between">
+        <div class="relative z-10 w-full p-6 flex items-center justify-between pl-20">
            <!-- Player -->
            <div class="flex items-center gap-4">
               <div class="w-16 h-16 rounded-full bg-slate-200 border-4 border-emerald-400 shadow-[0_0_20px_rgba(52,211,153,0.6)] flex items-center justify-center text-2xl font-black overflow-hidden bg-cover bg-center">
-                 ${GAME_ICONS.home("w-full h-full")}
+                 ${GAME_ICONS.sparkle ? GAME_ICONS.sparkle("w-10 h-10") : "⭐"}
               </div>
               <div class="flex flex-col gap-1">
                  <span class="text-white font-black text-sm drop-shadow-md">凯茜冒险家</span>
@@ -66,8 +66,8 @@ export class PKModule extends BaseModule {
 
            <!-- Boss -->
            <div class="flex items-center gap-4 flex-row-reverse">
-              <div class="w-16 h-16 rounded-full bg-slate-800 border-4 border-rose-500 shadow-[0_0_20px_rgba(244,63,94,0.6)] flex items-center justify-center text-3xl overflow-hidden">
-                 ${GAME_ICONS.chest ? GAME_ICONS.chest("w-full h-full") : ""}
+              <div class="w-16 h-16 rounded-full bg-slate-800 border-4 border-rose-500 shadow-[0_0_20px_rgba(244,63,94,0.6)] flex items-center justify-center text-3xl overflow-hidden text-white">
+                 ${GAME_ICONS.monster ? GAME_ICONS.monster("w-10 h-10") : ""}
               </div>
               <div class="flex flex-col gap-1 items-end">
                  <span class="text-rose-200 font-black text-sm drop-shadow-md">糊涂魔王</span>
@@ -82,15 +82,15 @@ export class PKModule extends BaseModule {
         <div class="relative flex-1 flex flex-col items-center justify-center z-10">
            <!-- Battle Area -->
            <div class="absolute inset-0 flex items-center justify-between px-20">
-              <div id="pk-player-sprite" class="w-40 h-40 bg-white/10 backdrop-blur-sm border-2 border-emerald-400/50 rounded-3xl animate-bounce-slow flex items-center justify-center text-6xl shadow-[0_20px_40px_rgba(0,0,0,0.3)]">
-                 ${GAME_ICONS.shieldLock ? GAME_ICONS.shieldLock("w-20 h-20") : ""}
+              <div id="pk-player-sprite" class="w-40 h-40 bg-white/10 backdrop-blur-sm border-2 border-emerald-400/50 rounded-3xl animate-bounce-slow flex items-center justify-center text-6xl shadow-[0_20px_40px_rgba(0,0,0,0.3)] text-emerald-300">
+                 ${GAME_ICONS.sparkle ? GAME_ICONS.sparkle("w-20 h-20") : "⭐"}
               </div>
               
               <!-- Projectile container -->
               <div id="pk-projectile-layer" class="absolute inset-0 pointer-events-none"></div>
 
-              <div id="pk-boss-sprite" class="w-48 h-48 bg-black/40 backdrop-blur-md border-2 border-rose-500/50 rounded-3xl animate-bounce-slow flex items-center justify-center text-8xl shadow-[0_20px_40px_rgba(0,0,0,0.5)]" style="animation-delay: 0.5s">
-                 ${GAME_ICONS.chest ? GAME_ICONS.chest("w-32 h-32") : ""}
+              <div id="pk-boss-sprite" class="w-48 h-48 bg-black/40 backdrop-blur-md border-2 border-rose-500/50 rounded-3xl animate-bounce-slow flex items-center justify-center text-8xl shadow-[0_20px_40px_rgba(0,0,0,0.5)] text-rose-400" style="animation-delay: 0.5s">
+                 ${GAME_ICONS.monster ? GAME_ICONS.monster("w-28 h-28") : ""}
               </div>
            </div>
 
@@ -265,12 +265,19 @@ export class PKModule extends BaseModule {
      }
 
      this.container.innerHTML = `
-        <div class="relative w-full h-full bg-slate-900 flex flex-col items-center justify-center p-6 text-center select-none">
-           <div class="text-8xl mb-6">${won ? GAME_ICONS.trophy("w-24 h-24") : GAME_ICONS.shieldLock("w-24 h-24")}</div>
-           <h2 class="text-4xl font-black text-white mb-4">${won ? "战斗胜利！" : "挑战失败！"}</h2>
-           <p class="text-slate-300 font-bold mb-10">${won ? "获得 20 金币奖励！" : "糊涂魔王太强了，再去复习一下吧！"}</p>
+        <div class="relative w-full h-full bg-slate-900 flex flex-col items-center justify-center p-6 text-center select-none animate-fade-in">
+           <div class="mb-6 flex items-center justify-center">${won ? GAME_ICONS.trophy("w-28 h-28") : GAME_ICONS.shieldLock("w-28 h-28")}</div>
+           <h2 class="text-4xl font-black text-white mb-3">${won ? "战斗大胜利！" : "挑战失败！"}</h2>
+           <p class="text-slate-300 font-bold mb-6">${won ? "成功击败糊涂魔王！获得 20 凯茜星币奖励！" : "糊涂魔王太强大了，去每日复习巩固一下生字再来挑战吧！"}</p>
            
-           <button id="btn-pk-exit" class="bg-gradient-to-r from-amber-400 to-orange-500 text-white font-black text-xl px-12 py-4 rounded-full shadow-[0_10px_20px_rgba(245,158,11,0.4)] active:scale-95 transition-transform border-4 border-white">
+           ${won ? `
+             <div class="candy-pill rounded-full px-6 py-2 mb-8 text-yellow-300 font-black flex items-center gap-2">
+               <span class="flex items-center">${GAME_ICONS.coin("w-5 h-5")}</span>
+               <span>+20 凯茜星币已到账</span>
+             </div>
+           ` : ""}
+
+           <button id="btn-pk-exit" class="btn-game-orange text-white font-black text-lg px-12 py-3.5 rounded-full shadow-2xl active:scale-95 transition-transform border-2 border-white">
               返回大地图
            </button>
         </div>

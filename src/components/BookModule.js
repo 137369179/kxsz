@@ -2,7 +2,7 @@
  * 凯茜识字 (Cathy Literacy) - 130 本分级绘本馆与子集阅读器
  * 核心特色：
  *  1. 16:9 影院级大画幅绘本
- *  2. 画面隐藏互动寻宝热区（发现小鱼、大门、马车等趣味弹跳）
+ *  2. 画面隐藏互动寻宝热区（发现小鱼大门马车等趣味弹跳）
  *  3. 高精音频时间轴逐字变色卡拉OK伴读 + 单字精准点读
  *  4. 阅读理解趣味小测验（交互答题）
  *  5. 3D 黄金结业宝箱与星币礼炮结算
@@ -23,6 +23,31 @@ export class BookModule extends BaseModule {
     this.isQuizMode = false;
     this.quizAnswered = false;
     this.karaokeTimer = null;
+    // 阅读进度持久化 key
+    this._progressKey = "cathy_book_progress_v1";
+    this._loadProgress();
+  }
+
+  /** 从 localStorage 恢复阅读进度 */
+  _loadProgress() {
+    try {
+      const raw = localStorage.getItem(this._progressKey);
+      if (raw) {
+        const d = JSON.parse(raw);
+        if (d.bookId) this._lastBookId = d.bookId;
+        if (typeof d.pageIndex === "number") this.currentPageIndex = d.pageIndex;
+      }
+    } catch {}
+  }
+
+  /** 保存阅读进度到 localStorage */
+  _saveProgress() {
+    try {
+      localStorage.setItem(
+        this._progressKey,
+        JSON.stringify({ bookId: this.currentBook?.id, pageIndex: this.currentPageIndex })
+      );
+    } catch {}
   }
 
   destroy() {
@@ -48,10 +73,11 @@ export class BookModule extends BaseModule {
   // 1. 绘本馆书架界面
   // ----------------------------------------------------
   renderShelf() {
-    const mainEl = mountGameShell(this.container, {
+    const { content: mainEl, destroy: destroyShell } = mountGameShell(this.container, {
       activeMode: "books",
       heading: "凯茜分级绘本馆"
     });
+    this._addCleanup(destroyShell);
 
     mainEl.innerHTML = `
       <div class="relative w-full max-w-5xl mx-auto flex flex-col select-none animate-fade-in pb-8 overflow-y-auto no-scrollbar max-h-[calc(100vh-100px)]">
@@ -68,7 +94,7 @@ export class BookModule extends BaseModule {
               <h1 class="text-2xl font-black drop-shadow-md">凯茜分级阅读馆 (130 本精品绘本)</h1>
             </div>
             <p class="text-xs text-sky-200 font-bold">
-              严格遵循“子集阅读”设计，每篇绘本仅含已学汉字，伴读高亮、画面寻宝、理解测验！
+              严格遵循“子集阅读”设计，每篇绘本仅含已学汉字，伴读高亮画面寻宝理解测验！
             </p>
           </div>
         </div>
@@ -127,7 +153,9 @@ export class BookModule extends BaseModule {
       this._on(card, "click", () => {
         const bookId = card.dataset.bookId;
         this.currentBook = STORYBOOKS_DATABASE.find((b) => b.id === bookId);
-        this.currentPageIndex = 0;
+        // 恢复上次阅读进度，首次阅读从头开始
+        this.currentPageIndex = this._lastBookId === bookId ? this.currentPageIndex : 0;
+        this._lastBookId = bookId;
         this.isQuizMode = false;
         this.quizAnswered = false;
         soundAndFX.playSuccessSound();
@@ -144,10 +172,11 @@ export class BookModule extends BaseModule {
     const page = book.pages[this.currentPageIndex];
     const totalPages = book.pages.length;
 
-    const mainEl = mountGameShell(this.container, {
+    const { content: mainEl, destroy: destroyShell } = mountGameShell(this.container, {
       activeMode: "books",
       heading: `${book.title}`
     });
+    this._addCleanup(destroyShell);
 
     mainEl.innerHTML = `
       <div class="relative w-full max-w-5xl mx-auto flex flex-col justify-between py-2 px-4 select-none animate-fade-in">
@@ -176,25 +205,26 @@ export class BookModule extends BaseModule {
         <div class="w-full bg-white/95 backdrop-blur-md rounded-3xl overflow-hidden shadow-2xl border-4 border-amber-200 mb-3 flex flex-col md:flex-row items-center">
           
           <!-- 左侧：插画 + 隐藏互动寻宝热区 -->
-          <div class="relative w-full md:w-1/2 h-64 md:h-80 overflow-hidden bg-amber-100 group">
+          <div class="relative w-full md:w-1/2 h-64 md:h-80 overflow-hidden bg-amber-100 group rounded-2xl">
             <img src="${page.image}" alt="绘本插图" loading="lazy" decoding="async" class="w-full h-full object-cover" />
             
             <!-- 隐藏寻宝热区气泡 -->
-            ${(page.hotspots || []).map((hp, idx) => `
-              <button class="hotspot-trigger-btn absolute z-20 w-10 h-10 rounded-full bg-yellow-400/80 border-2 border-white text-white font-black text-xs flex items-center justify-center shadow-lg animate-bounce-slow active:scale-90 hover:scale-125 transition-transform" style="top: ${hp.y}%; left: ${hp.x}%;" data-sound="${hp.sound}" data-label="${hp.label}">
-                ✨
+            ${(page.interactions || page.hotspots || []).map((hp, idx) => `
+              <button class="hotspot-trigger-btn absolute z-20 w-11 h-11 rounded-full bg-yellow-400/90 border-2 border-white text-amber-950 font-black text-xs flex items-center justify-center shadow-2xl animate-bounce-slow active:scale-90 hover:scale-125 transition-transform" style="top: ${hp.y}; left: ${hp.x};" data-sound="${hp.sound || ''}" data-label="${hp.text || hp.label || ''}">
+                <span class="flex items-center pointer-events-none">${GAME_ICONS.sparkle("w-6 h-6")}</span>
               </button>
             `).join("")}
 
-            <div class="absolute bottom-2 left-2 bg-black/50 backdrop-blur-md text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full pointer-events-none">
-              ✨ 画面隐藏小宝藏，点击试试！
+            <div class="absolute bottom-2 left-2 bg-black/60 backdrop-blur-md text-white text-[10px] font-bold px-3 py-1 rounded-full pointer-events-none flex items-center gap-1.5">
+              <span class="flex items-center">${GAME_ICONS.sparkle("w-3.5 h-3.5")}</span>
+              <span>画面隐藏小宝藏，点击试试！</span>
             </div>
           </div>
 
           <!-- 右侧：文字伴读区 (支持逐字点读) -->
           <div class="w-full md:w-1/2 p-6 flex flex-col justify-between text-center h-64 md:h-80">
             <div class="text-[11px] font-black text-amber-700 bg-amber-50 inline-block px-3 py-1 rounded-full border border-amber-200 self-center">
-              👉 点击任意汉字即可单独听音点读
+               点击任意汉字即可单独听音点读
             </div>
 
             <div id="karaoke-text-container" class="text-2xl md:text-3xl font-black text-amber-950 leading-relaxed tracking-wider flex flex-wrap justify-center items-center gap-1.5 my-auto">
@@ -212,7 +242,7 @@ export class BookModule extends BaseModule {
             </div>
 
             <div class="text-[11px] text-gray-500 font-semibold">
-              💡 核心生字：${(book.targetChars || []).join("、")}
+               核心生字：${(book.targetChars || []).join("")}
             </div>
           </div>
 
@@ -223,7 +253,7 @@ export class BookModule extends BaseModule {
           <button id="btn-prev-page" class="bg-white hover:bg-amber-50 text-amber-900 font-black text-xs px-6 py-2.5 rounded-full shadow-lg border-2 border-amber-200 transition-all active:scale-95 ${
             this.currentPageIndex === 0 ? "opacity-40 pointer-events-none" : ""
           }">
-            ⬅️ 上一页
+            ️ 上一页
           </button>
 
           <div class="flex items-center gap-2">
@@ -299,6 +329,7 @@ export class BookModule extends BaseModule {
       this._on(prevBtn, "click", () => {
         if (this.currentPageIndex > 0) {
           this.currentPageIndex--;
+          this._saveProgress();
           soundAndFX.playPop();
           this.render();
         }
@@ -311,6 +342,7 @@ export class BookModule extends BaseModule {
       this._on(nextBtn, "click", () => {
         if (this.currentPageIndex < book.pages.length - 1) {
           this.currentPageIndex++;
+          this._saveProgress();
           soundAndFX.playPop();
           this.render();
         } else {
@@ -329,16 +361,19 @@ export class BookModule extends BaseModule {
   // ----------------------------------------------------
   renderQuiz() {
     const book = this.currentBook;
-    const quiz = book.quiz || {
+    const rawQuiz = Array.isArray(book.quiz) ? book.quiz[0] : book.quiz;
+    const quiz = rawQuiz || {
       question: `故事中提到了哪些有趣的生字和故事？`,
       options: ["大家一起快乐识字", "什么都没发生", "大怪兽睡大觉"],
-      answer: 0
+      correctIndex: 0
     };
+    const correctIdx = (quiz.correctIndex !== undefined) ? quiz.correctIndex : (quiz.answer !== undefined ? quiz.answer : 0);
 
-    const mainEl = mountGameShell(this.container, {
+    const { content: mainEl, destroy: destroyShell } = mountGameShell(this.container, {
       activeMode: "books",
       heading: `阅读测验 · ${book.title}`
     });
+    this._addCleanup(destroyShell);
 
     soundAndFX.speak(`小测验时间！${quiz.question}`);
 
@@ -348,7 +383,7 @@ export class BookModule extends BaseModule {
         <div class="bg-white/95 backdrop-blur-md rounded-3xl p-8 shadow-2xl border-4 border-amber-300 flex flex-col items-center text-center">
           <div class="mb-4 flex items-center justify-center">${GAME_ICONS.trophy("w-16 h-16")}</div>
           <span class="text-xs font-black bg-orange-100 text-orange-800 px-4 py-1 rounded-full mb-3">
-            📚 绘本阅读理解小测验
+             绘本阅读理解小测验
           </span>
           <h2 class="text-xl font-black text-amber-950 mb-6">
             ${quiz.question}
@@ -371,11 +406,11 @@ export class BookModule extends BaseModule {
         <!-- 结业胜利弹窗 -->
         <div id="book-finish-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md flex flex-col items-center justify-center text-white hidden animate-scale-up z-50">
           <div class="mb-4 flex items-center justify-center">${GAME_ICONS.trophy("w-24 h-24")}</div>
-          <h2 class="text-3xl font-black text-yellow-300 mb-2">恭喜读完《${book.title}》！</h2>
+          <h2 class="text-3xl font-black text-yellow-300 mb-2">恭喜读完${book.title}！</h2>
           <p class="text-xs text-gray-300 mb-6 font-semibold">你已经成功掌握了绘本中的全部汉字，阅读能力再上新台阶！</p>
-          <div class="candy-pill rounded-full px-6 py-2 mb-6 text-xs text-yellow-300 font-bold flex items-center gap-2">
-            <span class="flex items-center">${GAME_ICONS.coin("w-5 h-5")}</span>
-            <span>获得 15 凯茜星币奖励</span>
+          <div class="candy-pill rounded-full px-6 py-2 mb-4 text-xs text-yellow-300 font-bold flex items-center gap-3">
+            <span class="flex items-center gap-1"><span class="flex items-center">${GAME_ICONS.coin("w-4 h-4")}</span> +15 星币</span>
+            <span class="flex items-center gap-1"><span class="flex items-center">${GAME_ICONS.star("w-4 h-4", true)}</span> +5 星星</span>
           </div>
           <button id="btn-finish-return-shelf" class="btn-game-orange text-white font-black text-base px-10 py-3 rounded-full">
             收录进阅读记录，返回书架
@@ -394,12 +429,14 @@ export class BookModule extends BaseModule {
         this.quizAnswered = true;
 
         const pickedIdx = parseInt(btn.dataset.index, 10);
-        if (pickedIdx === quiz.answer) {
+        if (pickedIdx === correctIdx) {
           soundAndFX.playSuccessSound();
           soundAndFX.playVictoryFanfare();
           soundAndFX.triggerConfetti(this.container);
           soundAndFX.triggerCoinFly(this.container);
           ebbinghausManager.addCoins(15);
+          ebbinghausManager.progress.stars = (ebbinghausManager.progress.stars || 0) + 5;
+          ebbinghausManager.save();
           btn.classList.add("ring-4", "ring-emerald-500", "bg-emerald-100");
 
           this._timeout(() => {

@@ -1,6 +1,6 @@
 /**
  * 凯茜识字 (Cathy Literacy) - 1:1 艾宾浩斯复习调度组件
- * 纯正 3D 游戏 UI：待复习字库队列、发音速辨、星币结算与复习闭环
+ * 纯正 3D 游戏 UI：待复习字库队列发音速辨星币结算与复习闭环
  */
 
 import { CHARACTER_DATABASE } from "../data/characters.js";
@@ -217,7 +217,7 @@ export class ReviewModule extends BaseModule {
           ebbinghausManager.addCoins(2);
           soundAndFX.playSuccessSound();
           btn.classList.add("ring-8", "ring-emerald-400");
-          if (feedback) feedback.innerHTML = '<span class="text-emerald-300 text-lg">✨ 答对啦！记忆牢固！</span>';
+          if (feedback) feedback.innerHTML = '<span class="text-emerald-300 text-lg"> 答对啦！记忆牢固！</span>';
         } else {
           this.wrongCount++;
           ebbinghausManager.completeReview(charData.id, false);

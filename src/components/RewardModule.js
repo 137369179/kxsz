@@ -33,14 +33,15 @@ export class RewardModule extends BaseModule {
   render() {
     this.destroy();
 
-    const content = mountGameShell(this.container, { activeMode: "reward", heading: "" });
+    const { content: contentEl, destroy: destroyShell } = mountGameShell(this.container, { activeMode: "reward", heading: "凯茜成就城堡" });
+    this._addCleanup(destroyShell);
     const stickers = getStickers();
     const medals = getMedals();
     const earnedMedals = medals.filter((m) => m.earned).length;
     const calendar = getCalendar(this.calYear, this.calMonth);
     const profile = ebbinghausManager.progress.profile;
 
-    content.innerHTML = `
+    contentEl.innerHTML = `
       <div class="w-full h-full overflow-y-auto no-scrollbar bg-gradient-to-b from-indigo-950 via-purple-950 to-slate-950 text-white select-none">
 
         <!--  -->
@@ -120,26 +121,29 @@ export class RewardModule extends BaseModule {
     panel.innerHTML = `
       <div class="bg-white/5 backdrop-blur-md rounded-3xl border border-white/15 p-5">
         <div class="flex items-center justify-between mb-2">
-          <h2 class="font-black text-amber-200">凯茜装扮商城</h2>
-          <span class="text-xs font-black text-white/50"> <b class="text-amber-300">${s.earnedCount}</b> / ${s.total} </span>
+          <h2 class="font-black text-amber-200 flex items-center gap-2">
+            <span class="flex items-center">${GAME_ICONS.cards("w-5 h-5")}</span>
+            <span>汉字贴纸收藏册</span>
+          </h2>
+          <span class="text-xs font-black text-white/50">已收集 <b class="text-amber-300">${s.earnedCount}</b> / ${s.total} </span>
         </div>
         <div class="w-full h-3 bg-black/40 rounded-full overflow-hidden border border-white/10 mb-1.5">
           <div class="h-full bg-gradient-to-r from-yellow-400 via-amber-400 to-orange-500 rounded-full transition-all duration-700" style="width:${ratio}%"></div>
         </div>
-        <div class="text-[10px] text-white/40 font-bold text-right mb-4"> ${ratio}%</div>
+        <div class="text-[10px] text-white/40 font-bold text-right mb-4">收集进度 ${ratio}%</div>
 
         ${
           s.earned.length === 0
             ? `<div class="text-center py-10">
-                 <div class="text-6xl mb-3 animate-bounce-slow"></div>
-                 <p class="text-white/60 font-black text-sm"></p>
-                 <p class="text-white/40 text-xs font-bold mt-1"></p>
+                 <div class="w-16 h-16 mx-auto mb-3 opacity-60 flex items-center justify-center">${GAME_ICONS.chest("w-16 h-16")}</div>
+                 <p class="text-white/80 font-black text-sm">还没有收集到汉字贴纸</p>
+                 <p class="text-white/40 text-xs font-bold mt-1">去大地图学习汉字，通关即可解锁专属贴纸！</p>
                </div>`
             : `<div class="grid grid-cols-5 sm:grid-cols-8 lg:grid-cols-10 gap-2.5">
                  ${s.earned.map((st) => `
-                   <div class="sticker-cell relative flex flex-col items-center p-2 rounded-2xl bg-gradient-to-b from-amber-100 to-amber-300 border-2 border-amber-400 shadow-lg hover:scale-110 active:scale-95 transition-transform cursor-pointer" title=" ${st.masteryRate}%">
-                     <div class=\"w-8 h-8 rounded-full bg-gradient-to-br from-amber-200 to-orange-300 flex items-center justify-center font-black text-amber-900 border border-amber-400 shadow-inner\">${st.emoji}</div>
-                     <span class="text-lg font-black text-amber-950 leading-tight">${st.char}</span>
+                   <div class="sticker-cell relative flex flex-col items-center p-2 rounded-2xl bg-gradient-to-b from-amber-100 to-amber-300 border-2 border-amber-400 shadow-lg hover:scale-110 active:scale-95 transition-transform cursor-pointer" title="掌握度 ${st.masteryRate}%">
+                     <div class="w-8 h-8 rounded-full bg-gradient-to-br from-amber-200 to-orange-300 flex items-center justify-center font-black text-amber-900 border border-amber-400 shadow-inner">${st.char}</div>
+                     <span class="text-lg font-black text-amber-950 leading-tight mt-1">${st.char}</span>
                      <span class="text-[9px] font-black text-amber-700">${st.pinyin}</span>
                      <span class="absolute -top-1.5 -right-1.5 text-[9px] bg-amber-500 text-white rounded-full w-4 h-4 flex items-center justify-center shadow">新</span>
                    </div>
@@ -147,15 +151,15 @@ export class RewardModule extends BaseModule {
                </div>`
         }
 
-        <!--  -->
+        <!-- 待解锁 -->
         ${
           s.upcoming.length
             ? `<div class="mt-5">
-                 <h3 class="text-xs font-black text-white/50 mb-2">  · </h3>
+                 <h3 class="text-xs font-black text-white/50 mb-2">即将解锁 · 待探索字</h3>
                  <div class="grid grid-cols-6 sm:grid-cols-12 gap-2">
                    ${s.upcoming.map((c) => `
                      <div class="flex flex-col items-center p-1.5 rounded-xl bg-white/5 border border-white/10 opacity-60">
-                       <span class="text-lg"><div class=\"w-5 h-5 inline-block align-middle\">${__lockIcon}</div></span>
+                       <span class="text-lg"><div class="w-5 h-5 inline-block align-middle">${__lockIcon}</div></span>
                        <span class="text-xs font-black text-white/40">?</span>
                      </div>
                    `).join("")}
@@ -167,9 +171,9 @@ export class RewardModule extends BaseModule {
     `;
   }
 
-  /**  */
+  /** 荣誉勋章墙 */
   _renderMedalWall(panel) {
-        const __lockIcon = GAME_ICONS.shieldLock("w-4 h-4");
+    const __lockIcon = GAME_ICONS.shieldLock("w-4 h-4");
     const __trophyIcon = GAME_ICONS.trophy("w-5 h-5");
 
     const medals = getMedals();
@@ -179,7 +183,6 @@ export class RewardModule extends BaseModule {
         ${medals.map((m) => `
           <div class="medal-card relative rounded-3xl p-4 border-2 ${m.earned ? `bg-gradient-to-b ${TIER_STYLE[m.tier] || TIER_STYLE.gold} shadow-[0_10px_25px_rgba(0,0,0,0.45)]` : "bg-white/5 border-white/10"} flex flex-col items-center text-center ${m.earned ? "hover:scale-105 active:scale-95 transition-transform" : ""}">
             ${m.isNew ? '<span class="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-black px-2 py-0.5 rounded-full border-2 border-white animate-bounce">NEW</span>' : ""}
-            <!--  SVG 3D  Emoji -->
             <div class="relative flex flex-col items-center justify-center">
               <div class="relative w-24 h-24 ${m.earned ? 'animate-bounce-slow' : 'grayscale opacity-40'}">
                 <div class="w-full h-full rounded-full border-4 shadow-lg flex items-center justify-center overflow-hidden 
@@ -190,7 +193,7 @@ export class RewardModule extends BaseModule {
                   ${m.earned ? __trophyIcon : `<div class="w-12 h-12">${__lockIcon}</div>`}
                 </div>
               </div>
-              ${m.earned ? '<span class="absolute -bottom-2 left-1/2 -translate-x-1/2 text-[10px] bg-white text-amber-700 font-black px-3 py-1 rounded-full shadow-[0_4px_8px_rgba(0,0,0,0.3)] border border-amber-200 z-10"></span>' : ""}
+              ${m.earned ? '<span class="absolute -bottom-2 left-1/2 -translate-x-1/2 text-[10px] bg-white text-amber-700 font-black px-3 py-1 rounded-full shadow-[0_4px_8px_rgba(0,0,0,0.3)] border border-amber-200 z-10">已达成</span>' : ""}
             </div>
             <div class="mt-3 font-black text-sm ${m.earned ? "text-amber-950 drop-shadow" : "text-white/80"}">${m.name}</div>
             <div class="text-[10px] font-bold mt-0.5 ${m.earned ? "text-amber-900/80" : "text-white/40"}">${m.desc}</div>
@@ -233,7 +236,7 @@ export class RewardModule extends BaseModule {
         ? `<span class="text-[10px] font-black text-amber-300 mt-1">已装备</span>`
         : item.owned
         ? `<button data-buy="${item.id}" class="shop-action mt-1.5 bg-emerald-500/90 hover:bg-emerald-500 text-white text-[11px] font-black px-4 py-1.5 rounded-full active:scale-95 transition-transform">装备</button>`
-        : `<button data-buy="${item.id}" class="shop-action mt-1.5 ${item.affordable ? "bg-gradient-to-r from-amber-400 to-orange-500 hover:brightness-110" : "bg-white/10 opacity-50 cursor-not-allowed"} text-white text-[11px] font-black px-4 py-1.5 rounded-full active:scale-95 transition-transform">💰 ${item.price}</button>`;
+        : `<button data-buy="${item.id}" class="shop-action mt-1.5 ${item.affordable ? "bg-gradient-to-r from-amber-400 to-orange-500 hover:brightness-110" : "bg-white/10 opacity-50 cursor-not-allowed"} text-white text-[11px] font-black px-4 py-1.5 rounded-full active:scale-95 transition-transform flex items-center gap-1"><span class="flex items-center">${GAME_ICONS.coin("w-3.5 h-3.5")}</span><span>${item.price}</span></button>`;
 
       const border = item.equipped
         ? "border-amber-400 bg-amber-400/15"
@@ -254,11 +257,16 @@ export class RewardModule extends BaseModule {
       <div class="bg-white/5 backdrop-blur-md rounded-3xl border border-white/15 p-5">
         <div class="flex items-center justify-between mb-5">
           <div>
-            <h2 class="font-black text-amber-200">凯茜装扮商城</h2>
-            <p class="text-[10px] text-white/40 font-bold mt-0.5">使用金币购买头像与边框</p>
+            <h2 class="font-black text-amber-200 flex items-center gap-2">
+              <span class="flex items-center">${GAME_ICONS.chest("w-5 h-5")}</span>
+              <span>凯茜装扮商城</span>
+            </h2>
+            <p class="text-[10px] text-white/40 font-bold mt-0.5">使用星币购买限定头像与个性边框</p>
           </div>
           <div class="bg-black/40 backdrop-blur-md flex items-center gap-2 text-amber-300 font-black text-sm px-4 py-2 rounded-full border border-white/15">
-            <span class="text-lg">💰</span><span>${shop.coins}</span><span class="text-[10px] text-white/40 font-black">金币</span>
+            <span class="flex items-center">${GAME_ICONS.coin("w-5 h-5")}</span>
+            <span>${shop.coins}</span>
+            <span class="text-[10px] text-white/40 font-black">星币</span>
           </div>
         </div>
 
@@ -286,11 +294,10 @@ export class RewardModule extends BaseModule {
         if (!item) return;
 
         if (item.owned) {
-          // 
           if (item.type === "avatar") ebbinghausManager.equipAvatar(item.value);
           else ebbinghausManager.equipFrame(item.id);
           soundAndFX.playSuccessSound();
-          showGameToast(this.container, `<div class=\"w-5 h-5 inline-block align-middle\">${__sparkleIcon}</div> ${item.name}`, "success");
+          showGameToast(this.container, `已装备: ${item.name}`, "success");
         } else {
           const res = ebbinghausManager.purchase(id);
           if (res.ok) {
@@ -302,7 +309,7 @@ export class RewardModule extends BaseModule {
             showGameToast(this.container, `购买成功: ${item.name}`, "success");
           } else {
             soundAndFX.playSoftError();
-            showGameToast(this.container, "金币不足，快去学习赚取吧！", "error");
+            showGameToast(this.container, "星币不足，快去学习赚取吧！", "error");
             return;
           }
         }

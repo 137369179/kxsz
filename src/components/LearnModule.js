@@ -1,11 +1,11 @@
 /**
  * 凯茜识字 (Cathy Literacy) - 1:1 沉浸式五步闭环教学引擎
  * 核心特色：
- * 1. 【玩】8大汉字专属物理情景交互（拉绳升日、擦云见月、涌泉流水、摩擦点火、敲石成山、浇水长木、跨栏成人、喂食成口）+ 4阶段象形蜕变
- * 2. 【认】3D Q弹果冻大字 + 偏旁部首拆解 + 词组实物小剧场
- * 3. 【练】太空战机射击 / 飞翔气球小游戏
- * 4. 【写】AI 魔法星光毛笔描红 + 严格倒笔画阻断拦截 + 全屏 Confetti 礼炮
- * 5. 【测】闪电速测 + 黄金宝箱降落 + 三星飞入“Duang! Duang! Duang!”
+ * 1. 玩8大汉字专属物理情景交互（拉绳升日擦云见月涌泉流水摩擦点火敲石成山浇水长木跨栏成人喂食成口）+ 4阶段象形蜕变
+ * 2. 认3D Q弹果冻大字 + 偏旁部首拆解 + 词组实物小剧场
+ * 3. 练太空战机射击 / 飞翔气球小游戏
+ * 4. 写AI 魔法星光毛笔描红 + 严格倒笔画阻断拦截 + 全屏 Confetti 礼炮
+ * 5. 测闪电速测 + 黄金宝箱降落 + 三星飞入“Duang! Duang! Duang!”
  */
 
 import { HanziEngine } from "../utils/hanziEngine.js";
@@ -52,7 +52,7 @@ export class LearnModule extends BaseModule {
             <span>返回地图</span>
           </button>
 
-          <!-- 五步发光水晶连珠 (玩、认、练、写、测) -->
+          <!-- 五步发光水晶连珠 (玩认练写测) -->
           <div class="flex items-center gap-3 bg-black/60 px-6 py-1.5 rounded-full border border-white/30 shadow-2xl">
             ${[
               { step: 1, name: "玩", iconSvg: (cls) => GAME_ICONS.gem(cls) },
@@ -71,7 +71,7 @@ export class LearnModule extends BaseModule {
                     ? "bg-emerald-500 text-white shadow-md"
                     : "bg-white/20 text-white/40"
                 }">
-                  ${s.step < this.currentStep ? "✓" : `<span class="flex items-center">${s.iconSvg("w-4 h-4")}</span>`}
+                  ${s.step < this.currentStep ? "" : `<span class="flex items-center">${s.iconSvg("w-4 h-4")}</span>`}
                 </div>
                 <span class="text-xs font-black ${s.step === this.currentStep ? "text-yellow-300 drop-shadow" : "text-white/60"}">${s.name}</span>
                 ${s.step < 5 ? `<div class="w-4 h-0.5 ${s.step < this.currentStep ? "bg-emerald-400" : "bg-white/20"}"></div>` : ""}
@@ -168,95 +168,95 @@ export class LearnModule extends BaseModule {
     // 为不同汉字定制专属情景
     switch (char.char) {
       case "日":
-        guide = "👇 向上拉动金色法绳，升起灿烂红日！";
+        guide = " 向上拉动金色法绳，升起灿烂红日！";
         sceneHTML = `
           <div id="interactive-actor" class="relative flex flex-col items-center cursor-pointer group">
             <div id="play-target-anim" class="w-36 h-36 rounded-full bg-gradient-to-tr from-yellow-300 via-orange-400 to-red-500 shadow-[0_0_70px_rgba(255,160,0,1)] flex items-center justify-center text-7xl text-white font-black border-4 border-white transition-all duration-1000 transform translate-y-16 scale-75">
-              🌞
+              
             </div>
             <div class="w-2.5 h-28 bg-amber-800 border-2 border-yellow-300 rounded-full flex items-center justify-center mt-2 animate-pulse">
               <div class="w-8 h-8 rounded-full bg-yellow-400 border-2 border-white shadow-xl flex items-center justify-center text-xs">
-                ✊
+                
               </div>
             </div>
           </div>
         `;
         break;
       case "月":
-        guide = "👇 划动手指擦除夜空乌云，找到皎洁月亮！";
+        guide = " 划动手指擦除夜空乌云，找到皎洁月亮！";
         sceneHTML = `
           <div id="interactive-actor" class="relative flex flex-col items-center cursor-pointer group">
             <div id="play-target-anim" class="w-40 h-40 rounded-full bg-slate-900 border-4 border-slate-700 flex items-center justify-center text-7xl transition-all duration-1000">
-              ☁️🌙
+              ️
             </div>
-            <span class="text-xs text-yellow-200 mt-3 bg-black/40 px-3 py-1 rounded-full border border-white/20">👉 划开云雾</span>
+            <span class="text-xs text-yellow-200 mt-3 bg-black/40 px-3 py-1 rounded-full border border-white/20"> 划开云雾</span>
           </div>
         `;
         break;
       case "水":
-        guide = "👇 点击疏通清澈泉眼，让甘甜河水奔流！";
+        guide = " 点击疏通清澈泉眼，让甘甜河水奔流！";
         sceneHTML = `
           <div id="interactive-actor" class="relative flex flex-col items-center cursor-pointer group">
             <div id="play-target-anim" class="w-40 h-40 rounded-3xl bg-cyan-600/80 border-4 border-cyan-300 shadow-[0_0_50px_rgba(0,188,212,0.8)] flex items-center justify-center text-7xl transition-all duration-1000">
-              💧🌊
+              
             </div>
-            <span class="text-xs text-cyan-200 mt-3 bg-black/40 px-3 py-1 rounded-full border border-white/20">👉 点击喷泉</span>
+            <span class="text-xs text-cyan-200 mt-3 bg-black/40 px-3 py-1 rounded-full border border-white/20"> 点击喷泉</span>
           </div>
         `;
         break;
       case "火":
-        guide = "👇 快速滑动摩擦取火，点燃温暖的篝火！";
+        guide = " 快速滑动摩擦取火，点燃温暖的篝火！";
         sceneHTML = `
           <div id="interactive-actor" class="relative flex flex-col items-center cursor-pointer group">
             <div id="play-target-anim" class="w-40 h-40 rounded-3xl bg-amber-950 border-4 border-orange-500 shadow-[0_0_50px_rgba(255,87,34,0.8)] flex items-center justify-center text-7xl transition-all duration-1000">
-              🪵🔥
+              
             </div>
-            <span class="text-xs text-orange-200 mt-3 bg-black/40 px-3 py-1 rounded-full border border-white/20">👉 摩擦点火</span>
+            <span class="text-xs text-orange-200 mt-3 bg-black/40 px-3 py-1 rounded-full border border-white/20"> 摩擦点火</span>
           </div>
         `;
         break;
       case "山":
-        guide = "👇 依次敲击三块奇石，唤醒巍峨大山！";
+        guide = " 依次敲击三块奇石，唤醒巍峨大山！";
         sceneHTML = `
           <div id="interactive-actor" class="relative flex flex-col items-center cursor-pointer group">
             <div id="play-target-anim" class="w-44 h-36 rounded-3xl bg-stone-700 border-4 border-stone-400 shadow-[0_0_50px_rgba(100,100,100,0.8)] flex items-center justify-center text-7xl transition-all duration-1000">
-              ⛰️
+              ️
             </div>
-            <span class="text-xs text-stone-200 mt-3 bg-black/40 px-3 py-1 rounded-full border border-white/20">👉 敲击唤醒</span>
+            <span class="text-xs text-stone-200 mt-3 bg-black/40 px-3 py-1 rounded-full border border-white/20"> 敲击唤醒</span>
           </div>
         `;
         break;
       case "木":
-        guide = "👇 拖动喷壶给小嫩芽浇水，长成参天大树！";
+        guide = " 拖动喷壶给小嫩芽浇水，长成参天大树！";
         sceneHTML = `
           <div id="interactive-actor" class="relative flex flex-col items-center cursor-pointer group">
             <div id="play-target-anim" class="w-40 h-40 rounded-3xl bg-emerald-900 border-4 border-emerald-400 shadow-[0_0_50px_rgba(76,175,80,0.8)] flex items-center justify-center text-7xl transition-all duration-1000">
-              🌱🌳
+              
             </div>
-            <span class="text-xs text-emerald-200 mt-3 bg-black/40 px-3 py-1 rounded-full border border-white/20">👉 浇水成长</span>
+            <span class="text-xs text-emerald-200 mt-3 bg-black/40 px-3 py-1 rounded-full border border-white/20"> 浇水成长</span>
           </div>
         `;
         break;
       case "人":
-        guide = "👇 帮助小勇士迈开双腿跨栏赛跑！";
+        guide = " 帮助小勇士迈开双腿跨栏赛跑！";
         sceneHTML = `
           <div id="interactive-actor" class="relative flex flex-col items-center cursor-pointer group">
             <div id="play-target-anim" class="w-40 h-40 rounded-3xl bg-orange-950 border-4 border-orange-400 shadow-[0_0_50px_rgba(255,107,0,0.8)] flex items-center justify-center text-7xl transition-all duration-1000">
-              🏃
+              
             </div>
-            <span class="text-xs text-orange-200 mt-3 bg-black/40 px-3 py-1 rounded-full border border-white/20">👉 迈步向前</span>
+            <span class="text-xs text-orange-200 mt-3 bg-black/40 px-3 py-1 rounded-full border border-white/20"> 迈步向前</span>
           </div>
         `;
         break;
       case "口":
       default:
-        guide = "👇 把美味草莓喂进小怪兽的大嘴巴里！";
+        guide = " 把美味草莓喂进小怪兽的大嘴巴里！";
         sceneHTML = `
           <div id="interactive-actor" class="relative flex flex-col items-center cursor-pointer group">
             <div id="play-target-anim" class="w-40 h-40 rounded-3xl bg-pink-950 border-4 border-pink-400 shadow-[0_0_50px_rgba(233,30,99,0.8)] flex items-center justify-center text-7xl transition-all duration-1000">
-              👾🍓
+              
             </div>
-            <span class="text-xs text-pink-200 mt-3 bg-black/40 px-3 py-1 rounded-full border border-white/20">👉 喂食大口</span>
+            <span class="text-xs text-pink-200 mt-3 bg-black/40 px-3 py-1 rounded-full border border-white/20"> 喂食大口</span>
           </div>
         `;
         break;
@@ -287,14 +287,14 @@ export class LearnModule extends BaseModule {
                   ${char.oracleGlyph || char.char}
                 </div>
               </div>
-              <span class="text-2xl text-orange-400 font-black">➔</span>
+              <span class="text-2xl text-orange-400 font-black"></span>
               <div class="flex flex-col items-center">
                 <span class="text-xs text-yellow-300 font-bold mb-1">2. 小篆演变</span>
                 <div class="w-20 h-20 rounded-2xl bg-amber-200 text-amber-950 flex items-center justify-center text-3xl font-black shadow-inner border-2 border-amber-400">
                   ${char.bronzeGlyph || char.char}
                 </div>
               </div>
-              <span class="text-2xl text-orange-400 font-black">➔</span>
+              <span class="text-2xl text-orange-400 font-black"></span>
               <div class="flex flex-col items-center">
                 <span class="text-xs text-yellow-300 font-bold mb-1">3. 楷体规范字</span>
                 <div class="w-24 h-24 rounded-3xl bg-gradient-to-tr from-yellow-400 to-orange-500 text-white flex items-center justify-center text-5xl font-black shadow-2xl border-4 border-white animate-pulse">
@@ -304,7 +304,7 @@ export class LearnModule extends BaseModule {
             </div>
 
             <button id="btn-next-to-rec" class="mt-4 bg-gradient-to-r from-emerald-400 to-emerald-600 text-white font-black text-sm px-8 py-3 rounded-full shadow-2xl border-2 border-white active:scale-95 transition-transform flex items-center gap-2">
-              <span>👀</span> 去【认】字大剧场 ➔
+              <span></span> 去认字大剧场 
             </button>
           </div>
 
@@ -348,7 +348,7 @@ export class LearnModule extends BaseModule {
   // ----------------------------------------------------------------
   renderStepRecognize(stage) {
     const char = this.charData;
-    soundAndFX.speak(`认一认：“${char.char}”，拼音读作 ${char.pinyin}。点击大字听发音！`);
+    soundAndFX.speak(`认一认：“${char.char}”，拼音读作 ${char.pinyin}点击大字听发音！`);
 
     stage.innerHTML = `
       <div class="relative w-full max-w-4xl h-[480px] bg-gradient-to-b from-purple-900 via-indigo-900 to-slate-950 rounded-3xl overflow-hidden shadow-2xl border-4 border-amber-300 flex items-center justify-between p-8 animate-fade-in select-none">
@@ -402,7 +402,7 @@ export class LearnModule extends BaseModule {
           </div>
 
           <button id="btn-finish-rec-step" class="mt-4 w-full bg-gradient-to-r from-orange-500 to-amber-500 text-white font-black text-sm py-3 rounded-full shadow-lg border border-white active:scale-95 transition-all flex items-center justify-center gap-2">
-            <span>${window.GAME_ICONS ? window.GAME_ICONS.star("w-4 h-4 inline-block") : ""}</span> 开启【读】字评测 ➔
+            <span>${window.GAME_ICONS ? window.GAME_ICONS.star("w-4 h-4 inline-block") : ""}</span> 开启读字评测 
           </button>
         </div>
 
@@ -468,11 +468,11 @@ export class LearnModule extends BaseModule {
           <div>
             <h3 class="text-sm font-black text-white mb-6">语音评测挑战</h3>
             <p class="text-xs text-sky-200 mb-8 leading-relaxed">
-              点击下方按钮，对着麦克风大声朗读“<strong class="text-yellow-300 text-base">${char.char}</strong>”。凯茜会为你打分哦！
+              点击下方按钮，对着麦克风大声朗读“<strong class="text-yellow-300 text-base">${char.char}</strong>”凯茜会为你打分哦！
             </p>
             
             <button id="btn-start-record" class="w-24 h-24 mx-auto rounded-full bg-gradient-to-tr from-rose-400 to-red-500 shadow-[0_10px_20px_rgba(244,63,94,0.6)] flex items-center justify-center border-4 border-white active:scale-90 transition-all hover:scale-105">
-               <div class="w-12 h-12">${window.GAME_ICONS ? window.GAME_ICONS.audio("w-full h-full") : "🎤"}</div>
+               <div class="w-12 h-12">${window.GAME_ICONS ? window.GAME_ICONS.audio("w-full h-full") : ""}</div>
             </button>
             <div id="record-status" class="mt-4 text-xs font-bold text-rose-200">
               点击开始录音
@@ -480,7 +480,7 @@ export class LearnModule extends BaseModule {
           </div>
 
           <button id="btn-finish-read-step" class="mt-4 w-full bg-gradient-to-r from-blue-500 to-sky-500 text-white font-black text-sm py-3 rounded-full shadow-lg border border-white active:scale-95 transition-all flex items-center justify-center gap-2 opacity-50 pointer-events-none">
-            <span>${window.GAME_ICONS ? window.GAME_ICONS.sparkle("w-4 h-4 inline-block") : ""}</span> 去【练】字小游戏 ➔
+            <span>${window.GAME_ICONS ? window.GAME_ICONS.sparkle("w-4 h-4 inline-block") : ""}</span> 去练字小游戏 
           </button>
         </div>
 
@@ -500,6 +500,9 @@ export class LearnModule extends BaseModule {
         import('../utils/pronunciationEval.js').then(m => {
            window.pronunciationEval = m.pronunciationEval || m.default;
            this.handleRecordToggle(btnRecord, statusTxt, finishBtn, scoreDisplay, scoreNum);
+        }).catch((err) => {
+          console.error("[LearnModule] pronunciationEval load failed:", err);
+          statusTxt.textContent = "发音评测模块加载失败，请稍后重试";
         });
       } else {
         this.handleRecordToggle(btnRecord, statusTxt, finishBtn, scoreDisplay, scoreNum);
@@ -507,8 +510,8 @@ export class LearnModule extends BaseModule {
     });
 
     this._on(finishBtn, "click", () => {
-      window.soundAndFX.playPop();
-      this.currentStep = 6;
+      soundAndFX.playPop();
+      this.currentStep = 4;
       this.render();
     });
   }
@@ -552,7 +555,7 @@ export class LearnModule extends BaseModule {
     // Listen to events
     if (!this._evalListenerBound) {
       this._evalListenerBound = true;
-      window.eventBus.on("AUDIO_EVAL_RESULT", (res) => {
+      window.eventBus.on(EVENTS.AUDIO_EVAL_RESULT, (res) => {
          if (this.currentStep !== 3) return; // Prevent memory leak cross-screens
          
          const score = res.totalScore || 0;
@@ -572,7 +575,7 @@ export class LearnModule extends BaseModule {
          btnRecord.classList.remove("animate-pulse", "ring-4", "ring-emerald-400");
       });
       
-      window.eventBus.on("AUDIO_EVAL_ERROR", () => {
+      window.eventBus.on(EVENTS.AUDIO_EVAL_ERROR, () => {
          if (this.currentStep !== 3) return;
          statusTxt.textContent = "录音失败，点击重试";
          btnRecord.classList.remove("animate-pulse", "ring-4", "ring-emerald-400");
@@ -634,7 +637,7 @@ export class LearnModule extends BaseModule {
           <h2 class="text-2xl font-black text-yellow-300 mb-2">神枪手！射击挑战大满贯！</h2>
           <p class="text-xs text-gray-300 mb-6 font-semibold">你已经彻底掌握了“${char.char}”字的辨识与发音！</p>
           <button id="btn-next-to-write" class="bg-gradient-to-r from-emerald-400 to-emerald-600 text-white font-black text-sm px-10 py-3.5 rounded-full shadow-2xl border-2 border-white active:scale-95 transition-transform flex items-center gap-2">
-            <span>✍️</span> 去【写】字小画堂 ➔
+            <span>️</span> 去写字小画堂 
           </button>
         </div>
 
@@ -676,7 +679,7 @@ export class LearnModule extends BaseModule {
     if (nextBtn) {
       this._on(nextBtn, "click", () => {
         soundAndFX.playPop();
-        this.currentStep = 6;
+        this.currentStep = 5;
         this.render();
       });
     }
@@ -701,7 +704,7 @@ export class LearnModule extends BaseModule {
         <div class="w-72 flex flex-col justify-between h-full bg-white/80 backdrop-blur-md rounded-3xl p-6 border-2 border-amber-200 shadow-xl text-center">
           <div>
             <span class="bg-amber-100 text-amber-800 text-xs font-black px-4 py-1 rounded-full mb-3 inline-block">
-              ✍️ 魔法星光笔描红
+              ️ 魔法星光笔描红
             </span>
             <h3 class="text-lg font-black text-amber-950 mb-2">规范笔顺写好字</h3>
             <p class="text-xs text-gray-600 leading-relaxed font-semibold">
@@ -711,12 +714,12 @@ export class LearnModule extends BaseModule {
 
           <div class="flex flex-col gap-3">
             <button id="btn-reset-write" class="w-full bg-amber-100 hover:bg-amber-200 text-amber-900 font-black text-xs py-3 rounded-full shadow-sm active:scale-95 transition-all flex items-center justify-center gap-1.5">
-              <span>🔄</span> 重新书写这一字
+              <span></span> 重新书写这一字
             </button>
 
             <button id="btn-finish-write-step" class="w-full bg-gradient-to-r from-orange-500 to-amber-500 text-white font-black text-sm py-3.5 rounded-full shadow-xl border border-white active:scale-95 transition-all flex items-center justify-center gap-2 hidden animate-bounce-slow">
               <span class="flex items-center">${GAME_ICONS.chest("w-5 h-5")}</span>
-              <span>书写满分！去开宝箱 ➔</span>
+              <span>书写满分！去开宝箱 </span>
             </button>
           </div>
         </div>
@@ -744,7 +747,7 @@ export class LearnModule extends BaseModule {
     if (nextBtn) {
       this._on(nextBtn, "click", () => {
         soundAndFX.playPop();
-        this.currentStep = 6;
+        this.currentStep = 5;
         this.render();
       });
     }
@@ -792,14 +795,14 @@ export class LearnModule extends BaseModule {
             ${char.char}
           </div>
 
-          <h2 class="text-2xl font-black text-yellow-300 mb-1">获得全新专属字卡：【${char.char}】</h2>
+          <h2 class="text-2xl font-black text-yellow-300 mb-1">获得全新专属字卡：${char.char}</h2>
           <p class="text-xs text-gray-300 mb-4 flex items-center gap-2">
             <span class="flex items-center">${GAME_ICONS.coin("w-4 h-4")} 获得 10 凯茜星币</span>
             <span class="flex items-center">${GAME_ICONS.star("w-4 h-4", true)} 3 颗凯茜之星</span>
           </p>
 
           <button id="btn-confirm-return-map" class="bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 text-white font-black text-base px-12 py-3.5 rounded-full shadow-[0_0_40px_rgba(255,107,0,0.9)] border-2 border-white active:scale-95 transition-transform">
-            🎉 收入生词本，返回大地图
+             收入生词本，返回大地图
           </button>
         </div>
 

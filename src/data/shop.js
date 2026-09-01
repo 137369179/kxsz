@@ -1,7 +1,7 @@
 /**
  *  (Cathy Literacy) - 
  * ------------------------------------------------------------
- * // → 
+ * //  
  * price = 0  shop.ownedisOwned 
  *  value  profile.avatar  emoji
  */
@@ -23,7 +23,7 @@ export const SHOP_FRAMES = [
   { id: "frame_crystal", type: "frame", name: "冰晶雪魄", price: 600 }
 ];
 
-/**  id →  */
+/**  id   */
 export const FRAME_CLASSES = {
   frame_none: "",
   frame_gold: "ring-4 ring-amber-400 shadow-[0_0_14px_rgba(251,191,36,0.9)]",
