@@ -54,7 +54,7 @@ export class ReviewModule extends BaseModule {
 
   renderEmpty() {
     const __rvProgress = ebbinghausManager.progress;
-    const __rvSpeakerIcon = soundAndFX.isMuted ? GAME_ICONS.speaker("w-5 h-5", true) : GAME_ICONS.speaker("w-5 h-5", false);
+    const __rvSpeakerIcon = soundAndFX.isMuted ? GAME_ICONS.speaker(true) : GAME_ICONS.speaker(false);
     this.container.innerHTML = `
       <div class="relative w-full h-full min-h-[640px] flex flex-col select-none overflow-hidden bg-gradient-to-b from-indigo-900 via-purple-900 to-indigo-950">
         
@@ -66,10 +66,10 @@ export class ReviewModule extends BaseModule {
           </div>
           <div class="flex items-center gap-2">
             <div class="candy-pill flex items-center gap-1.5 text-yellow-300 font-black text-xs px-3 py-1 rounded-full">
-              ${GAME_ICONS.coin("w-4 h-4")}<span>${__rvProgress.coins}</span>
+              ${GAME_ICONS.coin()}<span>${__rvProgress.coins}</span>
             </div>
             <div class="candy-pill flex items-center gap-1.5 text-amber-300 font-black text-xs px-3 py-1 rounded-full">
-              ${GAME_ICONS.star("w-4 h-4", true)}<span>${__rvProgress.stars}</span>
+              ${GAME_ICONS.star(true)}<span>${__rvProgress.stars}</span>
             </div>
           </div>
         </header>
@@ -77,11 +77,11 @@ export class ReviewModule extends BaseModule {
         <main class="relative z-10 flex-1 flex items-center justify-center">
 
         <div class="flex flex-col items-center text-center animate-scale-up">
-          <div class="mb-4 flex items-center justify-center">${GAME_ICONS.reviewBell("w-20 h-20")}</div>
+          <div class="mb-4 flex items-center justify-center">${GAME_ICONS.reviewBell()}</div>
           <h2 class="text-2xl font-black text-yellow-300 mb-2">太棒啦！</h2>
           <p class="text-sm text-white/70 mb-8">当前记忆度满分，没有需要紧急复习的汉字哦</p>
           <button id="btn-review-empty-back" class="btn-game-orange text-white font-black text-base px-10 py-3.5 rounded-full flex items-center gap-2">
-            <span class="flex items-center">${GAME_ICONS.home("w-5 h-5")}</span>
+            <span class="flex items-center">${GAME_ICONS.home()}</span>
             <span>返回大地图</span>
           </button>
         </div>
@@ -95,7 +95,7 @@ export class ReviewModule extends BaseModule {
     if (soundBtn) {
       this._on(soundBtn, "click", () => {
         soundAndFX.toggleMute();
-        const ic = soundAndFX.isMuted ? GAME_ICONS.speaker("w-5 h-5", true) : GAME_ICONS.speaker("w-5 h-5", false);
+        const ic = soundAndFX.isMuted ? GAME_ICONS.speaker(true) : GAME_ICONS.speaker(false);
         soundBtn.innerHTML = ic;
       });
     }
@@ -109,7 +109,7 @@ export class ReviewModule extends BaseModule {
 
   renderRound() {
     const __rvProgress = ebbinghausManager.progress;
-    const __rvSpeakerIcon = soundAndFX.isMuted ? GAME_ICONS.speaker("w-5 h-5", true) : GAME_ICONS.speaker("w-5 h-5", false);
+    const __rvSpeakerIcon = soundAndFX.isMuted ? GAME_ICONS.speaker(true) : GAME_ICONS.speaker(false);
     const charData = this.queue[this.currentIndex];
     const options = shuffle([charData.char, ...(charData.confusingChars || ["日", "月", "木"]).slice(0, 3)]);
     const progress = this.currentIndex + 1;
@@ -122,7 +122,7 @@ export class ReviewModule extends BaseModule {
         <!-- 顶部导航与复习数据看板 -->
         <header class="relative z-30 w-full px-6 py-3 flex items-center justify-between bg-black/40 backdrop-blur-md border-b border-white/20">
           <button id="btn-review-quit" class="btn-game-wood text-white font-black text-xs px-4 py-1.5 rounded-2xl flex items-center gap-1.5">
-            <span class="flex items-center">${GAME_ICONS.home("w-4 h-4")}</span>
+            <span class="flex items-center">${GAME_ICONS.home()}</span>
             <span>退出复习</span>
           </button>
 
@@ -136,10 +136,10 @@ export class ReviewModule extends BaseModule {
               ${__rvSpeakerIcon}
             </button>
             <div class="candy-pill flex items-center gap-1.5 text-yellow-300 font-black text-xs px-3 py-1 rounded-full">
-              ${GAME_ICONS.coin("w-4 h-4")}<span>${__rvProgress.coins}</span>
+              ${GAME_ICONS.coin()}<span>${__rvProgress.coins}</span>
             </div>
             <div class="candy-pill flex items-center gap-1.5 text-amber-300 font-black text-xs px-3 py-1 rounded-full">
-              ${GAME_ICONS.star("w-4 h-4", true)}<span>${__rvProgress.stars}</span>
+              ${GAME_ICONS.star(true)}<span>${__rvProgress.stars}</span>
             </div>
             <div class="candy-pill flex items-center gap-2 px-4 py-1.5 rounded-full text-white font-black text-xs">
               <span class="text-emerald-400">正确 ${this.correctCount}</span>
@@ -153,7 +153,7 @@ export class ReviewModule extends BaseModule {
           <div class="relative w-full max-w-3xl bg-white/10 backdrop-blur-md rounded-3xl border-2 border-white/20 p-8 flex flex-col items-center animate-fade-in">
 
             <button id="btn-review-replay" class="w-24 h-24 rounded-full btn-game-orange border-4 border-white flex items-center justify-center animate-bounce-slow mb-6 active:scale-95 shadow-xl">
-              <span class="flex items-center">${GAME_ICONS.speaker("w-12 h-12")}</span>
+              <span class="flex items-center">${GAME_ICONS.speaker()}</span>
             </button>
             <p class="text-white font-black text-sm mb-8 drop-shadow">点击听音，找出读音对应的正确汉字</p>
 
@@ -200,7 +200,7 @@ export class ReviewModule extends BaseModule {
     if (soundBtn) {
       this._on(soundBtn, "click", () => {
         soundAndFX.toggleMute();
-        const ic = soundAndFX.isMuted ? GAME_ICONS.speaker("w-5 h-5", true) : GAME_ICONS.speaker("w-5 h-5", false);
+        const ic = soundAndFX.isMuted ? GAME_ICONS.speaker(true) : GAME_ICONS.speaker(false);
         soundBtn.innerHTML = ic;
       });
     }
@@ -242,7 +242,7 @@ export class ReviewModule extends BaseModule {
 
   renderSummary() {
     const __rvProgress = ebbinghausManager.progress;
-    const __rvSpeakerIcon = soundAndFX.isMuted ? GAME_ICONS.speaker("w-5 h-5", true) : GAME_ICONS.speaker("w-5 h-5", false);
+    const __rvSpeakerIcon = soundAndFX.isMuted ? GAME_ICONS.speaker(true) : GAME_ICONS.speaker(false);
     const total = this.queue.length;
     const perfect = this.wrongCount === 0;
 
@@ -256,7 +256,7 @@ export class ReviewModule extends BaseModule {
       <div class="relative w-full h-full min-h-[640px] flex items-center justify-center bg-gradient-to-b from-purple-950 via-indigo-950 to-purple-900 select-none">
         <div class="flex flex-col items-center text-center text-white animate-scale-up bg-white/10 backdrop-blur-md rounded-3xl border-2 border-white/20 p-10 max-w-lg">
           <div class="mb-3 flex items-center justify-center">
-            ${perfect ? GAME_ICONS.trophy("w-20 h-20") : GAME_ICONS.star("w-20 h-20", true)}
+            ${perfect ? GAME_ICONS.trophy() : GAME_ICONS.star(true)}
           </div>
           <h2 class="text-2xl font-black text-yellow-300 mb-2">
             ${perfect ? "完美通关！" : "复习完成！"}
@@ -269,18 +269,18 @@ export class ReviewModule extends BaseModule {
               ${__rvSpeakerIcon}
             </button>
             <div class="candy-pill flex items-center gap-1.5 text-yellow-300 font-black text-xs px-3 py-1 rounded-full">
-              ${GAME_ICONS.coin("w-4 h-4")}<span>${__rvProgress.coins}</span>
+              ${GAME_ICONS.coin()}<span>${__rvProgress.coins}</span>
             </div>
             <div class="candy-pill flex items-center gap-1.5 text-amber-300 font-black text-xs px-3 py-1 rounded-full">
-              ${GAME_ICONS.star("w-4 h-4", true)}<span>${__rvProgress.stars}</span>
+              ${GAME_ICONS.star(true)}<span>${__rvProgress.stars}</span>
             </div>
           </div>
           <div class="candy-pill rounded-2xl px-6 py-3 mb-6 text-xs text-yellow-300 font-bold flex items-center gap-1.5">
-            <span class="flex items-center">${GAME_ICONS.coin("w-4 h-4")}</span>
+            <span class="flex items-center">${GAME_ICONS.coin()}</span>
             <span>获得 ${this.correctCount * 2} 凯茜星币</span>
           </div>
           <button id="btn-review-done" class="btn-game-orange text-white font-black text-base px-12 py-3.5 rounded-full flex items-center gap-2">
-            <span class="flex items-center">${GAME_ICONS.home("w-5 h-5")}</span>
+            <span class="flex items-center">${GAME_ICONS.home()}</span>
             <span>领取奖励并返回大地图</span>
           </button>
         </div>
@@ -300,7 +300,7 @@ export class ReviewModule extends BaseModule {
     if (soundBtn) {
       this._on(soundBtn, "click", () => {
         soundAndFX.toggleMute();
-        const ic = soundAndFX.isMuted ? GAME_ICONS.speaker("w-5 h-5", true) : GAME_ICONS.speaker("w-5 h-5", false);
+        const ic = soundAndFX.isMuted ? GAME_ICONS.speaker(true) : GAME_ICONS.speaker(false);
         soundBtn.innerHTML = ic;
       });
     }

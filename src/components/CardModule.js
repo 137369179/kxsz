@@ -115,7 +115,7 @@ export class CardModule extends BaseModule {
         <div class="w-full flex flex-col gap-3 bg-white/95 backdrop-blur-md px-6 py-4 rounded-3xl shadow-xl border-2 border-amber-200 mb-4 sticky top-0 z-20">
           <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
             <div class="flex items-center gap-3">
-              <span class="flex items-center">${GAME_ICONS.cards("w-8 h-8")}</span>
+              <span class="flex items-center">${GAME_ICONS.cards()}</span>
               <div>
                 <h1 class="text-base font-black text-amber-950">生词字卡库 · 偏旁部首专项板块</h1>
                 <p class="text-xs text-amber-700 font-semibold">1800 汉字造字本源解析3D 翻转卡片偏旁归纳与组词例句</p>
@@ -220,7 +220,7 @@ export class CardModule extends BaseModule {
             visibleChars.length === 0
               ? `
             <div class="col-span-full py-16 text-center text-gray-400 font-black text-sm">
-              <div class="w-12 h-12 mx-auto mb-2 flex items-center justify-center">${GAME_ICONS.book("w-10 h-10")}</div>
+              <div class="w-12 h-12 mx-auto mb-2 flex items-center justify-center">${GAME_ICONS.book()}</div>
               未找到符合条件的生字卡片，换个关键词或筛选条件试试吧！
             </div>
           `
@@ -335,7 +335,9 @@ export class CardModule extends BaseModule {
     if (speakRadBtn) {
       this._on(speakRadBtn, "click", () => {
         soundAndFX.playPop();
-        soundAndFX.speak(RADICAL_ORIGINS[this.selectedRadical] || "");
+        if (RADICAL_ORIGINS[this.selectedRadical]) {
+          soundAndFX.speakPriority(RADICAL_ORIGINS[this.selectedRadical] || "", { kind: "sentence", priority: 1 });
+        }
       });
     }
 
@@ -481,12 +483,12 @@ export class CardModule extends BaseModule {
     overlay.innerHTML = `
       <div class="relative w-full max-w-sm bg-gradient-to-b from-amber-50 to-orange-50 rounded-3xl p-6 shadow-2xl border-4 border-amber-300 flex flex-col items-center">
         <button id="btn-close-stroke-demo" class="absolute -top-12 right-0 w-9 h-9 rounded-full bg-white text-gray-800 font-extrabold text-lg flex items-center justify-center shadow-lg hover:bg-gray-100 active:scale-95 cursor-pointer">
-          ${GAME_ICONS.back("w-5 h-5")}
+          ${GAME_ICONS.back()}
         </button>
 
         <div class="flex items-center justify-between w-full mb-3 pb-2 border-b border-amber-200">
           <span class="text-sm font-black text-amber-900 flex items-center gap-1.5">
-            ${GAME_ICONS.brush("w-4 h-4")}
+            ${GAME_ICONS.brush()}
             <span>标准笔顺演示 · “${c.char}” (${c.pinyin})</span>
           </span>
           <span id="demo-stroke-name" class="text-xs font-black bg-amber-200 text-amber-900 px-2.5 py-0.5 rounded-full">准备起笔</span>
@@ -499,7 +501,7 @@ export class CardModule extends BaseModule {
 
         <div class="flex items-center gap-3 mt-4 w-full justify-center">
           <button id="btn-replay-stroke-demo" class="btn-game-orange text-white text-xs font-black px-6 py-2.5 rounded-full shadow-lg active:scale-95 flex items-center gap-1.5 cursor-pointer">
-            ${GAME_ICONS.brush("w-4 h-4")}
+            ${GAME_ICONS.brush()}
             <span>重新演示</span>
           </button>
         </div>
@@ -638,7 +640,7 @@ export class CardModule extends BaseModule {
           
           <!-- 关闭按钮 -->
           <button id="btn-close-modal" class="absolute -top-12 right-0 w-9 h-9 rounded-full bg-white text-gray-800 font-extrabold text-lg flex items-center justify-center shadow-lg hover:bg-gray-100 active:scale-95 z-50 cursor-pointer" title="关闭">
-            ${GAME_ICONS.back("w-5 h-5")}
+            ${GAME_ICONS.back()}
           </button>
 
           <!-- 3D 翻转卡片容器 -->
@@ -650,11 +652,11 @@ export class CardModule extends BaseModule {
                 <span class="text-xs font-black bg-amber-200 text-amber-900 px-3 py-1 rounded-full">${c.radical}部 · ${c.strokeCount || 4}画</span>
                 <div class="flex items-center gap-2">
                   <button id="btn-modal-demo-strokes" class="flex items-center gap-1 bg-amber-200 hover:bg-amber-300 text-amber-900 px-3 py-1 rounded-full text-xs font-black shadow active:scale-90 transition-all cursor-pointer" title="笔顺笔画动画演示">
-                    <span class="flex items-center">${GAME_ICONS.brush("w-3.5 h-3.5")}</span>
+                    <span class="flex items-center">${GAME_ICONS.brush()}</span>
                     <span>笔顺</span>
                   </button>
                   <button id="btn-modal-speak-char" class="w-8 h-8 rounded-full bg-orange-500 text-white flex items-center justify-center shadow text-sm active:scale-90 cursor-pointer" title="朗读">
-                    ${GAME_ICONS.speaker("w-4 h-4")}
+                    ${GAME_ICONS.speaker()}
                   </button>
                 </div>
               </div>
@@ -682,7 +684,7 @@ export class CardModule extends BaseModule {
             <div class="absolute inset-0 bg-gradient-to-b from-orange-50 to-amber-100 rounded-3xl shadow-2xl border-4 border-orange-300 p-6 flex flex-col justify-between backface-hidden rotate-y-180 ${!this.isCardFlipped ? 'pointer-events-none' : ''}">
               <div class="flex items-center justify-between pb-2 border-b border-amber-200">
                 <span class="text-xs font-black text-amber-900 flex items-center gap-1.5">
-                  ${GAME_ICONS.book("w-4 h-4")}
+                  ${GAME_ICONS.book()}
                   <span>组词造句本源</span>
                 </span>
                 <span class="text-[10px] text-orange-600 font-bold">已翻转</span>

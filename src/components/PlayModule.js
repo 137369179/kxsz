@@ -370,7 +370,7 @@ export class PlayModule extends BaseModule {
               </div>
               <div class="flex items-center gap-2">
                 <span class="text-xs font-black text-yellow-300 streak-badge px-3 py-1 rounded-full border border-yellow-300/60 ${roundCorrect > 0 ? "" : "opacity-40"}">
-                  🔥 连击 x${roundCorrect}
+                  连击 x${roundCorrect}
                 </span>
                 <span class="text-xs font-black text-amber-200/70">最高 ${maxStreak}</span>
               </div>
@@ -519,8 +519,8 @@ export class PlayModule extends BaseModule {
             bossHp = Math.max(0, bossHp - finalDmg);
             if (bossBar) bossBar.style.width = `${bossHp}%`;
             // 飘字：暴击伤害 + 连击
-            spawnFloatingText(arena, `-${finalDmg} 暴击！${finalDmg >= 45 ? "💥" : ""}`, "dmg", { color: finalDmg >= 45 ? "#f97316" : "#fb7185", top: 45, size: finalDmg >= 45 ? 40 : 32 });
-            if (roundCorrect >= 2) spawnFloatingText(arena, `🔥 连击 x${roundCorrect}`, "combo", { color: "#fbbf24", top: 30, size: 22 });
+            spawnFloatingText(arena, `-${finalDmg} 暴击！${finalDmg >= 45 ? "" : ""}`, "dmg", { color: finalDmg >= 45 ? "#f97316" : "#fb7185", top: 45, size: finalDmg >= 45 ? 40 : 32 });
+            if (roundCorrect >= 2) spawnFloatingText(arena, `连击 x${roundCorrect}`, "combo", { color: "#fbbf24", top: 30, size: 22 });
 
             applyRage();
 
@@ -645,7 +645,7 @@ export class PlayModule extends BaseModule {
             </div>
             <div class="flex items-center gap-2">
               <span id="match-combo" class="text-xs font-black text-yellow-300 streak-badge px-3 py-1 rounded-full border border-yellow-300/60 ${combo > 0 ? "" : "opacity-40"}">
-                🔥 Combo x${combo}
+                Combo x${combo}
               </span>
               <span class="text-xs font-black text-amber-200/70">最高 ${maxCombo}</span>
             </div>
@@ -687,7 +687,7 @@ export class PlayModule extends BaseModule {
           <p class="text-xs text-gray-300 mb-2 font-semibold">还有 <b id="match-fail-remain" class="text-yellow-300">0</b> 对未消除</p>
           <p class="text-xs text-gray-400 mb-6 font-semibold">再试一次，连击拿高分！</p>
           <button id="btn-match-retry" class="btn-game-orange text-white font-black text-base px-10 py-3 rounded-full">
-            🔄 再战一轮
+            再战一轮
           </button>
         </div>
 
@@ -726,7 +726,7 @@ export class PlayModule extends BaseModule {
     // ===== 限时：T 秒倒计时，超时判负 =====
     const updateComboUI = () => {
       if (!comboEl) return;
-      comboEl.textContent = `🔥 Combo x${combo}`;
+      comboEl.textContent = `Combo x${combo}`;
       comboEl.classList.toggle("opacity-40", combo <= 0);
     };
     if (stopTimer) stopTimer();
@@ -769,7 +769,7 @@ export class PlayModule extends BaseModule {
             matchedCount++;
             if (scoreEl) scoreEl.textContent = matchedCount;
             updateComboUI();
-            spawnFloatingText(arena, `✓ 配对成功 ${combo >= 2 ? `Combo x${combo}` : ""}`, "match-ok", { color: "#34d399", top: 32, size: 22 });
+            spawnFloatingText(arena, `配对成功 ${combo >= 2 ? `Combo x${combo}` : ""}`, "match-ok", { color: "#34d399", top: 32, size: 22 });
 
             // ===== 艾宾浩斯复习闭环：配对成功 = 复习成功 =====
             const c = CHARACTER_DATABASE.find((x) => x.char === b1.dataset.match);
@@ -880,8 +880,8 @@ export class PlayModule extends BaseModule {
             </div>
 
             <div class="candy-pill flex items-center gap-4 px-5 py-1.5 rounded-full text-xs font-black">
-              <span class="text-rose-400"> 红队: ${p1Score}${p1Streak >= 2 ? ` 🔥x${p1Streak}` : ""}</span>
-              <span class="text-cyan-400"> 蓝队: ${p2Score}${p2Streak >= 2 ? ` 🔥x${p2Streak}` : ""}</span>
+              <span class="text-rose-400"> 红队: ${p1Score}${p1Streak >= 2 ? `  x${p1Streak}` : ""}</span>
+              <span class="text-cyan-400"> 蓝队: ${p2Score}${p2Streak >= 2 ? `  x${p2Streak}` : ""}</span>
             </div>
           </header>
 
@@ -992,7 +992,7 @@ export class PlayModule extends BaseModule {
           const crownEl = this.container.querySelector("#pk-win-crown");
           const rewardEl = this.container.querySelector("#pk-win-reward");
           const winner = p1Score > p2Score ? "红队" : p1Score < p2Score ? "蓝队" : "平局";
-          if (crownEl) crownEl.textContent = winner === "红队" ? "👑 红队获得冠军皇冠！" : winner === "蓝队" ? "👑 蓝队获得冠军皇冠！" : "🤝 势均力敌，握手言和！";
+          if (crownEl) crownEl.textContent = winner === "红队" ? "红队获得冠军皇冠！" : winner === "蓝队" ? "蓝队获得冠军皇冠！" : "势均力敌，握手言和！";
           // 奖励：基础 15 币 + 胜方加成 + 连胜加成
           let reward = 15;
           if (p1Score > p2Score) reward += 5 + Math.min(p1Streak * 2, 6);
@@ -1018,7 +1018,7 @@ export class PlayModule extends BaseModule {
             soundAndFX.playSuccessSound();
             soundAndFX.triggerConfetti(this.container);
             btn.classList.add("ring-8", "ring-emerald-400");
-            spawnFloatingText(arena, `✓ 红队 +10${p1Streak >= 2 ? ` 🔥连胜 x${p1Streak}` : ""}`, "pk-ok", { color: "#fb7185", top: 34, size: 22 });
+            spawnFloatingText(arena, `红队 +10${p1Streak >= 2 ? ` 连胜 x${p1Streak}` : ""}`, "pk-ok", { color: "#fb7185", top: 34, size: 22 });
             // ===== 艾宾浩斯复习闭环：抢拍正确 = 复习成功 =====
             const c = CHARACTER_DATABASE.find((x) => x.char === r.char);
             if (c) ebbinghausManager.completeReview(c.id, true);
@@ -1028,7 +1028,7 @@ export class PlayModule extends BaseModule {
             p1Streak = 0;
             soundAndFX.playSoftError();
             btn.classList.add("ring-8", "ring-rose-400");
-            spawnFloatingText(arena, "✗ 蓝队 +10", "pk-miss", { color: "#22d3ee", top: 34, size: 20 });
+            spawnFloatingText(arena, "蓝队 +10", "pk-miss", { color: "#22d3ee", top: 34, size: 20 });
             // ===== 闭环：抢拍错误 = 标记难字 =====
             const c = CHARACTER_DATABASE.find((x) => x.char === r.char);
             if (c) ebbinghausManager.completeReview(c.id, false);
@@ -1083,7 +1083,7 @@ export class PlayModule extends BaseModule {
               ${GAME_ICONS.coin("w-4 h-4")}<span>${__pmProgress.coins}</span>
             </div>
             <div class="candy-pill flex items-center gap-1.5 text-emerald-300 font-black text-xs px-3 py-1 rounded-full">
-              ✅ <span>已学 <b id="idiom-learned-count" class="text-yellow-300">${learned.size}</b>/${db.length}</span>
+              <span>已学 <b id="idiom-learned-count" class="text-yellow-300">${learned.size}</b>/${db.length}</span>
             </div>
           </div>
         </header>
@@ -1094,7 +1094,7 @@ export class PlayModule extends BaseModule {
               const isLearned = learned.has(item.id || item.name);
               return `
               <div class="idiom-card bg-white/10 backdrop-blur-md rounded-3xl p-5 border-2 ${isLearned ? "border-emerald-400/70" : "border-emerald-300/40"} shadow-xl hover:border-yellow-300 cursor-pointer transition-all hover:scale-105 flex flex-col justify-between relative" data-idiom-idx="${db.indexOf(item)}">
-                ${isLearned ? `<span class="learned-stamp w-7 h-7 rounded-full bg-emerald-500 border-2 border-white text-white flex items-center justify-center text-sm shadow-lg">✓</span>` : ""}
+                ${isLearned ? `<span class="learned-stamp w-7 h-7 rounded-full bg-emerald-500 border-2 border-white text-white flex items-center justify-center text-sm shadow-lg">OK</span>` : ""}
                 <div>
                   <div class="flex items-center justify-between mb-2">
                     <span class="text-[11px] font-bold text-emerald-300 tracking-wider">${item.pinyin || ""}</span>
@@ -1106,7 +1106,7 @@ export class PlayModule extends BaseModule {
                   <p class="text-xs text-gray-200 leading-relaxed font-semibold">${item.desc || item.meaning || ""}</p>
                 </div>
                 <div class="mt-4 pt-3 border-t border-white/10 flex justify-between items-center">
-                  <span class="text-[10px] ${isLearned ? "text-emerald-400 font-black" : "text-emerald-400/70 font-bold"}">${isLearned ? "🏅 已掌握" : "国学启蒙必学"}</span>
+                  <span class="text-[10px] ${isLearned ? "text-emerald-400 font-black" : "text-emerald-400/70 font-bold"}">${isLearned ? " 已掌握" : "国学启蒙必学"}</span>
                   <button class="text-[10px] ${isLearned ? "bg-emerald-400" : "bg-yellow-400"} text-amber-950 font-black px-3 py-1 rounded-full shadow active:scale-90 transition-transform">${isLearned ? "再次回顾" : "听故事闯关"}</button>
                 </div>
               </div>

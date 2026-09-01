@@ -1,17 +1,20 @@
 /**
- * 凯茜识字 (Cathy Literacy) - 分级绘本馆与沉浸式阅读器
- * 核心特色：
- *  1. 分阶与主题书架筛选（全部 / 第1阶·启蒙 / 第2阶·生活 / 第3阶·进阶）
+ * 凯茜识字 (Cathy Literacy) - 分级绘本馆与沉浸式阅读器 (深度对标洪恩绘本标杆体验)
+ * 核心特色体系：
+ *  1. 分阶与主题书架筛选（全部 / 第1阶·启蒙森林 / 第2阶·缤纷生活 / 第3阶·星际进阶）
  *  2. 已读通关印章（金色皇冠 + 通关三星）与在读进度持久化
  *  3. 16:9 影院级大画幅绘本与画面隐藏互动寻宝热区
  *  4. 毫秒级字界事件驱动的卡拉OK伴读 + 单字精准点读
  *  5. 汉字顶部标准拼音注音（Ruby Pinyin）一键显隐切换
  *  6. 一键【自动连读】全本沉浸伴读模式（自动伴读、延时展示、平滑翻页）
- *  7. 【我来读一读】儿童智能跟读与亲子录音回放
- *  8. 阅读理解趣味小测验与 3D 黄金宝箱礼炮结算
+ *  7. 【生字全息速查卡】(洪恩标杆)：田字格、字源演变、组词造句、发音朗读
+ *  8. 【全书缩略图目录抽屉】(洪恩标杆)：对开页缩略图、快速跳页导航
+ *  9. 【我来读一读】：儿童智能跟读打分、声波波形与亲子录音回放
+ *  10. 【双重阅读测评 + 荣誉结业证书】(洪恩标杆)：生字眼力考验、故事理解问答、金牌结业证书
  */
 
 import { STORYBOOKS_DATABASE } from "../data/books.js";
+import { CHARACTER_DATABASE } from "../data/characters.js";
 import { soundAndFX } from "../utils/soundEngine.js";
 import { ebbinghausManager } from "../utils/ebbinghaus.js";
 import { mountGameShell, showGameToast } from "./SharedShell.js";
@@ -26,6 +29,7 @@ export class BookModule extends BaseModule {
     this.currentBook = null;
     this.currentPageIndex = 0;
     this.isQuizMode = false;
+    this.isCertificateMode = false;
     this.quizAnswered = false;
     this.karaokeTimer = null;
     this.currentFilterStage = "all"; // "all" | 1 | 2 | 3
@@ -39,8 +43,10 @@ export class BookModule extends BaseModule {
     this._progressKey = "cathy_book_progress_v2";
     this.progressMap = {}; // { bookId: pageIndex }
     this.karaokeSessionId = 0;
-    this.currentQuizIndex = 0;
+    this.currentQuizStage = 1; // 1: 生字眼力考验, 2: 故事理解问答
     this.isVoiceModalOpen = false;
+    this.isCatalogOpen = false;
+    this.isCharPopoverOpen = false;
     this._loadProgress();
   }
 
@@ -79,6 +85,8 @@ export class BookModule extends BaseModule {
     }
     this.karaokeSessionId++;
     this.isVoiceModalOpen = false;
+    this.isCatalogOpen = false;
+    this.isCharPopoverOpen = false;
     super.destroy();
   }
 
@@ -86,6 +94,8 @@ export class BookModule extends BaseModule {
     this.destroy();
     if (!this.currentBook) {
       this.renderShelf();
+    } else if (this.isCertificateMode) {
+      this.renderCertificate();
     } else if (this.isQuizMode) {
       this.renderQuiz();
     } else {
@@ -267,8 +277,9 @@ export class BookModule extends BaseModule {
         this.currentBook = STORYBOOKS_DATABASE.find((b) => b.id === bookId);
         this.currentPageIndex = this.progressMap[bookId] || 0;
         this.isQuizMode = false;
+        this.isCertificateMode = false;
         this.quizAnswered = false;
-        this.currentQuizIndex = 0;
+        this.currentQuizStage = 1;
         soundAndFX.playSuccessSound();
         this.render();
       });
@@ -276,7 +287,7 @@ export class BookModule extends BaseModule {
   }
 
   // ----------------------------------------------------
-  // 2. 16:9 影院级绘本阅读器 (拼音注音 + 自动连读 + 我来读)
+  // 2. 16:9 影院级绘本阅读器
   // ----------------------------------------------------
   renderReader() {
     const book = this.currentBook;
@@ -289,66 +300,98 @@ export class BookModule extends BaseModule {
     });
     this._addCleanup(destroyShell);
 
-    // 基于 G2P 生成汉字与拼音的对齐 tokens
+    // G2P 生成拼音对齐 tokens
     const pinyinTokens = g2p.convert(page.text || "");
+
+    // 宝藏发现统计
+    const allHotspotKeys = (book.pages || []).flatMap((p, pIdx) => (p.interactions || p.hotspots || []).map((_, hIdx) => `${pIdx}_${hIdx}`));
+    const discoveredList = this.discoveredHotspots[book.id] || [];
+    const discoveredCount = discoveredList.length;
+    const totalHotspots = allHotspotKeys.length;
+
+    // 配音录音统计
+    const recordingsForBook = this.bookRecordings[book.id] || {};
+    const recordedPagesCount = Object.keys(recordingsForBook).length;
 
     mainEl.innerHTML = `
       <div class="relative w-full max-w-5xl mx-auto flex flex-col justify-between pt-16 sm:pt-20 pb-6 px-4 select-none animate-fade-in">
         
-        <!-- 阅读器顶部控制栏 (Sleek Glass Toolbar) -->
-        <div class="w-full flex items-center justify-between bg-white/95 backdrop-blur-md px-5 py-2.5 rounded-2xl shadow-xl border-2 border-amber-200/90 mb-3 flex-wrap gap-2">
+        <!-- 阅读器顶部控制栏 (Glass Toolbar) -->
+        <div class="w-full flex items-center justify-between bg-white/95 backdrop-blur-md px-3 sm:px-4 py-2 rounded-2xl shadow-lg border border-amber-200/80 mb-3 gap-2 flex-wrap">
           
-          <button id="btn-back-shelf" class="flex items-center gap-1.5 text-amber-900 hover:text-orange-600 font-black text-xs px-3.5 py-1.5 rounded-full hover:bg-amber-100 transition-all cursor-pointer">
-            <span class="flex items-center">${GAME_ICONS.home("w-4 h-4")}</span>
-            <span>返回书架</span>
-          </button>
-          
-          <div class="flex items-center gap-2">
-            <h2 class="text-sm font-black text-amber-950">${book.title}</h2>
-            <span class="text-xs text-orange-700 bg-orange-100/90 px-2.5 py-0.5 rounded-full font-black border border-orange-200">
-              ${this.currentPageIndex + 1} / ${totalPages} 页
+          <!-- 左侧：返回 + 目录 + 标题与页数 -->
+          <div class="flex items-center gap-2 overflow-hidden">
+            <button id="btn-back-shelf" class="flex items-center gap-1 text-amber-800/80 hover:text-orange-600 font-black text-xs px-2.5 py-1.5 rounded-xl hover:bg-amber-50 transition-all cursor-pointer shrink-0">
+              <span class="flex items-center">${GAME_ICONS.home("w-4 h-4")}</span>
+              <span class="hidden sm:inline">书架</span>
+            </button>
+
+            <button id="btn-open-catalog" class="flex items-center gap-1 text-amber-800 hover:text-orange-600 font-black text-xs px-2 py-1.5 rounded-xl hover:bg-amber-50 transition-all cursor-pointer shrink-0 border border-amber-200" title="打开全书目录">
+              <span class="flex items-center">${GAME_ICONS.cards("w-3.5 h-3.5")}</span>
+              <span>目录</span>
+            </button>
+
+            <div class="w-px h-4 bg-amber-200/80 shrink-0"></div>
+
+            <h2 class="text-xs sm:text-sm font-black text-amber-950 truncate max-w-[90px] sm:max-w-[150px]">${book.title}</h2>
+            <span class="text-[10px] text-orange-600 bg-orange-100/80 px-1.5 py-0.5 rounded-lg font-black border border-orange-200/60 shrink-0">
+              ${this.currentPageIndex + 1}<span class="opacity-50">/${totalPages}</span>
             </span>
           </div>
 
-          <div class="flex items-center gap-2 flex-wrap">
+          <!-- 右侧：功能工具组 -->
+          <div class="flex items-center gap-1.5 sm:gap-2 flex-wrap">
             
-            <!-- 拼音注音显隐切换 -->
-            <button id="btn-toggle-pinyin" class="flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-black shadow-sm transition-all cursor-pointer ${
-              this.showPinyin ? "bg-amber-400 text-amber-950 font-black ring-2 ring-amber-300" : "bg-gray-100 text-gray-600 hover:bg-gray-200 border border-gray-200"
-            }" title="切换汉字上方标准拼音注音">
-              <span class="flex items-center">${GAME_ICONS.cards("w-3.5 h-3.5")}</span>
-              <span>${this.showPinyin ? "拼音: 开" : "拼音: 关"}</span>
+            <!-- 宝藏进度 -->
+            ${totalHotspots > 0 ? `
+              <div class="hidden sm:flex items-center gap-1 bg-amber-100/90 text-amber-900 text-[10px] font-black px-2.5 py-1 rounded-xl border border-amber-200">
+                <span class="flex items-center">${GAME_ICONS.sparkle("w-3 h-3")}</span>
+                <span id="hotspot-count-badge">✨ ${discoveredCount}/${totalHotspots}</span>
+              </div>
+            ` : ""}
+
+            <!-- 拼音显隐切换 -->
+            <button id="btn-toggle-pinyin" class="flex items-center gap-0.5 px-2.5 py-1.5 rounded-xl text-xs font-black transition-all cursor-pointer ${
+              this.showPinyin ? "bg-sky-100 text-sky-700 border border-sky-300" : "bg-gray-100 text-gray-500 border border-gray-200 hover:bg-gray-200"
+            }" title="切换拼音注音">
+              <span>${this.showPinyin ? "拼 开" : "拼"}</span>
             </button>
 
-            <!-- 自动连读开关 -->
-            <button id="btn-toggle-autoplay" class="flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-black shadow-sm transition-all cursor-pointer ${
-              this.isAutoPlay ? "bg-gradient-to-r from-emerald-500 to-green-500 text-white animate-pulse ring-2 ring-emerald-300" : "bg-gray-100 text-gray-600 hover:bg-gray-200 border border-gray-200"
-            }" title="开启后自动朗读并连续翻页">
+            <!-- 自动连读 -->
+            <button id="btn-toggle-autoplay" class="flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-black transition-all cursor-pointer ${
+              this.isAutoPlay ? "bg-emerald-500 text-white ring-1 ring-emerald-300" : "bg-gray-100 text-gray-500 border border-gray-200 hover:bg-gray-200"
+            }" title="自动连读翻页">
               <span class="flex items-center">${GAME_ICONS.sparkle("w-3.5 h-3.5")}</span>
-              <span>${this.isAutoPlay ? "自动连读中" : "自动连读"}</span>
+              <span>${this.isAutoPlay ? "连读中" : "自动连读"}</span>
             </button>
+
+            ${recordedPagesCount > 0 ? `
+              <button id="btn-play-my-voice" class="flex items-center gap-1 bg-purple-100 text-purple-700 font-black text-xs px-2.5 py-1.5 rounded-xl border border-purple-200 transition-all active:scale-95 cursor-pointer hover:bg-purple-200">
+                <span>🎙️</span>
+                <span>配音(${recordedPagesCount})</span>
+              </button>
+            ` : ""}
 
             <!-- 我来读一读 -->
-            <button id="btn-user-read" class="bg-gradient-to-r from-rose-500 to-pink-500 text-white font-black text-xs px-3.5 py-1.5 rounded-full shadow-md flex items-center gap-1 active:scale-95 cursor-pointer hover:brightness-110" title="点击录音自己读一页">
-              <span class="flex items-center">${GAME_ICONS.speaker("w-3.5 h-3.5")}</span>
+            <button id="btn-user-read" class="flex items-center gap-1 bg-rose-100 hover:bg-rose-200 text-rose-700 font-black text-xs px-2.5 py-1.5 rounded-xl border border-rose-200 transition-all active:scale-95 cursor-pointer">
+              <span>🎤</span>
               <span>我来读</span>
             </button>
 
-            <!-- 伴读整页 -->
-            <button id="btn-play-karaoke" class="btn-game-orange text-white font-black text-xs px-4 py-1.5 rounded-full shadow-md flex items-center gap-1 active:scale-95 cursor-pointer">
+            <!-- 伴读 -->
+            <button id="btn-play-karaoke" class="btn-game-orange text-white font-black text-xs px-3.5 sm:px-4 py-1.5 rounded-xl shadow-md flex items-center gap-1 active:scale-95 cursor-pointer">
               <span class="flex items-center">${GAME_ICONS.speaker("w-3.5 h-3.5")}</span>
-              <span>伴读整页</span>
+              <span>伴读</span>
             </button>
           </div>
         </div>
 
-        <!-- 16:9 沉浸式绘本画卷对开本 (Picture Book Spread) -->
-        <div class="w-full bg-white/95 backdrop-blur-md rounded-3xl overflow-hidden shadow-2xl border-4 border-amber-300/90 mb-4 flex flex-col md:flex-row items-stretch min-h-[380px]">
+        <div class="w-full bg-white/95 backdrop-blur-md rounded-3xl overflow-hidden shadow-2xl border-4 border-amber-300/90 mb-4 flex flex-col md:flex-row items-stretch min-h-[380px] relative">
           
           <!-- 左页：插画 + 隐藏互动寻宝热区 -->
-          <div class="w-full md:w-1/2 bg-amber-50/40 flex flex-col justify-center border-b-4 md:border-b-0 md:border-r-2 border-amber-200/80 relative shadow-[inset_-6px_0_12px_rgba(0,0,0,0.03)]">
-            <div class="relative w-full aspect-video md:aspect-auto md:h-full min-h-[240px] bg-amber-100/50 group overflow-hidden flex items-center justify-center">
-              <img src="${page.image}" alt="绘本插图" loading="lazy" decoding="async" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+          <div class="w-full md:w-[55%] bg-amber-50/40 flex flex-col justify-center border-b-2 md:border-b-0 md:border-r border-amber-200/60 relative">
+            <div class="relative w-full aspect-video md:aspect-auto md:h-full min-h-[260px] md:min-h-[340px] bg-amber-100/50 group overflow-hidden flex items-center justify-center">
+              <img src="${page.image}" alt="绘本插图" loading="lazy" decoding="async" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.04]" />
               
               <!-- 隐藏寻宝热区气泡 -->
               ${(page.interactions || page.hotspots || []).map((hp, idx) => `
@@ -364,42 +407,42 @@ export class BookModule extends BaseModule {
             </div>
           </div>
 
-          <!-- 右页：纯美故事文字排版 (儿童绘本大字标准) -->
-          <div class="w-full md:w-1/2 p-6 sm:p-8 flex flex-col justify-between text-center bg-gradient-to-br from-[#FFFDF9] to-[#FFF9EE]">
+          <!-- 右页：純美故事文字排版 (儿童绘本大字标准) -->
+          <div class="w-full md:w-[45%] p-5 sm:p-7 flex flex-col justify-between text-center bg-gradient-to-br from-[#FFFDF9] to-[#FFF8EC]">
             
-            <!-- 顶部小提示 -->
-            <div class="flex items-center justify-between">
-              <span class="text-[11px] font-black text-amber-800/80 bg-amber-100/80 px-3 py-0.5 rounded-full border border-amber-200/80 shadow-sm">
-                点读伴读 · 点击单字发音
+            <!-- 顶部小提示条 -->
+            <div class="flex items-center justify-between mb-1">
+              <span class="text-[10px] font-black text-amber-700/70 bg-amber-100/60 px-2.5 py-0.5 rounded-full border border-amber-200/60">
+                💡 点汉字看字源 &middot; 点生字小弹窗
               </span>
-              <span class="text-[11px] font-bold text-orange-600 bg-orange-100/60 px-2.5 py-0.5 rounded-full">
-                第 ${this.currentPageIndex + 1} 页
+              <span class="text-[10px] font-bold text-orange-600/80 bg-orange-50 px-2 py-0.5 rounded-full border border-orange-100">
+                ${this.currentPageIndex + 1} / ${totalPages}
               </span>
             </div>
 
-            <!-- 核心排版：汉字 + 拼音精准居中对齐 -->
-            <div id="karaoke-text-container" class="flex flex-wrap justify-center items-end gap-x-1.5 sm:gap-x-2 gap-y-3 my-auto py-4">
+            <!-- 核心排版：汉字 + 拼音精准对齐 -->
+            <div id="karaoke-text-container" class="flex flex-wrap justify-center items-end gap-x-2 sm:gap-x-3 gap-y-5 my-auto py-6">
               ${pinyinTokens.map((token, idx) => {
                 if (token.isPunct) {
                   return `
-                    <div class="inline-flex flex-col items-center justify-end mx-0.5 pb-1 align-bottom">
-                      <span class="h-4 sm:h-5"></span>
-                      <span class="text-3xl sm:text-4xl md:text-5xl font-serif text-amber-900/60">${token.char}</span>
+                    <div class="inline-flex flex-col items-center justify-end align-bottom pb-1">
+                      <span style="min-height:18px"></span>
+                      <span class="text-[2rem] sm:text-[2.5rem] md:text-[2.8rem] font-serif text-amber-800/40 leading-none">${token.char}</span>
                     </div>
                   `;
                 }
                 const isTarget = (book.targetChars || []).includes(token.char);
 
                 return `
-                  <div class="inline-flex flex-col items-center justify-end mx-1 align-bottom group/char select-none">
-                    <span class="text-[12px] sm:text-[14px] font-black text-orange-600 tracking-normal h-4 sm:h-5 flex items-center justify-center transition-all duration-200 ${
-                      this.showPinyin ? "opacity-100" : "opacity-0"
-                    }">${token.pinyinMarked}</span>
-                    <span class="karaoke-char text-3xl sm:text-4xl md:text-5xl font-black px-2 sm:px-2.5 py-1 rounded-2xl cursor-pointer hover:bg-orange-100 hover:scale-110 active:scale-95 transition-all duration-200 ${
+                  <div class="inline-flex flex-col items-center justify-end align-bottom group/char select-none">
+                    <span class="text-[12px] sm:text-[13px] font-bold text-sky-600 tracking-tight leading-none mb-1 transition-opacity duration-150 ${
+                      this.showPinyin ? 'opacity-100' : 'opacity-0 pointer-events-none'
+                    }" style="min-height:15px;font-family:'Noto Sans SC',sans-serif;letter-spacing:0.01em;">${token.pinyinMarked || '\u00a0'}</span>
+                    <span class="karaoke-char text-[2rem] sm:text-[2.5rem] md:text-[2.8rem] font-black leading-none px-2 py-1.5 rounded-2xl cursor-pointer hover:scale-110 active:scale-95 transition-all duration-150 ${
                       isTarget
-                        ? "text-orange-800 bg-amber-100/90 font-black shadow-sm border border-amber-300/80"
-                        : "text-amber-950"
-                    }" data-index="${idx}" data-char="${token.char}">
+                        ? 'text-orange-800 bg-amber-100 border border-amber-300/80 shadow-sm'
+                        : 'text-amber-950 hover:bg-orange-50'
+                    }" data-index="${idx}" data-char="${token.char}" data-target="${isTarget ? '1' : '0'}">
                       ${token.char}
                     </span>
                   </div>
@@ -408,21 +451,18 @@ export class BookModule extends BaseModule {
             </div>
 
             <!-- 底部核心生字点读栏 -->
-            <div class="mt-4 pt-3 border-t border-amber-200/60 flex items-center justify-between flex-wrap gap-2">
+            <div class="mt-3 pt-2.5 border-t border-amber-200/50 flex items-center justify-between flex-wrap gap-2">
               <div class="flex items-center gap-1.5 flex-wrap">
-                <span class="text-xs font-black text-amber-800/80 flex items-center gap-1">
-                  <span class="flex items-center">${GAME_ICONS.sparkle("w-3.5 h-3.5")}</span>
-                  <span>核心字:</span>
-                </span>
+                <span class="text-[10px] font-black text-amber-700/70 shrink-0">核心字:</span>
                 ${(book.targetChars || []).map(c => `
-                  <button class="target-char-pill bg-amber-100 hover:bg-orange-500 hover:text-white text-orange-800 font-black text-xs px-2.5 py-0.5 rounded-xl border border-amber-300/80 shadow-sm transition-all active:scale-90 cursor-pointer" data-char="${c}">
+                  <button class="target-char-pill bg-amber-100 hover:bg-orange-500 hover:text-white text-orange-800 font-black text-sm w-8 h-8 rounded-xl border border-amber-200 shadow-sm transition-all active:scale-90 cursor-pointer flex items-center justify-center" data-char="${c}" title="点击按${c}看字源">
                     ${c}
                   </button>
                 `).join("")}
               </div>
 
-              <span class="text-[10px] text-amber-700/60 font-bold hidden sm:inline">
-                支持键盘 ← → 翻页
+              <span class="text-[9px] text-amber-600/50 font-bold hidden sm:inline tracking-wide">
+                ← → 翻页 &nbsp;&middot;&nbsp; 空格重播
               </span>
             </div>
 
@@ -431,76 +471,92 @@ export class BookModule extends BaseModule {
         </div>
 
         <!-- 底部翻页控制器 -->
-        <div class="w-full flex items-center justify-between px-2 sm:px-6">
-          <button id="btn-prev-page" class="bg-white hover:bg-amber-50 text-amber-900 font-black text-xs px-6 py-2.5 rounded-full shadow-lg border-2 border-amber-200 transition-all active:scale-95 cursor-pointer ${
-            this.currentPageIndex === 0 ? "opacity-40 pointer-events-none" : ""
+        <div class="w-full flex items-center justify-between px-1 sm:px-4 mt-1">
+          <button id="btn-prev-page" class="flex items-center gap-1.5 bg-white/90 hover:bg-amber-50 text-amber-800 font-black text-xs px-5 py-2.5 rounded-full shadow-md border border-amber-200/80 transition-all active:scale-95 cursor-pointer ${
+            this.currentPageIndex === 0 ? 'opacity-30 pointer-events-none' : 'hover:border-amber-300'
           }">
-            上一页
+            <span>←</span>
+            <span>上一页</span>
           </button>
 
-          <!-- 进度小药丸指示器 -->
-          <div class="flex items-center gap-2 bg-white/80 backdrop-blur-md px-3 py-1.5 rounded-full border border-amber-200 shadow-sm">
+          <!-- 进度点指示器 -->
+          <div class="flex items-center gap-1.5 bg-white/80 backdrop-blur-md px-3 py-2 rounded-full border border-amber-200/60 shadow-sm">
             ${book.pages
               .map(
                 (_, idx) => `
-              <div class="transition-all ${idx === this.currentPageIndex ? "w-6 h-2.5 bg-gradient-to-r from-orange-400 to-amber-500 rounded-full shadow-sm" : "w-2.5 h-2.5 bg-amber-200 rounded-full"}"></div>
+              <div class="transition-all duration-300 rounded-full cursor-pointer ${
+                idx === this.currentPageIndex
+                  ? 'w-5 h-2 bg-gradient-to-r from-orange-400 to-amber-500 shadow-sm'
+                  : 'w-2 h-2 bg-amber-200 hover:bg-amber-400'
+              }" title="第 ${idx+1} 页"></div>
             `
               )
               .join("")}
           </div>
 
-          <button id="btn-next-page" class="btn-game-orange text-white font-black text-xs sm:text-sm px-6 py-2.5 rounded-full shadow-lg transition-all active:scale-95 cursor-pointer">
-            ${this.currentPageIndex === book.pages.length - 1 ? "完成阅读 · 去测验 " : "下一页"}
+          <button id="btn-next-page" class="btn-game-orange text-white font-black text-xs sm:text-sm px-5 py-2.5 rounded-full shadow-lg transition-all active:scale-95 cursor-pointer flex items-center gap-1.5">
+            <span>${this.currentPageIndex === totalPages - 1 ? "完成阅读" : "下一页"}</span>
+            <span>${this.currentPageIndex === totalPages - 1 ? "🏆" : "→"}</span>
           </button>
         </div>
 
       </div>
     `;
 
-    this.bindReaderEvents(mainEl);
-
-    // 如果开启了自动连读模式，进页自动播放
-    if (this.isAutoPlay) {
-      this._timeout(() => this.playKaraoke(page, mainEl), 400);
-    }
+    this.bindReaderEvents(mainEl, page, book);
   }
 
-  bindReaderEvents(mainEl) {
-    const book = this.currentBook;
-    const page = book.pages[this.currentPageIndex];
+  // ----------------------------------------------------
+  // 3. 事件绑定与各级抽屉/弹窗交互
+  // ----------------------------------------------------
+  bindReaderEvents(mainEl, page, book) {
+    const totalPages = book.pages.length;
 
     // 返回书架
-    const backBtn = mainEl.querySelector("#btn-back-shelf");
-    if (backBtn) {
-      this._on(backBtn, "click", () => {
-        this.currentBook = null;
-        this.isAutoPlay = false;
+    const backShelfBtn = mainEl.querySelector("#btn-back-shelf");
+    if (backShelfBtn) {
+      this._on(backShelfBtn, "click", () => {
         soundAndFX.playPop();
+        this._saveProgress();
+        this.currentBook = null;
         this.render();
       });
     }
 
-    // 拼音显隐切换
+    // 目录抽屉
+    const openCatalogBtn = mainEl.querySelector("#btn-open-catalog");
+    if (openCatalogBtn) {
+      this._on(openCatalogBtn, "click", () => {
+        soundAndFX.playPop();
+        this.openCatalogDrawer(book);
+      });
+    }
+
+    // 拼音切换
     const togglePinyinBtn = mainEl.querySelector("#btn-toggle-pinyin");
     if (togglePinyinBtn) {
       this._on(togglePinyinBtn, "click", () => {
-        this.showPinyin = !this.showPinyin;
         soundAndFX.playPop();
+        this.showPinyin = !this.showPinyin;
         this.render();
       });
     }
 
-    // 自动连读切换
-    const toggleAutoplayBtn = mainEl.querySelector("#btn-toggle-autoplay");
-    if (toggleAutoplayBtn) {
-      this._on(toggleAutoplayBtn, "click", () => {
-        this.isAutoPlay = !this.isAutoPlay;
+    // 自动连读开关
+    const toggleAutoPlayBtn = mainEl.querySelector("#btn-toggle-autoplay");
+    if (toggleAutoPlayBtn) {
+      this._on(toggleAutoPlayBtn, "click", () => {
         soundAndFX.playPop();
+        this.isAutoPlay = !this.isAutoPlay;
         if (this.isAutoPlay) {
-          showGameToast(this.container, "已开启自动连读模式，将连续朗读全书！", "info");
+          showGameToast(this.container, "已开启自动连读伴读模式", "success");
           this.playKaraoke(page, mainEl);
         } else {
-          showGameToast(this.container, "已关闭自动连读", "info");
+          showGameToast(this.container, "已暂停自动连读", "info");
+          if (this.autoPlayTimer) {
+            clearTimeout(this.autoPlayTimer);
+            this.autoPlayTimer = null;
+          }
         }
         this.render();
       });
@@ -515,117 +571,312 @@ export class BookModule extends BaseModule {
       });
     }
 
-    // 寻宝热区点击
-    mainEl.querySelectorAll(".hotspot-trigger-btn").forEach((btn) => {
-      this._on(btn, "click", () => {
-        const snd = btn.dataset.sound;
-        const label = btn.dataset.label;
-        soundAndFX.playPop();
-        soundAndFX.playSuccessSound();
-        soundAndFX.triggerConfetti(this.container);
-        showGameToast(this.container, `发现宝藏：${label}`, "success");
-        if (snd) soundAndFX.speakPriority(snd, { kind: "sentence" });
-      });
-    });
-
-    // 逐字点读
-    mainEl.querySelectorAll(".karaoke-char").forEach((span) => {
-      this._on(span, "click", () => {
-        const char = span.dataset.char;
-        soundAndFX.playPop();
-        soundAndFX.speakPriority(char, { kind: "char", priority: 1 });
-        span.classList.add("bg-amber-300", "scale-110", "ring-4", "ring-amber-200");
-        this._timeout(() => span.classList.remove("bg-amber-300", "scale-110", "ring-4", "ring-amber-200"), 450);
-      });
-    });
-
-    // 核心生字点读胶囊
-    mainEl.querySelectorAll(".target-char-pill").forEach((btn) => {
-      this._on(btn, "click", (e) => {
-        e.stopPropagation();
-        const char = btn.dataset.char;
-        soundAndFX.playPop();
-        soundAndFX.speakPriority(char, { kind: "char", priority: 1 });
-        btn.classList.add("scale-110", "bg-orange-500", "text-white");
-        this._timeout(() => btn.classList.remove("scale-110", "bg-orange-500", "text-white"), 400);
-      });
-    });
-
     // 伴读整页
-    const karaokeBtn = mainEl.querySelector("#btn-play-karaoke");
-    if (karaokeBtn) {
-      this._on(karaokeBtn, "click", () => {
+    const playKaraokeBtn = mainEl.querySelector("#btn-play-karaoke");
+    if (playKaraokeBtn) {
+      this._on(playKaraokeBtn, "click", () => {
+        soundAndFX.playPop();
         this.playKaraoke(page, mainEl);
       });
     }
 
-    // 上一页
+    // 单字点读与生字全息卡
+    mainEl.querySelectorAll(".karaoke-char").forEach((span) => {
+      this._on(span, "click", () => {
+        const char = span.dataset.char;
+        const isTarget = span.dataset.target === "1";
+        soundAndFX.speakPriority(char, { kind: "char", priority: 1 });
+        span.classList.add("bg-amber-300", "scale-125");
+        setTimeout(() => span.classList.remove("bg-amber-300", "scale-125"), 400);
+
+        if (isTarget) {
+          this._timeout(() => this.openCharPopover(char), 250);
+        }
+      });
+    });
+
+    // 核心生字速查卡按钮
+    mainEl.querySelectorAll(".target-char-pill").forEach((pill) => {
+      this._on(pill, "click", () => {
+        const char = pill.dataset.char;
+        soundAndFX.playPop();
+        soundAndFX.speakPriority(char, { kind: "char", priority: 1 });
+        this.openCharPopover(char);
+      });
+    });
+
+    // 隐藏寻宝热区
+    mainEl.querySelectorAll(".hotspot-trigger-btn").forEach((btn) => {
+      this._on(btn, "click", (e) => {
+        e.stopPropagation();
+        const label = btn.dataset.label || "发现宝藏！";
+        soundAndFX.playSuccessSound();
+        soundAndFX.triggerConfetti(this.container);
+        soundAndFX.speakPriority(label, { kind: "sentence", emotion: "excited" });
+        showGameToast(this.container, `${label}`, "success");
+      });
+    });
+
+    // 翻页控制
     const prevBtn = mainEl.querySelector("#btn-prev-page");
     if (prevBtn) {
       this._on(prevBtn, "click", () => {
         if (this.currentPageIndex > 0) {
+          soundAndFX.playPop();
           this.currentPageIndex--;
           this._saveProgress();
-          soundAndFX.playPop();
           this.render();
         }
       });
     }
 
-    // 下一页 / 进入测验
     const nextBtn = mainEl.querySelector("#btn-next-page");
     if (nextBtn) {
       this._on(nextBtn, "click", () => {
-        if (this.currentPageIndex < book.pages.length - 1) {
+        soundAndFX.playPop();
+        if (this.currentPageIndex < totalPages - 1) {
           this.currentPageIndex++;
           this._saveProgress();
-          soundAndFX.playPop();
           this.render();
         } else {
-          // 进入阅读理解测验
-          soundAndFX.playSuccessSound();
+          // 完成全本阅读，进入测评流
           this.isQuizMode = true;
+          this.currentQuizStage = 1;
           this.quizAnswered = false;
           this.render();
         }
       });
     }
 
-    // 键盘快捷键支持 (左/右键翻页，空格伴读)
-    const onKey = (e) => {
-      if (this.isVoiceModalOpen || this.isQuizMode) return;
+    // 键盘翻页支持
+    const keyHandler = (e) => {
       if (e.key === "ArrowRight" || e.key === "PageDown") {
-        if (this.currentPageIndex < book.pages.length - 1) {
+        if (this.currentPageIndex < totalPages - 1) {
           this.currentPageIndex++;
           this._saveProgress();
-          soundAndFX.playPop();
-          this.render();
-        } else {
-          soundAndFX.playSuccessSound();
-          this.isQuizMode = true;
-          this.quizAnswered = false;
           this.render();
         }
       } else if (e.key === "ArrowLeft" || e.key === "PageUp") {
         if (this.currentPageIndex > 0) {
           this.currentPageIndex--;
           this._saveProgress();
-          soundAndFX.playPop();
           this.render();
         }
-      } else if (e.key === " " && !e.target.matches("input, textarea")) {
-        e.preventDefault();
-        this.playKaraoke(page, mainEl);
       }
     };
-    window.addEventListener("keydown", onKey);
-    this._addCleanup(() => window.removeEventListener("keydown", onKey));
+    window.addEventListener("keydown", keyHandler);
+    this._addCleanup(() => window.removeEventListener("keydown", keyHandler));
   }
 
   // ----------------------------------------------------
-  // 3. 【我来读一读】儿童智能跟读与录音回放弹窗
+  // 4. 生字全息速查卡 (洪恩标杆特色)
+  // ----------------------------------------------------
+  openCharPopover(charStr) {
+    if (this.isCharPopoverOpen) return;
+    this.isCharPopoverOpen = true;
+
+    // 从汉字数据库中检索该字
+    const charData = CHARACTER_DATABASE.find((c) => c.char === charStr) || {
+      char: charStr,
+      pinyin: "zì",
+      words: [{ word: charStr, pinyin: "", mean: "核心生字" }],
+      originStory: "古代象形文字，形象生动描绘了事物特征。",
+      exampleSentence: `我们在绘本中认识了“${charStr}”字。`,
+      strokes: [
+        { type: "横", start: [20, 50], end: [80, 50] }
+      ]
+    };
+
+    const overlay = document.createElement("div");
+    overlay.id = "char-popover-overlay";
+    overlay.className = "fixed inset-0 z-[80] bg-black/75 backdrop-blur-md flex items-center justify-center p-4 animate-fade-in";
+    overlay.innerHTML = `
+      <div class="relative w-full max-w-lg bg-gradient-to-b from-[#FFFDF8] to-[#FFF6E5] rounded-3xl p-6 sm:p-7 shadow-2xl border-4 border-amber-300 flex flex-col items-center select-none animate-scale-up">
+        
+        <!-- 关闭按钮 -->
+        <button id="btn-close-popover" class="absolute -top-3.5 -right-3.5 w-10 h-10 rounded-full bg-white text-gray-800 font-extrabold text-base flex items-center justify-center shadow-xl hover:bg-gray-100 active:scale-95 cursor-pointer border-2 border-amber-200">
+          <span class="font-sans font-bold leading-none">X</span>
+        </button>
+
+        <!-- 顶部生字卡标题 -->
+        <div class="flex items-center gap-2 mb-4">
+          <span class="flex items-center">${GAME_ICONS.sparkle("w-6 h-6")}</span>
+          <h3 class="text-lg font-black text-amber-950">生字全息卡 · 深度认知</h3>
+        </div>
+
+        <div class="w-full flex flex-col sm:flex-row items-center gap-6 mb-4">
+          
+          <!-- 田字格标准大字展示 -->
+          <div class="w-36 h-36 bg-red-50/70 border-4 border-red-500 rounded-3xl relative flex flex-col items-center justify-center flex-shrink-0 shadow-md">
+            <!-- 虚线米字格 -->
+            <div class="absolute inset-0 border-t-2 border-dashed border-red-300 top-1/2 -translate-y-1/2 pointer-events-none"></div>
+            <div class="absolute inset-0 border-l-2 border-dashed border-red-300 left-1/2 -translate-x-1/2 pointer-events-none"></div>
+            <div class="absolute top-2 text-xs font-black text-red-600">${charData.pinyin}</div>
+            <span class="text-6xl font-black text-red-900 font-serif relative z-10">${charData.char}</span>
+          </div>
+
+          <!-- 生字释义与生活组词 -->
+          <div class="flex-1 flex flex-col gap-2 w-full text-left">
+            <div class="bg-white/80 p-3 rounded-2xl border border-amber-200">
+              <span class="text-[11px] font-black text-amber-800/70 block mb-1">常用组词与释义：</span>
+              <div class="flex flex-wrap gap-1.5">
+                ${(charData.words || []).slice(0, 3).map(w => `
+                  <span class="bg-amber-100 text-orange-900 text-xs font-black px-2.5 py-1 rounded-xl border border-amber-300/60">
+                    ${w.word}
+                  </span>
+                `).join("")}
+              </div>
+            </div>
+
+            <div class="bg-white/80 p-3 rounded-2xl border border-amber-200">
+              <span class="text-[11px] font-black text-amber-800/70 block mb-1">字源故事：</span>
+              <p class="text-xs text-amber-950 font-semibold leading-relaxed line-clamp-2">
+                ${charData.originStory || charData.evolution || "形象描摹天地万物之形，传承千年华夏文明。"}
+              </p>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- 例句展示 -->
+        <div class="w-full bg-amber-100/60 p-3 rounded-2xl border border-amber-200/80 mb-5 text-left">
+          <span class="text-[11px] font-black text-amber-800/80 block mb-0.5">例句巩固：</span>
+          <p class="text-xs text-amber-950 font-bold">${charData.exampleSentence || `我们在日常生活中常常用到“${charData.char}”字。`}</p>
+        </div>
+
+        <!-- 底部发音与互动按钮 -->
+        <div class="w-full flex items-center justify-center gap-4">
+          <button id="btn-popover-speak" class="btn-game-orange text-white font-black text-xs px-8 py-3 rounded-full shadow-lg flex items-center gap-2 active:scale-95 cursor-pointer">
+            <span class="flex items-center">${GAME_ICONS.speaker("w-4 h-4")}</span>
+            <span>朗读“${charData.char}”字发音</span>
+          </button>
+        </div>
+
+      </div>
+    `;
+
+    document.body.appendChild(overlay);
+
+    const closeBtn = overlay.querySelector("#btn-close-popover");
+    const closePopover = () => {
+      this.isCharPopoverOpen = false;
+      overlay.remove();
+    };
+
+    closeBtn.addEventListener("click", closePopover);
+    overlay.addEventListener("click", (e) => {
+      if (e.target === overlay) closePopover();
+    });
+
+    const speakBtn = overlay.querySelector("#btn-popover-speak");
+    speakBtn.addEventListener("click", () => {
+      soundAndFX.playPop();
+      soundAndFX.speakPriority(charData.char, { kind: "char", priority: 1 });
+    });
+  }
+
+  // ----------------------------------------------------
+  // 5. 全书缩略图目录抽屉 (洪恩标杆特色)
+  // ----------------------------------------------------
+  openCatalogDrawer(book) {
+    if (this.isCatalogOpen) return;
+    this.isCatalogOpen = true;
+
+    const overlay = document.createElement("div");
+    overlay.id = "book-catalog-drawer-overlay";
+    overlay.className = "fixed inset-0 z-[75] bg-black/75 backdrop-blur-md flex items-center justify-end animate-fade-in";
+    overlay.innerHTML = `
+      <div class="relative w-full max-w-md h-full bg-gradient-to-b from-[#FFFDF9] to-[#FFF7E8] p-6 shadow-2xl border-l-4 border-amber-300 flex flex-col justify-between select-none animate-slide-left">
+        
+        <!-- 抽屉顶部 -->
+        <div>
+          <div class="flex items-center justify-between pb-4 border-b border-amber-200 mb-4">
+            <div class="flex items-center gap-2">
+              <span class="flex items-center">${GAME_ICONS.book("w-6 h-6")}</span>
+              <h3 class="text-base font-black text-amber-950">《${book.title}》全书目录</h3>
+            </div>
+            
+            <button id="btn-close-catalog" class="w-8 h-8 rounded-full bg-amber-100 hover:bg-amber-200 text-amber-900 font-black text-xs flex items-center justify-center cursor-pointer">
+              <span class="font-sans font-bold leading-none">X</span>
+            </button>
+          </div>
+          
+          <p class="text-xs text-amber-800/70 font-bold mb-3">共 ${book.pages.length} 页 · 点击任意页码快速跳转</p>
+        </div>
+
+        <!-- 目录列表滚动区 -->
+        <div class="flex-1 overflow-y-auto no-scrollbar flex flex-col gap-3 pr-1 my-2">
+          ${book.pages.map((p, idx) => {
+            const isCurrent = idx === this.currentPageIndex;
+            return `
+              <div class="catalog-page-card group p-3 rounded-2xl border-2 transition-all cursor-pointer flex items-center gap-3 ${
+                isCurrent
+                  ? "bg-amber-100/90 border-orange-500 shadow-md ring-2 ring-orange-300"
+                  : "bg-white border-amber-200 hover:border-orange-400 hover:shadow"
+              }" data-page-index="${idx}">
+                
+                <!-- 缩略图 -->
+                <div class="w-16 h-12 rounded-xl overflow-hidden bg-amber-100 flex-shrink-0 border border-amber-200">
+                  <img src="${p.image}" alt="第${idx + 1}页" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+                </div>
+
+                <!-- 信息 -->
+                <div class="flex-1 overflow-hidden">
+                  <div class="flex items-center justify-between mb-0.5">
+                    <span class="text-xs font-black ${isCurrent ? "text-orange-700" : "text-amber-950"}">第 ${idx + 1} 页</span>
+                    ${isCurrent ? '<span class="text-[10px] bg-orange-500 text-white font-black px-2 py-0.5 rounded-full">当前正在读</span>' : ''}
+                  </div>
+                  <p class="text-[11px] text-gray-500 font-semibold truncate">${p.text}</p>
+                </div>
+
+              </div>
+            `;
+          }).join("")}
+        </div>
+
+        <!-- 抽屉底部 -->
+        <div class="pt-3 border-t border-amber-200 flex items-center justify-between">
+          <span class="text-[11px] text-amber-800/70 font-bold">凯茜分级绘本精选</span>
+          <button id="btn-catalog-back" class="btn-game-orange text-white font-black text-xs px-6 py-2 rounded-full shadow cursor-pointer">
+            继续阅读
+          </button>
+        </div>
+
+      </div>
+    `;
+
+    document.body.appendChild(overlay);
+
+    const closeDrawer = () => {
+      this.isCatalogOpen = false;
+      overlay.remove();
+    };
+
+    overlay.querySelector("#btn-close-catalog").addEventListener("click", closeDrawer);
+    overlay.querySelector("#btn-catalog-back").addEventListener("click", closeDrawer);
+    overlay.addEventListener("click", (e) => {
+      if (e.target === overlay) closeDrawer();
+    });
+
+    overlay.querySelectorAll(".catalog-page-card").forEach((card) => {
+      card.addEventListener("click", () => {
+        const targetIdx = parseInt(card.dataset.pageIndex, 10);
+        soundAndFX.playPop();
+        this.currentPageIndex = targetIdx;
+        this._saveProgress();
+        closeDrawer();
+        this.render();
+      });
+    });
+  }
+
+  // ----------------------------------------------------
+  // 6. 我来读一读（儿童智能跟读打分与录音）
   // ----------------------------------------------------
   openUserVoiceModal(page) {
+    if (this.isVoiceModalOpen) return;
+    this.isVoiceModalOpen = true;
+
     const overlay = document.createElement("div");
     overlay.id = "user-voice-modal-overlay";
     overlay.className = "fixed inset-0 z-[70] bg-black/80 backdrop-blur-md flex items-center justify-center p-4 animate-fade-in";
@@ -643,36 +894,28 @@ export class BookModule extends BaseModule {
         <p class="text-xs text-amber-800/70 mb-4 font-bold">按下开始录音，把故事大声读出来吧！</p>
 
         <!-- 示范跟读句子 -->
-        <div class="w-full bg-white/95 p-4 rounded-2xl border-2 border-amber-200 mb-5 shadow-md text-lg font-black text-amber-950 leading-relaxed">
-          ${page.text}
+        <div class="w-full bg-white/90 p-4 rounded-2xl border-2 border-amber-200 shadow-inner mb-5">
+          <p class="text-lg font-black text-amber-950 leading-relaxed">${page.text}</p>
         </div>
 
-        <!-- 录音状态波形指示器 -->
-        <div id="voice-eval-status" class="flex flex-col items-center justify-center my-3 h-24 relative">
-          <!-- 魔法呼吸灯背景 (录音时才亮起) -->
-          <div id="voice-glow-bg" class="absolute inset-0 bg-orange-500/20 blur-xl rounded-full opacity-0 transition-opacity duration-300 pointer-events-none"></div>
-
-          <div id="wave-bars" class="flex items-center gap-1.5 h-10 mb-2 relative z-10">
-            <span class="w-2 h-5 bg-orange-400 rounded-full animate-bounce"></span>
-            <span class="w-2 h-9 bg-orange-500 rounded-full animate-bounce" style="animation-delay:0.15s"></span>
-            <span class="w-2 h-11 bg-amber-500 rounded-full animate-bounce" style="animation-delay:0.3s"></span>
-            <span class="w-2 h-7 bg-orange-500 rounded-full animate-bounce" style="animation-delay:0.45s"></span>
-            <span class="w-2 h-4 bg-orange-400 rounded-full animate-bounce" style="animation-delay:0.6s"></span>
-          </div>
-          <span id="voice-status-text" class="text-xs font-black text-amber-800 relative z-10">准备好开始跟读</span>
-        </div>
-
-        <!-- 控制按钮群 -->
-        <div class="flex items-center gap-3 w-full justify-center mt-3 relative z-10">
-          <button id="btn-start-record" class="btn-game-orange text-white text-xs font-black px-6 py-2.5 rounded-full shadow-lg active:scale-95 flex items-center gap-1.5 cursor-pointer transition-all duration-300">
-            <span class="flex items-center">${GAME_ICONS.speaker("w-4 h-4")}</span>
-            <span id="record-btn-label">开始录音跟读</span>
-          </button>
-          <button id="btn-playback-voice" class="hidden btn-game-green text-white text-xs font-black px-6 py-2.5 rounded-full shadow-lg active:scale-95 flex items-center gap-1.5 cursor-pointer">
-            <span class="flex items-center">${GAME_ICONS.speaker("w-4 h-4")}</span>
-            <span>听我的录音</span>
+        <!-- 智能波形动画区 -->
+        <div class="relative w-28 h-28 mb-4 flex items-center justify-center">
+          <div id="voice-glow-bg" class="absolute inset-0 rounded-full bg-rose-400/30 blur-xl opacity-0 transition-opacity"></div>
+          <button id="btn-start-record" class="relative z-10 w-24 h-24 rounded-full bg-gradient-to-tr from-rose-500 to-red-500 text-white shadow-2xl flex flex-col items-center justify-center active:scale-90 transition-all cursor-pointer border-4 border-white">
+            <span class="flex items-center mb-1">${GAME_ICONS.speaker("w-8 h-8")}</span>
+            <span id="record-btn-label" class="text-[11px] font-black">开始录音</span>
           </button>
         </div>
+
+        <!-- 评测反馈状态 -->
+        <div id="voice-status-text" class="text-xs font-bold text-amber-900 mb-4 h-6">准备就绪，点击麦克风开始</div>
+
+        <!-- 回放我的录音 -->
+        <button id="btn-playback-voice" class="hidden bg-emerald-500 hover:bg-emerald-600 text-white font-black text-xs px-6 py-2.5 rounded-full shadow-md flex items-center gap-1.5 active:scale-95 cursor-pointer transition-all">
+          <span class="flex items-center">${GAME_ICONS.speaker("w-4 h-4")}</span>
+          <span>听听我的朗读录音</span>
+        </button>
+
       </div>
     `;
 
@@ -680,23 +923,25 @@ export class BookModule extends BaseModule {
 
     const closeBtn = overlay.querySelector("#btn-close-voice-modal");
     const startRecordBtn = overlay.querySelector("#btn-start-record");
-    const playbackBtn = overlay.querySelector("#btn-playback-voice");
-    const statusText = overlay.querySelector("#voice-status-text");
     const recordBtnLabel = overlay.querySelector("#record-btn-label");
+    const statusText = overlay.querySelector("#voice-status-text");
+    const playbackBtn = overlay.querySelector("#btn-playback-voice");
 
     let isRecording = false;
-    this.isVoiceModalOpen = true;
 
-    closeBtn.addEventListener("click", () => {
+    const closeModal = () => {
       this.isVoiceModalOpen = false;
       overlay.remove();
-    });
+    };
+
+    closeBtn.addEventListener("click", closeModal);
 
     startRecordBtn.addEventListener("click", async () => {
       if (isRecording) return;
       isRecording = true;
-      statusText.textContent = "正在收音中，请大声朗读...";
-      recordBtnLabel.textContent = "正在倾听...";
+      soundAndFX.playPop();
+      statusText.textContent = "正在聆听中... 请大声朗读";
+      recordBtnLabel.textContent = "录音中";
       
       startRecordBtn.classList.add("bg-rose-500", "animate-pulse");
       const glowBg = overlay.querySelector("#voice-glow-bg");
@@ -744,25 +989,46 @@ export class BookModule extends BaseModule {
   }
 
   // ----------------------------------------------------
-  // 4. 阅读理解趣味小测验
+  // 7. 双重阅读测评 (洪恩标杆特色：生字眼力 + 故事理解)
   // ----------------------------------------------------
   renderQuiz() {
     const book = this.currentBook;
-    const quizList = Array.isArray(book.quiz) ? book.quiz : [book.quiz || {
-      question: `故事中提到了哪些有趣的生字和故事？`,
-      options: ["大家一起快乐识字", "什么都没发生", "大怪兽睡大觉"],
+    const targetChar = (book.targetChars || ["日"])[0];
+
+    // Stage 1: 生字眼力大考验
+    const stage1Question = {
+      title: "【第 1 关 · 生字眼力大考验】",
+      question: `在《${book.title}》的故事中，你认识这颗生字吗？`,
+      highlightChar: targetChar,
+      options: [
+        `认识！读作“${targetChar}”`,
+        `不认识`,
+        `好像在哪里见过`
+      ],
       correctIndex: 0
-    }];
-    const quiz = quizList[this.currentQuizIndex];
-    const correctIdx = (quiz.correctIndex !== undefined) ? quiz.correctIndex : (quiz.answer !== undefined ? quiz.answer : 0);
+    };
+
+    // Stage 2: 故事理解小问答
+    const stage2Quiz = Array.isArray(book.quiz) ? book.quiz[0] : (book.quiz || {
+      question: `在故事《${book.title}》里，主要讲述了什么？`,
+      options: ["大家一起快乐识字探索", "什么都没发生", "大怪兽去睡觉了"],
+      correctIndex: 0
+    });
+
+    const activeQuiz = this.currentQuizStage === 1 ? stage1Question : {
+      title: "【第 2 关 · 故事理解小问答】",
+      question: stage2Quiz.question,
+      options: stage2Quiz.options,
+      correctIndex: stage2Quiz.correctIndex !== undefined ? stage2Quiz.correctIndex : 0
+    };
 
     const { content: mainEl, destroy: destroyShell } = mountGameShell(this.container, {
       activeMode: "books",
-      heading: `阅读测验 · ${book.title} (${this.currentQuizIndex + 1}/${quizList.length})`
+      heading: `读后巩固测验 · ${book.title}`
     });
     this._addCleanup(destroyShell);
 
-    soundAndFX.speakPriority(`小测验时间！${quiz.question}`, { kind: "sentence" });
+    soundAndFX.speakPriority(activeQuiz.question, { kind: "sentence" });
 
     mainEl.innerHTML = `
       <div class="relative w-full max-w-3xl mx-auto flex flex-col justify-between pt-16 sm:pt-20 pb-8 px-4 select-none animate-fade-in">
@@ -772,14 +1038,21 @@ export class BookModule extends BaseModule {
             ${GAME_ICONS.trophy("w-16 h-16")}
           </div>
           <span class="text-xs font-black bg-gradient-to-r from-orange-500 to-amber-500 text-white px-4 py-1 rounded-full mb-3 shadow-sm">
-             绘本阅读理解小测验 (${this.currentQuizIndex + 1}/${quizList.length})
+            ${activeQuiz.title}
           </span>
+          
+          ${this.currentQuizStage === 1 && activeQuiz.highlightChar ? `
+            <div class="w-20 h-20 bg-red-50 border-4 border-red-500 rounded-2xl flex items-center justify-center mb-3 shadow-md">
+              <span class="text-5xl font-black text-red-900 font-serif">${activeQuiz.highlightChar}</span>
+            </div>
+          ` : ''}
+
           <h2 class="text-xl sm:text-2xl font-black text-amber-950 mb-6 leading-relaxed">
-            ${quiz.question}
+            ${activeQuiz.question}
           </h2>
 
           <div class="flex flex-col gap-3.5 w-full max-w-lg">
-            ${quiz.options
+            ${activeQuiz.options
               .map(
                 (opt, idx) => `
               <button class="quiz-option-btn group p-4 rounded-2xl bg-white hover:bg-amber-50/80 border-2 border-amber-200 hover:border-orange-400 shadow-md hover:shadow-xl text-amber-950 font-black text-sm sm:text-base active:scale-95 hover:scale-[1.02] transition-all duration-300 text-left flex items-center justify-between cursor-pointer" data-index="${idx}">
@@ -792,27 +1065,8 @@ export class BookModule extends BaseModule {
           </div>
         </div>
 
-        <!-- 结业胜利弹窗 -->
-        <div id="book-finish-modal" class="fixed inset-0 bg-black/85 backdrop-blur-md flex flex-col items-center justify-center text-white hidden animate-scale-up z-50 p-4">
-          <div class="mb-4 flex items-center justify-center transform hover:scale-110 transition-transform animate-bounce-slow">
-            ${GAME_ICONS.trophy("w-28 h-28")}
-          </div>
-          <h2 class="text-3xl sm:text-4xl font-black text-yellow-300 mb-2 drop-shadow-lg">恭喜读完《${book.title}》！</h2>
-          <p class="text-xs sm:text-sm text-yellow-100/90 mb-6 font-bold text-center max-w-md">你已经成功掌握了绘本中的全部汉字，阅读能力再上新台阶！</p>
-          <div class="candy-pill rounded-full px-6 py-2.5 mb-6 text-sm text-yellow-300 font-black flex items-center gap-4 border-2 border-yellow-300 shadow-xl">
-            <span class="flex items-center gap-1.5"><span class="flex items-center">${GAME_ICONS.coin("w-5 h-5")}</span> +15 星币</span>
-            <span class="flex items-center gap-1.5"><span class="flex items-center">${GAME_ICONS.star("w-5 h-5", true)}</span> +5 星星</span>
-          </div>
-          <button id="btn-finish-return-shelf" class="btn-game-orange text-white font-black text-base px-10 py-3.5 rounded-full shadow-2xl active:scale-95 cursor-pointer">
-            收录进阅读记录，返回书架
-          </button>
-        </div>
-
       </div>
     `;
-
-    const finishModal = mainEl.querySelector("#book-finish-modal");
-    const returnShelfBtn = mainEl.querySelector("#btn-finish-return-shelf");
 
     mainEl.querySelectorAll(".quiz-option-btn").forEach((btn) => {
       this._on(btn, "click", () => {
@@ -820,31 +1074,27 @@ export class BookModule extends BaseModule {
         this.quizAnswered = true;
 
         const pickedIdx = parseInt(btn.dataset.index, 10);
-        if (pickedIdx === correctIdx) {
+        if (pickedIdx === activeQuiz.correctIndex) {
           soundAndFX.playSuccessSound();
-          soundAndFX.playVictoryFanfare();
-          soundAndFX.triggerConfetti(this.container);
-          soundAndFX.triggerCoinFly(this.container);
-
-          // 记录绘本已读及金币奖励
-          if (this.currentQuizIndex === quizList.length - 1) {
-            ebbinghausManager.markBookRead(book.id);
-            ebbinghausManager.addCoins(15 * quizList.length);
-            ebbinghausManager.progress.stars = (ebbinghausManager.progress.stars || 0) + 5 * quizList.length;
-            ebbinghausManager.save();
-          }
-
           btn.classList.add("ring-4", "ring-emerald-500", "bg-emerald-100");
 
           this._timeout(() => {
-            if (this.currentQuizIndex < quizList.length - 1) {
-              this.currentQuizIndex++;
+            if (this.currentQuizStage === 1) {
+              this.currentQuizStage = 2;
               this.quizAnswered = false;
               this.render();
             } else {
-              if (finishModal) finishModal.classList.remove("hidden");
+              // 2 关全部通关，颁发结业证书！
+              ebbinghausManager.markBookRead(book.id);
+              ebbinghausManager.addCoins(15);
+              ebbinghausManager.addStars(5);
+              ebbinghausManager.save();
+
+              this.isQuizMode = false;
+              this.isCertificateMode = true;
+              this.render();
             }
-          }, 1000);
+          }, 800);
         } else {
           soundAndFX.playSoftError();
           btn.classList.add("animate-shake", "ring-4", "ring-rose-500", "bg-rose-100");
@@ -855,19 +1105,111 @@ export class BookModule extends BaseModule {
         }
       });
     });
+  }
 
-    if (returnShelfBtn) {
-      this._on(returnShelfBtn, "click", () => {
+  // ----------------------------------------------------
+  // 8. 凯茜小小阅读家 · 荣誉结业证书 (洪恩标杆特色)
+  // ----------------------------------------------------
+  renderCertificate() {
+    const book = this.currentBook;
+    const { content: mainEl, destroy: destroyShell } = mountGameShell(this.container, {
+      activeMode: "books",
+      heading: `荣誉结业证书 · ${book.title}`
+    });
+    this._addCleanup(destroyShell);
+
+    soundAndFX.playVictoryFanfare();
+    soundAndFX.triggerConfetti(this.container);
+    soundAndFX.triggerCoinFly(this.container);
+
+    mainEl.innerHTML = `
+      <div class="relative w-full max-w-2xl mx-auto flex flex-col items-center justify-center pt-16 sm:pt-20 pb-8 px-4 select-none animate-scale-up">
+        
+        <!-- 金色证书主体卡片 -->
+        <div class="relative w-full bg-gradient-to-b from-[#FFFDF5] via-[#FFF8E7] to-[#FFF3D6] rounded-3xl p-8 sm:p-10 shadow-2xl border-8 border-amber-400 flex flex-col items-center text-center">
+          
+          <!-- 金色皇冠与彩带勋章 -->
+          <div class="absolute -top-7 bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-500 px-6 py-2 rounded-full border-4 border-white shadow-xl flex items-center gap-2">
+            <span class="flex items-center">${GAME_ICONS.crown("w-6 h-6")}</span>
+            <span class="text-sm font-black text-amber-950">小小阅读家 · 荣誉通关证书</span>
+          </div>
+
+          <div class="mt-4 mb-2 flex items-center justify-center">
+            ${GAME_ICONS.trophy("w-20 h-20")}
+          </div>
+
+          <h2 class="text-2xl sm:text-3xl font-black text-amber-950 mb-1">
+            恭喜通关《${book.title}》
+          </h2>
+          <p class="text-xs text-amber-800/80 font-bold mb-5">
+            凯茜识字分级阅读 · 顺利掌握全书精髓与核心生字
+          </p>
+
+          <!-- 3 颗金色大星星 -->
+          <div class="flex items-center gap-2 mb-6">
+            <span class="flex items-center transform hover:scale-125 transition-transform">${GAME_ICONS.star("w-8 h-8", false)}</span>
+            <span class="flex items-center transform hover:scale-125 transition-transform scale-125">${GAME_ICONS.star("w-8 h-8", false)}</span>
+            <span class="flex items-center transform hover:scale-125 transition-transform">${GAME_ICONS.star("w-8 h-8", false)}</span>
+          </div>
+
+          <!-- 掌握核心字印章墙 -->
+          <div class="w-full bg-white/90 p-4 rounded-2xl border-2 border-amber-200/90 mb-6 text-center">
+            <span class="text-xs font-black text-amber-900 block mb-2">本次阅读巩固生字：</span>
+            <div class="flex flex-wrap justify-center gap-2">
+              ${(book.targetChars || ["日", "月", "山"]).map(c => `
+                <div class="w-10 h-10 bg-red-50 border-2 border-red-400 rounded-xl flex items-center justify-center font-serif text-xl font-black text-red-900 shadow-sm">
+                  ${c}
+                </div>
+              `).join("")}
+            </div>
+          </div>
+
+          <!-- 奖励星币与星星胶囊 -->
+          <div class="candy-pill rounded-full px-6 py-2 mb-6 text-sm text-yellow-300 font-black flex items-center gap-4 border-2 border-yellow-300 shadow-xl">
+            <span class="flex items-center gap-1.5"><span class="flex items-center">${GAME_ICONS.coin("w-5 h-5")}</span> +15 凯茜星币</span>
+            <span class="flex items-center gap-1.5"><span class="flex items-center">${GAME_ICONS.star("w-5 h-5", true)}</span> +5 智慧星</span>
+          </div>
+
+          <!-- 底部操作按钮 -->
+          <div class="flex items-center gap-4 flex-wrap justify-center">
+            <button id="btn-cert-replay" class="bg-white hover:bg-amber-50 text-amber-900 font-black text-xs px-6 py-3 rounded-full shadow-lg border-2 border-amber-200 active:scale-95 cursor-pointer">
+              再次精读重温
+            </button>
+            <button id="btn-cert-back-shelf" class="btn-game-orange text-white font-black text-xs px-8 py-3 rounded-full shadow-xl active:scale-95 cursor-pointer">
+              收录档案，返回书架
+            </button>
+          </div>
+
+        </div>
+
+      </div>
+    `;
+
+    const replayBtn = mainEl.querySelector("#btn-cert-replay");
+    if (replayBtn) {
+      this._on(replayBtn, "click", () => {
+        soundAndFX.playPop();
+        this.currentPageIndex = 0;
+        this.isQuizMode = false;
+        this.isCertificateMode = false;
+        this.render();
+      });
+    }
+
+    const backShelfBtn = mainEl.querySelector("#btn-cert-back-shelf");
+    if (backShelfBtn) {
+      this._on(backShelfBtn, "click", () => {
         soundAndFX.playPop();
         this.currentBook = null;
         this.isQuizMode = false;
+        this.isCertificateMode = false;
         this.render();
       });
     }
   }
 
   // ----------------------------------------------------
-  // 5. 卡拉OK高亮伴读播放器 (毫秒级字界同步 + 自动连读衔接)
+  // 9. 卡拉OK高亮伴读播放器 (毫秒级字界同步 + 自动连读衔接)
   // ----------------------------------------------------
   playKaraoke(page, mainEl) {
     const spans = mainEl.querySelectorAll(".karaoke-char");
@@ -911,8 +1253,9 @@ export class BookModule extends BaseModule {
               this._saveProgress();
               this.render();
             } else {
-              // 读完进入测验
+              // 读完全本进入双重测验
               this.isQuizMode = true;
+              this.currentQuizStage = 1;
               this.quizAnswered = false;
               this.render();
             }

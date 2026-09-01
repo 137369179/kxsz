@@ -66,7 +66,7 @@ export class ParentModule extends BaseModule {
         <div class="w-full max-w-md bg-white/95 backdrop-blur-md rounded-3xl p-8 shadow-2xl border-4 border-amber-300 flex flex-col items-center text-center">
           
           <div class="w-16 h-16 rounded-3xl bg-amber-100 text-amber-800 flex items-center justify-center mb-3 shadow-inner">
-            <span class="flex items-center">${GAME_ICONS.shieldLock("w-10 h-10")}</span>
+            <span class="flex items-center">${GAME_ICONS.shieldLock()}</span>
           </div>
 
           <h2 class="text-xl font-black text-amber-950 mb-1">家长安全门禁</h2>
@@ -135,7 +135,7 @@ export class ParentModule extends BaseModule {
         <!-- 顶部导航与锁定按钮 -->
         <div class="w-full flex flex-col sm:flex-row items-center justify-between bg-white/95 backdrop-blur-md px-6 py-4 rounded-3xl shadow-xl border-2 border-amber-200 mb-6 gap-4">
           <div class="flex items-center gap-3">
-            <span class="flex items-center">${GAME_ICONS.shieldLock("w-8 h-8")}</span>
+            <span class="flex items-center">${GAME_ICONS.shieldLock()}</span>
             <div>
               <h1 class="text-base font-black text-amber-950">凯茜识字 · 家长督学与设置中心</h1>
               <p class="text-xs text-amber-700 font-semibold">学习遗忘罗盘监控12 勋章成长墙A4 田字格字帖打印与防沉迷设置</p>
@@ -211,7 +211,7 @@ export class ParentModule extends BaseModule {
             <span class="text-xs text-gray-500 font-bold">累计收集之星</span>
             <div class="text-3xl font-black text-emerald-600 my-1 flex items-center justify-center gap-1">
               <span>${progress.stars || (charCount * 3)}</span>
-              <span class="flex items-center">${GAME_ICONS.star("w-6 h-6", false)}</span>
+              <span class="flex items-center">${GAME_ICONS.star(false)}</span>
             </div>
             <span class="text-[10px] text-emerald-700 font-bold">星币余额: ${progress.coins || 60}</span>
           </div>
@@ -227,7 +227,7 @@ export class ParentModule extends BaseModule {
         <div class="bg-white/95 rounded-3xl p-6 shadow-xl border-2 border-amber-200 mb-6">
           <div class="flex items-center justify-between mb-4">
             <div class="flex items-center gap-2">
-              <span class="flex items-center">${GAME_ICONS.calendar("w-5 h-5")}</span>
+              <span class="flex items-center">${GAME_ICONS.calendar()}</span>
               <h3 class="text-sm font-black text-amber-950">近 7 日识字趋势统计</h3>
             </div>
             <span class="text-xs text-amber-700 font-bold">本周总计: ${history.reduce((a,b) => a + b.count, 0)} 字</span>
@@ -250,7 +250,7 @@ export class ParentModule extends BaseModule {
         <!-- 艾宾浩斯复习计划卡片 -->
         <div class="bg-white/95 rounded-3xl p-6 shadow-xl border-2 border-amber-200">
           <div class="flex items-center gap-2 mb-2">
-            <span class="flex items-center">${GAME_ICONS.sparkle("w-5 h-5")}</span>
+            <span class="flex items-center">${GAME_ICONS.sparkle()}</span>
             <h3 class="text-sm font-black text-amber-950">艾宾浩斯智能复习调度系统</h3>
           </div>
           <p class="text-xs text-gray-600 leading-relaxed font-semibold">
@@ -302,13 +302,13 @@ export class ParentModule extends BaseModule {
           <div class="flex items-center justify-between mb-4 pb-3 border-b border-amber-100">
             <div>
               <h3 class="text-base font-black text-amber-950 flex items-center gap-2">
-                <span class="flex items-center">${GAME_ICONS.print("w-5 h-5")}</span>
+                <span class="flex items-center">${GAME_ICONS.print()}</span>
                 <span>A4 规范田字格描红字帖生成器</span>
               </h3>
               <p class="text-xs text-gray-500 font-semibold mt-0.5">一键生成国家教育部规范的儿童生字田字格描红练习帖，支持连接打印机或导出 PDF</p>
             </div>
             <button id="btn-trigger-print" class="btn-game-orange text-white font-black text-xs px-6 py-2.5 rounded-full shadow-lg flex items-center gap-1.5 active:scale-95">
-              <span class="flex items-center">${GAME_ICONS.print("w-4 h-4")}</span>
+              <span class="flex items-center">${GAME_ICONS.print()}</span>
               <span>一键打印字帖 (A4)</span>
             </button>
           </div>
@@ -373,7 +373,7 @@ export class ParentModule extends BaseModule {
         <!-- 4. 教学流程与防沉迷设置 -->
         <div class="bg-white/95 rounded-3xl p-6 shadow-xl border-2 border-amber-200">
           <h2 class="text-base font-black text-amber-950 mb-4 flex items-center gap-2">
-            <span class="flex items-center">${GAME_ICONS.parent("w-5 h-5")}</span>
+            <span class="flex items-center">${GAME_ICONS.parent()}</span>
             <span>教学闭环与护眼防沉迷设置</span>
           </h2>
 

@@ -28,16 +28,16 @@ export function mountGameShell(container, { activeMode, heading }) {
             ${
               activeMode !== "map"
               ? `<button data-nav="map" class="shell-nav-btn w-12 h-12 bg-black/40 backdrop-blur-md rounded-full text-white flex items-center justify-center hover:bg-black/60 transition-transform active:scale-90 border-2 border-amber-300 shadow-xl" title="返回地图" aria-label="返回世界地图">
-                  ${GAME_ICONS.home("w-7 h-7")}
+                  ${GAME_ICONS.home()}
                  </button>`
               : `<button data-nav="parent" class="shell-nav-btn w-12 h-12 bg-gradient-to-tr from-amber-600 to-orange-500 rounded-full text-white flex items-center justify-center hover:scale-105 transition-transform active:scale-90 border-2 border-white shadow-[0_4px_12px_rgba(0,0,0,0.4)]" title="家长中心" aria-label="进入家长中心">
-                  ${GAME_ICONS.shieldLock("w-7 h-7")}
+                  ${GAME_ICONS.shieldLock()}
                  </button>`
             }
 
             <button id="shell-btn-sound-toggle" class="w-11 h-11 bg-black/40 backdrop-blur-md rounded-full text-white flex items-center justify-center hover:bg-black/60 transition-transform active:scale-90 border border-white/30 shadow-lg" title="声音开关" aria-label="切换声音开关">
               <span id="shell-sound-icon-container" class="flex items-center justify-center" aria-hidden="true">
-                ${soundAndFX.isMuted ? GAME_ICONS.speaker("w-6 h-6", true) : GAME_ICONS.speaker("w-6 h-6", false)}
+                ${soundAndFX.isMuted ? GAME_ICONS.speaker(true) : GAME_ICONS.speaker(false)}
               </span>
             </button>
           </div>
@@ -45,12 +45,12 @@ export function mountGameShell(container, { activeMode, heading }) {
           <!-- 星星 & 金币 -->
           <div class="flex items-center gap-3 pointer-events-auto">
             <div class="candy-pill flex items-center gap-2 text-yellow-300 font-black text-sm px-4 py-1.5 rounded-full border-2 border-yellow-300 shadow-lg" title="星星" aria-label="星星数量">
-              ${GAME_ICONS.star("w-5 h-5", false)}
+              ${GAME_ICONS.star(false)}
               <span id="shell-stars-count" aria-live="polite">${progress.stars}</span>
             </div>
 
             <div class="candy-pill flex items-center gap-2 text-amber-300 font-black text-sm px-4 py-1.5 rounded-full border-2 border-amber-300 shadow-lg relative" title="金币" aria-label="金币数量">
-              ${GAME_ICONS.coin("w-5 h-5")}
+              ${GAME_ICONS.coin()}
               <span id="shell-coins-count" class="relative z-10 font-black text-yellow-200" aria-live="polite">${progress.coins}</span>
               <div id="shell-coins-target-anchor" class="absolute left-4 top-4 w-1 h-1"></div>
             </div>
@@ -106,8 +106,8 @@ export function mountGameShell(container, { activeMode, heading }) {
       const containerEl = soundBtn.querySelector("#shell-sound-icon-container");
       if (containerEl) {
         containerEl.innerHTML = muted
-          ? GAME_ICONS.speaker("w-6 h-6", true)
-          : GAME_ICONS.speaker("w-6 h-6", false);
+          ? GAME_ICONS.speaker(true)
+          : GAME_ICONS.speaker(false);
       }
     };
     soundBtn.addEventListener("click", soundFn);

@@ -42,19 +42,19 @@ export class MapModule extends BaseModule {
           <button class="island-tab-btn px-4 py-1.5 rounded-full text-xs font-black transition-all flex items-center gap-1.5 ${
             this.currentIsland === 1 ? "bg-emerald-500 text-white shadow-lg scale-105" : "text-white/80 hover:text-white"
           }" data-island="1">
-            <span class="flex items-center">${GAME_ICONS.islandForest("w-4 h-4")}</span>
+            <span class="flex items-center">${GAME_ICONS.islandForest()}</span>
             <span>奇幻森林岛 (1-200)</span>
           </button>
           <button class="island-tab-btn px-4 py-1.5 rounded-full text-xs font-black transition-all flex items-center gap-1.5 ${
             this.currentIsland === 2 ? "bg-amber-500 text-white shadow-lg scale-105" : "text-white/80 hover:text-white"
           }" data-island="2">
-            <span class="flex items-center">${GAME_ICONS.islandTown("w-4 h-4")}</span>
+            <span class="flex items-center">${GAME_ICONS.islandTown()}</span>
             <span>缤纷小镇岛 (201-600)</span>
           </button>
           <button class="island-tab-btn px-4 py-1.5 rounded-full text-xs font-black transition-all flex items-center gap-1.5 ${
             this.currentIsland === 3 ? "bg-indigo-600 text-white shadow-lg scale-105" : "text-white/80 hover:text-white"
           }" data-island="3">
-            <span class="flex items-center">${GAME_ICONS.islandSpace("w-4 h-4")}</span>
+            <span class="flex items-center">${GAME_ICONS.islandSpace()}</span>
             <span>星际探索岛 (601-1300)</span>
           </button>
         </div>
@@ -62,31 +62,31 @@ export class MapModule extends BaseModule {
         <!-- 7 大地标快捷入口建筑 (游乐场绘本馆字卡库奖励城堡竞技场复习) -->
         <div class="absolute top-20 right-6 z-20 flex flex-wrap justify-end gap-2.5 max-w-[400px]">
           <button class="map-landmark-btn group bg-white/90 backdrop-blur-md px-3.5 py-1.5 rounded-2xl border-2 border-purple-300 shadow-xl flex items-center gap-1.5 active:scale-95 transition-all mb-2" data-mode="play">
-            <span class="flex items-center group-hover:scale-110 transition-transform">${GAME_ICONS.arcade("w-5 h-5")}</span>
+            <span class="flex items-center group-hover:scale-110 transition-transform">${GAME_ICONS.arcade()}</span>
             <span class="text-xs font-black text-purple-950">游乐场</span>
           </button>
           <button class="map-landmark-btn group bg-white/90 backdrop-blur-md px-3.5 py-1.5 rounded-2xl border-2 border-sky-300 shadow-xl flex items-center gap-1.5 active:scale-95 transition-all mb-2" data-mode="books">
-            <span class="flex items-center group-hover:scale-110 transition-transform">${GAME_ICONS.book("w-5 h-5")}</span>
+            <span class="flex items-center group-hover:scale-110 transition-transform">${GAME_ICONS.book()}</span>
             <span class="text-xs font-black text-sky-950">绘本馆</span>
           </button>
           <button class="map-landmark-btn group bg-white/90 backdrop-blur-md px-3.5 py-1.5 rounded-2xl border-2 border-amber-300 shadow-xl flex items-center gap-1.5 active:scale-95 transition-all mb-2" data-mode="cards">
-            <span class="flex items-center group-hover:scale-110 transition-transform">${GAME_ICONS.cards("w-5 h-5")}</span>
+            <span class="flex items-center group-hover:scale-110 transition-transform">${GAME_ICONS.cards()}</span>
             <span class="text-xs font-black text-amber-950">字卡库</span>
           </button>
           <button class="map-landmark-btn group bg-white/90 backdrop-blur-md px-3.5 py-1.5 rounded-2xl border-2 border-rose-300 shadow-xl flex items-center gap-1.5 active:scale-95 transition-all mb-2" data-mode="reward">
-            <span class="flex items-center group-hover:scale-110 transition-transform">${GAME_ICONS.chest("w-5 h-5")}</span>
+            <span class="flex items-center group-hover:scale-110 transition-transform">${GAME_ICONS.chest()}</span>
             <span class="text-xs font-black text-rose-950">奖励城堡</span>
           </button>
           <button class="map-landmark-btn group bg-white/90 backdrop-blur-md px-3.5 py-1.5 rounded-2xl border-2 border-indigo-300 shadow-xl flex items-center gap-1.5 active:scale-95 transition-all mb-2" data-mode="pk">
-            <span class="flex items-center group-hover:scale-110 transition-transform">${GAME_ICONS.trophy("w-5 h-5")}</span>
+            <span class="flex items-center group-hover:scale-110 transition-transform">${GAME_ICONS.trophy()}</span>
             <span class="text-xs font-black text-indigo-950">竞技场</span>
           </button>
           <button class="map-landmark-btn group bg-white/90 backdrop-blur-md px-3.5 py-1.5 rounded-2xl border-2 border-green-300 shadow-xl flex items-center gap-1.5 active:scale-95 transition-all mb-2" data-mode="idiom">
-            <span class="flex items-center group-hover:scale-110 transition-transform">${GAME_ICONS.book("w-5 h-5")}</span>
+            <span class="flex items-center group-hover:scale-110 transition-transform">${GAME_ICONS.book()}</span>
             <span class="text-xs font-black text-green-950">国学馆</span>
           </button>
           <button class="map-landmark-btn group bg-white/90 backdrop-blur-md px-3.5 py-1.5 rounded-2xl border-2 border-teal-300 shadow-xl flex items-center gap-1.5 active:scale-95 transition-all" data-mode="review">
-            <span class="flex items-center group-hover:scale-110 transition-transform">${GAME_ICONS.calendar("w-5 h-5")}</span>
+            <span class="flex items-center group-hover:scale-110 transition-transform">${GAME_ICONS.calendar()}</span>
             <span class="text-xs font-black text-teal-950">每日复习</span>
           </button>
         </div>
@@ -131,7 +131,7 @@ export class MapModule extends BaseModule {
                       <div id="cathy-mascot-anchor" class="absolute -top-24 z-30 flex flex-col items-center animate-bounce-cathy pointer-events-none">
                         <!-- 对话气泡 -->
                         <div class="bg-gradient-to-r from-orange-500 to-amber-500 text-white text-[11px] font-black px-3 py-1 rounded-full shadow-2xl whitespace-nowrap mb-1.5 border-2 border-white animate-pulse flex items-center gap-1">
-                          <span class="flex items-center">${GAME_ICONS.star("w-3.5 h-3.5")}</span>
+                          <span class="flex items-center">${GAME_ICONS.star()}</span>
                           <span>凯茜：快来学“${charItem.char}”字！</span>
                         </div>
                         <img src="assets/images/cathy_mascot.webp" class="w-16 h-16 rounded-full border-4 border-white shadow-2xl object-cover ring-4 ring-orange-400/80" />
@@ -150,18 +150,18 @@ export class MapModule extends BaseModule {
                     }">
                       
                       <!-- 皇冠图标 (通关后) -->
-                      ${isCompleted ? `<span class="absolute -top-3.5 flex items-center drop-shadow">${GAME_ICONS.crown("w-6 h-6")}</span>` : ""}
+                      ${isCompleted ? `<span class="absolute -top-3.5 flex items-center drop-shadow">${GAME_ICONS.crown()}</span>` : ""}
 
                       <!-- 汉字与拼音 -->
-                      <span class="text-3xl drop-shadow-md tracking-wider flex items-center justify-center">${isLocked ? GAME_ICONS.shieldLock("w-7 h-7") : charItem.char}</span>
+                      <span class="text-3xl drop-shadow-md tracking-wider flex items-center justify-center">${isLocked ? GAME_ICONS.shieldLock() : charItem.char}</span>
                       <span class="text-[10px] font-extrabold ${isCompleted ? "text-amber-900" : "text-white/90"} mt-0.5">${isLocked ? `第${index + 1}关` : charItem.pinyin}</span>
                     </div>
 
                     <!-- 底部三颗金色发光星星 -->
                     <div class="flex items-center gap-1 mt-2.5 bg-black/60 backdrop-blur-md px-3 py-1 rounded-full border border-white/30 shadow-lg">
-                      <span class="flex items-center">${GAME_ICONS.star("w-3.5 h-3.5", !isCompleted)}</span>
-                      <span class="flex items-center">${GAME_ICONS.star("w-3.5 h-3.5", !isCompleted)}</span>
-                      <span class="flex items-center">${GAME_ICONS.star("w-3.5 h-3.5", !isCompleted)}</span>
+                      <span class="flex items-center">${GAME_ICONS.star(!isCompleted)}</span>
+                      <span class="flex items-center">${GAME_ICONS.star(!isCompleted)}</span>
+                      <span class="flex items-center">${GAME_ICONS.star(!isCompleted)}</span>
                     </div>
 
                   </div>
@@ -176,7 +176,7 @@ export class MapModule extends BaseModule {
 
         <!-- 3. 右下角直达最新待学字金色罗盘 -->
         <button id="btn-quick-target-char" class="absolute bottom-6 right-6 z-30 bg-gradient-to-r from-orange-500 via-amber-500 to-yellow-400 text-white font-black text-sm px-6 py-3.5 rounded-full shadow-[0_10px_25px_rgba(255,107,0,0.6)] border-4 border-white active:scale-95 transition-all flex items-center gap-2 animate-bounce-slow">
-          <span class="flex items-center">${GAME_ICONS.compass("w-6 h-6")}</span>
+          <span class="flex items-center">${GAME_ICONS.compass()}</span>
           <span>直达最新生字</span>
         </button>
 
@@ -185,7 +185,7 @@ export class MapModule extends BaseModule {
           
           <!-- 每日签到徽章 -->
           <button id="btn-daily-signin" class="group bg-gradient-to-r from-rose-500 via-pink-500 to-fuchsia-500 text-white font-black text-xs px-4 py-2.5 rounded-2xl shadow-xl border-2 border-white/50 active:scale-95 transition-all flex items-center gap-2 ${progress.todaySignedIn ? 'opacity-70 cursor-not-allowed' : 'animate-bounce-slow'}">
-            <span class="flex items-center">${GAME_ICONS.calendar("w-5 h-5")}</span>
+            <span class="flex items-center">${GAME_ICONS.calendar()}</span>
             <div class="flex flex-col items-start">
               <span>${progress.todaySignedIn ? '今日已签到' : '每日签到领奖励'}</span>
               <span class="text-[9px] text-white/80 font-bold">连续 ${progress.signInStreak || 0} 天</span>
@@ -206,7 +206,7 @@ export class MapModule extends BaseModule {
 
           <!-- 总学习进度 -->
           <div class="bg-black/60 backdrop-blur-md rounded-2xl px-4 py-2 border border-white/20 shadow-xl flex items-center gap-3">
-            <span class="flex items-center">${GAME_ICONS.sparkle("w-5 h-5")}</span>
+            <span class="flex items-center">${GAME_ICONS.sparkle()}</span>
             <div>
               <div class="text-[10px] text-white/60 font-bold">已学 <b class="text-amber-300">${Object.keys(progress.charRecords || {}).length}</b> / ${CHARACTER_DATABASE.length} 字</div>
               <div class="text-[10px] text-white/60 font-bold">星币 <b class="text-yellow-300">${progress.coins}</b> · 星星 <b class="text-amber-300">${progress.stars}</b></div>

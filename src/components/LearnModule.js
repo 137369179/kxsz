@@ -38,7 +38,7 @@ export class LearnModule extends BaseModule {
     this.destroy();
 
     const __lnProgress = ebbinghausManager.progress;
-    const __lnSpeakerIcon = soundAndFX.isMuted ? GAME_ICONS.speaker("w-5 h-5", true) : GAME_ICONS.speaker("w-5 h-5", false);
+    const __lnSpeakerIcon = soundAndFX.isMuted ? GAME_ICONS.speaker(true) : GAME_ICONS.speaker(false);
 
     this.container.innerHTML = `
       <div class="relative w-full h-full min-h-[640px] flex flex-col justify-between select-none overflow-hidden bg-gradient-to-br from-indigo-950 via-purple-950 to-slate-950">
@@ -48,7 +48,7 @@ export class LearnModule extends BaseModule {
           
           <!-- 返回地图按钮 -->
           <button id="btn-learn-back-map" class="flex items-center gap-2 bg-gradient-to-r from-amber-600 to-orange-600 text-white font-black text-xs px-4 py-2 rounded-full shadow-xl border-2 border-white/80 active:scale-95 transition-transform">
-            <span class="flex items-center">${GAME_ICONS.home("w-4 h-4")}</span>
+            <span class="flex items-center">${GAME_ICONS.home()}</span>
             <span>返回地图</span>
           </button>
 
@@ -71,7 +71,7 @@ export class LearnModule extends BaseModule {
                     ? "bg-emerald-500 text-white shadow-md"
                     : "bg-white/20 text-white/40"
                 }">
-                  ${s.step < this.currentStep ? `<span class="flex items-center">${GAME_ICONS.star("w-4 h-4", true)}</span>` : `<span class="flex items-center">${s.iconSvg("w-4 h-4")}</span>`}
+                  ${s.step < this.currentStep ? `<span class="flex items-center">${GAME_ICONS.star(true)}</span>` : `<span class="flex items-center">${s.iconSvg("w-4 h-4")}</span>`}
                 </div>
                 <span class="text-xs font-black ${s.step === this.currentStep ? "text-yellow-300 drop-shadow" : "text-white/60"}">${s.name}</span>
                 ${s.step < 5 ? `<div class="w-4 h-0.5 ${s.step < this.currentStep ? "bg-emerald-400" : "bg-white/20"}"></div>` : ""}
@@ -91,10 +91,10 @@ export class LearnModule extends BaseModule {
               ${__lnSpeakerIcon}
             </button>
             <div class="candy-pill flex items-center gap-1.5 text-yellow-300 font-black text-xs px-3 py-1 rounded-full bg-black/40 border border-white/30">
-              ${GAME_ICONS.coin("w-4 h-4")}<span>${__lnProgress.coins}</span>
+              ${GAME_ICONS.coin()}<span>${__lnProgress.coins}</span>
             </div>
             <div class="candy-pill flex items-center gap-1.5 text-amber-300 font-black text-xs px-3 py-1 rounded-full bg-black/40 border border-white/30">
-              ${GAME_ICONS.star("w-4 h-4", true)}<span>${__lnProgress.stars}</span>
+              ${GAME_ICONS.star(true)}<span>${__lnProgress.stars}</span>
             </div>
           </div>
 
@@ -176,7 +176,7 @@ export class LearnModule extends BaseModule {
             </div>
             <div class="w-2.5 h-28 bg-amber-800 border-2 border-yellow-300 rounded-full flex items-center justify-center mt-2 animate-pulse">
               <div class="w-8 h-8 rounded-full bg-yellow-400 border-2 border-white shadow-xl flex items-center justify-center text-xs">
-                ${GAME_ICONS.sparkle("w-5 h-5")}
+                ${GAME_ICONS.sparkle()}
               </div>
             </div>
           </div>
@@ -294,7 +294,7 @@ export class LearnModule extends BaseModule {
         break;
     }
 
-    soundAndFX.speak(guide);
+    soundAndFX.speakPriority(guide, { kind: "sentence", priority: 1 });
 
     stage.innerHTML = `
       <div class="relative w-full max-w-4xl h-[480px] bg-gradient-to-b from-sky-400 via-amber-200 to-orange-300 rounded-3xl overflow-hidden shadow-2xl border-4 border-amber-300 flex flex-col items-center justify-between p-6 animate-fade-in text-center">
@@ -408,7 +408,7 @@ export class LearnModule extends BaseModule {
         <div class="w-80 flex flex-col justify-between h-full bg-white/10 backdrop-blur-md rounded-3xl p-6 border-2 border-white/30">
           <div>
             <h3 class="text-xs font-black text-yellow-300 mb-3 flex items-center gap-1.5">
-              <span class="flex items-center">${GAME_ICONS.chest("w-4 h-4")}</span>
+              <span class="flex items-center">${GAME_ICONS.chest()}</span>
               <span>常用词语拓展：</span>
             </h3>
             
@@ -686,9 +686,9 @@ export class LearnModule extends BaseModule {
 
         <div id="practice-win-modal" class="absolute inset-0 bg-black/85 backdrop-blur-md flex flex-col items-center justify-center text-white hidden animate-scale-up z-40">
           <div class="flex items-center gap-2 mb-3">
-            <span class="flex items-center">${GAME_ICONS.star("w-12 h-12", true)}</span>
-            <span class="flex items-center">${GAME_ICONS.star("w-16 h-16", true)}</span>
-            <span class="flex items-center">${GAME_ICONS.star("w-12 h-12", true)}</span>
+            <span class="flex items-center">${GAME_ICONS.star(true)}</span>
+            <span class="flex items-center">${GAME_ICONS.star(true)}</span>
+            <span class="flex items-center">${GAME_ICONS.star(true)}</span>
           </div>
           <h2 class="text-2xl font-black text-yellow-300 mb-2">神枪手！射击挑战大满贯！</h2>
           <p class="text-xs text-gray-300 mb-6 font-semibold">你已经彻底掌握了“${char.char}”字的辨识与发音！</p>
@@ -747,7 +747,7 @@ export class LearnModule extends BaseModule {
   // ----------------------------------------------------------------
   renderStepWrite(stage) {
     const char = this.charData;
-    soundAndFX.speak(`魔法毛笔描红！请从发光起点开始，按照笔顺书写“${char.char}”字！`);
+    soundAndFX.speakPriority(`魔法毛笔描红！请从发光起点开始，按照笔顺书写“${char.char}”字！`, { kind: "sentence", priority: 1 });
 
     stage.innerHTML = `
       <div class="relative w-full max-w-4xl h-[480px] bg-gradient-to-b from-amber-50 via-orange-50 to-amber-100 rounded-3xl overflow-hidden shadow-2xl border-4 border-amber-300 flex items-center justify-between p-8 animate-fade-in">
@@ -775,7 +775,7 @@ export class LearnModule extends BaseModule {
             </button>
 
             <button id="btn-finish-write-step" class="w-full bg-gradient-to-r from-orange-500 to-amber-500 text-white font-black text-sm py-3.5 rounded-full shadow-xl border border-white active:scale-95 transition-all flex items-center justify-center gap-2 hidden animate-bounce-slow">
-              <span class="flex items-center">${GAME_ICONS.chest("w-5 h-5")}</span>
+              <span class="flex items-center">${GAME_ICONS.chest()}</span>
               <span>书写满分！去开宝箱 </span>
             </button>
           </div>
@@ -824,19 +824,19 @@ export class LearnModule extends BaseModule {
           <!-- 三颗金色大星槽 (Duang! Duang! Duang!) -->
           <div class="flex items-center gap-4 mb-4">
             <div id="star-slot-1" class="w-14 h-14 rounded-full bg-white/10 border-2 border-white/30 flex items-center justify-center transition-all duration-500">
-              <span class="flex items-center">${GAME_ICONS.star("w-8 h-8", false)}</span>
+              <span class="flex items-center">${GAME_ICONS.star(false)}</span>
             </div>
             <div id="star-slot-2" class="w-16 h-16 rounded-full bg-white/10 border-2 border-white/30 flex items-center justify-center -translate-y-2 transition-all duration-500">
-              <span class="flex items-center">${GAME_ICONS.star("w-10 h-10", false)}</span>
+              <span class="flex items-center">${GAME_ICONS.star(false)}</span>
             </div>
             <div id="star-slot-3" class="w-14 h-14 rounded-full bg-white/10 border-2 border-white/30 flex items-center justify-center transition-all duration-500">
-              <span class="flex items-center">${GAME_ICONS.star("w-8 h-8", false)}</span>
+              <span class="flex items-center">${GAME_ICONS.star(false)}</span>
             </div>
           </div>
 
           <!-- 黄金大宝箱 (点击开启) -->
           <button id="btn-open-golden-chest" class="group relative w-36 h-36 rounded-3xl bg-gradient-to-tr from-amber-400 via-yellow-300 to-amber-600 border-4 border-white shadow-[0_0_60px_rgba(255,235,59,0.8)] flex items-center justify-center active:scale-90 transition-transform cursor-pointer animate-bounce-slow">
-            <span class="flex items-center">${GAME_ICONS.chest("w-20 h-20")}</span>
+            <span class="flex items-center">${GAME_ICONS.chest()}</span>
             <div class="absolute -bottom-3 bg-red-600 text-white font-black text-xs px-4 py-1 rounded-full shadow-lg border border-white">
               点击开启通关宝箱！
             </div>
@@ -854,8 +854,8 @@ export class LearnModule extends BaseModule {
 
           <h2 class="text-2xl font-black text-yellow-300 mb-1">获得全新专属字卡：${char.char}</h2>
           <p class="text-xs text-gray-300 mb-4 flex items-center gap-2">
-            <span class="flex items-center">${GAME_ICONS.coin("w-4 h-4")} 获得 10 凯茜星币</span>
-            <span class="flex items-center">${GAME_ICONS.star("w-4 h-4", true)} 3 颗凯茜之星</span>
+            <span class="flex items-center">${GAME_ICONS.coin()} 获得 10 凯茜星币</span>
+            <span class="flex items-center">${GAME_ICONS.star(true)} 3 颗凯茜之星</span>
           </p>
 
           <button id="btn-confirm-return-map" class="bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 text-white font-black text-base px-12 py-3.5 rounded-full shadow-[0_0_40px_rgba(255,107,0,0.9)] border-2 border-white active:scale-95 transition-transform">
@@ -885,7 +885,7 @@ export class LearnModule extends BaseModule {
         this._timeout(() => {
           soundAndFX.playStarEarned(1);
           if (star1) {
-            star1.innerHTML = `<span class="flex items-center">${GAME_ICONS.star("w-8 h-8", true)}</span>`;
+            star1.innerHTML = `<span class="flex items-center">${GAME_ICONS.star(true)}</span>`;
             star1.classList.add("bg-yellow-400", "scale-125", "shadow-[0_0_20px_rgba(255,235,59,1)]");
           }
         }, 200);
@@ -893,7 +893,7 @@ export class LearnModule extends BaseModule {
         this._timeout(() => {
           soundAndFX.playStarEarned(2);
           if (star2) {
-            star2.innerHTML = `<span class="flex items-center">${GAME_ICONS.star("w-10 h-10", true)}</span>`;
+            star2.innerHTML = `<span class="flex items-center">${GAME_ICONS.star(true)}</span>`;
             star2.classList.add("bg-yellow-400", "scale-125", "shadow-[0_0_20px_rgba(255,235,59,1)]");
           }
         }, 600);
@@ -901,7 +901,7 @@ export class LearnModule extends BaseModule {
         this._timeout(() => {
           soundAndFX.playStarEarned(3);
           if (star3) {
-            star3.innerHTML = `<span class="flex items-center">${GAME_ICONS.star("w-8 h-8", true)}</span>`;
+            star3.innerHTML = `<span class="flex items-center">${GAME_ICONS.star(true)}</span>`;
             star3.classList.add("bg-yellow-400", "scale-125", "shadow-[0_0_20px_rgba(255,235,59,1)]");
           }
         }, 1000);

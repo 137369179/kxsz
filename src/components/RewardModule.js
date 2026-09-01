@@ -112,8 +112,8 @@ export class RewardModule extends BaseModule {
 
   /**  */
   _renderStickerWall(panel) {
-        const __lockIcon = GAME_ICONS.shieldLock("w-4 h-4");
-    const __sparkleIcon = GAME_ICONS.star("w-4 h-4");
+        const __lockIcon = GAME_ICONS.shieldLock();
+    const __sparkleIcon = GAME_ICONS.star();
 
     const s = getStickers();
     const ratio = s.total ? Math.round((s.earnedCount / s.total) * 100) : 0;
@@ -122,7 +122,7 @@ export class RewardModule extends BaseModule {
       <div class="bg-white/5 backdrop-blur-md rounded-3xl border border-white/15 p-5">
         <div class="flex items-center justify-between mb-2">
           <h2 class="font-black text-amber-200 flex items-center gap-2">
-            <span class="flex items-center">${GAME_ICONS.cards("w-5 h-5")}</span>
+            <span class="flex items-center">${GAME_ICONS.cards()}</span>
             <span>汉字贴纸收藏册</span>
           </h2>
           <span class="text-xs font-black text-white/50">已收集 <b class="text-amber-300">${s.earnedCount}</b> / ${s.total} </span>
@@ -135,7 +135,7 @@ export class RewardModule extends BaseModule {
         ${
           s.earned.length === 0
             ? `<div class="text-center py-10">
-                 <div class="w-16 h-16 mx-auto mb-3 opacity-60 flex items-center justify-center">${GAME_ICONS.chest("w-16 h-16")}</div>
+                 <div class="w-16 h-16 mx-auto mb-3 opacity-60 flex items-center justify-center">${GAME_ICONS.chest()}</div>
                  <p class="text-white/80 font-black text-sm">还没有收集到汉字贴纸</p>
                  <p class="text-white/40 text-xs font-bold mt-1">去大地图学习汉字，通关即可解锁专属贴纸！</p>
                </div>`
@@ -173,8 +173,8 @@ export class RewardModule extends BaseModule {
 
   /** 荣誉勋章墙 */
   _renderMedalWall(panel) {
-    const __lockIcon = GAME_ICONS.shieldLock("w-4 h-4");
-    const __trophyIcon = GAME_ICONS.trophy("w-5 h-5");
+    const __lockIcon = GAME_ICONS.shieldLock();
+    const __trophyIcon = GAME_ICONS.trophy();
 
     const medals = getMedals();
 
@@ -216,7 +216,7 @@ export class RewardModule extends BaseModule {
 
   /**  /  */
   _renderShop(panel) {
-        const __sparkleIcon = GAME_ICONS.star("w-4 h-4");
+        const __sparkleIcon = GAME_ICONS.star();
 
     const shop = getShopData();
 
@@ -226,7 +226,7 @@ export class RewardModule extends BaseModule {
         item.type === "avatar"
           ? item.icon
             ? `<img src="${item.icon}" class="w-full h-full rounded-full object-cover" />`
-            : `<div class="w-10 h-10">${GAME_ICONS.cards("w-5 h-5")}</div>`
+            : `<div class="w-10 h-10">${GAME_ICONS.cards()}</div>`
           : `<span class="text-3xl"></span>`;
       return `<div class="rounded-full bg-amber-50 flex items-center justify-center overflow-hidden ${size} ${frameCls}">${inner}</div>`;
     };
@@ -236,7 +236,7 @@ export class RewardModule extends BaseModule {
         ? `<span class="text-[10px] font-black text-amber-300 mt-1">已装备</span>`
         : item.owned
         ? `<button data-buy="${item.id}" class="shop-action mt-1.5 bg-emerald-500/90 hover:bg-emerald-500 text-white text-[11px] font-black px-4 py-1.5 rounded-full active:scale-95 transition-transform">装备</button>`
-        : `<button data-buy="${item.id}" class="shop-action mt-1.5 ${item.affordable ? "bg-gradient-to-r from-amber-400 to-orange-500 hover:brightness-110" : "bg-white/10 opacity-50 cursor-not-allowed"} text-white text-[11px] font-black px-4 py-1.5 rounded-full active:scale-95 transition-transform flex items-center gap-1"><span class="flex items-center">${GAME_ICONS.coin("w-3.5 h-3.5")}</span><span>${item.price}</span></button>`;
+        : `<button data-buy="${item.id}" class="shop-action mt-1.5 ${item.affordable ? "bg-gradient-to-r from-amber-400 to-orange-500 hover:brightness-110" : "bg-white/10 opacity-50 cursor-not-allowed"} text-white text-[11px] font-black px-4 py-1.5 rounded-full active:scale-95 transition-transform flex items-center gap-1"><span class="flex items-center">${GAME_ICONS.coin()}</span><span>${item.price}</span></button>`;
 
       const border = item.equipped
         ? "border-amber-400 bg-amber-400/15"
@@ -258,13 +258,13 @@ export class RewardModule extends BaseModule {
         <div class="flex items-center justify-between mb-5">
           <div>
             <h2 class="font-black text-amber-200 flex items-center gap-2">
-              <span class="flex items-center">${GAME_ICONS.chest("w-5 h-5")}</span>
+              <span class="flex items-center">${GAME_ICONS.chest()}</span>
               <span>凯茜装扮商城</span>
             </h2>
             <p class="text-[10px] text-white/40 font-bold mt-0.5">使用星币购买限定头像与个性边框</p>
           </div>
           <div class="bg-black/40 backdrop-blur-md flex items-center gap-2 text-amber-300 font-black text-sm px-4 py-2 rounded-full border border-white/15">
-            <span class="flex items-center">${GAME_ICONS.coin("w-5 h-5")}</span>
+            <span class="flex items-center">${GAME_ICONS.coin()}</span>
             <span>${shop.coins}</span>
             <span class="text-[10px] text-white/40 font-black">星币</span>
           </div>
@@ -320,8 +320,8 @@ export class RewardModule extends BaseModule {
 
   /**  */
   _renderCalendar(panel) {
-        const __sparkleIcon = GAME_ICONS.star("w-4 h-4");
-    const __trophyIcon = GAME_ICONS.trophy("w-5 h-5");
+        const __sparkleIcon = GAME_ICONS.star();
+    const __trophyIcon = GAME_ICONS.trophy();
 
     const cal = getCalendar(this.calYear, this.calMonth);
     const monthLabel = `${cal.year}年 ${cal.monthIdx + 1}月`;
@@ -410,7 +410,7 @@ export class RewardModule extends BaseModule {
 
   /** "" */
   _celebrateNewMedals() {
-    const __trophyIcon = GAME_ICONS.trophy("w-5 h-5");
+    const __trophyIcon = GAME_ICONS.trophy();
     const newIds = getNewMedalIds();
     if (newIds.length === 0) return;
 
