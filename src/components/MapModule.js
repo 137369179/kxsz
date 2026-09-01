@@ -159,9 +159,9 @@ export class MapModule extends BaseModule {
 
                     <!-- 底部三颗金色发光星星 -->
                     <div class="flex items-center gap-1 mt-2.5 bg-black/60 backdrop-blur-md px-3 py-1 rounded-full border border-white/30 shadow-lg">
-                      <span class="flex items-center">${GAME_ICONS.star("w-3.5 h-3.5", isCompleted)}</span>
-                      <span class="flex items-center">${GAME_ICONS.star("w-3.5 h-3.5", isCompleted)}</span>
-                      <span class="flex items-center">${GAME_ICONS.star("w-3.5 h-3.5", isCompleted)}</span>
+                      <span class="flex items-center">${GAME_ICONS.star("w-3.5 h-3.5", !isCompleted)}</span>
+                      <span class="flex items-center">${GAME_ICONS.star("w-3.5 h-3.5", !isCompleted)}</span>
+                      <span class="flex items-center">${GAME_ICONS.star("w-3.5 h-3.5", !isCompleted)}</span>
                     </div>
 
                   </div>

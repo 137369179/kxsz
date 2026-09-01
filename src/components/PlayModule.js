@@ -183,7 +183,7 @@ export class PlayModule extends BaseModule {
       const __pmSpeakerIcon = soundAndFX.isMuted ? GAME_ICONS.speaker("w-5 h-5", true) : GAME_ICONS.speaker("w-5 h-5", false);
       const options = shuffle([curChar.char, ...(curChar.confusingChars || ["木", "日", "月"]).slice(0, 3)]);
 
-      soundAndFX.speak(`消灭怪兽！找出汉字：“${curChar.char}”`);
+      soundAndFX.speakPriority(`消灭怪兽！找出汉字：“${curChar.char}”`, { kind: "sentence", priority: 1 });
 
       this.container.innerHTML = `
         <div class="relative w-full h-full min-h-[640px] flex flex-col justify-between select-none overflow-hidden bg-gradient-to-b from-slate-950 via-rose-950 to-slate-950 text-white">
@@ -527,7 +527,7 @@ export class PlayModule extends BaseModule {
 
     const renderRound = () => {
       const r = roundData[(currentRound - 1) % roundData.length];
-      soundAndFX.speak(`抢拍汉字：“${r.char}”`);
+      soundAndFX.speakPriority(`抢拍汉字：“${r.char}”`, { kind: "sentence", priority: 1 });
 
       this.container.innerHTML = `
         <div class="relative w-full h-full min-h-[640px] flex flex-col justify-between select-none overflow-hidden bg-gradient-to-b from-slate-950 via-indigo-950 to-slate-950 text-white">
@@ -804,14 +804,14 @@ export class PlayModule extends BaseModule {
         const el = this.container.querySelector(sel);
         if (el) el.style.opacity = "1";
       });
-      soundAndFX.speak(`${name}${desc}`);
+      soundAndFX.speakPriority(`${name}。${desc}`, { kind: "sentence", priority: 1 });
     }, 80);
 
     const backBtn = this.container.querySelector("#btn-story-back");
     if (backBtn) this._on(backBtn, "click", () => { soundAndFX.playPop(); this.renderIdiomHall(); });
 
     const narrateBtn = this.container.querySelector("#btn-narrate");
-    if (narrateBtn) this._on(narrateBtn, "click", () => { soundAndFX.playPop(); soundAndFX.speak(story); });
+    if (narrateBtn) this._on(narrateBtn, "click", () => { soundAndFX.playPop(); soundAndFX.speakPriority(story, { kind: "sentence", priority: 1 }); });
 
     const quizBtn = this.container.querySelector("#btn-to-quiz");
     if (quizBtn && gameQuestion) this._on(quizBtn, "click", () => { soundAndFX.playPop(); this._renderIdiomQuiz(idiom); });

@@ -123,7 +123,7 @@ export class PKModule extends BaseModule {
 
     this._on(this.container.querySelector("#pk-btn-listen"), "click", () => {
       if (this.targetChar) {
-         soundAndFX.speak(this.targetChar.char);
+         soundAndFX.speakPriority(this.targetChar.char, { kind: "char", priority: 1 });
       }
     });
 
@@ -154,7 +154,7 @@ export class PKModule extends BaseModule {
     });
 
     // Auto speak
-    this._timeout(() => soundAndFX.speak(this.targetChar.char), 500);
+    this._timeout(() => soundAndFX.speakPriority(this.targetChar.char, { kind: "char", priority: 1 }), 500);
   }
 
   async handleAnswer(idx) {

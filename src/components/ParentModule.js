@@ -211,7 +211,7 @@ export class ParentModule extends BaseModule {
             <span class="text-xs text-gray-500 font-bold">累计收集之星</span>
             <div class="text-3xl font-black text-emerald-600 my-1 flex items-center justify-center gap-1">
               <span>${progress.stars || (charCount * 3)}</span>
-              <span class="flex items-center">${GAME_ICONS.star("w-6 h-6", true)}</span>
+              <span class="flex items-center">${GAME_ICONS.star("w-6 h-6", false)}</span>
             </div>
             <span class="text-[10px] text-emerald-700 font-bold">星币余额: ${progress.coins || 60}</span>
           </div>

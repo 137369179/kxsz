@@ -45,12 +45,12 @@ export function mountGameShell(container, { activeMode, heading }) {
           <!-- 星星 & 金币 -->
           <div class="flex items-center gap-3 pointer-events-auto">
             <div class="candy-pill flex items-center gap-2 text-yellow-300 font-black text-sm px-4 py-1.5 rounded-full border-2 border-yellow-300 shadow-lg" title="星星" aria-label="星星数量">
-              ${GAME_ICONS.star("w-5 h-5", true)}
+              ${GAME_ICONS.star("w-5 h-5", false)}
               <span id="shell-stars-count" aria-live="polite">${progress.stars}</span>
             </div>
 
             <div class="candy-pill flex items-center gap-2 text-amber-300 font-black text-sm px-4 py-1.5 rounded-full border-2 border-amber-300 shadow-lg relative" title="金币" aria-label="金币数量">
-              ${GAME_ICONS.coin("w-6 h-6")}
+              ${GAME_ICONS.coin("w-5 h-5")}
               <span id="shell-coins-count" class="relative z-10 font-black text-yellow-200" aria-live="polite">${progress.coins}</span>
               <div id="shell-coins-target-anchor" class="absolute left-4 top-4 w-1 h-1"></div>
             </div>
