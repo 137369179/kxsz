@@ -4,10 +4,10 @@
  * 
  *
  * 
- *   : text → speechSynthesis ( TTS, ,  Web Audio, DSP )
- *   : text →  voice-server (8766) → Edge  TTS (zh-CN-XiaoyiNeural )
- *        → mp3 → decodeAudioData → AudioBufferSourceNode →  DSP 
- *        →  (voiceChar/Word/Sentence/Tutor/EvalGain) → Compressor → Master
+ *   : text  speechSynthesis ( TTS, ,  Web Audio, DSP )
+ *   : text   voice-server (8766)  Edge  TTS (zh-CN-XiaoxiaoNeural )
+ *         mp3  decodeAudioData  AudioBufferSourceNode   DSP 
+ *          (voiceChar/Word/Sentence/Tutor/EvalGain)  Compressor  Master
  *
  *  (DSP  Web Audio ):
  *   1.  (48kHz, //)
@@ -15,13 +15,13 @@
  *   3. :  playbackRate ±1.5%  jitter ()
  *      +  90ms  ()
  *
- * : neural () → speechSynthesis (soundEngine )
+ * : neural ()  speechSynthesis (soundEngine )
  *
  * : Chrome 87+ ( crypto.randomUUID /  ES2021 )
  */
 
 // ============================================================
-// 1.  → SSML prosody 
+// 1.   SSML prosody 
 // ============================================================
 /**
  *  readingModes.js EMOTION_MATRIX :
@@ -57,12 +57,13 @@ class NeuralVoiceEngine {
   constructor() {
     this.base = (typeof location !== "undefined" && location.protocol === "https:")
       ? "https://127.0.0.1:8766" : "http://127.0.0.1:8766";
-    this.voice = "zh-CN-XiaoyiNeural";
+    this.voice = "zh-CN-XiaoxiaoNeural"; // 默认音色: 晓晓·明亮少女 (MOS 盲测冠军 4.10)
     this.available = null; // null=
     this._probing = null;
     this._mem = new Map(); // key -> {buffer, lastUsed}
     this._memMax = 160;
     this._fetching = new Map(); // key -> Promise<AudioBuffer>
+    this._fetchingMax = 32; // 限制并发 TTS 请求数，防止浏览器资源耗尽
     this.stats = { plays: 0, cacheHits: 0, netFetch: 0, fallbacks: 0 };
     this.dspEnabled = true;
     this.jitterEnabled = true;
@@ -108,7 +109,7 @@ class NeuralVoiceEngine {
     });
   }
 
-  /**  AudioBuffer ( LRU → HTTP → decodeAudioData) */
+  /**  AudioBuffer ( LRU  HTTP  decodeAudioData) */
   async getBuffer(ctx, text, rate, pitch, voice) {
     const key = this._key(text, rate, pitch, voice);
     const hit = this._mem.get(key);
@@ -118,6 +119,11 @@ class NeuralVoiceEngine {
       return hit.buffer;
     }
     if (this._fetching.has(key)) return this._fetching.get(key);
+    // 限制并发 TTS 请求数，防止浏览器资源耗尽
+    if (this._fetching.size >= this._fetchingMax) {
+      this.stats.fallbacks++;
+      return null; // 暂不发起新请求，等待已有请求完成
+    }
     const p = (async () => {
       this.stats.netFetch++;
       const url = `${this.base}/tts?text=${encodeURIComponent(text)}` +
@@ -141,7 +147,7 @@ class NeuralVoiceEngine {
 
   /**
    *  DSP  (, ·Web Audio )
-   * source → [HighShelf 3.2kHz +2dB] → [Peaking 2.8kHz +1dB Q1.4] → outGain → dest
+   * source  [HighShelf 3.2kHz +2dB]  [Peaking 2.8kHz +1dB Q1.4]  outGain  dest
    */
   _buildPolishChain(ctx, dest) {
     if (!this.dspEnabled || !ctx.createBiquadFilter) return null;
@@ -170,7 +176,7 @@ class NeuralVoiceEngine {
    */
   async play({ text, ctx, dest, emotion, pitchOffset, rateMul, volume = 1, onEnd }) {
     if (!ctx || !dest) return null;
-    // (>12 ) → ,  ≈ max()  sum()
+    // (>12 )  ,  ≈ max()  sum()
     if (this.batchEnabled && [...text].length > 12) {
       const h = await this.playSentence({ text, ctx, dest, emotion, pitchOffset, rateMul, volume, onEnd });
       if (h) return h;
@@ -251,7 +257,7 @@ class NeuralVoiceEngine {
     }).catch(() => {});
   }
 
-  // ---------- base64 → ArrayBuffer (Chrome 87 ,  atob ) ----------
+  // ---------- base64  ArrayBuffer (Chrome 87 ,  atob ) ----------
   _b64ToArrayBuffer(b64) {
     const bin = typeof atob === "function" ? atob(b64) : this._atobPolyfill(b64);
     const len = bin.length;
@@ -278,7 +284,7 @@ class NeuralVoiceEngine {
    * :  T N :
    *    ≈ T/ × N (≈ T )
    *    ≈ max() ≈  ~2.3s
-   * 10 :  ~10s →  ~2.3s (≈4x )
+   * 10 :  ~10s   ~2.3s (≈4x )
    *
    * @returns  play()  handle;  null ( _playSingle/TTS)
    */

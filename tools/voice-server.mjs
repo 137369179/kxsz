@@ -4,7 +4,7 @@
  * ============================================================
  * 解决「声音像机器人」的根本方案：
  *   系统 speechSynthesis (拼接式机械音, 无法 DSP) 
- *   → 微软 Edge 神经 TTS (zh-CN-XiaoyiNeural 晓依童声, 48kHz 真人级)
+ *   → 微软 Edge 神经 TTS (zh-CN-XiaoxiaoNeural 晓晓童声, 48kHz 真人级)
  *
  * 为什么需要本服务：
  *   Edge TTS WSS 端点校验 Origin (必须是 chrome-extension://...)，
@@ -56,7 +56,8 @@ const OUTPUT_FORMAT = "audio-24khz-96kbitrate-mono-mp3";
 const CACHE_VERSION = "v2-96k";
 
 // ---------------- 默认音色 ----------------
-const DEFAULT_VOICE = "zh-CN-XiaoyiNeural";
+// MOS 盲测冠军: 晓晓·明亮少女 (zh-CN-XiaoxiaoNeural, MOS 4.10) 取代原晓依 (3.80)
+const DEFAULT_VOICE = "zh-CN-XiaoxiaoNeural";
 
 // ---------------- DRM: Sec-MS-GEC + MUID ----------------
 // 官方算法 (edge-tts drm.py): sha256( f"{ticks:.0f}{TOKEN}" ) 大写 hex
@@ -381,7 +382,7 @@ const server = http.createServer(async (req, res) => {
 
 server.listen(PORT, HOST, () => {
   console.log(`🎤 神经语音代理服务已启动: http://${HOST}:${PORT}`);
-  console.log(`   默认音色: ${DEFAULT_VOICE} (晓依·真人级童声)`);
+  console.log(`   默认音色: ${DEFAULT_VOICE} (晓晓·明亮少女, MOS 盲测冠军)`);
   console.log(`   缓存目录: ${CACHE_DIR}`);
   // 启动即后台预热高频字表 (不阻塞)
   setTimeout(() => {

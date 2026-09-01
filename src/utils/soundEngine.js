@@ -2,27 +2,27 @@
  * 凯茜识字 (Cathy Literacy) - 1:1 洪恩识字级 多轨混音优先级队列 + 栈式闪避 音频引擎系统
  *
  * 机制级架构 (对标 iHuman Chinese Audio Engine)：
- * 1. 【六级总线管线】Source → SubGain (×6) → CategoryGain (BGM/Voice/SFX) → DynamicsCompressor → MasterGain → Destination
- * 2. 【Voice 5 子通道 + 优先级队列】tutor(1) > eval(2) > char(3) > word(4) > sentence(5) — 高优打断低优 + resumeStack 弹栈恢复
- * 3. 【智能音频闪避 3 策略栈】char_duck(-16.5dB) / tutor_duck(-12dB+SFX) / eval_duck(BGM=0) — 栈式 push/pop 无痕恢复
- * 4. 【全局 DR Compressor】-24dB / 4:1 / knee 30 防 32 路并发削波
- * 5. 【程序化生成 BGM 引擎】纯 Web Audio 实时合成五声童趣马林巴 9 场景 + 交叉淡入淡出
- * 6. 【立体声声像 Spatial Panning】笔顺滑行左右声道 3D 渲染
- * 7. 【高并发复音池】瞬时连击不吞音，节点注册 + onended 自动回收
- * 8. 【神经童声引擎】晓依 zh-CN-XiaoyiNeural 经本地 voice-server(8766) 代理,
+ * 1. 六级总线管线Source  SubGain (×6)  CategoryGain (BGM/Voice/SFX)  DynamicsCompressor  MasterGain  Destination
+ * 2. Voice 5 子通道 + 优先级队列tutor(1) > eval(2) > char(3) > word(4) > sentence(5) — 高优打断低优 + resumeStack 弹栈恢复
+ * 3. 智能音频闪避 3 策略栈char_duck(-16.5dB) / tutor_duck(-12dB+SFX) / eval_duck(BGM=0) — 栈式 push/pop 无痕恢复
+ * 4. 全局 DR Compressor-24dB / 4:1 / knee 30 防 32 路并发削波
+ * 5. 程序化生成 BGM 引擎纯 Web Audio 实时合成五声童趣马林巴 9 场景 + 交叉淡入淡出
+ * 6. 立体声声像 Spatial Panning笔顺滑行左右声道 3D 渲染
+ * 7. 高并发复音池瞬时连击不吞音，节点注册 + onended 自动回收
+ * 8. 神经童声引擎晓晓 zh-CN-XiaoxiaoNeural 经本地 voice-server(8766) 代理,
  *    优先神经合成(96kbps + 子句并行),失败自动降级 speechSynthesis
  *
- * ⚠️ 向后兼容：所有旧 API (soundAndFX.speak / playJellyBoing / playBGM 等) 行为 100% 不变
+ * ️ 向后兼容：所有旧 API (soundAndFX.speak / playJellyBoing / playBGM 等) 行为 100% 不变
  *
  * 2026-09-01 R3 重建说明：本文件曾被外部操作回退为 343 行原始版，
- * 本版本基于会话内架构记忆 + 原始 SFX 实现完整重建（六级总线/优先级队列/闪避栈/神经集成）。
+ * 本版本基于会话内架构记忆 + 原始 SFX 实现完整重建（六级总线/优先级队列/闪避栈/神经集成）
  */
 
 import { EVENTS, eventBus } from "./eventBus.js";
 import { neuralVoice } from "./neuralVoice.js";
 
 // ============================================================
-// 0. 内部工具类：优先级队列、栈式闪避调度、节点注册表
+// 0. 内部工具类：优先级队列栈式闪避调度节点注册表
 // ============================================================
 
 /** 优先级语音队列项 */
@@ -110,6 +110,9 @@ class PrioritySpeechQueue {
         if (result.onEndPromise) {
           result.onEndPromise.then(({ interrupted }) => {
             this._finishCurrent(interrupted);
+          }).catch((err) => {
+            console.warn("[PSQ] onEndPromise rejected:", err);
+            this._finishCurrent(false);
           });
         }
       }
@@ -312,7 +315,7 @@ class CathyAudioEngine {
     this.isMuted = false;
     this.speechRate = 0.85;
 
-    // --- 神经童声 (晓依 zh-CN-XiaoyiNeural, 经 voice-server:8766 代理) ---
+    // --- 神经童声 (晓晓 zh-CN-XiaoxiaoNeural, 经 voice-server:8766 代理) ---
     // true: 优先神经童声, 不可用自动降级 speechSynthesis
     // AC 验收场景会临时置 false 以保证时序稳定 (见 audioIntegrationSuite)
     this.neuralVoiceEnabled = true;
@@ -447,7 +450,7 @@ class CathyAudioEngine {
   }
 
   /**
-   * 通用优先级 speak 入口。
+   * 通用优先级 speak 入口
    * @param {string} text
    * @param {{kind?:string, emotion?:string, pitchOffset?:number, rateMul?:number, duckStrategy?:string|null, onEnd?:Function, useNeural?:boolean}} opts
    */
@@ -576,7 +579,7 @@ class CathyAudioEngine {
               return await h.onEndPromise;
             }
           } catch (e) {
-            // neural 不可用 → 降级
+            // neural 不可用  降级
           }
         }
         if (cancelledEarly) return { interrupted: true };
@@ -598,6 +601,11 @@ class CathyAudioEngine {
           clearInterval(queueItem._progressTimer);
           ensureDuckPopped();
           return r;
+        }).catch((err) => {
+          clearInterval(queueItem._progressTimer);
+          ensureDuckPopped();
+          console.warn("[PSQ] onEndPromise cleanup error:", err);
+          return { interrupted: false };
         }),
       };
     };
@@ -631,9 +639,9 @@ class CathyAudioEngine {
   /** 根据文本关键词推断教学情绪; 无命中返回 neutral */
   _detectEmotion(text) {
     if (!text) return "neutral";
-    // 问号结尾 → 提问语气
+    // 问号结尾  提问语气
     if (/[?？]\s*$/.test(text.trim())) return "question";
-    // 感叹号 + 奖励词 → 更兴奋
+    // 感叹号 + 奖励词  更兴奋
     for (const rule of CathyAudioEngine.EMOTION_KEYWORDS) {
       for (const w of rule.words) {
         if (text.includes(w)) return rule.emotion;
@@ -715,11 +723,16 @@ class CathyAudioEngine {
     await new Promise(r => setTimeout(r, 320));
     push(`after bgm start: duck=[${snap().duckStack.join(',')}]`);
 
-    // 事件采集
+    // 事件采集（限制上限防止内存无限增长）
+    const MAX_EVENTS = 2000;
     const events = [];
-    const u1 = eventBus.on(EVENTS.AUDIO_QUEUE_INTERRUPT, (e) => events.push({ type: "interrupt", e }));
-    const u2 = eventBus.on(EVENTS.AUDIO_QUEUE_RESUME, (e) => events.push({ type: "resume", e }));
-    const u3 = eventBus.on(EVENTS.AUDIO_BUS_STATE_CHANGE, (e) => events.push({ type: "bus", cause: e.cause }));
+    const pushEvent = (ev) => {
+      if (events.length >= MAX_EVENTS) events.splice(0, events.length - MAX_EVENTS + 1);
+      events.push(ev);
+    };
+    const u1 = eventBus.on(EVENTS.AUDIO_QUEUE_INTERRUPT, (e) => pushEvent({ type: "interrupt", e }));
+    const u2 = eventBus.on(EVENTS.AUDIO_QUEUE_RESUME, (e) => pushEvent({ type: "resume", e }));
+    const u3 = eventBus.on(EVENTS.AUDIO_BUS_STATE_CHANGE, (e) => pushEvent({ type: "bus", cause: e.cause }));
 
     let wordEnded = false;
     let tutorEnded = false;
@@ -1021,7 +1034,7 @@ class CathyAudioEngine {
     });
   }
 
-  // 10. 成功答对音 (上行双音 C5→G5)
+  // 10. 成功答对音 (上行双音 C5G5)
   playSuccessSound() {
     this._tone({ type: "sine", from: 523.25, dur: 0.12, vol: 0.28 });
     this._tone({ type: "sine", from: 783.99, dur: 0.22, vol: 0.26, delay: 0.1 });
@@ -1063,6 +1076,12 @@ class CathyAudioEngine {
     src.connect(bp); bp.connect(gain); gain.connect(this._sfxOut());
     this.nodeRegistry.register(src, "sfx");
     src.start(now); src.stop(now + dur);
+  }
+
+  // 13.5 激光射击/射击气球音 (快速下行调频)
+  playLaserShoot() {
+    this._tone({ type: "sawtooth", from: 1200, to: 200, dur: 0.12, vol: 0.2 });
+    this._tone({ type: "sine", from: 800, to: 150, dur: 0.08, vol: 0.15 });
   }
 
   // 14. 攻击命中音 (方波打击)
@@ -1226,7 +1245,7 @@ class CathyAudioEngine {
     this.playCoinClink();
     for (let i = 0; i < count; i++) {
       const coin = document.createElement("div");
-      coin.textContent = "🪙";
+      coin.textContent = "";
       coin.style.cssText = `position:fixed;left:${startX}px;top:${startY}px;font-size:22px;pointer-events:none;z-index:60;transition:all .6s cubic-bezier(.22,.61,.36,1);opacity:1;`;
       document.body.appendChild(coin);
       requestAnimationFrame(() => {
