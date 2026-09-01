@@ -1,19 +1,48 @@
-const CACHE_NAME = "cathy-literacy-v2-7-1"; // 2026-09-01: 默认音色切换为晓晓·明亮少女
+// 版本号单一来源：注册 URL ?v= 由 index.html 从 version.js 注入
+const _ver = new URL(self.location.href).searchParams.get("v") || "2.7.3";
+const CACHE_NAME = `cathy-literacy-v${_ver.replace(/\./g, "-")}`; // 与 src/utils/version.js 的 CACHE_VERSION 对齐
 
 // 核心数据文件预缓存列表（install 阶段离线就绪）
 const CORE_ASSETS = [
   "./index.html",
-  "./style.css?v=2.7.0",
-  "./src/app.js?v=2.7.0",
+  `./style.css?v=${_ver}`,
+  `./src/app.js?v=${_ver}`,
   "./src/utils/eventBus.js",
   "./src/utils/storageManager.js",
+  "./src/utils/version.js",
   "./src/utils/soundEngine.js",
   "./src/utils/neuralVoice.js",
   "./src/utils/ebbinghaus.js",
   "./src/utils/hanziEngine.js",
   "./src/utils/gameIcons.js",
+  "./src/utils/pronunciationEval.js",
+  "./src/utils/readingModes.js",
+  "./src/utils/strokeVoiceSync.js",
+  "./src/utils/drillEngine.js",
+  "./src/utils/rewardEngine.js",
+  "./src/utils/bgmAndChant.js",
+  "./src/utils/dspChain.js",
+  "./src/utils/g2p.js",
+  "./src/utils/audioSafety.js",
+  "./src/utils/parentVoice.js",
+  "./src/utils/playSceneEngine.js",
   "./src/data/characters.js",
   "./src/data/books.js",
+  "./src/data/hanzi_strokes.js",
+  "./src/data/strokes_29.js",
+  "./src/data/idioms.js",
+  "./src/data/shop.js",
+  // 核心图片资源
+  "./assets/images/cathy_mascot.webp",
+  "./assets/images/cathy_world_map.webp",
+  "./assets/images/icon_star.webp",
+  "./assets/images/icon_coin.webp",
+  "./assets/images/icon_trophy.webp",
+  "./assets/images/icon_home.webp",
+  "./assets/images/icon_book.webp",
+  "./assets/images/icon_cards.webp",
+  "./assets/images/icon_pen.webp",
+  "./assets/images/icon_speaker.webp",
 ];
 
 // 静态资源走 Cache-First（离线秒开）
@@ -61,7 +90,7 @@ self.addEventListener("fetch", (event) => {
             }
             return networkResponse;
           })
-          .catch(() => caches.match("./index.html")); // 极端情况回退首页
+          .catch(() => caches.match("./index.html").then(res => res || new Response("Offline", { status: 503 }))); // 极端情况回退首页
       })
     );
   } else {
@@ -75,7 +104,7 @@ self.addEventListener("fetch", (event) => {
           }
           return networkResponse;
         })
-        .catch(() => caches.match(event.request))
+        .catch(() => caches.match(event.request).then(res => res || new Response("Offline", { status: 503 })))
     );
   }
 });
