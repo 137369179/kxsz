@@ -1435,6 +1435,6875 @@ export const CHARACTER_DATABASE = [
     ],
     confusingChars: ["丢", "法", "云", "支"]
   }
+,
+{
+  "id": "char_051",
+  "char": "春",
+  "pinyin": "chūn",
+  "pinyinTone": 1,
+  "oracleGlyph": "",
+  "bronzeGlyph": "春",
+  "radical": "日",
+  "strokeCount": 9,
+  "stage": 1,
+  "themeIsland": "forest",
+  "unitIndex": 14,
+  "levelIndex": 51,
+  "evolution": {
+    "story": "春的甲骨文像草木萌芽、阳光普照，象征春回大地，万物复苏",
+    "oracleDesc": "草木萌发沐浴阳光",
+    "bronzeDesc": "屯草与日字相合",
+    "sealDesc": "三横撇捺配日字",
+    "modernDesc": "三横一撇一捺一日九笔"
+  },
+  "words": [
+    {
+      "word": "春天",
+      "pinyin": "chūn tiān",
+      "desc": "四季之首温暖的季节"
+    },
+    {
+      "word": "春风",
+      "pinyin": "chūn fēng",
+      "desc": "春天温暖和煦的风"
+    },
+    {
+      "word": "立春",
+      "pinyin": "lì chūn",
+      "desc": "春季开始的节气"
+    }
+  ],
+  "sentence": "温暖的春天来到了，花儿朵朵盛开，小鸟在枝头唱歌。",
+  "gameConfig": {
+    "type": "balloon_pop",
+    "title": "找春字气球",
+    "instruction": "点击读音为'chūn'的气球！",
+    "options": [
+      "春",
+      "日",
+      "天",
+      "草"
+    ],
+    "correctIndex": 0
+  },
+  "strokes": [
+    {
+      "name": "横",
+      "order": 1,
+      "path": "M 28,25 L 72,25",
+      "start": {
+        "x": 28,
+        "y": 25
+      },
+      "end": {
+        "x": 72,
+        "y": 25
+      }
+    },
+    {
+      "name": "横",
+      "order": 2,
+      "path": "M 32,35 L 68,35",
+      "start": {
+        "x": 32,
+        "y": 35
+      },
+      "end": {
+        "x": 68,
+        "y": 35
+      }
+    },
+    {
+      "name": "横",
+      "order": 3,
+      "path": "M 18,45 L 82,45",
+      "start": {
+        "x": 18,
+        "y": 45
+      },
+      "end": {
+        "x": 82,
+        "y": 45
+      }
+    },
+    {
+      "name": "撇",
+      "order": 4,
+      "path": "M 50,15 L 20,70",
+      "start": {
+        "x": 50,
+        "y": 15
+      },
+      "end": {
+        "x": 20,
+        "y": 70
+      }
+    },
+    {
+      "name": "捺",
+      "order": 5,
+      "path": "M 48,45 L 82,70",
+      "start": {
+        "x": 48,
+        "y": 45
+      },
+      "end": {
+        "x": 82,
+        "y": 70
+      }
+    },
+    {
+      "name": "竖",
+      "order": 6,
+      "path": "M 35,58 L 35,88",
+      "start": {
+        "x": 35,
+        "y": 58
+      },
+      "end": {
+        "x": 35,
+        "y": 88
+      }
+    },
+    {
+      "name": "横折",
+      "order": 7,
+      "path": "M 35,58 L 65,58 L 65,88",
+      "start": {
+        "x": 35,
+        "y": 58
+      },
+      "end": {
+        "x": 65,
+        "y": 88
+      },
+      "corner": {
+        "x": 65,
+        "y": 58
+      }
+    },
+    {
+      "name": "横",
+      "order": 8,
+      "path": "M 35,72 L 65,72",
+      "start": {
+        "x": 35,
+        "y": 72
+      },
+      "end": {
+        "x": 65,
+        "y": 72
+      }
+    },
+    {
+      "name": "横",
+      "order": 9,
+      "path": "M 35,88 L 65,88",
+      "start": {
+        "x": 35,
+        "y": 88
+      },
+      "end": {
+        "x": 65,
+        "y": 88
+      }
+    }
+  ],
+  "confusingChars": [
+    "看",
+    "青",
+    "香",
+    "泰"
+  ]
+},
+{
+  "id": "char_052",
+  "char": "夏",
+  "pinyin": "xià",
+  "pinyinTone": 4,
+  "oracleGlyph": "",
+  "bronzeGlyph": "夏",
+  "radical": "夂",
+  "strokeCount": 10,
+  "stage": 1,
+  "themeIsland": "forest",
+  "unitIndex": 14,
+  "levelIndex": 52,
+  "evolution": {
+    "story": "夏的甲骨文像一个手舞足蹈、头戴盛冠的人在欢庆盛夏丰收",
+    "oracleDesc": "头戴盛冠起舞的人",
+    "bronzeDesc": "大头双手双足分明",
+    "sealDesc": "上百下夂相连",
+    "modernDesc": "横竖横折横横撇横撇捺十笔"
+  },
+  "words": [
+    {
+      "word": "夏天",
+      "pinyin": "xià tiān",
+      "desc": "阳光炽热草木繁茂的季节"
+    },
+    {
+      "word": "立夏",
+      "pinyin": "lì xià",
+      "desc": "夏季开始的节气"
+    },
+    {
+      "word": "盛夏",
+      "pinyin": "shèng xià",
+      "desc": "炎热夏天的最顶峰"
+    }
+  ],
+  "sentence": "炎热的夏天，小朋友们在树荫下吃冰甜的大西瓜。",
+  "gameConfig": {
+    "type": "balloon_pop",
+    "title": "找夏字气球",
+    "instruction": "点击读音为'xià'的气球！",
+    "options": [
+      "夏",
+      "复",
+      "冬",
+      "秋"
+    ],
+    "correctIndex": 0
+  },
+  "strokes": [
+    {
+      "name": "横",
+      "order": 1,
+      "path": "M 25,20 L 75,20",
+      "start": {
+        "x": 25,
+        "y": 20
+      },
+      "end": {
+        "x": 75,
+        "y": 20
+      }
+    },
+    {
+      "name": "竖",
+      "order": 2,
+      "path": "M 35,20 L 35,48",
+      "start": {
+        "x": 35,
+        "y": 20
+      },
+      "end": {
+        "x": 35,
+        "y": 48
+      }
+    },
+    {
+      "name": "横折",
+      "order": 3,
+      "path": "M 35,28 L 68,28 L 68,48",
+      "start": {
+        "x": 35,
+        "y": 28
+      },
+      "end": {
+        "x": 68,
+        "y": 48
+      },
+      "corner": {
+        "x": 68,
+        "y": 28
+      }
+    },
+    {
+      "name": "横",
+      "order": 4,
+      "path": "M 35,38 L 68,38",
+      "start": {
+        "x": 35,
+        "y": 38
+      },
+      "end": {
+        "x": 68,
+        "y": 38
+      }
+    },
+    {
+      "name": "横",
+      "order": 5,
+      "path": "M 35,48 L 68,48",
+      "start": {
+        "x": 35,
+        "y": 48
+      },
+      "end": {
+        "x": 68,
+        "y": 48
+      }
+    },
+    {
+      "name": "撇",
+      "order": 6,
+      "path": "M 40,48 L 18,70",
+      "start": {
+        "x": 40,
+        "y": 48
+      },
+      "end": {
+        "x": 18,
+        "y": 70
+      }
+    },
+    {
+      "name": "横撇",
+      "order": 7,
+      "path": "M 35,62 L 72,62 L 45,78",
+      "start": {
+        "x": 35,
+        "y": 62
+      },
+      "end": {
+        "x": 45,
+        "y": 78
+      },
+      "corner": {
+        "x": 72,
+        "y": 62
+      }
+    },
+    {
+      "name": "捺",
+      "order": 8,
+      "path": "M 45,65 L 82,90",
+      "start": {
+        "x": 45,
+        "y": 65
+      },
+      "end": {
+        "x": 82,
+        "y": 90
+      }
+    }
+  ],
+  "confusingChars": [
+    "复",
+    "冬",
+    "秋",
+    "自"
+  ]
+},
+{
+  "id": "char_053",
+  "char": "秋",
+  "pinyin": "qiū",
+  "pinyinTone": 1,
+  "oracleGlyph": "",
+  "bronzeGlyph": "秋",
+  "radical": "禾",
+  "strokeCount": 9,
+  "stage": 1,
+  "themeIsland": "forest",
+  "unitIndex": 14,
+  "levelIndex": 53,
+  "evolution": {
+    "story": "秋由禾和火组成，代表庄稼成熟金黄，到了秋收烤谷的时节",
+    "oracleDesc": "禾苗与蟋蟀昆虫",
+    "bronzeDesc": "左禾右火成形",
+    "sealDesc": "禾火左右平分",
+    "modernDesc": "左禾右火九笔"
+  },
+  "words": [
+    {
+      "word": "秋天",
+      "pinyin": "qiū tiān",
+      "desc": "金风送爽瓜果飘香的季节"
+    },
+    {
+      "word": "秋风",
+      "pinyin": "qiū fēng",
+      "desc": "秋季凉爽的风"
+    },
+    {
+      "word": "秋收",
+      "pinyin": "qiū shōu",
+      "desc": "秋季收获成熟的庄稼"
+    }
+  ],
+  "sentence": "美丽的秋天到了，树叶变黄了，果园里挂满了红苹果。",
+  "gameConfig": {
+    "type": "balloon_pop",
+    "title": "找秋字气球",
+    "instruction": "点击读音为'qiū'的气球！",
+    "options": [
+      "秋",
+      "禾",
+      "和",
+      "火"
+    ],
+    "correctIndex": 0
+  },
+  "strokes": [
+    {
+      "name": "撇",
+      "order": 1,
+      "path": "M 38,18 L 18,28",
+      "start": {
+        "x": 38,
+        "y": 18
+      },
+      "end": {
+        "x": 18,
+        "y": 28
+      }
+    },
+    {
+      "name": "横",
+      "order": 2,
+      "path": "M 12,42 L 48,42",
+      "start": {
+        "x": 12,
+        "y": 42
+      },
+      "end": {
+        "x": 48,
+        "y": 42
+      }
+    },
+    {
+      "name": "竖",
+      "order": 3,
+      "path": "M 30,22 L 30,85",
+      "start": {
+        "x": 30,
+        "y": 22
+      },
+      "end": {
+        "x": 30,
+        "y": 85
+      }
+    },
+    {
+      "name": "撇",
+      "order": 4,
+      "path": "M 30,42 L 12,65",
+      "start": {
+        "x": 30,
+        "y": 42
+      },
+      "end": {
+        "x": 12,
+        "y": 65
+      }
+    },
+    {
+      "name": "点",
+      "order": 5,
+      "path": "M 30,45 L 45,60",
+      "start": {
+        "x": 30,
+        "y": 45
+      },
+      "end": {
+        "x": 45,
+        "y": 60
+      }
+    },
+    {
+      "name": "点",
+      "order": 6,
+      "path": "M 58,35 L 52,48",
+      "start": {
+        "x": 58,
+        "y": 35
+      },
+      "end": {
+        "x": 52,
+        "y": 48
+      }
+    },
+    {
+      "name": "撇",
+      "order": 7,
+      "path": "M 82,30 L 72,48",
+      "start": {
+        "x": 82,
+        "y": 30
+      },
+      "end": {
+        "x": 72,
+        "y": 48
+      }
+    },
+    {
+      "name": "撇",
+      "order": 8,
+      "path": "M 68,22 L 52,88",
+      "start": {
+        "x": 68,
+        "y": 22
+      },
+      "end": {
+        "x": 52,
+        "y": 88
+      }
+    },
+    {
+      "name": "捺",
+      "order": 9,
+      "path": "M 68,52 L 88,88",
+      "start": {
+        "x": 68,
+        "y": 52
+      },
+      "end": {
+        "x": 88,
+        "y": 88
+      }
+    }
+  ],
+  "confusingChars": [
+    "和",
+    "种",
+    "伙",
+    "禾"
+  ]
+},
+{
+  "id": "char_054",
+  "char": "冬",
+  "pinyin": "dōng",
+  "pinyinTone": 1,
+  "oracleGlyph": "",
+  "bronzeGlyph": "冬",
+  "radical": "夂",
+  "strokeCount": 5,
+  "stage": 1,
+  "themeIsland": "forest",
+  "unitIndex": 14,
+  "levelIndex": 54,
+  "evolution": {
+    "story": "冬的甲骨文像一根绳子的末端打着结，表示一年的终点与寒冬",
+    "oracleDesc": "绳索末端系结",
+    "bronzeDesc": "上下相连终结",
+    "sealDesc": "夂字配冰点",
+    "modernDesc": "撇横撇捺点点五笔"
+  },
+  "words": [
+    {
+      "word": "冬天",
+      "pinyin": "dōng tiān",
+      "desc": "下雪结冰寒冷的季节"
+    },
+    {
+      "word": "冬眠",
+      "pinyin": "dōng mián",
+      "desc": "动物在冬天睡觉休眠"
+    },
+    {
+      "word": "立冬",
+      "pinyin": "lì dōng",
+      "desc": "冬季开始的节气"
+    }
+  ],
+  "sentence": "白茫茫的冬天来了，小朋友们在雪地上开心地堆雪人。",
+  "gameConfig": {
+    "type": "balloon_pop",
+    "title": "找冬字气球",
+    "instruction": "点击读音为'dōng'的气球！",
+    "options": [
+      "冬",
+      "终",
+      "东",
+      "条"
+    ],
+    "correctIndex": 0
+  },
+  "strokes": [
+    {
+      "name": "撇",
+      "order": 1,
+      "path": "M 48,15 L 28,35",
+      "start": {
+        "x": 48,
+        "y": 15
+      },
+      "end": {
+        "x": 28,
+        "y": 35
+      }
+    },
+    {
+      "name": "横撇",
+      "order": 2,
+      "path": "M 28,35 L 75,35 L 42,58",
+      "start": {
+        "x": 28,
+        "y": 35
+      },
+      "end": {
+        "x": 42,
+        "y": 58
+      },
+      "corner": {
+        "x": 75,
+        "y": 35
+      }
+    },
+    {
+      "name": "捺",
+      "order": 3,
+      "path": "M 40,40 L 80,68",
+      "start": {
+        "x": 40,
+        "y": 40
+      },
+      "end": {
+        "x": 80,
+        "y": 68
+      }
+    },
+    {
+      "name": "点",
+      "order": 4,
+      "path": "M 42,72 L 45,80",
+      "start": {
+        "x": 42,
+        "y": 72
+      },
+      "end": {
+        "x": 45,
+        "y": 80
+      }
+    },
+    {
+      "name": "点",
+      "order": 5,
+      "path": "M 58,78 L 62,88",
+      "start": {
+        "x": 58,
+        "y": 78
+      },
+      "end": {
+        "x": 62,
+        "y": 88
+      }
+    }
+  ],
+  "confusingChars": [
+    "东",
+    "处",
+    "条",
+    "终"
+  ]
+},
+{
+  "id": "char_055",
+  "char": "红",
+  "pinyin": "hóng",
+  "pinyinTone": 2,
+  "oracleGlyph": "",
+  "bronzeGlyph": "红",
+  "radical": "纟",
+  "strokeCount": 6,
+  "stage": 1,
+  "themeIsland": "forest",
+  "unitIndex": 14,
+  "levelIndex": 55,
+  "evolution": {
+    "story": "红由纟和工组成，纟代表丝线，古代用赤色染丝称作红",
+    "oracleDesc": "丝线染色之状",
+    "bronzeDesc": "纟工左右分明",
+    "sealDesc": "繁体紅字",
+    "modernDesc": "绞丝工字六笔"
+  },
+  "words": [
+    {
+      "word": "红色",
+      "pinyin": "hóng sè",
+      "desc": "鲜艳如火的颜色"
+    },
+    {
+      "word": "红花",
+      "pinyin": "hóng huā",
+      "desc": "红色的花朵"
+    },
+    {
+      "word": "红日",
+      "pinyin": "hóng rì",
+      "desc": "升起的红太阳"
+    }
+  ],
+  "sentence": "小红戴着鲜艳的红领巾，高高兴兴去上学。",
+  "gameConfig": {
+    "type": "balloon_pop",
+    "title": "找红字气球",
+    "instruction": "点击读音为'hóng'的气球！",
+    "options": [
+      "红",
+      "江",
+      "级",
+      "绿"
+    ],
+    "correctIndex": 0
+  },
+  "strokes": [
+    {
+      "name": "撇折",
+      "order": 1,
+      "path": "M 30,20 L 18,42 L 35,42",
+      "start": {
+        "x": 30,
+        "y": 20
+      },
+      "end": {
+        "x": 35,
+        "y": 42
+      },
+      "corner": {
+        "x": 18,
+        "y": 42
+      }
+    },
+    {
+      "name": "撇折",
+      "order": 2,
+      "path": "M 35,38 L 15,62 L 38,62",
+      "start": {
+        "x": 35,
+        "y": 38
+      },
+      "end": {
+        "x": 38,
+        "y": 62
+      },
+      "corner": {
+        "x": 15,
+        "y": 62
+      }
+    },
+    {
+      "name": "提",
+      "order": 3,
+      "path": "M 22,82 L 40,68",
+      "start": {
+        "x": 22,
+        "y": 82
+      },
+      "end": {
+        "x": 40,
+        "y": 68
+      }
+    },
+    {
+      "name": "横",
+      "order": 4,
+      "path": "M 50,30 L 85,30",
+      "start": {
+        "x": 50,
+        "y": 30
+      },
+      "end": {
+        "x": 85,
+        "y": 30
+      }
+    },
+    {
+      "name": "竖",
+      "order": 5,
+      "path": "M 68,30 L 68,80",
+      "start": {
+        "x": 68,
+        "y": 30
+      },
+      "end": {
+        "x": 68,
+        "y": 80
+      }
+    },
+    {
+      "name": "横",
+      "order": 6,
+      "path": "M 45,80 L 90,80",
+      "start": {
+        "x": 45,
+        "y": 80
+      },
+      "end": {
+        "x": 90,
+        "y": 80
+      }
+    }
+  ],
+  "confusingChars": [
+    "江",
+    "级",
+    "纪",
+    "工"
+  ]
+},
+{
+  "id": "char_056",
+  "char": "绿",
+  "pinyin": "lǜ",
+  "pinyinTone": 4,
+  "oracleGlyph": "",
+  "bronzeGlyph": "绿",
+  "radical": "纟",
+  "strokeCount": 11,
+  "stage": 1,
+  "themeIsland": "forest",
+  "unitIndex": 15,
+  "levelIndex": 56,
+  "evolution": {
+    "story": "绿由纟和录组成，像用草木染出青绿色的生机丝线",
+    "oracleDesc": "草木染青绿丝线",
+    "bronzeDesc": "左右结构完备",
+    "sealDesc": "纟录两体",
+    "modernDesc": "绞丝录旁十一笔"
+  },
+  "words": [
+    {
+      "word": "绿色",
+      "pinyin": "lǜ sè",
+      "desc": "如春草般生机盎然的颜色"
+    },
+    {
+      "word": "绿叶",
+      "pinyin": "lǜ yè",
+      "desc": "植物绿色的叶片"
+    },
+    {
+      "word": "碧绿",
+      "pinyin": "bì lǜ",
+      "desc": "青绿晶莹如玉石"
+    }
+  ],
+  "sentence": "山坡上长满了碧绿的小草，大自然真美丽！",
+  "gameConfig": {
+    "type": "balloon_pop",
+    "title": "找绿字气球",
+    "instruction": "点击读音为'lǜ'的气球！",
+    "options": [
+      "绿",
+      "红",
+      "录",
+      "缘"
+    ],
+    "correctIndex": 0
+  },
+  "strokes": [
+    {
+      "name": "撇折",
+      "order": 1,
+      "path": "M 28,18 L 18,38 L 32,38",
+      "start": {
+        "x": 28,
+        "y": 18
+      },
+      "end": {
+        "x": 32,
+        "y": 38
+      },
+      "corner": {
+        "x": 18,
+        "y": 38
+      }
+    },
+    {
+      "name": "撇折",
+      "order": 2,
+      "path": "M 32,35 L 15,55 L 35,55",
+      "start": {
+        "x": 32,
+        "y": 35
+      },
+      "end": {
+        "x": 35,
+        "y": 55
+      },
+      "corner": {
+        "x": 15,
+        "y": 55
+      }
+    },
+    {
+      "name": "提",
+      "order": 3,
+      "path": "M 20,78 L 38,62",
+      "start": {
+        "x": 20,
+        "y": 78
+      },
+      "end": {
+        "x": 38,
+        "y": 62
+      }
+    },
+    {
+      "name": "横折",
+      "order": 4,
+      "path": "M 48,22 L 80,22 L 80,38",
+      "start": {
+        "x": 48,
+        "y": 22
+      },
+      "end": {
+        "x": 80,
+        "y": 38
+      },
+      "corner": {
+        "x": 80,
+        "y": 22
+      }
+    },
+    {
+      "name": "横",
+      "order": 5,
+      "path": "M 48,38 L 80,38",
+      "start": {
+        "x": 48,
+        "y": 38
+      },
+      "end": {
+        "x": 80,
+        "y": 38
+      }
+    },
+    {
+      "name": "横",
+      "order": 6,
+      "path": "M 45,50 L 85,50",
+      "start": {
+        "x": 45,
+        "y": 50
+      },
+      "end": {
+        "x": 85,
+        "y": 50
+      }
+    },
+    {
+      "name": "竖钩",
+      "order": 7,
+      "path": "M 65,50 L 65,88 L 58,80",
+      "start": {
+        "x": 65,
+        "y": 50
+      },
+      "end": {
+        "x": 58,
+        "y": 80
+      }
+    },
+    {
+      "name": "点",
+      "order": 8,
+      "path": "M 52,62 L 48,72",
+      "start": {
+        "x": 52,
+        "y": 62
+      },
+      "end": {
+        "x": 48,
+        "y": 72
+      }
+    },
+    {
+      "name": "提",
+      "order": 9,
+      "path": "M 45,82 L 58,75",
+      "start": {
+        "x": 45,
+        "y": 82
+      },
+      "end": {
+        "x": 58,
+        "y": 75
+      }
+    },
+    {
+      "name": "撇",
+      "order": 10,
+      "path": "M 78,60 L 72,70",
+      "start": {
+        "x": 78,
+        "y": 60
+      },
+      "end": {
+        "x": 72,
+        "y": 70
+      }
+    },
+    {
+      "name": "点",
+      "order": 11,
+      "path": "M 75,75 L 85,85",
+      "start": {
+        "x": 75,
+        "y": 75
+      },
+      "end": {
+        "x": 85,
+        "y": 85
+      }
+    }
+  ],
+  "confusingChars": [
+    "录",
+    "缘",
+    "绝",
+    "绍"
+  ]
+},
+{
+  "id": "char_057",
+  "char": "蓝",
+  "pinyin": "lán",
+  "pinyinTone": 2,
+  "oracleGlyph": "",
+  "bronzeGlyph": "蓝",
+  "radical": "艹",
+  "strokeCount": 13,
+  "stage": 1,
+  "themeIsland": "forest",
+  "unitIndex": 15,
+  "levelIndex": 57,
+  "evolution": {
+    "story": "蓝由艹和监组成，古代用蓼蓝草浸水提取纯净青蓝色",
+    "oracleDesc": "蓼蓝草萃取青色",
+    "bronzeDesc": "艹草配监皿",
+    "sealDesc": "繁体藍字",
+    "modernDesc": "草字头监字底十三笔"
+  },
+  "words": [
+    {
+      "word": "蓝天",
+      "pinyin": "lán tiān",
+      "desc": "晴朗无云的蔚蓝色天空"
+    },
+    {
+      "word": "蓝色",
+      "pinyin": "lán sè",
+      "desc": "如天空海洋般的颜色"
+    },
+    {
+      "word": "大海蓝",
+      "pinyin": "dà hǎi lán",
+      "desc": "深邃广阔的蓝色"
+    }
+  ],
+  "sentence": "白云在蔚蓝的天空中自由自在地飘荡。",
+  "gameConfig": {
+    "type": "balloon_pop",
+    "title": "找蓝字气球",
+    "instruction": "点击读音为'lán'的气球！",
+    "options": [
+      "蓝",
+      "篮",
+      "草",
+      "天"
+    ],
+    "correctIndex": 0
+  },
+  "strokes": [
+    {
+      "name": "横",
+      "order": 1,
+      "path": "M 20,20 L 80,20",
+      "start": {
+        "x": 20,
+        "y": 20
+      },
+      "end": {
+        "x": 80,
+        "y": 20
+      }
+    },
+    {
+      "name": "竖",
+      "order": 2,
+      "path": "M 35,12 L 35,28",
+      "start": {
+        "x": 35,
+        "y": 12
+      },
+      "end": {
+        "x": 35,
+        "y": 28
+      }
+    },
+    {
+      "name": "竖",
+      "order": 3,
+      "path": "M 65,12 L 65,28",
+      "start": {
+        "x": 65,
+        "y": 12
+      },
+      "end": {
+        "x": 65,
+        "y": 28
+      }
+    },
+    {
+      "name": "竖",
+      "order": 4,
+      "path": "M 30,35 L 30,62",
+      "start": {
+        "x": 30,
+        "y": 35
+      },
+      "end": {
+        "x": 30,
+        "y": 62
+      }
+    },
+    {
+      "name": "横折",
+      "order": 5,
+      "path": "M 30,35 L 55,35 L 55,62",
+      "start": {
+        "x": 30,
+        "y": 35
+      },
+      "end": {
+        "x": 55,
+        "y": 62
+      },
+      "corner": {
+        "x": 55,
+        "y": 35
+      }
+    },
+    {
+      "name": "横",
+      "order": 6,
+      "path": "M 30,48 L 55,48",
+      "start": {
+        "x": 30,
+        "y": 48
+      },
+      "end": {
+        "x": 55,
+        "y": 48
+      }
+    },
+    {
+      "name": "横",
+      "order": 7,
+      "path": "M 30,62 L 55,62",
+      "start": {
+        "x": 30,
+        "y": 62
+      },
+      "end": {
+        "x": 55,
+        "y": 62
+      }
+    },
+    {
+      "name": "撇",
+      "order": 8,
+      "path": "M 72,32 L 62,48",
+      "start": {
+        "x": 72,
+        "y": 32
+      },
+      "end": {
+        "x": 62,
+        "y": 48
+      }
+    },
+    {
+      "name": "横",
+      "order": 9,
+      "path": "M 60,48 L 85,48",
+      "start": {
+        "x": 60,
+        "y": 48
+      },
+      "end": {
+        "x": 85,
+        "y": 48
+      }
+    },
+    {
+      "name": "竖",
+      "order": 10,
+      "path": "M 25,68 L 25,90",
+      "start": {
+        "x": 25,
+        "y": 68
+      },
+      "end": {
+        "x": 25,
+        "y": 90
+      }
+    },
+    {
+      "name": "横折",
+      "order": 11,
+      "path": "M 25,68 L 78,68 L 78,90",
+      "start": {
+        "x": 25,
+        "y": 68
+      },
+      "end": {
+        "x": 78,
+        "y": 90
+      },
+      "corner": {
+        "x": 78,
+        "y": 68
+      }
+    },
+    {
+      "name": "竖",
+      "order": 12,
+      "path": "M 45,72 L 45,88",
+      "start": {
+        "x": 45,
+        "y": 72
+      },
+      "end": {
+        "x": 45,
+        "y": 88
+      }
+    },
+    {
+      "name": "横",
+      "order": 13,
+      "path": "M 18,90 L 85,90",
+      "start": {
+        "x": 18,
+        "y": 90
+      },
+      "end": {
+        "x": 85,
+        "y": 90
+      }
+    }
+  ],
+  "confusingChars": [
+    "篮",
+    "监",
+    "落",
+    "草"
+  ]
+},
+{
+  "id": "char_058",
+  "char": "黄",
+  "pinyin": "huáng",
+  "pinyinTone": 2,
+  "oracleGlyph": "",
+  "bronzeGlyph": "黄",
+  "radical": "黄",
+  "strokeCount": 11,
+  "stage": 1,
+  "themeIsland": "forest",
+  "unitIndex": 15,
+  "levelIndex": 58,
+  "evolution": {
+    "story": "黄的甲骨文像人胸前佩戴一块温润金黄的玉璧",
+    "oracleDesc": "佩戴黄色玉璧之人",
+    "bronzeDesc": "玉璧与佩饰分明",
+    "sealDesc": "草部光彩照人",
+    "modernDesc": "横竖竖横竖横折横竖横八十一笔"
+  },
+  "words": [
+    {
+      "word": "黄色",
+      "pinyin": "huáng sè",
+      "desc": "如阳光和金子般的颜色"
+    },
+    {
+      "word": "金黄",
+      "pinyin": "jīn huáng",
+      "desc": "闪耀金色光芒的黄色"
+    },
+    {
+      "word": "黄叶",
+      "pinyin": "huáng yè",
+      "desc": "秋天飘落的黄叶片"
+    }
+  ],
+  "sentence": "秋风吹过，田野里翻滚着金黄色的麦浪。",
+  "gameConfig": {
+    "type": "balloon_pop",
+    "title": "找黄字气球",
+    "instruction": "点击读音为'huáng'的气球！",
+    "options": [
+      "黄",
+      "金",
+      "广",
+      "草"
+    ],
+    "correctIndex": 0
+  },
+  "strokes": [
+    {
+      "name": "横",
+      "order": 1,
+      "path": "M 25,20 L 75,20",
+      "start": {
+        "x": 25,
+        "y": 20
+      },
+      "end": {
+        "x": 75,
+        "y": 20
+      }
+    },
+    {
+      "name": "竖",
+      "order": 2,
+      "path": "M 38,12 L 38,28",
+      "start": {
+        "x": 38,
+        "y": 12
+      },
+      "end": {
+        "x": 38,
+        "y": 28
+      }
+    },
+    {
+      "name": "竖",
+      "order": 3,
+      "path": "M 62,12 L 62,28",
+      "start": {
+        "x": 62,
+        "y": 12
+      },
+      "end": {
+        "x": 62,
+        "y": 28
+      }
+    },
+    {
+      "name": "横",
+      "order": 4,
+      "path": "M 18,35 L 82,35",
+      "start": {
+        "x": 18,
+        "y": 35
+      },
+      "end": {
+        "x": 82,
+        "y": 35
+      }
+    },
+    {
+      "name": "竖",
+      "order": 5,
+      "path": "M 32,35 L 32,60",
+      "start": {
+        "x": 32,
+        "y": 35
+      },
+      "end": {
+        "x": 32,
+        "y": 60
+      }
+    },
+    {
+      "name": "横折",
+      "order": 6,
+      "path": "M 32,45 L 68,45 L 68,60",
+      "start": {
+        "x": 32,
+        "y": 45
+      },
+      "end": {
+        "x": 68,
+        "y": 60
+      },
+      "corner": {
+        "x": 68,
+        "y": 45
+      }
+    },
+    {
+      "name": "横",
+      "order": 7,
+      "path": "M 32,60 L 68,60",
+      "start": {
+        "x": 32,
+        "y": 60
+      },
+      "end": {
+        "x": 68,
+        "y": 60
+      }
+    },
+    {
+      "name": "竖",
+      "order": 8,
+      "path": "M 50,35 L 50,75",
+      "start": {
+        "x": 50,
+        "y": 35
+      },
+      "end": {
+        "x": 50,
+        "y": 75
+      }
+    },
+    {
+      "name": "横",
+      "order": 9,
+      "path": "M 20,75 L 80,75",
+      "start": {
+        "x": 20,
+        "y": 75
+      },
+      "end": {
+        "x": 80,
+        "y": 75
+      }
+    },
+    {
+      "name": "撇",
+      "order": 10,
+      "path": "M 38,78 L 25,92",
+      "start": {
+        "x": 38,
+        "y": 78
+      },
+      "end": {
+        "x": 25,
+        "y": 92
+      }
+    },
+    {
+      "name": "点",
+      "order": 11,
+      "path": "M 62,78 L 75,92",
+      "start": {
+        "x": 62,
+        "y": 78
+      },
+      "end": {
+        "x": 75,
+        "y": 92
+      }
+    }
+  ],
+  "confusingChars": [
+    "共",
+    "革",
+    "苗",
+    "草"
+  ]
+},
+{
+  "id": "char_059",
+  "char": "白",
+  "pinyin": "bái",
+  "pinyinTone": 2,
+  "oracleGlyph": "",
+  "bronzeGlyph": "白",
+  "radical": "白",
+  "strokeCount": 5,
+  "stage": 1,
+  "themeIsland": "forest",
+  "unitIndex": 15,
+  "levelIndex": 59,
+  "evolution": {
+    "story": "白的甲骨文像一粒饱满晶莹、露出雪白胚芽的白米",
+    "oracleDesc": "晶莹雪白的米粒",
+    "bronzeDesc": "光芒外射之形",
+    "sealDesc": "上撇下日形",
+    "modernDesc": "撇竖横折横横五笔"
+  },
+  "words": [
+    {
+      "word": "白云",
+      "pinyin": "bái yún",
+      "desc": "天空洁白的云彩"
+    },
+    {
+      "word": "雪白",
+      "pinyin": "xuě bái",
+      "desc": "像雪花一样纯洁洁白"
+    },
+    {
+      "word": "白天",
+      "pinyin": "bái tiān",
+      "desc": "太阳升起光明的时刻"
+    }
+  ],
+  "sentence": "蓝蓝的天空上飘着几朵像棉花糖一样的白云。",
+  "gameConfig": {
+    "type": "balloon_pop",
+    "title": "找白字气球",
+    "instruction": "点击读音为'bái'的气球！",
+    "options": [
+      "白",
+      "日",
+      "百",
+      "自"
+    ],
+    "correctIndex": 0
+  },
+  "strokes": [
+    {
+      "name": "撇",
+      "order": 1,
+      "path": "M 50,15 L 42,32",
+      "start": {
+        "x": 50,
+        "y": 15
+      },
+      "end": {
+        "x": 42,
+        "y": 32
+      }
+    },
+    {
+      "name": "竖",
+      "order": 2,
+      "path": "M 30,32 L 30,85",
+      "start": {
+        "x": 30,
+        "y": 32
+      },
+      "end": {
+        "x": 30,
+        "y": 85
+      }
+    },
+    {
+      "name": "横折",
+      "order": 3,
+      "path": "M 30,32 L 72,32 L 72,85",
+      "start": {
+        "x": 30,
+        "y": 32
+      },
+      "end": {
+        "x": 72,
+        "y": 85
+      },
+      "corner": {
+        "x": 72,
+        "y": 32
+      }
+    },
+    {
+      "name": "横",
+      "order": 4,
+      "path": "M 30,58 L 72,58",
+      "start": {
+        "x": 30,
+        "y": 58
+      },
+      "end": {
+        "x": 72,
+        "y": 58
+      }
+    },
+    {
+      "name": "横",
+      "order": 5,
+      "path": "M 30,85 L 72,85",
+      "start": {
+        "x": 30,
+        "y": 85
+      },
+      "end": {
+        "x": 72,
+        "y": 85
+      }
+    }
+  ],
+  "confusingChars": [
+    "日",
+    "自",
+    "百",
+    "目"
+  ]
+},
+{
+  "id": "char_060",
+  "char": "黑",
+  "pinyin": "hēi",
+  "pinyinTone": 1,
+  "oracleGlyph": "",
+  "bronzeGlyph": "黑",
+  "radical": "黑",
+  "strokeCount": 12,
+  "stage": 1,
+  "themeIsland": "forest",
+  "unitIndex": 15,
+  "levelIndex": 60,
+  "evolution": {
+    "story": "黑的甲骨文像一个人在烟囱火灶旁被煤烟熏黑了脸面",
+    "oracleDesc": "被灶烟熏黑的人",
+    "bronzeDesc": "上里下火形",
+    "sealDesc": "上里下四点底",
+    "modernDesc": "里字头四点底十二笔"
+  },
+  "words": [
+    {
+      "word": "黑色",
+      "pinyin": "hēi sè",
+      "desc": "如墨水和夜空般的颜色"
+    },
+    {
+      "word": "黑夜",
+      "pinyin": "hēi yè",
+      "desc": "没有太阳的深邃夜晚"
+    },
+    {
+      "word": "黑板",
+      "pinyin": "hēi bǎn",
+      "desc": "教室里老师写字的板"
+    }
+  ],
+  "sentence": "黑夜里，无数闪亮的小星星在天空眨眼睛。",
+  "gameConfig": {
+    "type": "balloon_pop",
+    "title": "找黑字气球",
+    "instruction": "点击读音为'hēi'的气球！",
+    "options": [
+      "黑",
+      "墨",
+      "里",
+      "点"
+    ],
+    "correctIndex": 0
+  },
+  "strokes": [
+    {
+      "name": "竖",
+      "order": 1,
+      "path": "M 32,20 L 32,48",
+      "start": {
+        "x": 32,
+        "y": 20
+      },
+      "end": {
+        "x": 32,
+        "y": 48
+      }
+    },
+    {
+      "name": "横折",
+      "order": 2,
+      "path": "M 32,20 L 70,20 L 70,48",
+      "start": {
+        "x": 32,
+        "y": 20
+      },
+      "end": {
+        "x": 70,
+        "y": 48
+      },
+      "corner": {
+        "x": 70,
+        "y": 20
+      }
+    },
+    {
+      "name": "点",
+      "order": 3,
+      "path": "M 42,28 L 45,35",
+      "start": {
+        "x": 42,
+        "y": 28
+      },
+      "end": {
+        "x": 45,
+        "y": 35
+      }
+    },
+    {
+      "name": "撇",
+      "order": 4,
+      "path": "M 60,28 L 57,35",
+      "start": {
+        "x": 60,
+        "y": 28
+      },
+      "end": {
+        "x": 57,
+        "y": 35
+      }
+    },
+    {
+      "name": "横",
+      "order": 5,
+      "path": "M 32,48 L 70,48",
+      "start": {
+        "x": 32,
+        "y": 48
+      },
+      "end": {
+        "x": 70,
+        "y": 48
+      }
+    },
+    {
+      "name": "竖",
+      "order": 6,
+      "path": "M 50,12 L 50,70",
+      "start": {
+        "x": 50,
+        "y": 12
+      },
+      "end": {
+        "x": 50,
+        "y": 70
+      }
+    },
+    {
+      "name": "横",
+      "order": 7,
+      "path": "M 22,60 L 78,60",
+      "start": {
+        "x": 22,
+        "y": 60
+      },
+      "end": {
+        "x": 78,
+        "y": 60
+      }
+    },
+    {
+      "name": "横",
+      "order": 8,
+      "path": "M 18,72 L 82,72",
+      "start": {
+        "x": 18,
+        "y": 72
+      },
+      "end": {
+        "x": 82,
+        "y": 72
+      }
+    },
+    {
+      "name": "点",
+      "order": 9,
+      "path": "M 22,82 L 18,92",
+      "start": {
+        "x": 22,
+        "y": 82
+      },
+      "end": {
+        "x": 18,
+        "y": 92
+      }
+    },
+    {
+      "name": "点",
+      "order": 10,
+      "path": "M 40,82 L 42,92",
+      "start": {
+        "x": 40,
+        "y": 82
+      },
+      "end": {
+        "x": 42,
+        "y": 92
+      }
+    },
+    {
+      "name": "点",
+      "order": 11,
+      "path": "M 60,82 L 62,92",
+      "start": {
+        "x": 60,
+        "y": 82
+      },
+      "end": {
+        "x": 62,
+        "y": 92
+      }
+    },
+    {
+      "name": "点",
+      "order": 12,
+      "path": "M 78,82 L 82,92",
+      "start": {
+        "x": 78,
+        "y": 82
+      },
+      "end": {
+        "x": 82,
+        "y": 92
+      }
+    }
+  ],
+  "confusingChars": [
+    "里",
+    "墨",
+    "点",
+    "照"
+  ]
+}
+,
+{
+  "id": "char_061",
+  "char": "开",
+  "pinyin": "kāi",
+  "pinyinTone": 1,
+  "oracleGlyph": "",
+  "bronzeGlyph": "开",
+  "radical": "廾",
+  "strokeCount": 4,
+  "stage": 1,
+  "themeIsland": "forest",
+  "unitIndex": 16,
+  "levelIndex": 61,
+  "evolution": {
+    "story": "开的甲骨文像双手拨开门闩打开大门，表示开启、展开",
+    "oracleDesc": "双手开启门闩之形",
+    "bronzeDesc": "门闩与双手分明",
+    "sealDesc": "门内横木开启",
+    "modernDesc": "横横撇竖四笔"
+  },
+  "words": [
+    {
+      "word": "开门",
+      "pinyin": "kāi mén",
+      "desc": "把门打开"
+    },
+    {
+      "word": "开花",
+      "pinyin": "kāi huā",
+      "desc": "花朵绽放展开"
+    },
+    {
+      "word": "开心",
+      "pinyin": "kāi xīn",
+      "desc": "心情欢畅快乐"
+    }
+  ],
+  "sentence": "春天来了，公园里五颜六色的花儿都开花了。",
+  "gameConfig": {
+    "type": "balloon_pop",
+    "title": "找开字气球",
+    "instruction": "点击读音为'kāi'的气球！",
+    "options": [
+      "开",
+      "关",
+      "井",
+      "升"
+    ],
+    "correctIndex": 0
+  },
+  "strokes": [
+    {
+      "name": "横",
+      "order": 1,
+      "path": "M 25,28 L 75,28",
+      "start": {
+        "x": 25,
+        "y": 28
+      },
+      "end": {
+        "x": 75,
+        "y": 28
+      }
+    },
+    {
+      "name": "横",
+      "order": 2,
+      "path": "M 15,50 L 85,50",
+      "start": {
+        "x": 15,
+        "y": 50
+      },
+      "end": {
+        "x": 85,
+        "y": 50
+      }
+    },
+    {
+      "name": "撇",
+      "order": 3,
+      "path": "M 38,20 L 32,88",
+      "start": {
+        "x": 38,
+        "y": 20
+      },
+      "end": {
+        "x": 32,
+        "y": 88
+      }
+    },
+    {
+      "name": "竖",
+      "order": 4,
+      "path": "M 65,20 L 65,88",
+      "start": {
+        "x": 65,
+        "y": 20
+      },
+      "end": {
+        "x": 65,
+        "y": 88
+      }
+    }
+  ],
+  "confusingChars": [
+    "井",
+    "升",
+    "并",
+    "关"
+  ]
+},
+{
+  "id": "char_062",
+  "char": "关",
+  "pinyin": "guān",
+  "pinyinTone": 1,
+  "oracleGlyph": "",
+  "bronzeGlyph": "关",
+  "radical": "丷",
+  "strokeCount": 6,
+  "stage": 1,
+  "themeIsland": "forest",
+  "unitIndex": 16,
+  "levelIndex": 62,
+  "evolution": {
+    "story": "关的甲骨文像门扇两边合拢插上门闩，表示关闭、合拢",
+    "oracleDesc": "两扇门闩合拢",
+    "bronzeDesc": "门框上加横木",
+    "sealDesc": "门内横闭",
+    "modernDesc": "点撇横横撇捺六笔"
+  },
+  "words": [
+    {
+      "word": "关门",
+      "pinyin": "guān mén",
+      "desc": "把门扇合拢闭合"
+    },
+    {
+      "word": "关心",
+      "pinyin": "guān xīn",
+      "desc": "放在心上体贴关照"
+    },
+    {
+      "word": "开关",
+      "pinyin": "kāi guān",
+      "desc": "控制通断的按钮"
+    }
+  ],
+  "sentence": "睡觉前，小朋友记得轻轻把房间的门关好。",
+  "gameConfig": {
+    "type": "balloon_pop",
+    "title": "找关字气球",
+    "instruction": "点击读音为'guān'的气球！",
+    "options": [
+      "关",
+      "开",
+      "天",
+      "美"
+    ],
+    "correctIndex": 0
+  },
+  "strokes": [
+    {
+      "name": "点",
+      "order": 1,
+      "path": "M 35,18 L 38,28",
+      "start": {
+        "x": 35,
+        "y": 18
+      },
+      "end": {
+        "x": 38,
+        "y": 28
+      }
+    },
+    {
+      "name": "撇",
+      "order": 2,
+      "path": "M 65,18 L 60,28",
+      "start": {
+        "x": 65,
+        "y": 18
+      },
+      "end": {
+        "x": 60,
+        "y": 28
+      }
+    },
+    {
+      "name": "横",
+      "order": 3,
+      "path": "M 28,42 L 72,42",
+      "start": {
+        "x": 28,
+        "y": 42
+      },
+      "end": {
+        "x": 72,
+        "y": 42
+      }
+    },
+    {
+      "name": "横",
+      "order": 4,
+      "path": "M 15,58 L 85,58",
+      "start": {
+        "x": 15,
+        "y": 58
+      },
+      "end": {
+        "x": 85,
+        "y": 58
+      }
+    },
+    {
+      "name": "撇",
+      "order": 5,
+      "path": "M 50,30 L 22,88",
+      "start": {
+        "x": 50,
+        "y": 30
+      },
+      "end": {
+        "x": 22,
+        "y": 88
+      }
+    },
+    {
+      "name": "捺",
+      "order": 6,
+      "path": "M 50,58 L 80,88",
+      "start": {
+        "x": 50,
+        "y": 58
+      },
+      "end": {
+        "x": 80,
+        "y": 88
+      }
+    }
+  ],
+  "confusingChars": [
+    "天",
+    "美",
+    "头",
+    "开"
+  ]
+},
+{
+  "id": "char_063",
+  "char": "飞",
+  "pinyin": "fēi",
+  "pinyinTone": 1,
+  "oracleGlyph": "",
+  "bronzeGlyph": "飞",
+  "radical": "飞",
+  "strokeCount": 3,
+  "stage": 1,
+  "themeIsland": "forest",
+  "unitIndex": 16,
+  "levelIndex": 63,
+  "evolution": {
+    "story": "飞的甲骨文像一只展开双翅、在蓝天中展翅翱翔的鸟儿",
+    "oracleDesc": "展开双翼的飞鸟",
+    "bronzeDesc": "羽翼丰满张开",
+    "sealDesc": "繁体飛字",
+    "modernDesc": "横折斜钩撇点三笔"
+  },
+  "words": [
+    {
+      "word": "飞鸟",
+      "pinyin": "fēi niǎo",
+      "desc": "在空中飞翔的鸟儿"
+    },
+    {
+      "word": "飞机",
+      "pinyin": "fēi jī",
+      "desc": "在天空中航行的大飞机"
+    },
+    {
+      "word": "飞快",
+      "pinyin": "fēi kuài",
+      "desc": "速度极快如飞行一般"
+    }
+  ],
+  "sentence": "小鸟张开翅膀，在蔚蓝的天空上自由飞翔。",
+  "gameConfig": {
+    "type": "balloon_pop",
+    "title": "找飞字气球",
+    "instruction": "点击读音为'fēi'的气球！",
+    "options": [
+      "飞",
+      "鸟",
+      "风",
+      "云"
+    ],
+    "correctIndex": 0
+  },
+  "strokes": [
+    {
+      "name": "横折斜钩",
+      "order": 1,
+      "path": "M 32,32 L 68,32 L 65,85 L 75,78",
+      "start": {
+        "x": 32,
+        "y": 32
+      },
+      "end": {
+        "x": 75,
+        "y": 78
+      },
+      "corner": {
+        "x": 68,
+        "y": 32
+      }
+    },
+    {
+      "name": "撇",
+      "order": 2,
+      "path": "M 48,35 L 30,65",
+      "start": {
+        "x": 48,
+        "y": 35
+      },
+      "end": {
+        "x": 30,
+        "y": 65
+      }
+    },
+    {
+      "name": "点",
+      "order": 3,
+      "path": "M 35,68 L 38,78",
+      "start": {
+        "x": 35,
+        "y": 68
+      },
+      "end": {
+        "x": 38,
+        "y": 78
+      }
+    }
+  ],
+  "confusingChars": [
+    "风",
+    "鸟",
+    "九",
+    "乙"
+  ]
+},
+{
+  "id": "char_064",
+  "char": "走",
+  "pinyin": "zǒu",
+  "pinyinTone": 3,
+  "oracleGlyph": "",
+  "bronzeGlyph": "走",
+  "radical": "走",
+  "strokeCount": 7,
+  "stage": 1,
+  "themeIsland": "forest",
+  "unitIndex": 16,
+  "levelIndex": 64,
+  "evolution": {
+    "story": "走的甲骨文上面是一个甩开双臂奔跑的人，下面是一只脚印止",
+    "oracleDesc": "挥臂大步快跑的人",
+    "bronzeDesc": "上夭下止形",
+    "sealDesc": "上土下止相连",
+    "modernDesc": "横竖横竖横撇捺七笔"
+  },
+  "words": [
+    {
+      "word": "走路",
+      "pinyin": "zǒu lù",
+      "desc": "迈开双脚向前行走"
+    },
+    {
+      "word": "走开",
+      "pinyin": "zǒu kāi",
+      "desc": "离开当前的地方"
+    },
+    {
+      "word": "行走",
+      "pinyin": "xíng zǒu",
+      "desc": "大步在道路上前进"
+    }
+  ],
+  "sentence": "小兔蹦蹦跳跳，快乐地走在回家的林间小路上。",
+  "gameConfig": {
+    "type": "balloon_pop",
+    "title": "找走字气球",
+    "instruction": "点击读音为'zǒu'的气球！",
+    "options": [
+      "走",
+      "足",
+      "起",
+      "越"
+    ],
+    "correctIndex": 0
+  },
+  "strokes": [
+    {
+      "name": "横",
+      "order": 1,
+      "path": "M 28,25 L 72,25",
+      "start": {
+        "x": 28,
+        "y": 25
+      },
+      "end": {
+        "x": 72,
+        "y": 25
+      }
+    },
+    {
+      "name": "竖",
+      "order": 2,
+      "path": "M 50,15 L 50,42",
+      "start": {
+        "x": 50,
+        "y": 15
+      },
+      "end": {
+        "x": 50,
+        "y": 42
+      }
+    },
+    {
+      "name": "横",
+      "order": 3,
+      "path": "M 18,42 L 82,42",
+      "start": {
+        "x": 18,
+        "y": 42
+      },
+      "end": {
+        "x": 82,
+        "y": 42
+      }
+    },
+    {
+      "name": "竖",
+      "order": 4,
+      "path": "M 50,42 L 50,65",
+      "start": {
+        "x": 50,
+        "y": 42
+      },
+      "end": {
+        "x": 50,
+        "y": 65
+      }
+    },
+    {
+      "name": "横",
+      "order": 5,
+      "path": "M 30,65 L 70,65",
+      "start": {
+        "x": 30,
+        "y": 65
+      },
+      "end": {
+        "x": 70,
+        "y": 65
+      }
+    },
+    {
+      "name": "撇",
+      "order": 6,
+      "path": "M 48,65 L 22,88",
+      "start": {
+        "x": 48,
+        "y": 65
+      },
+      "end": {
+        "x": 22,
+        "y": 88
+      }
+    },
+    {
+      "name": "捺",
+      "order": 7,
+      "path": "M 35,68 L 88,88",
+      "start": {
+        "x": 35,
+        "y": 68
+      },
+      "end": {
+        "x": 88,
+        "y": 88
+      }
+    }
+  ],
+  "confusingChars": [
+    "足",
+    "起",
+    "赶",
+    "土"
+  ]
+},
+{
+  "id": "char_065",
+  "char": "跑",
+  "pinyin": "pǎo",
+  "pinyinTone": 3,
+  "oracleGlyph": "",
+  "bronzeGlyph": "跑",
+  "radical": "足",
+  "strokeCount": 12,
+  "stage": 1,
+  "themeIsland": "forest",
+  "unitIndex": 16,
+  "levelIndex": 65,
+  "evolution": {
+    "story": "跑由足和包组成，足代表双脚，包代表蓄力如球，表示双脚快速向前奔跑",
+    "oracleDesc": "双脚如风蓄力奔跑",
+    "bronzeDesc": "左足右包结构",
+    "sealDesc": "足包合体",
+    "modernDesc": "足字旁包字右十二笔"
+  },
+  "words": [
+    {
+      "word": "跑步",
+      "pinyin": "pǎo bù",
+      "desc": "锻炼身体快速奔跑"
+    },
+    {
+      "word": "快跑",
+      "pinyin": "kuài pǎo",
+      "desc": "迈大步飞快前进"
+    },
+    {
+      "word": "赛跑",
+      "pinyin": "sài pǎo",
+      "desc": "比拼速度的跑步比赛"
+    }
+  ],
+  "sentence": "操场上，小朋友们在进行精彩的接力赛跑。",
+  "gameConfig": {
+    "type": "balloon_pop",
+    "title": "找跑字气球",
+    "instruction": "点击读音为'pǎo'的气球！",
+    "options": [
+      "跑",
+      "跳",
+      "泡",
+      "抱"
+    ],
+    "correctIndex": 0
+  },
+  "strokes": [
+    {
+      "name": "竖",
+      "order": 1,
+      "path": "M 22,25 L 22,48",
+      "start": {
+        "x": 22,
+        "y": 25
+      },
+      "end": {
+        "x": 22,
+        "y": 48
+      }
+    },
+    {
+      "name": "横折",
+      "order": 2,
+      "path": "M 22,25 L 42,25 L 42,48",
+      "start": {
+        "x": 22,
+        "y": 25
+      },
+      "end": {
+        "x": 42,
+        "y": 48
+      },
+      "corner": {
+        "x": 42,
+        "y": 25
+      }
+    },
+    {
+      "name": "横",
+      "order": 3,
+      "path": "M 22,48 L 42,48",
+      "start": {
+        "x": 22,
+        "y": 48
+      },
+      "end": {
+        "x": 42,
+        "y": 48
+      }
+    },
+    {
+      "name": "竖",
+      "order": 4,
+      "path": "M 32,48 L 32,70",
+      "start": {
+        "x": 32,
+        "y": 48
+      },
+      "end": {
+        "x": 32,
+        "y": 70
+      }
+    },
+    {
+      "name": "横",
+      "order": 5,
+      "path": "M 22,65 L 35,65",
+      "start": {
+        "x": 22,
+        "y": 65
+      },
+      "end": {
+        "x": 35,
+        "y": 65
+      }
+    },
+    {
+      "name": "竖",
+      "order": 6,
+      "path": "M 22,65 L 22,88",
+      "start": {
+        "x": 22,
+        "y": 65
+      },
+      "end": {
+        "x": 22,
+        "y": 88
+      }
+    },
+    {
+      "name": "提",
+      "order": 7,
+      "path": "M 15,88 L 42,75",
+      "start": {
+        "x": 15,
+        "y": 88
+      },
+      "end": {
+        "x": 42,
+        "y": 75
+      }
+    },
+    {
+      "name": "撇",
+      "order": 8,
+      "path": "M 68,18 L 55,30",
+      "start": {
+        "x": 68,
+        "y": 18
+      },
+      "end": {
+        "x": 55,
+        "y": 30
+      }
+    },
+    {
+      "name": "横折钩",
+      "order": 9,
+      "path": "M 55,30 L 88,30 L 85,60 L 78,55",
+      "start": {
+        "x": 55,
+        "y": 30
+      },
+      "end": {
+        "x": 78,
+        "y": 55
+      },
+      "corner": {
+        "x": 88,
+        "y": 30
+      }
+    },
+    {
+      "name": "撇",
+      "order": 10,
+      "path": "M 62,38 L 52,58",
+      "start": {
+        "x": 62,
+        "y": 38
+      },
+      "end": {
+        "x": 52,
+        "y": 58
+      }
+    },
+    {
+      "name": "横折",
+      "order": 11,
+      "path": "M 52,48 L 78,48 L 78,65",
+      "start": {
+        "x": 52,
+        "y": 48
+      },
+      "end": {
+        "x": 78,
+        "y": 65
+      },
+      "corner": {
+        "x": 78,
+        "y": 48
+      }
+    },
+    {
+      "name": "竖弯钩",
+      "order": 12,
+      "path": "M 60,60 Q 60,88 85,88 L 88,80",
+      "start": {
+        "x": 60,
+        "y": 60
+      },
+      "end": {
+        "x": 88,
+        "y": 80
+      }
+    }
+  ],
+  "confusingChars": [
+    "抱",
+    "泡",
+    "跳",
+    "包"
+  ]
+},
+{
+  "id": "char_066",
+  "char": "跳",
+  "pinyin": "tiào",
+  "pinyinTone": 4,
+  "oracleGlyph": "",
+  "bronzeGlyph": "跳",
+  "radical": "足",
+  "strokeCount": 13,
+  "stage": 1,
+  "themeIsland": "forest",
+  "unitIndex": 17,
+  "levelIndex": 66,
+  "evolution": {
+    "story": "跳由足和兆组成，兆像龟甲裂纹迅速弹开，表示双脚敏捷跃起腾空",
+    "oracleDesc": "双脚腾空跃起",
+    "bronzeDesc": "足兆左右对称",
+    "sealDesc": "足兆相和",
+    "modernDesc": "足字旁兆字右十三笔"
+  },
+  "words": [
+    {
+      "word": "跳高",
+      "pinyin": "tiào gāo",
+      "desc": "向上跃起的运动"
+    },
+    {
+      "word": "跳舞",
+      "pinyin": "tiào wǔ",
+      "desc": "跟随音乐优美地舞动"
+    },
+    {
+      "word": "跳绳",
+      "pinyin": "tiào shéng",
+      "desc": "摇绳跳跃的健康运动"
+    }
+  ],
+  "sentence": "小袋鼠欢快地在草地上跳来跳去。",
+  "gameConfig": {
+    "type": "balloon_pop",
+    "title": "找跳字气球",
+    "instruction": "点击读音为'tiào'的气球！",
+    "options": [
+      "跳",
+      "跑",
+      "桃",
+      "挑"
+    ],
+    "correctIndex": 0
+  },
+  "strokes": [
+    {
+      "name": "竖",
+      "order": 1,
+      "path": "M 22,25 L 22,48",
+      "start": {
+        "x": 22,
+        "y": 25
+      },
+      "end": {
+        "x": 22,
+        "y": 48
+      }
+    },
+    {
+      "name": "横折",
+      "order": 2,
+      "path": "M 22,25 L 42,25 L 42,48",
+      "start": {
+        "x": 22,
+        "y": 25
+      },
+      "end": {
+        "x": 42,
+        "y": 48
+      },
+      "corner": {
+        "x": 42,
+        "y": 25
+      }
+    },
+    {
+      "name": "横",
+      "order": 3,
+      "path": "M 22,48 L 42,48",
+      "start": {
+        "x": 22,
+        "y": 48
+      },
+      "end": {
+        "x": 42,
+        "y": 48
+      }
+    },
+    {
+      "name": "竖",
+      "order": 4,
+      "path": "M 32,48 L 32,70",
+      "start": {
+        "x": 32,
+        "y": 48
+      },
+      "end": {
+        "x": 32,
+        "y": 70
+      }
+    },
+    {
+      "name": "横",
+      "order": 5,
+      "path": "M 22,65 L 35,65",
+      "start": {
+        "x": 22,
+        "y": 65
+      },
+      "end": {
+        "x": 35,
+        "y": 65
+      }
+    },
+    {
+      "name": "竖",
+      "order": 6,
+      "path": "M 22,65 L 22,88",
+      "start": {
+        "x": 22,
+        "y": 65
+      },
+      "end": {
+        "x": 22,
+        "y": 88
+      }
+    },
+    {
+      "name": "提",
+      "order": 7,
+      "path": "M 15,88 L 42,75",
+      "start": {
+        "x": 15,
+        "y": 88
+      },
+      "end": {
+        "x": 42,
+        "y": 75
+      }
+    },
+    {
+      "name": "撇",
+      "order": 8,
+      "path": "M 62,25 L 55,65",
+      "start": {
+        "x": 62,
+        "y": 25
+      },
+      "end": {
+        "x": 55,
+        "y": 65
+      }
+    },
+    {
+      "name": "点",
+      "order": 9,
+      "path": "M 52,38 L 48,48",
+      "start": {
+        "x": 52,
+        "y": 38
+      },
+      "end": {
+        "x": 48,
+        "y": 48
+      }
+    },
+    {
+      "name": "提",
+      "order": 10,
+      "path": "M 46,75 L 58,68",
+      "start": {
+        "x": 46,
+        "y": 75
+      },
+      "end": {
+        "x": 58,
+        "y": 68
+      }
+    },
+    {
+      "name": "竖弯钩",
+      "order": 11,
+      "path": "M 75,20 Q 75,88 90,88 L 92,80",
+      "start": {
+        "x": 75,
+        "y": 20
+      },
+      "end": {
+        "x": 92,
+        "y": 80
+      }
+    },
+    {
+      "name": "撇",
+      "order": 12,
+      "path": "M 85,38 L 78,48",
+      "start": {
+        "x": 85,
+        "y": 38
+      },
+      "end": {
+        "x": 78,
+        "y": 48
+      }
+    },
+    {
+      "name": "点",
+      "order": 13,
+      "path": "M 78,65 L 85,75",
+      "start": {
+        "x": 78,
+        "y": 65
+      },
+      "end": {
+        "x": 85,
+        "y": 75
+      }
+    }
+  ],
+  "confusingChars": [
+    "桃",
+    "挑",
+    "跑",
+    "逃"
+  ]
+},
+{
+  "id": "char_067",
+  "char": "听",
+  "pinyin": "tīng",
+  "pinyinTone": 1,
+  "oracleGlyph": "",
+  "bronzeGlyph": "听",
+  "radical": "口",
+  "strokeCount": 7,
+  "stage": 1,
+  "themeIsland": "forest",
+  "unitIndex": 17,
+  "levelIndex": 67,
+  "evolution": {
+    "story": "听由口和斤组成，口代表用耳倾听言语，古代繁体為聽，现简化为听",
+    "oracleDesc": "倾耳聆听声音之状",
+    "bronzeDesc": "耳口德心合体",
+    "sealDesc": "听字成形",
+    "modernDesc": "口字旁斤字右七笔"
+  },
+  "words": [
+    {
+      "word": "听见",
+      "pinyin": "tīng jiàn",
+      "desc": "耳朵听到美妙的声音"
+    },
+    {
+      "word": "听话",
+      "pinyin": "tīng huà",
+      "desc": "懂事礼貌听从教导"
+    },
+    {
+      "word": "听音乐",
+      "pinyin": "tīng yīn yuè",
+      "desc": "欣赏好听动听的歌曲"
+    }
+  ],
+  "sentence": "小兔子竖起长长的大耳朵，仔细听树林里的声音。",
+  "gameConfig": {
+    "type": "balloon_pop",
+    "title": "找听字气球",
+    "instruction": "点击读音为'tīng'的气球！",
+    "options": [
+      "听",
+      "叫",
+      "叶",
+      "吃"
+    ],
+    "correctIndex": 0
+  },
+  "strokes": [
+    {
+      "name": "竖",
+      "order": 1,
+      "path": "M 20,32 L 20,68",
+      "start": {
+        "x": 20,
+        "y": 32
+      },
+      "end": {
+        "x": 20,
+        "y": 68
+      }
+    },
+    {
+      "name": "横折",
+      "order": 2,
+      "path": "M 20,32 L 40,32 L 40,68",
+      "start": {
+        "x": 20,
+        "y": 32
+      },
+      "end": {
+        "x": 40,
+        "y": 68
+      },
+      "corner": {
+        "x": 40,
+        "y": 32
+      }
+    },
+    {
+      "name": "横",
+      "order": 3,
+      "path": "M 20,68 L 40,68",
+      "start": {
+        "x": 20,
+        "y": 68
+      },
+      "end": {
+        "x": 40,
+        "y": 68
+      }
+    },
+    {
+      "name": "撇",
+      "order": 4,
+      "path": "M 80,18 L 60,30",
+      "start": {
+        "x": 80,
+        "y": 18
+      },
+      "end": {
+        "x": 60,
+        "y": 30
+      }
+    },
+    {
+      "name": "撇",
+      "order": 5,
+      "path": "M 58,30 L 52,88",
+      "start": {
+        "x": 58,
+        "y": 30
+      },
+      "end": {
+        "x": 52,
+        "y": 88
+      }
+    },
+    {
+      "name": "横",
+      "order": 6,
+      "path": "M 55,48 L 88,48",
+      "start": {
+        "x": 55,
+        "y": 48
+      },
+      "end": {
+        "x": 88,
+        "y": 48
+      }
+    },
+    {
+      "name": "竖",
+      "order": 7,
+      "path": "M 78,48 L 78,88",
+      "start": {
+        "x": 78,
+        "y": 48
+      },
+      "end": {
+        "x": 78,
+        "y": 88
+      }
+    }
+  ],
+  "confusingChars": [
+    "叶",
+    "叫",
+    "叮",
+    "吃"
+  ]
+},
+{
+  "id": "char_068",
+  "char": "说",
+  "pinyin": "shuō",
+  "pinyinTone": 1,
+  "oracleGlyph": "",
+  "bronzeGlyph": "说",
+  "radical": "讠",
+  "strokeCount": 9,
+  "stage": 1,
+  "themeIsland": "forest",
+  "unitIndex": 17,
+  "levelIndex": 68,
+  "evolution": {
+    "story": "说由讠和兑组成，讠代表语言交流，兑代表喜悦开口，表示开心地交谈说话",
+    "oracleDesc": "张口吐露欢喜言语",
+    "bronzeDesc": "言兑左右分明",
+    "sealDesc": "繁体説字",
+    "modernDesc": "言字旁兑字右九笔"
+  },
+  "words": [
+    {
+      "word": "说话",
+      "pinyin": "shuō huà",
+      "desc": "用语言表达心里的想法"
+    },
+    {
+      "word": "说明",
+      "pinyin": "shuō míng",
+      "desc": "解释说明清楚明白"
+    },
+    {
+      "word": "听说",
+      "pinyin": "tīng shuō",
+      "desc": "听到别人讲述的事情"
+    }
+  ],
+  "sentence": "老师微笑着对全班小朋友说话，大家听得可认真了。",
+  "gameConfig": {
+    "type": "balloon_pop",
+    "title": "找说字气球",
+    "instruction": "点击读音为'shuō'的气球！",
+    "options": [
+      "说",
+      "话",
+      "语",
+      "读"
+    ],
+    "correctIndex": 0
+  },
+  "strokes": [
+    {
+      "name": "点",
+      "order": 1,
+      "path": "M 22,25 L 25,35",
+      "start": {
+        "x": 22,
+        "y": 25
+      },
+      "end": {
+        "x": 25,
+        "y": 35
+      }
+    },
+    {
+      "name": "横折提",
+      "order": 2,
+      "path": "M 15,48 L 35,48 L 22,78 L 38,70",
+      "start": {
+        "x": 15,
+        "y": 48
+      },
+      "end": {
+        "x": 38,
+        "y": 70
+      },
+      "corner": {
+        "x": 35,
+        "y": 48
+      }
+    },
+    {
+      "name": "点",
+      "order": 3,
+      "path": "M 55,20 L 52,30",
+      "start": {
+        "x": 55,
+        "y": 20
+      },
+      "end": {
+        "x": 52,
+        "y": 30
+      }
+    },
+    {
+      "name": "撇",
+      "order": 4,
+      "path": "M 75,18 L 68,28",
+      "start": {
+        "x": 75,
+        "y": 18
+      },
+      "end": {
+        "x": 68,
+        "y": 28
+      }
+    },
+    {
+      "name": "竖",
+      "order": 5,
+      "path": "M 48,38 L 48,60",
+      "start": {
+        "x": 48,
+        "y": 38
+      },
+      "end": {
+        "x": 48,
+        "y": 60
+      }
+    },
+    {
+      "name": "横折",
+      "order": 6,
+      "path": "M 48,38 L 82,38 L 82,60",
+      "start": {
+        "x": 48,
+        "y": 38
+      },
+      "end": {
+        "x": 82,
+        "y": 60
+      },
+      "corner": {
+        "x": 82,
+        "y": 38
+      }
+    },
+    {
+      "name": "横",
+      "order": 7,
+      "path": "M 48,60 L 82,60",
+      "start": {
+        "x": 48,
+        "y": 60
+      },
+      "end": {
+        "x": 82,
+        "y": 60
+      }
+    },
+    {
+      "name": "撇",
+      "order": 8,
+      "path": "M 58,62 L 42,88",
+      "start": {
+        "x": 58,
+        "y": 62
+      },
+      "end": {
+        "x": 42,
+        "y": 88
+      }
+    },
+    {
+      "name": "竖弯钩",
+      "order": 9,
+      "path": "M 72,62 Q 72,88 88,88 L 90,80",
+      "start": {
+        "x": 72,
+        "y": 62
+      },
+      "end": {
+        "x": 90,
+        "y": 80
+      }
+    }
+  ],
+  "confusingChars": [
+    "话",
+    "语",
+    "读",
+    "认"
+  ]
+},
+{
+  "id": "char_069",
+  "char": "看",
+  "pinyin": "kàn",
+  "pinyinTone": 4,
+  "oracleGlyph": "",
+  "bronzeGlyph": "看",
+  "radical": "目",
+  "strokeCount": 9,
+  "stage": 1,
+  "themeIsland": "forest",
+  "unitIndex": 17,
+  "levelIndex": 69,
+  "evolution": {
+    "story": "看的甲骨文像人把手搭在眼睛上方遮挡强光，极目远望",
+    "oracleDesc": "手搭眼眶极目远眺",
+    "bronzeDesc": "上手下目形",
+    "sealDesc": "手目合体",
+    "modernDesc": "上手下目九笔"
+  },
+  "words": [
+    {
+      "word": "看见",
+      "pinyin": "kàn jiàn",
+      "desc": "用眼睛观察到美好的景物"
+    },
+    {
+      "word": "看书",
+      "pinyin": "kàn shū",
+      "desc": "阅读有趣的图画书故事"
+    },
+    {
+      "word": "观看",
+      "pinyin": "guān kàn",
+      "desc": "集中注意力欣赏观看"
+    }
+  ],
+  "sentence": "我们在草地上仰望星空，看闪闪发光的流星划过。",
+  "gameConfig": {
+    "type": "balloon_pop",
+    "title": "找看字气球",
+    "instruction": "点击读音为'kàn'的气球！",
+    "options": [
+      "看",
+      "着",
+      "目",
+      "春"
+    ],
+    "correctIndex": 0
+  },
+  "strokes": [
+    {
+      "name": "撇",
+      "order": 1,
+      "path": "M 65,15 L 35,28",
+      "start": {
+        "x": 65,
+        "y": 15
+      },
+      "end": {
+        "x": 35,
+        "y": 28
+      }
+    },
+    {
+      "name": "横",
+      "order": 2,
+      "path": "M 32,32 L 72,32",
+      "start": {
+        "x": 32,
+        "y": 32
+      },
+      "end": {
+        "x": 72,
+        "y": 32
+      }
+    },
+    {
+      "name": "横",
+      "order": 3,
+      "path": "M 18,45 L 82,45",
+      "start": {
+        "x": 18,
+        "y": 45
+      },
+      "end": {
+        "x": 82,
+        "y": 45
+      }
+    },
+    {
+      "name": "撇",
+      "order": 4,
+      "path": "M 48,22 L 25,65",
+      "start": {
+        "x": 48,
+        "y": 22
+      },
+      "end": {
+        "x": 25,
+        "y": 65
+      }
+    },
+    {
+      "name": "竖",
+      "order": 5,
+      "path": "M 40,55 L 40,90",
+      "start": {
+        "x": 40,
+        "y": 55
+      },
+      "end": {
+        "x": 40,
+        "y": 90
+      }
+    },
+    {
+      "name": "横折",
+      "order": 6,
+      "path": "M 40,55 L 75,55 L 75,90",
+      "start": {
+        "x": 40,
+        "y": 55
+      },
+      "end": {
+        "x": 75,
+        "y": 90
+      },
+      "corner": {
+        "x": 75,
+        "y": 55
+      }
+    },
+    {
+      "name": "横",
+      "order": 7,
+      "path": "M 40,68 L 75,68",
+      "start": {
+        "x": 40,
+        "y": 68
+      },
+      "end": {
+        "x": 75,
+        "y": 68
+      }
+    },
+    {
+      "name": "横",
+      "order": 8,
+      "path": "M 40,80 L 75,80",
+      "start": {
+        "x": 40,
+        "y": 80
+      },
+      "end": {
+        "x": 75,
+        "y": 80
+      }
+    },
+    {
+      "name": "横",
+      "order": 9,
+      "path": "M 40,90 L 75,90",
+      "start": {
+        "x": 40,
+        "y": 90
+      },
+      "end": {
+        "x": 75,
+        "y": 90
+      }
+    }
+  ],
+  "confusingChars": [
+    "着",
+    "春",
+    "目",
+    "手"
+  ]
+},
+{
+  "id": "char_070",
+  "char": "写",
+  "pinyin": "xiě",
+  "pinyinTone": 3,
+  "oracleGlyph": "",
+  "bronzeGlyph": "写",
+  "radical": "冖",
+  "strokeCount": 5,
+  "stage": 1,
+  "themeIsland": "forest",
+  "unitIndex": 17,
+  "levelIndex": 70,
+  "evolution": {
+    "story": "写的甲骨文像在房屋之中安放器皿描摹誊写，现简化为写",
+    "oracleDesc": "在屋内描摹书写",
+    "bronzeDesc": "宝盖配写形",
+    "sealDesc": "繁体寫字",
+    "modernDesc": "点横撇竖折折钩横五笔"
+  },
+  "words": [
+    {
+      "word": "写字",
+      "pinyin": "xiě zì",
+      "desc": "用笔在纸上书写规范汉字"
+    },
+    {
+      "word": "书写",
+      "pinyin": "shū xiě",
+      "desc": "认真工整地落笔写字"
+    },
+    {
+      "word": "写画",
+      "pinyin": "xiě huà",
+      "desc": "用彩笔画出美丽图画"
+    }
+  ],
+  "sentence": "小明坐在明亮的课桌前，认认真真地在田字格里写字。",
+  "gameConfig": {
+    "type": "balloon_pop",
+    "title": "找写字气球",
+    "instruction": "点击读音为'xiě'的气球！",
+    "options": [
+      "写",
+      "字",
+      "与",
+      "马"
+    ],
+    "correctIndex": 0
+  },
+  "strokes": [
+    {
+      "name": "点",
+      "order": 1,
+      "path": "M 50,15 L 50,25",
+      "start": {
+        "x": 50,
+        "y": 15
+      },
+      "end": {
+        "x": 50,
+        "y": 25
+      }
+    },
+    {
+      "name": "横折",
+      "order": 2,
+      "path": "M 20,32 L 80,32 L 80,45",
+      "start": {
+        "x": 20,
+        "y": 32
+      },
+      "end": {
+        "x": 80,
+        "y": 45
+      },
+      "corner": {
+        "x": 80,
+        "y": 32
+      }
+    },
+    {
+      "name": "撇",
+      "order": 3,
+      "path": "M 20,32 L 20,45",
+      "start": {
+        "x": 20,
+        "y": 32
+      },
+      "end": {
+        "x": 20,
+        "y": 45
+      }
+    },
+    {
+      "name": "竖折折钩",
+      "order": 4,
+      "path": "M 38,45 L 38,62 L 68,62 L 68,85 L 58,78",
+      "start": {
+        "x": 38,
+        "y": 45
+      },
+      "end": {
+        "x": 58,
+        "y": 78
+      },
+      "corner": {
+        "x": 68,
+        "y": 62
+      }
+    },
+    {
+      "name": "横",
+      "order": 5,
+      "path": "M 15,85 L 85,85",
+      "start": {
+        "x": 15,
+        "y": 85
+      },
+      "end": {
+        "x": 85,
+        "y": 85
+      }
+    }
+  ],
+  "confusingChars": [
+    "字",
+    "与",
+    "马",
+    "军"
+  ]
+}
+,
+{
+  "id": "char_071",
+  "char": "手",
+  "pinyin": "shǒu",
+  "pinyinTone": 3,
+  "meaning": "人体上肢前端拿东西的部分，也指本领、技能",
+  "oracleGlyph": "𠂇",
+  "bronzeGlyph": "手",
+  "radical": "手",
+  "strokeCount": 4,
+  "stage": 1,
+  "themeIsland": "forest",
+  "unitIndex": 15,
+  "levelIndex": 1,
+  "evolution": {
+    "oracle": "甲骨文字形像伸开五指的手掌",
+    "bronze": "金文线条圆润，手指分明",
+    "seal": "小篆规整化，指掌相连",
+    "modern": "现代楷书写作“手”，上部为三指与掌纹"
+  },
+  "words": [
+    {
+      "word": "小手",
+      "pinyin": "xiǎo shǒu",
+      "meaning": "可爱灵巧的小手"
+    },
+    {
+      "word": "双手",
+      "pinyin": "shuāng shǒu",
+      "meaning": "勤劳的两只手"
+    },
+    {
+      "word": "手表",
+      "pinyin": "shǒu biǎo",
+      "meaning": "戴在手腕上看时间的钟表"
+    }
+  ],
+  "sentence": "勤劳的小手爱劳动，画出美丽的图画。",
+  "gameConfig": {
+    "sound": "shou",
+    "balloonPopOptions": [
+      "手",
+      "毛",
+      "牛",
+      "午"
+    ],
+    "correctIndex": 0
+  },
+  "strokes": [
+    {
+      "name": "撇",
+      "order": 1,
+      "path": "M 65,22 L 35,35",
+      "start": {
+        "x": 65,
+        "y": 22
+      },
+      "end": {
+        "x": 35,
+        "y": 35
+      }
+    },
+    {
+      "name": "横",
+      "order": 2,
+      "path": "M 25,45 L 75,45",
+      "start": {
+        "x": 25,
+        "y": 45
+      },
+      "end": {
+        "x": 75,
+        "y": 45
+      }
+    },
+    {
+      "name": "横",
+      "order": 3,
+      "path": "M 15,60 L 85,60",
+      "start": {
+        "x": 15,
+        "y": 60
+      },
+      "end": {
+        "x": 85,
+        "y": 60
+      }
+    },
+    {
+      "name": "竖钩",
+      "order": 4,
+      "path": "M 50,22 L 50,88 L 38,78",
+      "start": {
+        "x": 50,
+        "y": 22
+      },
+      "end": {
+        "x": 38,
+        "y": 78
+      },
+      "corner": {
+        "x": 50,
+        "y": 88
+      }
+    }
+  ],
+  "confusingChars": [
+    "毛",
+    "牛",
+    "午",
+    "千"
+  ]
+},
+{
+  "id": "char_072",
+  "char": "足",
+  "pinyin": "zú",
+  "pinyinTone": 2,
+  "meaning": "脚，也指充足、足够",
+  "oracleGlyph": "𡲯",
+  "bronzeGlyph": "足",
+  "radical": "足",
+  "strokeCount": 7,
+  "stage": 1,
+  "themeIsland": "forest",
+  "unitIndex": 15,
+  "levelIndex": 2,
+  "evolution": {
+    "oracle": "甲骨文上方是膝盖骨，下方是脚趾与脚掌",
+    "bronze": "金文膝盖与小腿形态更清晰",
+    "seal": "小篆上面变成口形，下部为止（脚）",
+    "modern": "现代楷书写作“足”，表示脚与行走"
+  },
+  "words": [
+    {
+      "word": "足球",
+      "pinyin": "zú qiú",
+      "meaning": "用脚踢的球类运动"
+    },
+    {
+      "word": "双足",
+      "pinyin": "shuāng zú",
+      "meaning": "两只脚"
+    },
+    {
+      "word": "足够",
+      "pinyin": "zú gòu",
+      "meaning": "数量充足，达到需要"
+    }
+  ],
+  "sentence": "小朋友在绿茵茵的草地上快乐踢足球。",
+  "gameConfig": {
+    "sound": "zu",
+    "balloonPopOptions": [
+      "足",
+      "是",
+      "定",
+      "走"
+    ],
+    "correctIndex": 0
+  },
+  "strokes": [
+    {
+      "name": "竖",
+      "order": 1,
+      "path": "M 32,20 L 32,42",
+      "start": {
+        "x": 32,
+        "y": 20
+      },
+      "end": {
+        "x": 32,
+        "y": 42
+      }
+    },
+    {
+      "name": "横折",
+      "order": 2,
+      "path": "M 32,20 L 68,20 L 68,42",
+      "start": {
+        "x": 32,
+        "y": 20
+      },
+      "end": {
+        "x": 68,
+        "y": 42
+      },
+      "corner": {
+        "x": 68,
+        "y": 20
+      }
+    },
+    {
+      "name": "横",
+      "order": 3,
+      "path": "M 32,42 L 68,42",
+      "start": {
+        "x": 32,
+        "y": 42
+      },
+      "end": {
+        "x": 68,
+        "y": 42
+      }
+    },
+    {
+      "name": "竖",
+      "order": 4,
+      "path": "M 50,42 L 50,65",
+      "start": {
+        "x": 50,
+        "y": 42
+      },
+      "end": {
+        "x": 50,
+        "y": 65
+      }
+    },
+    {
+      "name": "横",
+      "order": 5,
+      "path": "M 30,65 L 70,65",
+      "start": {
+        "x": 30,
+        "y": 65
+      },
+      "end": {
+        "x": 70,
+        "y": 65
+      }
+    },
+    {
+      "name": "撇",
+      "order": 6,
+      "path": "M 42,66 L 20,88",
+      "start": {
+        "x": 42,
+        "y": 66
+      },
+      "end": {
+        "x": 20,
+        "y": 88
+      }
+    },
+    {
+      "name": "捺",
+      "order": 7,
+      "path": "M 58,66 L 85,88",
+      "start": {
+        "x": 58,
+        "y": 66
+      },
+      "end": {
+        "x": 85,
+        "y": 88
+      }
+    }
+  ],
+  "confusingChars": [
+    "是",
+    "定",
+    "走",
+    "疋"
+  ]
+},
+{
+  "id": "char_073",
+  "char": "耳",
+  "pinyin": "ěr",
+  "pinyinTone": 3,
+  "meaning": "听声音的人体器官，耳朵",
+  "oracleGlyph": "𦣞",
+  "bronzeGlyph": "耳",
+  "radical": "耳",
+  "strokeCount": 6,
+  "stage": 1,
+  "themeIsland": "forest",
+  "unitIndex": 15,
+  "levelIndex": 3,
+  "evolution": {
+    "oracle": "甲骨文逼真地描画了耳朵的轮廓与耳蜗",
+    "bronze": "金文线条稍作平直",
+    "seal": "小篆更加对称规整",
+    "modern": "现代楷书写作“耳”"
+  },
+  "words": [
+    {
+      "word": "耳朵",
+      "pinyin": "ěr duo",
+      "meaning": "听声音的感觉器官"
+    },
+    {
+      "word": "木耳",
+      "pinyin": "mù ěr",
+      "meaning": "生长在树木上的食用菌"
+    },
+    {
+      "word": "双耳",
+      "pinyin": "shuāng ěr",
+      "meaning": "两只耳朵"
+    }
+  ],
+  "sentence": "小兔子竖起长长的耳朵仔细听声音。",
+  "gameConfig": {
+    "sound": "er",
+    "balloonPopOptions": [
+      "耳",
+      "目",
+      "且",
+      "日"
+    ],
+    "correctIndex": 0
+  },
+  "strokes": [
+    {
+      "name": "横",
+      "order": 1,
+      "path": "M 22,25 L 78,25",
+      "start": {
+        "x": 22,
+        "y": 25
+      },
+      "end": {
+        "x": 78,
+        "y": 25
+      }
+    },
+    {
+      "name": "竖",
+      "order": 2,
+      "path": "M 38,26 L 38,78",
+      "start": {
+        "x": 38,
+        "y": 26
+      },
+      "end": {
+        "x": 38,
+        "y": 78
+      }
+    },
+    {
+      "name": "横",
+      "order": 3,
+      "path": "M 38,45 L 62,45",
+      "start": {
+        "x": 38,
+        "y": 45
+      },
+      "end": {
+        "x": 62,
+        "y": 45
+      }
+    },
+    {
+      "name": "横",
+      "order": 4,
+      "path": "M 38,62 L 62,62",
+      "start": {
+        "x": 38,
+        "y": 62
+      },
+      "end": {
+        "x": 62,
+        "y": 62
+      }
+    },
+    {
+      "name": "横",
+      "order": 5,
+      "path": "M 25,78 L 75,78",
+      "start": {
+        "x": 25,
+        "y": 78
+      },
+      "end": {
+        "x": 75,
+        "y": 78
+      }
+    },
+    {
+      "name": "竖",
+      "order": 6,
+      "path": "M 62,26 L 62,90",
+      "start": {
+        "x": 62,
+        "y": 26
+      },
+      "end": {
+        "x": 62,
+        "y": 90
+      }
+    }
+  ],
+  "confusingChars": [
+    "目",
+    "且",
+    "日",
+    "自"
+  ]
+},
+{
+  "id": "char_074",
+  "char": "目",
+  "pinyin": "mù",
+  "pinyinTone": 4,
+  "meaning": "眼睛，也指看或项目",
+  "oracleGlyph": "𥃦",
+  "bronzeGlyph": "目",
+  "radical": "目",
+  "strokeCount": 5,
+  "stage": 1,
+  "themeIsland": "forest",
+  "unitIndex": 15,
+  "levelIndex": 4,
+  "evolution": {
+    "oracle": "甲骨文是一只横着看的大眼睛与瞳孔",
+    "bronze": "金文眼角轮廓分明",
+    "seal": "小篆转为竖直立起来",
+    "modern": "现代楷书写作“目”，表示眼睛"
+  },
+  "words": [
+    {
+      "word": "目光",
+      "pinyin": "mù guāng",
+      "meaning": "眼睛看东西的神采"
+    },
+    {
+      "word": "双目",
+      "pinyin": "shuāng mù",
+      "meaning": "两只明亮的眼睛"
+    },
+    {
+      "word": "题目",
+      "pinyin": "tí mù",
+      "meaning": "文章或试题的名字"
+    }
+  ],
+  "sentence": "小明有一双明亮清澈的大眼睛，目光如炬。",
+  "gameConfig": {
+    "sound": "mu",
+    "balloonPopOptions": [
+      "目",
+      "日",
+      "田",
+      "自"
+    ],
+    "correctIndex": 0
+  },
+  "strokes": [
+    {
+      "name": "竖",
+      "order": 1,
+      "path": "M 30,20 L 30,85",
+      "start": {
+        "x": 30,
+        "y": 20
+      },
+      "end": {
+        "x": 30,
+        "y": 85
+      }
+    },
+    {
+      "name": "横折",
+      "order": 2,
+      "path": "M 30,20 L 70,20 L 70,85",
+      "start": {
+        "x": 30,
+        "y": 20
+      },
+      "end": {
+        "x": 70,
+        "y": 85
+      },
+      "corner": {
+        "x": 70,
+        "y": 20
+      }
+    },
+    {
+      "name": "横",
+      "order": 3,
+      "path": "M 30,42 L 70,42",
+      "start": {
+        "x": 30,
+        "y": 42
+      },
+      "end": {
+        "x": 70,
+        "y": 42
+      }
+    },
+    {
+      "name": "横",
+      "order": 4,
+      "path": "M 30,64 L 70,64",
+      "start": {
+        "x": 30,
+        "y": 64
+      },
+      "end": {
+        "x": 70,
+        "y": 64
+      }
+    },
+    {
+      "name": "横",
+      "order": 5,
+      "path": "M 30,85 L 70,85",
+      "start": {
+        "x": 30,
+        "y": 85
+      },
+      "end": {
+        "x": 70,
+        "y": 85
+      }
+    }
+  ],
+  "confusingChars": [
+    "日",
+    "田",
+    "自",
+    "月"
+  ]
+},
+{
+  "id": "char_075",
+  "char": "身",
+  "pinyin": "shēn",
+  "pinyinTone": 1,
+  "meaning": "人体躯干，身体",
+  "oracleGlyph": "𦥑",
+  "bronzeGlyph": "身",
+  "radical": "身",
+  "strokeCount": 7,
+  "stage": 1,
+  "themeIsland": "forest",
+  "unitIndex": 15,
+  "levelIndex": 5,
+  "evolution": {
+    "oracle": "甲骨文像一个挺着肚子的人的侧面体态",
+    "bronze": "金文侧身形态更加清晰",
+    "seal": "小篆演变为修长的人身形态",
+    "modern": "现代楷书写作“身”"
+  },
+  "words": [
+    {
+      "word": "身体",
+      "pinyin": "shēn tǐ",
+      "meaning": "人或动物的躯体"
+    },
+    {
+      "word": "身边",
+      "pinyin": "shēn biān",
+      "meaning": "身体旁边，靠近的地方"
+    },
+    {
+      "word": "自身",
+      "pinyin": "zì shēn",
+      "meaning": "自己，本人"
+    }
+  ],
+  "sentence": "每天坚持锻炼身体，个子长得高又壮。",
+  "gameConfig": {
+    "sound": "shen",
+    "balloonPopOptions": [
+      "身",
+      "射",
+      "月",
+      "自"
+    ],
+    "correctIndex": 0
+  },
+  "strokes": [
+    {
+      "name": "撇",
+      "order": 1,
+      "path": "M 48,15 L 38,32",
+      "start": {
+        "x": 48,
+        "y": 15
+      },
+      "end": {
+        "x": 38,
+        "y": 32
+      }
+    },
+    {
+      "name": "竖",
+      "order": 2,
+      "path": "M 38,32 L 38,85",
+      "start": {
+        "x": 38,
+        "y": 32
+      },
+      "end": {
+        "x": 38,
+        "y": 85
+      }
+    },
+    {
+      "name": "横折钩",
+      "order": 3,
+      "path": "M 38,32 L 68,32 L 68,75 L 55,75",
+      "start": {
+        "x": 38,
+        "y": 32
+      },
+      "end": {
+        "x": 55,
+        "y": 75
+      },
+      "corner": {
+        "x": 68,
+        "y": 32
+      }
+    },
+    {
+      "name": "横",
+      "order": 4,
+      "path": "M 38,46 L 68,46",
+      "start": {
+        "x": 38,
+        "y": 46
+      },
+      "end": {
+        "x": 68,
+        "y": 46
+      }
+    },
+    {
+      "name": "横",
+      "order": 5,
+      "path": "M 38,60 L 68,60",
+      "start": {
+        "x": 38,
+        "y": 60
+      },
+      "end": {
+        "x": 68,
+        "y": 60
+      }
+    },
+    {
+      "name": "提",
+      "order": 6,
+      "path": "M 22,75 L 55,68",
+      "start": {
+        "x": 22,
+        "y": 75
+      },
+      "end": {
+        "x": 55,
+        "y": 68
+      }
+    },
+    {
+      "name": "撇",
+      "order": 7,
+      "path": "M 75,45 L 25,92",
+      "start": {
+        "x": 75,
+        "y": 45
+      },
+      "end": {
+        "x": 25,
+        "y": 92
+      }
+    }
+  ],
+  "confusingChars": [
+    "射",
+    "月",
+    "自",
+    "由"
+  ]
+},
+{
+  "id": "char_076",
+  "char": "心",
+  "pinyin": "xīn",
+  "pinyinTone": 1,
+  "meaning": "心脏，引申为心思、情感",
+  "oracleGlyph": "𢖰",
+  "bronzeGlyph": "心",
+  "radical": "心",
+  "strokeCount": 4,
+  "stage": 1,
+  "themeIsland": "forest",
+  "unitIndex": 16,
+  "levelIndex": 1,
+  "evolution": {
+    "oracle": "甲骨文像跳动的心脏与血管瓣膜",
+    "bronze": "金文突出心室与心房的形状",
+    "seal": "小篆更加对称，像盛放爱心的器皿",
+    "modern": "现代楷书写作“心”，卧钩加三点"
+  },
+  "words": [
+    {
+      "word": "爱心",
+      "pinyin": "ài xīn",
+      "meaning": "关爱他人的温暖心意"
+    },
+    {
+      "word": "开心",
+      "pinyin": "kāi xīn",
+      "meaning": "心情愉快，欢喜"
+    },
+    {
+      "word": "心里",
+      "pinyin": "xīn lǐ",
+      "meaning": "内心深处"
+    }
+  ],
+  "sentence": "小明有一颗善良温暖的爱心，乐于帮助人。",
+  "gameConfig": {
+    "sound": "xin",
+    "balloonPopOptions": [
+      "心",
+      "必",
+      "寸",
+      "小"
+    ],
+    "correctIndex": 0
+  },
+  "strokes": [
+    {
+      "name": "点",
+      "order": 1,
+      "path": "M 28,45 L 22,58",
+      "start": {
+        "x": 28,
+        "y": 45
+      },
+      "end": {
+        "x": 22,
+        "y": 58
+      }
+    },
+    {
+      "name": "卧钩",
+      "order": 2,
+      "path": "M 32,58 C 45,85 70,85 80,60 L 72,55",
+      "start": {
+        "x": 32,
+        "y": 58
+      },
+      "end": {
+        "x": 72,
+        "y": 55
+      },
+      "corner": {
+        "x": 80,
+        "y": 60
+      }
+    },
+    {
+      "name": "点",
+      "order": 3,
+      "path": "M 48,42 L 52,52",
+      "start": {
+        "x": 48,
+        "y": 42
+      },
+      "end": {
+        "x": 52,
+        "y": 52
+      }
+    },
+    {
+      "name": "点",
+      "order": 4,
+      "path": "M 75,38 L 80,48",
+      "start": {
+        "x": 75,
+        "y": 38
+      },
+      "end": {
+        "x": 80,
+        "y": 48
+      }
+    }
+  ],
+  "confusingChars": [
+    "必",
+    "寸",
+    "小",
+    "水"
+  ]
+},
+{
+  "id": "char_077",
+  "char": "一",
+  "pinyin": "yī",
+  "pinyinTone": 1,
+  "meaning": "数字一，数目中最先的一个",
+  "oracleGlyph": "一",
+  "bronzeGlyph": "一",
+  "radical": "一",
+  "strokeCount": 1,
+  "stage": 1,
+  "themeIsland": "forest",
+  "unitIndex": 16,
+  "levelIndex": 2,
+  "evolution": {
+    "oracle": "甲骨文用一根算筹表示数字一",
+    "bronze": "金文同样写作一横",
+    "seal": "小篆形态保持平稳",
+    "modern": "现代楷书为标准的一横"
+  },
+  "words": [
+    {
+      "word": "一个",
+      "pinyin": "yí gè",
+      "meaning": "单个的事物"
+    },
+    {
+      "word": "一天",
+      "pinyin": "yì tiān",
+      "meaning": "一昼夜的时间"
+    },
+    {
+      "word": "第一",
+      "pinyin": "dì yī",
+      "meaning": "排在最前面的"
+    }
+  ],
+  "sentence": "新的一天开始了，太阳公公露出了笑脸。",
+  "gameConfig": {
+    "sound": "yi",
+    "balloonPopOptions": [
+      "一",
+      "二",
+      "十",
+      "七"
+    ],
+    "correctIndex": 0
+  },
+  "strokes": [
+    {
+      "name": "横",
+      "order": 1,
+      "path": "M 15,50 L 85,50",
+      "start": {
+        "x": 15,
+        "y": 50
+      },
+      "end": {
+        "x": 85,
+        "y": 50
+      }
+    }
+  ],
+  "confusingChars": [
+    "二",
+    "十",
+    "七",
+    "乙"
+  ]
+},
+{
+  "id": "char_078",
+  "char": "二",
+  "pinyin": "èr",
+  "pinyinTone": 4,
+  "meaning": "数字二，一加一的和",
+  "oracleGlyph": "二",
+  "bronzeGlyph": "二",
+  "radical": "二",
+  "strokeCount": 2,
+  "stage": 1,
+  "themeIsland": "forest",
+  "unitIndex": 16,
+  "levelIndex": 3,
+  "evolution": {
+    "oracle": "甲骨文用两根算筹上下平行摆放",
+    "bronze": "金文上下两横，下长上短",
+    "seal": "小篆平直对称",
+    "modern": "现代楷书上短横下长横"
+  },
+  "words": [
+    {
+      "word": "两个",
+      "pinyin": "liǎng gè",
+      "meaning": "一对事物"
+    },
+    {
+      "word": "二月",
+      "pinyin": "èr yuè",
+      "meaning": "一年的第二个月"
+    },
+    {
+      "word": "第二",
+      "pinyin": "dì èr",
+      "meaning": "位列第二"
+    }
+  ],
+  "sentence": "操场上有两只小兔子在快乐地跳跃。",
+  "gameConfig": {
+    "sound": "er",
+    "balloonPopOptions": [
+      "二",
+      "一",
+      "三",
+      "干"
+    ],
+    "correctIndex": 0
+  },
+  "strokes": [
+    {
+      "name": "横",
+      "order": 1,
+      "path": "M 25,38 L 75,38",
+      "start": {
+        "x": 25,
+        "y": 38
+      },
+      "end": {
+        "x": 75,
+        "y": 38
+      }
+    },
+    {
+      "name": "横",
+      "order": 2,
+      "path": "M 15,68 L 85,68",
+      "start": {
+        "x": 15,
+        "y": 68
+      },
+      "end": {
+        "x": 85,
+        "y": 68
+      }
+    }
+  ],
+  "confusingChars": [
+    "一",
+    "三",
+    "干",
+    "工"
+  ]
+},
+{
+  "id": "char_079",
+  "char": "三",
+  "pinyin": "sān",
+  "pinyinTone": 1,
+  "meaning": "数字三，二加一的和",
+  "oracleGlyph": "三",
+  "bronzeGlyph": "三",
+  "radical": "一",
+  "strokeCount": 3,
+  "stage": 1,
+  "themeIsland": "forest",
+  "unitIndex": 16,
+  "levelIndex": 4,
+  "evolution": {
+    "oracle": "甲骨文用三根算筹表示数字三",
+    "bronze": "金文中间一横稍短",
+    "seal": "小篆平直美观",
+    "modern": "现代楷书写作“三”，上中下三横"
+  },
+  "words": [
+    {
+      "word": "三只",
+      "pinyin": "sān zhī",
+      "meaning": "三个小动物"
+    },
+    {
+      "word": "三天",
+      "pinyin": "sān tiān",
+      "meaning": "三天的时间"
+    },
+    {
+      "word": "第三",
+      "pinyin": "dì sān",
+      "meaning": "位列第三"
+    }
+  ],
+  "sentence": "树枝上落着三只美丽的小鸟在唱歌。",
+  "gameConfig": {
+    "sound": "san",
+    "balloonPopOptions": [
+      "三",
+      "二",
+      "王",
+      "土"
+    ],
+    "correctIndex": 0
+  },
+  "strokes": [
+    {
+      "name": "横",
+      "order": 1,
+      "path": "M 22,30 L 78,30",
+      "start": {
+        "x": 22,
+        "y": 30
+      },
+      "end": {
+        "x": 78,
+        "y": 30
+      }
+    },
+    {
+      "name": "横",
+      "order": 2,
+      "path": "M 30,50 L 70,50",
+      "start": {
+        "x": 30,
+        "y": 50
+      },
+      "end": {
+        "x": 70,
+        "y": 50
+      }
+    },
+    {
+      "name": "横",
+      "order": 3,
+      "path": "M 15,70 L 85,70",
+      "start": {
+        "x": 15,
+        "y": 70
+      },
+      "end": {
+        "x": 85,
+        "y": 70
+      }
+    }
+  ],
+  "confusingChars": [
+    "二",
+    "王",
+    "土",
+    "丰"
+  ]
+},
+{
+  "id": "char_080",
+  "char": "四",
+  "pinyin": "sì",
+  "pinyinTone": 4,
+  "meaning": "数字四，三加一的和",
+  "oracleGlyph": "亖",
+  "bronzeGlyph": "四",
+  "radical": "囗",
+  "strokeCount": 5,
+  "stage": 1,
+  "themeIsland": "forest",
+  "unitIndex": 16,
+  "levelIndex": 5,
+  "evolution": {
+    "oracle": "甲骨文最早写作四横（亖），后假借口中吐气之形",
+    "bronze": "金文外框为方口，内含两笔",
+    "seal": "小篆规整为大口框内含分笔",
+    "modern": "现代楷书写作“四”"
+  },
+  "words": [
+    {
+      "word": "四季",
+      "pinyin": "sì jì",
+      "meaning": "春、夏、秋、冬四个季节"
+    },
+    {
+      "word": "四个",
+      "pinyin": "sì gè",
+      "meaning": "四个数量"
+    },
+    {
+      "word": "第四",
+      "pinyin": "dì sì",
+      "meaning": "位列第四"
+    }
+  ],
+  "sentence": "一年有四个美丽的季节，大自然真神奇。",
+  "gameConfig": {
+    "sound": "si",
+    "balloonPopOptions": [
+      "四",
+      "西",
+      "匹",
+      "田"
+    ],
+    "correctIndex": 0
+  },
+  "strokes": [
+    {
+      "name": "竖",
+      "order": 1,
+      "path": "M 22,25 L 22,82",
+      "start": {
+        "x": 22,
+        "y": 25
+      },
+      "end": {
+        "x": 22,
+        "y": 82
+      }
+    },
+    {
+      "name": "横折",
+      "order": 2,
+      "path": "M 22,25 L 78,25 L 78,82",
+      "start": {
+        "x": 22,
+        "y": 25
+      },
+      "end": {
+        "x": 78,
+        "y": 82
+      },
+      "corner": {
+        "x": 78,
+        "y": 25
+      }
+    },
+    {
+      "name": "撇",
+      "order": 3,
+      "path": "M 38,35 L 35,62",
+      "start": {
+        "x": 38,
+        "y": 35
+      },
+      "end": {
+        "x": 35,
+        "y": 62
+      }
+    },
+    {
+      "name": "竖弯",
+      "order": 4,
+      "path": "M 55,35 L 55,60 L 68,60",
+      "start": {
+        "x": 55,
+        "y": 35
+      },
+      "end": {
+        "x": 68,
+        "y": 60
+      },
+      "corner": {
+        "x": 55,
+        "y": 60
+      }
+    },
+    {
+      "name": "横",
+      "order": 5,
+      "path": "M 22,82 L 78,82",
+      "start": {
+        "x": 22,
+        "y": 82
+      },
+      "end": {
+        "x": 78,
+        "y": 82
+      }
+    }
+  ],
+  "confusingChars": [
+    "西",
+    "匹",
+    "田",
+    "回"
+  ]
+},
+{
+  "id": "char_081",
+  "char": "五",
+  "pinyin": "wǔ",
+  "pinyinTone": 3,
+  "meaning": "数字五，四加一的和",
+  "oracleGlyph": "𠄡",
+  "bronzeGlyph": "五",
+  "radical": "二",
+  "strokeCount": 4,
+  "stage": 2,
+  "themeIsland": "town",
+  "unitIndex": 17,
+  "levelIndex": 1,
+  "evolution": {
+    "oracle": "甲骨文写作交叉的十字或交叉算筹",
+    "bronze": "金文上下加两横作为天地限制",
+    "seal": "小篆线条更加流线规整",
+    "modern": "现代楷书写作“五”"
+  },
+  "words": [
+    {
+      "word": "五彩",
+      "pinyin": "wǔ cǎi",
+      "meaning": "色彩斑斓绚丽"
+    },
+    {
+      "word": "五月",
+      "pinyin": "wǔ yuè",
+      "meaning": "一年的第五个月"
+    },
+    {
+      "word": "五个",
+      "pinyin": "wǔ gè",
+      "meaning": "五个数量"
+    }
+  ],
+  "sentence": "天空中出现了一道五彩缤纷的彩虹。",
+  "gameConfig": {
+    "sound": "wu",
+    "balloonPopOptions": [
+      "五",
+      "丑",
+      "互",
+      "立"
+    ],
+    "correctIndex": 0
+  },
+  "strokes": [
+    {
+      "name": "横",
+      "order": 1,
+      "path": "M 25,25 L 75,25",
+      "start": {
+        "x": 25,
+        "y": 25
+      },
+      "end": {
+        "x": 75,
+        "y": 25
+      }
+    },
+    {
+      "name": "竖",
+      "order": 2,
+      "path": "M 48,25 L 42,80",
+      "start": {
+        "x": 48,
+        "y": 25
+      },
+      "end": {
+        "x": 42,
+        "y": 80
+      }
+    },
+    {
+      "name": "横折",
+      "order": 3,
+      "path": "M 45,52 L 68,52 L 68,80",
+      "start": {
+        "x": 45,
+        "y": 52
+      },
+      "end": {
+        "x": 68,
+        "y": 80
+      },
+      "corner": {
+        "x": 68,
+        "y": 52
+      }
+    },
+    {
+      "name": "横",
+      "order": 4,
+      "path": "M 18,80 L 82,80",
+      "start": {
+        "x": 18,
+        "y": 80
+      },
+      "end": {
+        "x": 82,
+        "y": 80
+      }
+    }
+  ],
+  "confusingChars": [
+    "丑",
+    "互",
+    "立",
+    "亚"
+  ]
+},
+{
+  "id": "char_082",
+  "char": "六",
+  "pinyin": "liù",
+  "pinyinTone": 4,
+  "meaning": "数字六，五加一的和",
+  "oracleGlyph": "𠃛",
+  "bronzeGlyph": "六",
+  "radical": "八",
+  "strokeCount": 4,
+  "stage": 2,
+  "themeIsland": "town",
+  "unitIndex": 17,
+  "levelIndex": 2,
+  "evolution": {
+    "oracle": "甲骨文像一座有屋顶与支柱的棚舍",
+    "bronze": "金文棚舍形状简化",
+    "seal": "小篆变为点横与八字底",
+    "modern": "现代楷书写作“六”"
+  },
+  "words": [
+    {
+      "word": "六只",
+      "pinyin": "liù zhī",
+      "meaning": "六只小动物"
+    },
+    {
+      "word": "六月",
+      "pinyin": "liù yuè",
+      "meaning": "六月，初夏时节"
+    },
+    {
+      "word": "第六",
+      "pinyin": "dì liù",
+      "meaning": "排在第六位"
+    }
+  ],
+  "sentence": "六一儿童节是小朋友们最快乐的节日。",
+  "gameConfig": {
+    "sound": "liu",
+    "balloonPopOptions": [
+      "六",
+      "大",
+      "文",
+      "立"
+    ],
+    "correctIndex": 0
+  },
+  "strokes": [
+    {
+      "name": "点",
+      "order": 1,
+      "path": "M 50,18 L 50,30",
+      "start": {
+        "x": 50,
+        "y": 18
+      },
+      "end": {
+        "x": 50,
+        "y": 30
+      }
+    },
+    {
+      "name": "横",
+      "order": 2,
+      "path": "M 20,38 L 80,38",
+      "start": {
+        "x": 20,
+        "y": 38
+      },
+      "end": {
+        "x": 80,
+        "y": 38
+      }
+    },
+    {
+      "name": "撇",
+      "order": 3,
+      "path": "M 42,48 L 25,82",
+      "start": {
+        "x": 42,
+        "y": 48
+      },
+      "end": {
+        "x": 25,
+        "y": 82
+      }
+    },
+    {
+      "name": "点",
+      "order": 4,
+      "path": "M 58,48 L 75,82",
+      "start": {
+        "x": 58,
+        "y": 48
+      },
+      "end": {
+        "x": 75,
+        "y": 82
+      }
+    }
+  ],
+  "confusingChars": [
+    "大",
+    "文",
+    "立",
+    "八"
+  ]
+},
+{
+  "id": "char_083",
+  "char": "七",
+  "pinyin": "qī",
+  "pinyinTone": 1,
+  "meaning": "数字七，六加一的和",
+  "oracleGlyph": "十",
+  "bronzeGlyph": "七",
+  "radical": "一",
+  "strokeCount": 2,
+  "stage": 2,
+  "themeIsland": "town",
+  "unitIndex": 17,
+  "levelIndex": 3,
+  "evolution": {
+    "oracle": "甲骨文像一根竖木被一横切断（切的本字）",
+    "bronze": "金文竖笔向右弯曲",
+    "seal": "小篆弯钩更加明显",
+    "modern": "现代楷书写作“七”，横加竖弯钩"
+  },
+  "words": [
+    {
+      "word": "七彩",
+      "pinyin": "qī cǎi",
+      "meaning": "七种美丽色彩"
+    },
+    {
+      "word": "七天",
+      "pinyin": "qī tiān",
+      "meaning": "一个星期七天"
+    },
+    {
+      "word": "第七",
+      "pinyin": "dì qī",
+      "meaning": "排在第七位"
+    }
+  ],
+  "sentence": "雨后天晴，天空中挂起美丽的七色彩虹。",
+  "gameConfig": {
+    "sound": "qi",
+    "balloonPopOptions": [
+      "七",
+      "十",
+      "匕",
+      "九"
+    ],
+    "correctIndex": 0
+  },
+  "strokes": [
+    {
+      "name": "横",
+      "order": 1,
+      "path": "M 20,48 L 80,42",
+      "start": {
+        "x": 20,
+        "y": 48
+      },
+      "end": {
+        "x": 80,
+        "y": 42
+      }
+    },
+    {
+      "name": "竖弯钩",
+      "order": 2,
+      "path": "M 48,20 L 48,78 L 78,78 L 78,65",
+      "start": {
+        "x": 48,
+        "y": 20
+      },
+      "end": {
+        "x": 78,
+        "y": 65
+      },
+      "corner": {
+        "x": 48,
+        "y": 78
+      }
+    }
+  ],
+  "confusingChars": [
+    "十",
+    "匕",
+    "九",
+    "丁"
+  ]
+},
+{
+  "id": "char_084",
+  "char": "八",
+  "pinyin": "bā",
+  "pinyinTone": 1,
+  "meaning": "数字八，七加一的和",
+  "oracleGlyph": "八",
+  "bronzeGlyph": "八",
+  "radical": "八",
+  "strokeCount": 2,
+  "stage": 2,
+  "themeIsland": "town",
+  "unitIndex": 17,
+  "levelIndex": 4,
+  "evolution": {
+    "oracle": "甲骨文像两道相背分开的线条，本义为相背分开",
+    "bronze": "金文形态保持两笔分开",
+    "seal": "小篆左撇右捺对称相背",
+    "modern": "现代楷书写作“八”，一撇一捺"
+  },
+  "words": [
+    {
+      "word": "八月",
+      "pinyin": "bā yuè",
+      "meaning": "八月金秋"
+    },
+    {
+      "word": "八个",
+      "pinyin": "bā gè",
+      "meaning": "八个数量"
+    },
+    {
+      "word": "第八",
+      "pinyin": "dì bā",
+      "meaning": "位列第八"
+    }
+  ],
+  "sentence": "八月中秋月儿圆，全家人一起吃月饼。",
+  "gameConfig": {
+    "sound": "ba",
+    "balloonPopOptions": [
+      "八",
+      "人",
+      "入",
+      "个"
+    ],
+    "correctIndex": 0
+  },
+  "strokes": [
+    {
+      "name": "撇",
+      "order": 1,
+      "path": "M 42,28 L 22,78",
+      "start": {
+        "x": 42,
+        "y": 28
+      },
+      "end": {
+        "x": 22,
+        "y": 78
+      }
+    },
+    {
+      "name": "捺",
+      "order": 2,
+      "path": "M 58,22 L 78,78",
+      "start": {
+        "x": 58,
+        "y": 22
+      },
+      "end": {
+        "x": 78,
+        "y": 78
+      }
+    }
+  ],
+  "confusingChars": [
+    "人",
+    "入",
+    "个",
+    "大"
+  ]
+},
+{
+  "id": "char_085",
+  "char": "九",
+  "pinyin": "jiǔ",
+  "pinyinTone": 3,
+  "meaning": "数字九，八加一的和，个位数中最大的数",
+  "oracleGlyph": "𠤭",
+  "bronzeGlyph": "九",
+  "radical": "丿",
+  "strokeCount": 2,
+  "stage": 2,
+  "themeIsland": "town",
+  "unitIndex": 17,
+  "levelIndex": 5,
+  "evolution": {
+    "oracle": "甲骨文像一条屈曲蜿蜒的手臂伸出手指",
+    "bronze": "金文弯曲幅度加大",
+    "seal": "小篆演化为斜撇与横折弯钩",
+    "modern": "现代楷书写作“九”"
+  },
+  "words": [
+    {
+      "word": "九月",
+      "pinyin": "jiǔ yuè",
+      "meaning": "九月秋高气爽"
+    },
+    {
+      "word": "九个",
+      "pinyin": "jiǔ gè",
+      "meaning": "九个数量"
+    },
+    {
+      "word": "第九",
+      "pinyin": "dì jiǔ",
+      "meaning": "位列第九"
+    }
+  ],
+  "sentence": "九月是开学的季节，我们背上书包上学去。",
+  "gameConfig": {
+    "sound": "jiu",
+    "balloonPopOptions": [
+      "九",
+      "几",
+      "力",
+      "丸"
+    ],
+    "correctIndex": 0
+  },
+  "strokes": [
+    {
+      "name": "撇",
+      "order": 1,
+      "path": "M 48,20 L 32,82",
+      "start": {
+        "x": 48,
+        "y": 20
+      },
+      "end": {
+        "x": 32,
+        "y": 82
+      }
+    },
+    {
+      "name": "横折弯钩",
+      "order": 2,
+      "path": "M 28,38 L 68,38 L 52,65 L 75,78 L 72,62",
+      "start": {
+        "x": 28,
+        "y": 38
+      },
+      "end": {
+        "x": 72,
+        "y": 62
+      },
+      "corner": {
+        "x": 68,
+        "y": 38
+      }
+    }
+  ],
+  "confusingChars": [
+    "几",
+    "力",
+    "丸",
+    "刀"
+  ]
+},
+{
+  "id": "char_086",
+  "char": "十",
+  "pinyin": "shí",
+  "pinyinTone": 2,
+  "meaning": "数字十，九加一的和，十全十美",
+  "oracleGlyph": "丨",
+  "bronzeGlyph": "十",
+  "radical": "十",
+  "strokeCount": 2,
+  "stage": 2,
+  "themeIsland": "town",
+  "unitIndex": 18,
+  "levelIndex": 1,
+  "evolution": {
+    "oracle": "甲骨文用一根竖放的算筹并在中间打结表示满十",
+    "bronze": "金文中间圆点扩大为粗横",
+    "seal": "小篆演变为正十字架",
+    "modern": "现代楷书为标准的一横一竖"
+  },
+  "words": [
+    {
+      "word": "十个",
+      "pinyin": "shí gè",
+      "meaning": "十个数量"
+    },
+    {
+      "word": "十分",
+      "pinyin": "shí fēn",
+      "meaning": "非常，极度"
+    },
+    {
+      "word": "十全十美",
+      "pinyin": "shí quán shí měi",
+      "meaning": "各方面都很完美"
+    }
+  ],
+  "sentence": "小红做事情非常认真，表现得十分优秀。",
+  "gameConfig": {
+    "sound": "shi",
+    "balloonPopOptions": [
+      "十",
+      "七",
+      "千",
+      "土"
+    ],
+    "correctIndex": 0
+  },
+  "strokes": [
+    {
+      "name": "横",
+      "order": 1,
+      "path": "M 18,50 L 82,50",
+      "start": {
+        "x": 18,
+        "y": 50
+      },
+      "end": {
+        "x": 82,
+        "y": 50
+      }
+    },
+    {
+      "name": "竖",
+      "order": 2,
+      "path": "M 50,18 L 50,82",
+      "start": {
+        "x": 50,
+        "y": 18
+      },
+      "end": {
+        "x": 50,
+        "y": 82
+      }
+    }
+  ],
+  "confusingChars": [
+    "七",
+    "千",
+    "土",
+    "干"
+  ]
+},
+{
+  "id": "char_087",
+  "char": "百",
+  "pinyin": "bǎi",
+  "pinyinTone": 3,
+  "meaning": "数字百，十个十，也表示很多",
+  "oracleGlyph": "𠚕",
+  "bronzeGlyph": "百",
+  "radical": "白",
+  "strokeCount": 6,
+  "stage": 2,
+  "themeIsland": "town",
+  "unitIndex": 18,
+  "levelIndex": 2,
+  "evolution": {
+    "oracle": "甲骨文是在白字上方加一横指事符号",
+    "bronze": "金文一横与白结合",
+    "seal": "小篆更加匀称",
+    "modern": "现代楷书写作“百”"
+  },
+  "words": [
+    {
+      "word": "一百",
+      "pinyin": "yì bǎi",
+      "meaning": "十个十的数目"
+    },
+    {
+      "word": "百花",
+      "pinyin": "bǎi huā",
+      "meaning": "各种各样的花朵"
+    },
+    {
+      "word": "百姓",
+      "pinyin": "bǎi xìng",
+      "meaning": "广大人民群众"
+    }
+  ],
+  "sentence": "春天来了，公园里百花齐放，美丽极了。",
+  "gameConfig": {
+    "sound": "bai",
+    "balloonPopOptions": [
+      "百",
+      "白",
+      "自",
+      "面"
+    ],
+    "correctIndex": 0
+  },
+  "strokes": [
+    {
+      "name": "横",
+      "order": 1,
+      "path": "M 20,25 L 80,25",
+      "start": {
+        "x": 20,
+        "y": 25
+      },
+      "end": {
+        "x": 80,
+        "y": 25
+      }
+    },
+    {
+      "name": "撇",
+      "order": 2,
+      "path": "M 50,26 L 40,42",
+      "start": {
+        "x": 50,
+        "y": 26
+      },
+      "end": {
+        "x": 40,
+        "y": 42
+      }
+    },
+    {
+      "name": "竖",
+      "order": 3,
+      "path": "M 32,42 L 32,85",
+      "start": {
+        "x": 32,
+        "y": 42
+      },
+      "end": {
+        "x": 32,
+        "y": 85
+      }
+    },
+    {
+      "name": "横折",
+      "order": 4,
+      "path": "M 32,42 L 68,42 L 68,85",
+      "start": {
+        "x": 32,
+        "y": 42
+      },
+      "end": {
+        "x": 68,
+        "y": 85
+      },
+      "corner": {
+        "x": 68,
+        "y": 42
+      }
+    },
+    {
+      "name": "横",
+      "order": 5,
+      "path": "M 32,64 L 68,64",
+      "start": {
+        "x": 32,
+        "y": 64
+      },
+      "end": {
+        "x": 68,
+        "y": 64
+      }
+    },
+    {
+      "name": "横",
+      "order": 6,
+      "path": "M 32,85 L 68,85",
+      "start": {
+        "x": 32,
+        "y": 85
+      },
+      "end": {
+        "x": 68,
+        "y": 85
+      }
+    }
+  ],
+  "confusingChars": [
+    "白",
+    "自",
+    "面",
+    "首"
+  ]
+},
+{
+  "id": "char_088",
+  "char": "千",
+  "pinyin": "qiān",
+  "pinyinTone": 1,
+  "meaning": "数字千，十个百，表示极多",
+  "oracleGlyph": "𠦃",
+  "bronzeGlyph": "千",
+  "radical": "十",
+  "strokeCount": 3,
+  "stage": 2,
+  "themeIsland": "town",
+  "unitIndex": 18,
+  "levelIndex": 3,
+  "evolution": {
+    "oracle": "甲骨文是在人字小腿上加一横，表示千数",
+    "bronze": "金文人字头与一横相接",
+    "seal": "小篆演化为短撇与十字相连",
+    "modern": "现代楷书写作“千”"
+  },
+  "words": [
+    {
+      "word": "一千",
+      "pinyin": "yì qiān",
+      "meaning": "十个百的数目"
+    },
+    {
+      "word": "千万",
+      "pinyin": "qiān wàn",
+      "meaning": "形容极多，或务必"
+    },
+    {
+      "word": "秋千",
+      "pinyin": "qiū qiān",
+      "meaning": "儿童喜欢的秋千玩具"
+    }
+  ],
+  "sentence": "小树林里有千万棵大树，郁郁葱葱。",
+  "gameConfig": {
+    "sound": "qian",
+    "balloonPopOptions": [
+      "千",
+      "十",
+      "干",
+      "于"
+    ],
+    "correctIndex": 0
+  },
+  "strokes": [
+    {
+      "name": "撇",
+      "order": 1,
+      "path": "M 65,22 L 35,35",
+      "start": {
+        "x": 65,
+        "y": 22
+      },
+      "end": {
+        "x": 35,
+        "y": 35
+      }
+    },
+    {
+      "name": "横",
+      "order": 2,
+      "path": "M 20,48 L 80,48",
+      "start": {
+        "x": 20,
+        "y": 48
+      },
+      "end": {
+        "x": 80,
+        "y": 48
+      }
+    },
+    {
+      "name": "竖",
+      "order": 3,
+      "path": "M 50,35 L 50,88",
+      "start": {
+        "x": 50,
+        "y": 35
+      },
+      "end": {
+        "x": 50,
+        "y": 88
+      }
+    }
+  ],
+  "confusingChars": [
+    "十",
+    "干",
+    "于",
+    "午"
+  ]
+},
+{
+  "id": "char_089",
+  "char": "上",
+  "pinyin": "shàng",
+  "pinyinTone": 4,
+  "meaning": "方位上，高处，也指上升、去往",
+  "oracleGlyph": "丄",
+  "bronzeGlyph": "上",
+  "radical": "一",
+  "strokeCount": 3,
+  "stage": 2,
+  "themeIsland": "town",
+  "unitIndex": 18,
+  "levelIndex": 4,
+  "evolution": {
+    "oracle": "甲骨文在基准长横之上画一短横指明位置（指事字）",
+    "bronze": "金文短横演变为竖笔与短横",
+    "seal": "小篆更加稳定",
+    "modern": "现代楷书写作“上”"
+  },
+  "words": [
+    {
+      "word": "上学",
+      "pinyin": "shàng xué",
+      "meaning": "去学校学习"
+    },
+    {
+      "word": "上面",
+      "pinyin": "shàng miàn",
+      "meaning": "位置较高的那一面"
+    },
+    {
+      "word": "早上",
+      "pinyin": "zǎo shang",
+      "meaning": "早晨太阳升起的时候"
+    }
+  ],
+  "sentence": "早晨背上漂亮的书包，高高兴兴上学去。",
+  "gameConfig": {
+    "sound": "shang",
+    "balloonPopOptions": [
+      "上",
+      "下",
+      "土",
+      "卡"
+    ],
+    "correctIndex": 0
+  },
+  "strokes": [
+    {
+      "name": "竖",
+      "order": 1,
+      "path": "M 50,22 L 50,75",
+      "start": {
+        "x": 50,
+        "y": 22
+      },
+      "end": {
+        "x": 50,
+        "y": 75
+      }
+    },
+    {
+      "name": "横",
+      "order": 2,
+      "path": "M 50,48 L 78,48",
+      "start": {
+        "x": 50,
+        "y": 48
+      },
+      "end": {
+        "x": 78,
+        "y": 48
+      }
+    },
+    {
+      "name": "横",
+      "order": 3,
+      "path": "M 18,75 L 82,75",
+      "start": {
+        "x": 18,
+        "y": 75
+      },
+      "end": {
+        "x": 82,
+        "y": 75
+      }
+    }
+  ],
+  "confusingChars": [
+    "下",
+    "土",
+    "卡",
+    "正"
+  ]
+},
+{
+  "id": "char_090",
+  "char": "下",
+  "pinyin": "xià",
+  "pinyinTone": 4,
+  "meaning": "方位下，低处，也指降落、下来",
+  "oracleGlyph": "丅",
+  "bronzeGlyph": "下",
+  "radical": "一",
+  "strokeCount": 3,
+  "stage": 2,
+  "themeIsland": "town",
+  "unitIndex": 18,
+  "levelIndex": 5,
+  "evolution": {
+    "oracle": "甲骨文在基准长横之下画一短横指明下方位置",
+    "bronze": "金文短横与竖笔结合",
+    "seal": "小篆规范指事线条",
+    "modern": "现代楷书写作“下”，长横加竖点"
+  },
+  "words": [
+    {
+      "word": "下雨",
+      "pinyin": "xià yǔ",
+      "meaning": "天空中降落雨滴"
+    },
+    {
+      "word": "下面",
+      "pinyin": "xià miàn",
+      "meaning": "位置较低的一面"
+    },
+    {
+      "word": "下午",
+      "pinyin": "xià wǔ",
+      "meaning": "中午以后的时间"
+    }
+  ],
+  "sentence": "天空下起了蒙蒙细雨，禾苗喝得饱饱的。",
+  "gameConfig": {
+    "sound": "xia",
+    "balloonPopOptions": [
+      "下",
+      "上",
+      "不",
+      "卜"
+    ],
+    "correctIndex": 0
+  },
+  "strokes": [
+    {
+      "name": "横",
+      "order": 1,
+      "path": "M 18,25 L 82,25",
+      "start": {
+        "x": 18,
+        "y": 25
+      },
+      "end": {
+        "x": 82,
+        "y": 25
+      }
+    },
+    {
+      "name": "竖",
+      "order": 2,
+      "path": "M 50,25 L 50,82",
+      "start": {
+        "x": 50,
+        "y": 25
+      },
+      "end": {
+        "x": 50,
+        "y": 82
+      }
+    },
+    {
+      "name": "点",
+      "order": 3,
+      "path": "M 52,48 L 75,65",
+      "start": {
+        "x": 52,
+        "y": 48
+      },
+      "end": {
+        "x": 75,
+        "y": 65
+      }
+    }
+  ],
+  "confusingChars": [
+    "上",
+    "不",
+    "卜",
+    "卡"
+  ]
+},
+{
+  "id": "char_091",
+  "char": "左",
+  "pinyin": "zuǒ",
+  "pinyinTone": 3,
+  "meaning": "方位左，面向南时东的一边",
+  "oracleGlyph": "𠂇",
+  "bronzeGlyph": "左",
+  "radical": "工",
+  "strokeCount": 5,
+  "stage": 3,
+  "themeIsland": "space",
+  "unitIndex": 19,
+  "levelIndex": 1,
+  "evolution": {
+    "oracle": "甲骨文画的是一只向左伸出的手",
+    "bronze": "金文手下加上工具“工”，表示持工具辅佐",
+    "seal": "小篆更加方正规矩",
+    "modern": "现代楷书写作“左”"
+  },
+  "words": [
+    {
+      "word": "左手",
+      "pinyin": "zuǒ shǒu",
+      "meaning": "身体左侧的手"
+    },
+    {
+      "word": "左边",
+      "pinyin": "zuǒ biān",
+      "meaning": "左侧的方向"
+    },
+    {
+      "word": "左右",
+      "pinyin": "zuǒ yòu",
+      "meaning": "左右两边，也表示大约"
+    }
+  ],
+  "sentence": "过马路时要先看左边，再看右边，注意安全。",
+  "gameConfig": {
+    "sound": "zuo",
+    "balloonPopOptions": [
+      "左",
+      "右",
+      "在",
+      "友"
+    ],
+    "correctIndex": 0
+  },
+  "strokes": [
+    {
+      "name": "横",
+      "order": 1,
+      "path": "M 22,30 L 78,30",
+      "start": {
+        "x": 22,
+        "y": 30
+      },
+      "end": {
+        "x": 78,
+        "y": 30
+      }
+    },
+    {
+      "name": "撇",
+      "order": 2,
+      "path": "M 50,15 L 20,80",
+      "start": {
+        "x": 50,
+        "y": 15
+      },
+      "end": {
+        "x": 20,
+        "y": 80
+      }
+    },
+    {
+      "name": "横",
+      "order": 3,
+      "path": "M 38,55 L 72,55",
+      "start": {
+        "x": 38,
+        "y": 55
+      },
+      "end": {
+        "x": 72,
+        "y": 55
+      }
+    },
+    {
+      "name": "竖",
+      "order": 4,
+      "path": "M 55,55 L 55,80",
+      "start": {
+        "x": 55,
+        "y": 55
+      },
+      "end": {
+        "x": 55,
+        "y": 80
+      }
+    },
+    {
+      "name": "横",
+      "order": 5,
+      "path": "M 32,80 L 78,80",
+      "start": {
+        "x": 32,
+        "y": 80
+      },
+      "end": {
+        "x": 78,
+        "y": 80
+      }
+    }
+  ],
+  "confusingChars": [
+    "右",
+    "在",
+    "友",
+    "灰"
+  ]
+},
+{
+  "id": "char_092",
+  "char": "右",
+  "pinyin": "yòu",
+  "pinyinTone": 4,
+  "meaning": "方位右，面向南时西的一边",
+  "oracleGlyph": "𠂇",
+  "bronzeGlyph": "右",
+  "radical": "口",
+  "strokeCount": 5,
+  "stage": 3,
+  "themeIsland": "space",
+  "unitIndex": 19,
+  "levelIndex": 2,
+  "evolution": {
+    "oracle": "甲骨文是一只向右伸出的右手",
+    "bronze": "金文在手下加“口”，表示用手进食或说话相助",
+    "seal": "小篆更加对称",
+    "modern": "现代楷书写作“右”"
+  },
+  "words": [
+    {
+      "word": "右手",
+      "pinyin": "yòu shǒu",
+      "meaning": "身体右侧的手"
+    },
+    {
+      "word": "右边",
+      "pinyin": "yòu biān",
+      "meaning": "右侧的方向"
+    },
+    {
+      "word": "向右转",
+      "pinyin": "xiàng yòu zhuǎn",
+      "meaning": "朝右边转身"
+    }
+  ],
+  "sentence": "同学们排好整齐的队伍，一起向右看齐。",
+  "gameConfig": {
+    "sound": "you",
+    "balloonPopOptions": [
+      "右",
+      "左",
+      "石",
+      "古"
+    ],
+    "correctIndex": 0
+  },
+  "strokes": [
+    {
+      "name": "横",
+      "order": 1,
+      "path": "M 22,30 L 78,30",
+      "start": {
+        "x": 22,
+        "y": 30
+      },
+      "end": {
+        "x": 78,
+        "y": 30
+      }
+    },
+    {
+      "name": "撇",
+      "order": 2,
+      "path": "M 50,15 L 20,80",
+      "start": {
+        "x": 50,
+        "y": 15
+      },
+      "end": {
+        "x": 20,
+        "y": 80
+      }
+    },
+    {
+      "name": "竖",
+      "order": 3,
+      "path": "M 38,55 L 38,82",
+      "start": {
+        "x": 38,
+        "y": 55
+      },
+      "end": {
+        "x": 38,
+        "y": 82
+      }
+    },
+    {
+      "name": "横折",
+      "order": 4,
+      "path": "M 38,55 L 75,55 L 75,82",
+      "start": {
+        "x": 38,
+        "y": 55
+      },
+      "end": {
+        "x": 75,
+        "y": 82
+      },
+      "corner": {
+        "x": 75,
+        "y": 55
+      }
+    },
+    {
+      "name": "横",
+      "order": 5,
+      "path": "M 38,82 L 75,82",
+      "start": {
+        "x": 38,
+        "y": 82
+      },
+      "end": {
+        "x": 75,
+        "y": 82
+      }
+    }
+  ],
+  "confusingChars": [
+    "左",
+    "石",
+    "古",
+    "在"
+  ]
+},
+{
+  "id": "char_093",
+  "char": "大",
+  "pinyin": "dà",
+  "pinyinTone": 4,
+  "meaning": "指在体积、数量、力量等方面超过一般，与小相对",
+  "oracleGlyph": "大",
+  "bronzeGlyph": "大",
+  "radical": "大",
+  "strokeCount": 3,
+  "stage": 3,
+  "themeIsland": "space",
+  "unitIndex": 19,
+  "levelIndex": 3,
+  "evolution": {
+    "oracle": "甲骨文像一个正面站立、张开双臂双腿的大人",
+    "bronze": "金文身形更为壮硕",
+    "seal": "小篆更加对称规整",
+    "modern": "现代楷书写作“大”，一横一撇一捺"
+  },
+  "words": [
+    {
+      "word": "大小",
+      "pinyin": "dà xiǎo",
+      "meaning": "物体的尺寸高低"
+    },
+    {
+      "word": "大家",
+      "pinyin": "dà jiā",
+      "meaning": "所有的人，众人"
+    },
+    {
+      "word": "大人",
+      "pinyin": "dà rén",
+      "meaning": "成年人"
+    }
+  ],
+  "sentence": "大象的身子像一堵厚厚的大墙，非常高大。",
+  "gameConfig": {
+    "sound": "da",
+    "balloonPopOptions": [
+      "大",
+      "太",
+      "犬",
+      "天"
+    ],
+    "correctIndex": 0
+  },
+  "strokes": [
+    {
+      "name": "横",
+      "order": 1,
+      "path": "M 18,35 L 82,35",
+      "start": {
+        "x": 18,
+        "y": 35
+      },
+      "end": {
+        "x": 82,
+        "y": 35
+      }
+    },
+    {
+      "name": "撇",
+      "order": 2,
+      "path": "M 50,15 L 22,85",
+      "start": {
+        "x": 50,
+        "y": 15
+      },
+      "end": {
+        "x": 22,
+        "y": 85
+      }
+    },
+    {
+      "name": "捺",
+      "order": 3,
+      "path": "M 50,35 L 78,85",
+      "start": {
+        "x": 50,
+        "y": 35
+      },
+      "end": {
+        "x": 78,
+        "y": 85
+      }
+    }
+  ],
+  "confusingChars": [
+    "太",
+    "犬",
+    "天",
+    "木"
+  ]
+},
+{
+  "id": "char_094",
+  "char": "小",
+  "pinyin": "xiǎo",
+  "pinyinTone": 3,
+  "meaning": "指在体积、数量、年龄等方面不及一般，与大相对",
+  "oracleGlyph": "小",
+  "bronzeGlyph": "小",
+  "radical": "小",
+  "strokeCount": 3,
+  "stage": 3,
+  "themeIsland": "space",
+  "unitIndex": 19,
+  "levelIndex": 4,
+  "evolution": {
+    "oracle": "甲骨文像三颗细小的沙粒或微小水滴",
+    "bronze": "金文中间竖起，两旁两点",
+    "seal": "小篆演变为竖钩与左右两点",
+    "modern": "现代楷书写作“小”"
+  },
+  "words": [
+    {
+      "word": "小朋友",
+      "pinyin": "xiǎo péng yǒu",
+      "meaning": "可爱的小孩子们"
+    },
+    {
+      "word": "小草",
+      "pinyin": "xiǎo cǎo",
+      "meaning": "嫩绿的小植物"
+    },
+    {
+      "word": "小鸟",
+      "pinyin": "xiǎo niǎo",
+      "meaning": "天空中飞翔的小动物"
+    }
+  ],
+  "sentence": "小鸟在树枝上欢快地唱歌，春意盎然。",
+  "gameConfig": {
+    "sound": "xiao",
+    "balloonPopOptions": [
+      "小",
+      "少",
+      "水",
+      "心"
+    ],
+    "correctIndex": 0
+  },
+  "strokes": [
+    {
+      "name": "竖钩",
+      "order": 1,
+      "path": "M 50,18 L 50,85 L 38,72",
+      "start": {
+        "x": 50,
+        "y": 18
+      },
+      "end": {
+        "x": 38,
+        "y": 72
+      },
+      "corner": {
+        "x": 50,
+        "y": 85
+      }
+    },
+    {
+      "name": "撇点",
+      "order": 2,
+      "path": "M 32,42 L 20,60",
+      "start": {
+        "x": 32,
+        "y": 42
+      },
+      "end": {
+        "x": 20,
+        "y": 60
+      }
+    },
+    {
+      "name": "点",
+      "order": 3,
+      "path": "M 68,42 L 80,60",
+      "start": {
+        "x": 68,
+        "y": 42
+      },
+      "end": {
+        "x": 80,
+        "y": 60
+      }
+    }
+  ],
+  "confusingChars": [
+    "少",
+    "水",
+    "心",
+    "不"
+  ]
+},
+{
+  "id": "char_095",
+  "char": "中",
+  "pinyin": "zhōng",
+  "pinyinTone": 1,
+  "meaning": "位置在中间，不偏不倚，也指中国",
+  "oracleGlyph": "𠁩",
+  "bronzeGlyph": "中",
+  "radical": "丨",
+  "strokeCount": 4,
+  "stage": 3,
+  "themeIsland": "space",
+  "unitIndex": 19,
+  "levelIndex": 5,
+  "evolution": {
+    "oracle": "甲骨文像一面带有飘带的旗帜插在正中央",
+    "bronze": "金文旗身变成方口形",
+    "seal": "小篆一竖贯穿方框中央",
+    "modern": "现代楷书写作“中”"
+  },
+  "words": [
+    {
+      "word": "中间",
+      "pinyin": "zhōng jiān",
+      "meaning": "正中央的位置"
+    },
+    {
+      "word": "中国",
+      "pinyin": "zhōng guó",
+      "meaning": "我们伟大的祖国"
+    },
+    {
+      "word": "中午",
+      "pinyin": "zhōng wǔ",
+      "meaning": "白天十二点左右"
+    }
+  ],
+  "sentence": "红旗在广场正中央高高飘扬，十分壮观。",
+  "gameConfig": {
+    "sound": "zhong",
+    "balloonPopOptions": [
+      "中",
+      "申",
+      "甲",
+      "由"
+    ],
+    "correctIndex": 0
+  },
+  "strokes": [
+    {
+      "name": "竖",
+      "order": 1,
+      "path": "M 25,32 L 25,65",
+      "start": {
+        "x": 25,
+        "y": 32
+      },
+      "end": {
+        "x": 25,
+        "y": 65
+      }
+    },
+    {
+      "name": "横折",
+      "order": 2,
+      "path": "M 25,32 L 75,32 L 75,65",
+      "start": {
+        "x": 25,
+        "y": 32
+      },
+      "end": {
+        "x": 75,
+        "y": 65
+      },
+      "corner": {
+        "x": 75,
+        "y": 32
+      }
+    },
+    {
+      "name": "横",
+      "order": 3,
+      "path": "M 25,65 L 75,65",
+      "start": {
+        "x": 25,
+        "y": 65
+      },
+      "end": {
+        "x": 75,
+        "y": 65
+      }
+    },
+    {
+      "name": "竖",
+      "order": 4,
+      "path": "M 50,15 L 50,88",
+      "start": {
+        "x": 50,
+        "y": 15
+      },
+      "end": {
+        "x": 50,
+        "y": 88
+      }
+    }
+  ],
+  "confusingChars": [
+    "申",
+    "甲",
+    "由",
+    "口"
+  ]
+},
+{
+  "id": "char_096",
+  "char": "多",
+  "pinyin": "duō",
+  "pinyinTone": 1,
+  "meaning": "数量大，与少相对",
+  "oracleGlyph": "𡖇",
+  "bronzeGlyph": "多",
+  "radical": "夕",
+  "strokeCount": 6,
+  "stage": 3,
+  "themeIsland": "space",
+  "unitIndex": 20,
+  "levelIndex": 1,
+  "evolution": {
+    "oracle": "甲骨文由两块肉叠放在一起表示重叠丰富",
+    "bronze": "金文上下两块肉形态更分明",
+    "seal": "小篆肉演化为两个夕字相叠",
+    "modern": "现代楷书写作“多”"
+  },
+  "words": [
+    {
+      "word": "许多",
+      "pinyin": "xǔ duō",
+      "meaning": "大量的，很多"
+    },
+    {
+      "word": "多么",
+      "pinyin": "duō me",
+      "meaning": "表示程度极深"
+    },
+    {
+      "word": "多彩",
+      "pinyin": "duō cǎi",
+      "meaning": "丰富多彩"
+    }
+  ],
+  "sentence": "花园里开满了许多五颜六色的鲜花。",
+  "gameConfig": {
+    "sound": "duo",
+    "balloonPopOptions": [
+      "多",
+      "夕",
+      "名",
+      "外"
+    ],
+    "correctIndex": 0
+  },
+  "strokes": [
+    {
+      "name": "撇",
+      "order": 1,
+      "path": "M 50,15 L 35,32",
+      "start": {
+        "x": 50,
+        "y": 15
+      },
+      "end": {
+        "x": 35,
+        "y": 32
+      }
+    },
+    {
+      "name": "横撇",
+      "order": 2,
+      "path": "M 35,32 L 68,32 L 40,55",
+      "start": {
+        "x": 35,
+        "y": 32
+      },
+      "end": {
+        "x": 40,
+        "y": 55
+      },
+      "corner": {
+        "x": 68,
+        "y": 32
+      }
+    },
+    {
+      "name": "点",
+      "order": 3,
+      "path": "M 50,42 L 55,48",
+      "start": {
+        "x": 50,
+        "y": 42
+      },
+      "end": {
+        "x": 55,
+        "y": 48
+      }
+    },
+    {
+      "name": "撇",
+      "order": 4,
+      "path": "M 48,55 L 32,72",
+      "start": {
+        "x": 48,
+        "y": 55
+      },
+      "end": {
+        "x": 32,
+        "y": 72
+      }
+    },
+    {
+      "name": "横撇",
+      "order": 5,
+      "path": "M 32,72 L 72,72 L 45,92",
+      "start": {
+        "x": 32,
+        "y": 72
+      },
+      "end": {
+        "x": 45,
+        "y": 92
+      },
+      "corner": {
+        "x": 72,
+        "y": 72
+      }
+    },
+    {
+      "name": "点",
+      "order": 6,
+      "path": "M 52,80 L 58,88",
+      "start": {
+        "x": 52,
+        "y": 80
+      },
+      "end": {
+        "x": 58,
+        "y": 88
+      }
+    }
+  ],
+  "confusingChars": [
+    "夕",
+    "名",
+    "外",
+    "夜"
+  ]
+},
+{
+  "id": "char_097",
+  "char": "少",
+  "pinyin": "shǎo",
+  "pinyinTone": 3,
+  "meaning": "数量小，与多相对；也读 shào，指年轻",
+  "oracleGlyph": "𡭕",
+  "bronzeGlyph": "少",
+  "radical": "小",
+  "strokeCount": 4,
+  "stage": 3,
+  "themeIsland": "space",
+  "unitIndex": 20,
+  "levelIndex": 2,
+  "evolution": {
+    "oracle": "甲骨文是在三个小沙粒旁加一撇指事符号",
+    "bronze": "金文形体同小字相近",
+    "seal": "小篆在小字下方加长撇",
+    "modern": "现代楷书写作“少”"
+  },
+  "words": [
+    {
+      "word": "多少",
+      "pinyin": "duō shao",
+      "meaning": "询问数量"
+    },
+    {
+      "word": "少年",
+      "pinyin": "shào nián",
+      "meaning": "朝气蓬勃的少年儿童"
+    },
+    {
+      "word": "很少",
+      "pinyin": "hěn shǎo",
+      "meaning": "数量极少"
+    }
+  ],
+  "sentence": "少年儿童像早晨八九点钟的太阳，充满希望。",
+  "gameConfig": {
+    "sound": "shao",
+    "balloonPopOptions": [
+      "少",
+      "小",
+      "水",
+      "步"
+    ],
+    "correctIndex": 0
+  },
+  "strokes": [
+    {
+      "name": "竖",
+      "order": 1,
+      "path": "M 50,18 L 50,60",
+      "start": {
+        "x": 50,
+        "y": 18
+      },
+      "end": {
+        "x": 50,
+        "y": 60
+      }
+    },
+    {
+      "name": "点",
+      "order": 2,
+      "path": "M 32,38 L 22,55",
+      "start": {
+        "x": 32,
+        "y": 38
+      },
+      "end": {
+        "x": 22,
+        "y": 55
+      }
+    },
+    {
+      "name": "撇点",
+      "order": 3,
+      "path": "M 68,38 L 78,55",
+      "start": {
+        "x": 68,
+        "y": 38
+      },
+      "end": {
+        "x": 78,
+        "y": 55
+      }
+    },
+    {
+      "name": "撇",
+      "order": 4,
+      "path": "M 75,48 L 20,88",
+      "start": {
+        "x": 75,
+        "y": 48
+      },
+      "end": {
+        "x": 20,
+        "y": 88
+      }
+    }
+  ],
+  "confusingChars": [
+    "小",
+    "水",
+    "步",
+    "沙"
+  ]
+},
+{
+  "id": "char_098",
+  "char": "雨",
+  "pinyin": "yǔ",
+  "pinyinTone": 3,
+  "meaning": "从云层中降落的水滴",
+  "oracleGlyph": "𩁹",
+  "bronzeGlyph": "雨",
+  "radical": "雨",
+  "strokeCount": 8,
+  "stage": 3,
+  "themeIsland": "space",
+  "unitIndex": 20,
+  "levelIndex": 3,
+  "evolution": {
+    "oracle": "甲骨文上方是一横象征天空与云层，下方落下一颗颗水滴",
+    "bronze": "金文水滴形态更饱满",
+    "seal": "小篆外框成罩，内有四个水滴点",
+    "modern": "现代楷书写作“雨”"
+  },
+  "words": [
+    {
+      "word": "下雨",
+      "pinyin": "xià yǔ",
+      "meaning": "天降甘霖"
+    },
+    {
+      "word": "雨滴",
+      "pinyin": "yǔ dī",
+      "meaning": "一滴滴晶莹的雨水"
+    },
+    {
+      "word": "雨伞",
+      "pinyin": "yǔ sǎn",
+      "meaning": "下雨天遮雨的工具"
+    }
+  ],
+  "sentence": "春雨沙沙地下，滋润着大地上的小树苗。",
+  "gameConfig": {
+    "sound": "yu",
+    "balloonPopOptions": [
+      "雨",
+      "两",
+      "雪",
+      "西"
+    ],
+    "correctIndex": 0
+  },
+  "strokes": [
+    {
+      "name": "横",
+      "order": 1,
+      "path": "M 25,20 L 75,20",
+      "start": {
+        "x": 25,
+        "y": 20
+      },
+      "end": {
+        "x": 75,
+        "y": 20
+      }
+    },
+    {
+      "name": "竖",
+      "order": 2,
+      "path": "M 50,20 L 50,40",
+      "start": {
+        "x": 50,
+        "y": 20
+      },
+      "end": {
+        "x": 50,
+        "y": 40
+      }
+    },
+    {
+      "name": "横折钩",
+      "order": 3,
+      "path": "M 20,40 L 80,40 L 80,82 L 72,75",
+      "start": {
+        "x": 20,
+        "y": 40
+      },
+      "end": {
+        "x": 72,
+        "y": 75
+      },
+      "corner": {
+        "x": 80,
+        "y": 40
+      }
+    },
+    {
+      "name": "竖",
+      "order": 4,
+      "path": "M 50,40 L 50,82",
+      "start": {
+        "x": 50,
+        "y": 40
+      },
+      "end": {
+        "x": 50,
+        "y": 82
+      }
+    },
+    {
+      "name": "点",
+      "order": 5,
+      "path": "M 32,50 L 35,58",
+      "start": {
+        "x": 32,
+        "y": 50
+      },
+      "end": {
+        "x": 35,
+        "y": 58
+      }
+    },
+    {
+      "name": "点",
+      "order": 6,
+      "path": "M 32,68 L 35,76",
+      "start": {
+        "x": 32,
+        "y": 68
+      },
+      "end": {
+        "x": 35,
+        "y": 76
+      }
+    },
+    {
+      "name": "点",
+      "order": 7,
+      "path": "M 65,50 L 68,58",
+      "start": {
+        "x": 65,
+        "y": 50
+      },
+      "end": {
+        "x": 68,
+        "y": 58
+      }
+    },
+    {
+      "name": "点",
+      "order": 8,
+      "path": "M 65,68 L 68,76",
+      "start": {
+        "x": 65,
+        "y": 68
+      },
+      "end": {
+        "x": 68,
+        "y": 76
+      }
+    }
+  ],
+  "confusingChars": [
+    "两",
+    "雪",
+    "西",
+    "面"
+  ]
+},
+{
+  "id": "char_099",
+  "char": "雪",
+  "pinyin": "xuě",
+  "pinyinTone": 3,
+  "meaning": "水蒸气凝结成的白色晶体，从空中飘落",
+  "oracleGlyph": "𩂥",
+  "bronzeGlyph": "雪",
+  "radical": "雨",
+  "strokeCount": 11,
+  "stage": 3,
+  "themeIsland": "space",
+  "unitIndex": 20,
+  "levelIndex": 4,
+  "evolution": {
+    "oracle": "甲骨文上方是雨字头，下方像用手拿着羽毛状的雪花",
+    "bronze": "金文雨头下加扫帚或彐",
+    "seal": "小篆更加对称规整",
+    "modern": "现代楷书写作“雪”，雨字头加彐"
+  },
+  "words": [
+    {
+      "word": "白雪",
+      "pinyin": "bái xuě",
+      "meaning": "洁白美丽的雪花"
+    },
+    {
+      "word": "雪花",
+      "pinyin": "xuě huā",
+      "meaning": "晶莹剔透的六角形雪花"
+    },
+    {
+      "word": "雪人",
+      "pinyin": "xuě rén",
+      "meaning": "用积雪堆成的人形玩具"
+    }
+  ],
+  "sentence": "冬天到了，漫天飘舞着洁白轻盈的小雪花。",
+  "gameConfig": {
+    "sound": "xue",
+    "balloonPopOptions": [
+      "雪",
+      "雨",
+      "雷",
+      "霜"
+    ],
+    "correctIndex": 0
+  },
+  "strokes": [
+    {
+      "name": "横",
+      "order": 1,
+      "path": "M 25,18 L 75,18",
+      "start": {
+        "x": 25,
+        "y": 18
+      },
+      "end": {
+        "x": 75,
+        "y": 18
+      }
+    },
+    {
+      "name": "竖",
+      "order": 2,
+      "path": "M 50,18 L 50,35",
+      "start": {
+        "x": 50,
+        "y": 18
+      },
+      "end": {
+        "x": 50,
+        "y": 35
+      }
+    },
+    {
+      "name": "横折钩",
+      "order": 3,
+      "path": "M 22,35 L 78,35 L 78,55 L 72,50",
+      "start": {
+        "x": 22,
+        "y": 35
+      },
+      "end": {
+        "x": 72,
+        "y": 50
+      },
+      "corner": {
+        "x": 78,
+        "y": 35
+      }
+    },
+    {
+      "name": "竖",
+      "order": 4,
+      "path": "M 50,35 L 50,55",
+      "start": {
+        "x": 50,
+        "y": 35
+      },
+      "end": {
+        "x": 50,
+        "y": 55
+      }
+    },
+    {
+      "name": "点",
+      "order": 5,
+      "path": "M 32,40 L 35,46",
+      "start": {
+        "x": 32,
+        "y": 40
+      },
+      "end": {
+        "x": 35,
+        "y": 46
+      }
+    },
+    {
+      "name": "点",
+      "order": 6,
+      "path": "M 32,48 L 35,54",
+      "start": {
+        "x": 32,
+        "y": 48
+      },
+      "end": {
+        "x": 35,
+        "y": 54
+      }
+    },
+    {
+      "name": "点",
+      "order": 7,
+      "path": "M 65,40 L 68,46",
+      "start": {
+        "x": 65,
+        "y": 40
+      },
+      "end": {
+        "x": 68,
+        "y": 46
+      }
+    },
+    {
+      "name": "点",
+      "order": 8,
+      "path": "M 65,48 L 68,54",
+      "start": {
+        "x": 65,
+        "y": 48
+      },
+      "end": {
+        "x": 68,
+        "y": 54
+      }
+    },
+    {
+      "name": "横折",
+      "order": 9,
+      "path": "M 30,65 L 70,65 L 70,75",
+      "start": {
+        "x": 30,
+        "y": 65
+      },
+      "end": {
+        "x": 70,
+        "y": 75
+      },
+      "corner": {
+        "x": 70,
+        "y": 65
+      }
+    },
+    {
+      "name": "横",
+      "order": 10,
+      "path": "M 30,75 L 65,75",
+      "start": {
+        "x": 30,
+        "y": 75
+      },
+      "end": {
+        "x": 65,
+        "y": 75
+      }
+    },
+    {
+      "name": "横",
+      "order": 11,
+      "path": "M 25,88 L 75,88",
+      "start": {
+        "x": 25,
+        "y": 88
+      },
+      "end": {
+        "x": 75,
+        "y": 88
+      }
+    }
+  ],
+  "confusingChars": [
+    "雨",
+    "雷",
+    "霜",
+    "雾"
+  ]
+},
+{
+  "id": "char_100",
+  "char": "风",
+  "pinyin": "fēng",
+  "pinyinTone": 1,
+  "meaning": "空气流动的自然现象",
+  "oracleGlyph": "𠘲",
+  "bronzeGlyph": "风",
+  "radical": "风",
+  "strokeCount": 4,
+  "stage": 3,
+  "themeIsland": "space",
+  "unitIndex": 20,
+  "levelIndex": 5,
+  "evolution": {
+    "oracle": "甲骨文像一只头顶有华丽羽冠的神鸟（凤鸟），神鸟飞翔带起大风",
+    "bronze": "金文在凤鸟体内加虫形",
+    "seal": "小篆更加对称方正",
+    "modern": "现代简体楷书写作“风”，外框加撇点"
+  },
+  "words": [
+    {
+      "word": "春风",
+      "pinyin": "chūn fēng",
+      "meaning": "温暖宜人的春天气息"
+    },
+    {
+      "word": "大风",
+      "pinyin": "dà fēng",
+      "meaning": "猛烈的风力"
+    },
+    {
+      "word": "风筝",
+      "pinyin": "fēng zheng",
+      "meaning": "依靠风力飞上天空的玩具"
+    }
+  ],
+  "sentence": "春风轻轻拂过脸颊，田野里的小草变绿了。",
+  "gameConfig": {
+    "sound": "feng",
+    "balloonPopOptions": [
+      "风",
+      "凤",
+      "凡",
+      "冈"
+    ],
+    "correctIndex": 0
+  },
+  "strokes": [
+    {
+      "name": "撇",
+      "order": 1,
+      "path": "M 30,22 L 20,82",
+      "start": {
+        "x": 30,
+        "y": 22
+      },
+      "end": {
+        "x": 20,
+        "y": 82
+      }
+    },
+    {
+      "name": "横折弯钩",
+      "order": 2,
+      "path": "M 30,22 L 78,22 L 78,82 L 68,75",
+      "start": {
+        "x": 30,
+        "y": 22
+      },
+      "end": {
+        "x": 68,
+        "y": 75
+      },
+      "corner": {
+        "x": 78,
+        "y": 22
+      }
+    },
+    {
+      "name": "撇",
+      "order": 3,
+      "path": "M 52,38 L 42,62",
+      "start": {
+        "x": 52,
+        "y": 38
+      },
+      "end": {
+        "x": 42,
+        "y": 62
+      }
+    },
+    {
+      "name": "点",
+      "order": 4,
+      "path": "M 48,52 L 65,65",
+      "start": {
+        "x": 48,
+        "y": 52
+      },
+      "end": {
+        "x": 65,
+        "y": 65
+      }
+    }
+  ],
+  "confusingChars": [
+    "凤",
+    "凡",
+    "冈",
+    "网"
+  ]
+}
 ];
 
 export const STAGES_METADATA = [

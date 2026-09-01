@@ -71,7 +71,7 @@ export class LearnModule extends BaseModule {
                     ? "bg-emerald-500 text-white shadow-md"
                     : "bg-white/20 text-white/40"
                 }">
-                  ${s.step < this.currentStep ? "" : `<span class="flex items-center">${s.iconSvg("w-4 h-4")}</span>`}
+                  ${s.step < this.currentStep ? `<span class="flex items-center">${GAME_ICONS.star("w-4 h-4", true)}</span>` : `<span class="flex items-center">${s.iconSvg("w-4 h-4")}</span>`}
                 </div>
                 <span class="text-xs font-black ${s.step === this.currentStep ? "text-yellow-300 drop-shadow" : "text-white/60"}">${s.name}</span>
                 ${s.step < 5 ? `<div class="w-4 h-0.5 ${s.step < this.currentStep ? "bg-emerald-400" : "bg-white/20"}"></div>` : ""}
@@ -158,7 +158,7 @@ export class LearnModule extends BaseModule {
   }
 
   // ----------------------------------------------------------------
-  // STEP 1: 玩 (8 大汉字专属物理情景交互 + 4 阶段象形蜕变)
+  // STEP 1: 玩 (专属物理情景交互 + 4 阶段象形蜕变)
   // ----------------------------------------------------------------
   renderStepPlay(stage) {
     const char = this.charData;
@@ -168,95 +168,127 @@ export class LearnModule extends BaseModule {
     // 为不同汉字定制专属情景
     switch (char.char) {
       case "日":
-        guide = " 向上拉动金色法绳，升起灿烂红日！";
+        guide = "向上拉动金色法绳，升起灿烂红日！";
         sceneHTML = `
           <div id="interactive-actor" class="relative flex flex-col items-center cursor-pointer group">
             <div id="play-target-anim" class="w-36 h-36 rounded-full bg-gradient-to-tr from-yellow-300 via-orange-400 to-red-500 shadow-[0_0_70px_rgba(255,160,0,1)] flex items-center justify-center text-7xl text-white font-black border-4 border-white transition-all duration-1000 transform translate-y-16 scale-75">
-              
+              ${char.oracleGlyph || "日"}
             </div>
             <div class="w-2.5 h-28 bg-amber-800 border-2 border-yellow-300 rounded-full flex items-center justify-center mt-2 animate-pulse">
               <div class="w-8 h-8 rounded-full bg-yellow-400 border-2 border-white shadow-xl flex items-center justify-center text-xs">
-                
+                ${GAME_ICONS.sparkle("w-5 h-5")}
               </div>
             </div>
           </div>
         `;
         break;
       case "月":
-        guide = " 划动手指擦除夜空乌云，找到皎洁月亮！";
+        guide = "划动手指擦除夜空乌云，找到皎洁月亮！";
         sceneHTML = `
           <div id="interactive-actor" class="relative flex flex-col items-center cursor-pointer group">
-            <div id="play-target-anim" class="w-40 h-40 rounded-full bg-slate-900 border-4 border-slate-700 flex items-center justify-center text-7xl transition-all duration-1000">
-              ️
+            <div id="play-target-anim" class="w-40 h-40 rounded-full bg-slate-900 border-4 border-slate-700 flex items-center justify-center text-7xl text-yellow-300 font-black transition-all duration-1000">
+              ${char.oracleGlyph || "月"}
             </div>
-            <span class="text-xs text-yellow-200 mt-3 bg-black/40 px-3 py-1 rounded-full border border-white/20"> 划开云雾</span>
+            <span class="text-xs text-yellow-200 mt-3 bg-black/40 px-3 py-1 rounded-full border border-white/20">划开云雾</span>
           </div>
         `;
         break;
       case "水":
-        guide = " 点击疏通清澈泉眼，让甘甜河水奔流！";
+        guide = "点击疏通清澈泉眼，让甘甜河水奔流！";
         sceneHTML = `
           <div id="interactive-actor" class="relative flex flex-col items-center cursor-pointer group">
-            <div id="play-target-anim" class="w-40 h-40 rounded-3xl bg-cyan-600/80 border-4 border-cyan-300 shadow-[0_0_50px_rgba(0,188,212,0.8)] flex items-center justify-center text-7xl transition-all duration-1000">
-              
+            <div id="play-target-anim" class="w-40 h-40 rounded-3xl bg-cyan-600/80 border-4 border-cyan-300 shadow-[0_0_50px_rgba(0,188,212,0.8)] flex items-center justify-center text-7xl text-white font-black transition-all duration-1000">
+              ${char.oracleGlyph || "水"}
             </div>
-            <span class="text-xs text-cyan-200 mt-3 bg-black/40 px-3 py-1 rounded-full border border-white/20"> 点击喷泉</span>
+            <span class="text-xs text-cyan-200 mt-3 bg-black/40 px-3 py-1 rounded-full border border-white/20">点击喷泉</span>
           </div>
         `;
         break;
       case "火":
-        guide = " 快速滑动摩擦取火，点燃温暖的篝火！";
+        guide = "快速滑动摩擦取火，点燃温暖的篝火！";
         sceneHTML = `
           <div id="interactive-actor" class="relative flex flex-col items-center cursor-pointer group">
-            <div id="play-target-anim" class="w-40 h-40 rounded-3xl bg-amber-950 border-4 border-orange-500 shadow-[0_0_50px_rgba(255,87,34,0.8)] flex items-center justify-center text-7xl transition-all duration-1000">
-              
+            <div id="play-target-anim" class="w-40 h-40 rounded-3xl bg-amber-950 border-4 border-orange-500 shadow-[0_0_50px_rgba(255,87,34,0.8)] flex items-center justify-center text-7xl text-yellow-400 font-black transition-all duration-1000">
+              ${char.oracleGlyph || "火"}
             </div>
-            <span class="text-xs text-orange-200 mt-3 bg-black/40 px-3 py-1 rounded-full border border-white/20"> 摩擦点火</span>
+            <span class="text-xs text-orange-200 mt-3 bg-black/40 px-3 py-1 rounded-full border border-white/20">摩擦点火</span>
           </div>
         `;
         break;
       case "山":
-        guide = " 依次敲击三块奇石，唤醒巍峨大山！";
+        guide = "依次敲击三块奇石，唤醒巍峨大山！";
         sceneHTML = `
           <div id="interactive-actor" class="relative flex flex-col items-center cursor-pointer group">
-            <div id="play-target-anim" class="w-44 h-36 rounded-3xl bg-stone-700 border-4 border-stone-400 shadow-[0_0_50px_rgba(100,100,100,0.8)] flex items-center justify-center text-7xl transition-all duration-1000">
-              ️
+            <div id="play-target-anim" class="w-44 h-36 rounded-3xl bg-stone-700 border-4 border-stone-400 shadow-[0_0_50px_rgba(100,100,100,0.8)] flex items-center justify-center text-7xl text-amber-200 font-black transition-all duration-1000">
+              ${char.oracleGlyph || "山"}
             </div>
-            <span class="text-xs text-stone-200 mt-3 bg-black/40 px-3 py-1 rounded-full border border-white/20"> 敲击唤醒</span>
+            <span class="text-xs text-stone-200 mt-3 bg-black/40 px-3 py-1 rounded-full border border-white/20">敲击唤醒</span>
           </div>
         `;
         break;
       case "木":
-        guide = " 拖动喷壶给小嫩芽浇水，长成参天大树！";
+        guide = "拖动喷壶给小嫩芽浇水，长成参天大树！";
         sceneHTML = `
           <div id="interactive-actor" class="relative flex flex-col items-center cursor-pointer group">
-            <div id="play-target-anim" class="w-40 h-40 rounded-3xl bg-emerald-900 border-4 border-emerald-400 shadow-[0_0_50px_rgba(76,175,80,0.8)] flex items-center justify-center text-7xl transition-all duration-1000">
-              
+            <div id="play-target-anim" class="w-40 h-40 rounded-3xl bg-emerald-900 border-4 border-emerald-400 shadow-[0_0_50px_rgba(76,175,80,0.8)] flex items-center justify-center text-7xl text-emerald-200 font-black transition-all duration-1000">
+              ${char.oracleGlyph || "木"}
             </div>
-            <span class="text-xs text-emerald-200 mt-3 bg-black/40 px-3 py-1 rounded-full border border-white/20"> 浇水成长</span>
+            <span class="text-xs text-emerald-200 mt-3 bg-black/40 px-3 py-1 rounded-full border border-white/20">浇水成长</span>
           </div>
         `;
         break;
       case "人":
-        guide = " 帮助小勇士迈开双腿跨栏赛跑！";
+        guide = "帮助小勇士迈开双腿跨栏赛跑！";
         sceneHTML = `
           <div id="interactive-actor" class="relative flex flex-col items-center cursor-pointer group">
-            <div id="play-target-anim" class="w-40 h-40 rounded-3xl bg-orange-950 border-4 border-orange-400 shadow-[0_0_50px_rgba(255,107,0,0.8)] flex items-center justify-center text-7xl transition-all duration-1000">
-              
+            <div id="play-target-anim" class="w-40 h-40 rounded-3xl bg-orange-950 border-4 border-orange-400 shadow-[0_0_50px_rgba(255,107,0,0.8)] flex items-center justify-center text-7xl text-yellow-300 font-black transition-all duration-1000">
+              ${char.oracleGlyph || "人"}
             </div>
-            <span class="text-xs text-orange-200 mt-3 bg-black/40 px-3 py-1 rounded-full border border-white/20"> 迈步向前</span>
+            <span class="text-xs text-orange-200 mt-3 bg-black/40 px-3 py-1 rounded-full border border-white/20">迈步向前</span>
           </div>
         `;
         break;
       case "口":
-      default:
-        guide = " 把美味草莓喂进小怪兽的大嘴巴里！";
+        guide = "把美味草莓喂进小怪兽的大嘴巴里！";
         sceneHTML = `
           <div id="interactive-actor" class="relative flex flex-col items-center cursor-pointer group">
-            <div id="play-target-anim" class="w-40 h-40 rounded-3xl bg-pink-950 border-4 border-pink-400 shadow-[0_0_50px_rgba(233,30,99,0.8)] flex items-center justify-center text-7xl transition-all duration-1000">
-              
+            <div id="play-target-anim" class="w-40 h-40 rounded-3xl bg-pink-950 border-4 border-pink-400 shadow-[0_0_50px_rgba(233,30,99,0.8)] flex items-center justify-center text-7xl text-pink-200 font-black transition-all duration-1000">
+              ${char.oracleGlyph || "口"}
             </div>
-            <span class="text-xs text-pink-200 mt-3 bg-black/40 px-3 py-1 rounded-full border border-white/20"> 喂食大口</span>
+            <span class="text-xs text-pink-200 mt-3 bg-black/40 px-3 py-1 rounded-full border border-white/20">喂食大口</span>
+          </div>
+        `;
+        break;
+      case "春":
+        guide = "轻抚大地唤醒春风，吹绿大树萌发嫩芽！";
+        sceneHTML = `
+          <div id="interactive-actor" class="relative flex flex-col items-center cursor-pointer group">
+            <div id="play-target-anim" class="w-40 h-40 rounded-3xl bg-emerald-700 border-4 border-emerald-300 shadow-[0_0_50px_rgba(16,185,129,0.8)] flex items-center justify-center text-7xl text-emerald-100 font-black transition-all duration-1000">
+              ${char.oracleGlyph || "春"}
+            </div>
+            <span class="text-xs text-emerald-200 mt-3 bg-black/40 px-3 py-1 rounded-full border border-white/20">迎春拂晓</span>
+          </div>
+        `;
+        break;
+      case "冬":
+        guide = "滚动雪球堆起可爱的冬日小雪人！";
+        sceneHTML = `
+          <div id="interactive-actor" class="relative flex flex-col items-center cursor-pointer group">
+            <div id="play-target-anim" class="w-40 h-40 rounded-3xl bg-sky-900 border-4 border-cyan-300 shadow-[0_0_50px_rgba(56,189,248,0.8)] flex items-center justify-center text-7xl text-sky-100 font-black transition-all duration-1000">
+              ${char.oracleGlyph || "冬"}
+            </div>
+            <span class="text-xs text-sky-200 mt-3 bg-black/40 px-3 py-1 rounded-full border border-white/20">堆小雪人</span>
+          </div>
+        `;
+        break;
+      default:
+        guide = `点击神奇魔法光球，探索“${char.char}”字的古老起源！`;
+        sceneHTML = `
+          <div id="interactive-actor" class="relative flex flex-col items-center cursor-pointer group">
+            <div id="play-target-anim" class="w-40 h-40 rounded-3xl bg-gradient-to-tr from-amber-600 to-orange-500 border-4 border-amber-300 shadow-[0_0_50px_rgba(245,158,11,0.8)] flex items-center justify-center text-7xl text-white font-black transition-all duration-1000">
+              ${char.oracleGlyph || char.char}
+            </div>
+            <span class="text-xs text-yellow-200 mt-3 bg-black/40 px-3 py-1 rounded-full border border-white/20">点击解密起源</span>
           </div>
         `;
         break;
@@ -328,9 +360,9 @@ export class LearnModule extends BaseModule {
         }
 
         this._timeout(() => {
-          soundAndFX.speak(`太棒啦！古人根据这个形状，创造出了“${char.char}”字！`);
+          soundAndFX.speakPriority(`太棒啦！古人根据这个形状，创造出了“${char.char}”字！`, { kind: "sentence", emotion: "excited" });
           if (revealBox) revealBox.classList.remove("hidden");
-        }, 1200);
+        }, 600);
       });
     }
 
@@ -348,7 +380,7 @@ export class LearnModule extends BaseModule {
   // ----------------------------------------------------------------
   renderStepRecognize(stage) {
     const char = this.charData;
-    soundAndFX.speak(`认一认：“${char.char}”，拼音读作 ${char.pinyin}点击大字听发音！`);
+    soundAndFX.speakPriority(`认一认：“${char.char}”，拼音读作 ${char.pinyin}。点击大字听发音！`, { kind: "sentence", emotion: "gentle" });
 
     stage.innerHTML = `
       <div class="relative w-full max-w-4xl h-[480px] bg-gradient-to-b from-purple-900 via-indigo-900 to-slate-950 rounded-3xl overflow-hidden shadow-2xl border-4 border-amber-300 flex items-center justify-between p-8 animate-fade-in select-none">
@@ -384,7 +416,7 @@ export class LearnModule extends BaseModule {
               ${char.words
                 .map(
                   (w) => `
-                <button class="word-balloon-btn p-3 bg-gradient-to-r from-amber-50 to-orange-100 hover:from-yellow-200 hover:to-orange-300 rounded-2xl border-2 border-amber-300 text-left flex items-center justify-between shadow-md active:scale-95 transition-all" data-word="${w.word}">
+                <button class="word-balloon-btn p-3 bg-gradient-to-r from-amber-50 to-orange-100 hover:from-yellow-200 hover:to-orange-300 rounded-2xl border-2 border-amber-300 text-left flex items-center justify-between shadow-md active:scale-95 transition-all cursor-pointer" data-word="${w.word}">
                   <div>
                     <span class="text-xs font-bold text-amber-700">${w.pinyin}</span>
                     <h4 class="text-base font-black text-amber-950">${w.word}</h4>
@@ -396,7 +428,7 @@ export class LearnModule extends BaseModule {
                 .join("")}
             </div>
 
-            <div class="mt-4 p-3 bg-black/40 rounded-2xl border border-white/20 text-xs text-yellow-200 font-semibold leading-relaxed">
+            <div id="sentence-card" class="mt-4 p-3 bg-black/40 hover:bg-black/60 rounded-2xl border border-white/20 text-xs text-yellow-200 font-semibold leading-relaxed cursor-pointer transition-all active:scale-95" title="点击朗读例句">
               ${window.GAME_ICONS ? window.GAME_ICONS.pen("w-4 h-4 inline-block") : ""} <span class="text-white font-bold">造句：</span>${char.sentence}
             </div>
           </div>
@@ -413,7 +445,7 @@ export class LearnModule extends BaseModule {
     if (jellyBtn) {
       this._on(jellyBtn, "click", () => {
         soundAndFX.playJellyBoing();
-        soundAndFX.speak(`${char.char}，${char.pinyin}`);
+        soundAndFX.speakPriority(`${char.char}，${char.pinyin}`, { kind: "char", priority: 1 });
         jellyBtn.classList.add("scale-110", "rotate-3");
         this._timeout(() => jellyBtn.classList.remove("scale-110", "rotate-3"), 250);
       });
@@ -423,9 +455,21 @@ export class LearnModule extends BaseModule {
       this._on(btn, "click", () => {
         const word = btn.dataset.word;
         soundAndFX.playPop();
-        soundAndFX.speak(word);
+        soundAndFX.speakPriority(word, { kind: "word", priority: 1 });
+        btn.classList.add("ring-2", "ring-yellow-400");
+        this._timeout(() => btn.classList.remove("ring-2", "ring-yellow-400"), 400);
       });
     });
+
+    const sentenceCard = stage.querySelector("#sentence-card");
+    if (sentenceCard) {
+      this._on(sentenceCard, "click", () => {
+        soundAndFX.playPop();
+        soundAndFX.speakPriority(char.sentence, { kind: "sentence", emotion: "gentle" });
+        sentenceCard.classList.add("ring-2", "ring-yellow-400", "bg-black/60");
+        this._timeout(() => sentenceCard.classList.remove("ring-2", "ring-yellow-400", "bg-black/60"), 800);
+      });
+    }
 
     const finishBtn = stage.querySelector("#btn-finish-rec-step");
     if (finishBtn) {
@@ -443,9 +487,7 @@ export class LearnModule extends BaseModule {
   // ----------------------------------------------------------------
   renderStepRead(stage) {
     const char = this.charData;
-    
-    // Fallback if pronunciationEval is not globally available yet
-    // Since we'll import it at the top of the file
+    soundAndFX.speakPriority(`读一读：“${char.char}”，点击麦克风大声朗读！`, { kind: "sentence", emotion: "gentle" });
     
     stage.innerHTML = `
       <div class="relative w-full max-w-4xl h-[480px] bg-gradient-to-b from-blue-900 via-indigo-900 to-slate-950 rounded-3xl overflow-hidden shadow-2xl border-4 border-sky-300 flex items-center justify-between p-8 animate-fade-in select-none">
@@ -455,9 +497,12 @@ export class LearnModule extends BaseModule {
             请大声朗读这个字
           </div>
 
-          <div class="relative w-48 h-48 rounded-full bg-gradient-to-tr from-sky-400 via-blue-500 to-indigo-600 border-4 border-white shadow-[0_0_60px_rgba(56,189,248,0.8)] flex items-center justify-center text-8xl font-black text-white">
+          <button id="read-char-circle" class="relative w-48 h-48 rounded-full bg-gradient-to-tr from-sky-400 via-blue-500 to-indigo-600 border-4 border-white shadow-[0_0_60px_rgba(56,189,248,0.8)] flex items-center justify-center text-8xl font-black text-white active:scale-95 transition-transform cursor-pointer" title="点击听示范发音">
             ${char.char}
-          </div>
+            <div class="absolute -bottom-2 bg-blue-900 text-sky-200 text-[10px] font-black px-3 py-0.5 rounded-full border border-sky-400">
+              示范发音 ${window.GAME_ICONS ? window.GAME_ICONS.speaker("w-3.5 h-3.5 inline-block") : ""}
+            </div>
+          </button>
           
           <div id="read-score-display" class="mt-8 text-3xl font-black text-yellow-300 opacity-0 transition-opacity">
             评分: <span id="read-score-num">0</span> 分！
@@ -471,7 +516,7 @@ export class LearnModule extends BaseModule {
               点击下方按钮，对着麦克风大声朗读“<strong class="text-yellow-300 text-base">${char.char}</strong>”凯茜会为你打分哦！
             </p>
             
-            <button id="btn-start-record" class="w-24 h-24 mx-auto rounded-full bg-gradient-to-tr from-rose-400 to-red-500 shadow-[0_10px_20px_rgba(244,63,94,0.6)] flex items-center justify-center border-4 border-white active:scale-90 transition-all hover:scale-105">
+            <button id="btn-start-record" class="w-24 h-24 mx-auto rounded-full bg-gradient-to-tr from-rose-400 to-red-500 shadow-[0_10px_20px_rgba(244,63,94,0.6)] flex items-center justify-center border-4 border-white active:scale-90 transition-all hover:scale-105 cursor-pointer">
                <div class="w-12 h-12">${window.GAME_ICONS ? window.GAME_ICONS.audio("w-full h-full") : ""}</div>
             </button>
             <div id="record-status" class="mt-4 text-xs font-bold text-rose-200">
@@ -492,10 +537,19 @@ export class LearnModule extends BaseModule {
     const finishBtn = stage.querySelector("#btn-finish-read-step");
     const scoreDisplay = stage.querySelector("#read-score-display");
     const scoreNum = stage.querySelector("#read-score-num");
-    
-    let isRecording = false;
+    const charCircle = stage.querySelector("#read-char-circle");
+
+    if (charCircle) {
+      this._on(charCircle, "click", () => {
+        soundAndFX.playPop();
+        soundAndFX.speakPriority(`${char.char}，${char.pinyin}`, { kind: "char", priority: 1 });
+      });
+    }
 
     this._on(btnRecord, "click", async () => {
+      // 停止所有发音，防止麦克风录入合成语音
+      if (soundAndFX.synth) soundAndFX.synth.cancel();
+
       if (typeof window.pronunciationEval === 'undefined') {
         import('../utils/pronunciationEval.js').then(m => {
            window.pronunciationEval = m.pronunciationEval || m.default;
@@ -568,9 +622,11 @@ export class LearnModule extends BaseModule {
          
          if (score >= 60) {
             window.soundAndFX.playSuccessSound();
+            window.soundAndFX.speakPriority(`太棒了！发音得到${score}分！`, { kind: "sentence", emotion: "excited" });
             finishBtn.classList.remove("opacity-50", "pointer-events-none");
          } else {
             window.soundAndFX.playEncouragement();
+            window.soundAndFX.speakPriority(`再试一次吧，请读“${char.char}”！`, { kind: "sentence", emotion: "correction" });
          }
          btnRecord.classList.remove("animate-pulse", "ring-4", "ring-emerald-400");
       });
@@ -591,7 +647,7 @@ export class LearnModule extends BaseModule {
     let hitCount = 0;
     const targetHits = 3;
 
-    soundAndFX.speak(`瞄准射击！请击中带有“${char.char}”字的太空发光气球！`);
+    soundAndFX.speakPriority(`瞄准射击！请击中带有“${char.char}”字的太空发光气球！`, { kind: "sentence", emotion: "excited" });
 
     stage.innerHTML = `
       <div class="relative w-full max-w-4xl h-[480px] bg-gradient-to-b from-slate-950 via-indigo-950 to-slate-900 rounded-3xl overflow-hidden shadow-2xl border-4 border-amber-300 flex flex-col justify-between p-6 animate-fade-in select-none">
@@ -611,7 +667,7 @@ export class LearnModule extends BaseModule {
           ${(char.gameConfig && char.gameConfig.options ? char.gameConfig.options : [char.char, "月", "山"])
             .map(
               (opt, idx) => `
-            <button class="balloon-target-btn relative group w-28 h-36 rounded-full bg-gradient-to-t from-orange-600 via-amber-400 to-yellow-200 border-4 border-white shadow-[0_0_30px_rgba(255,160,0,0.6)] flex flex-col items-center justify-center active:scale-75 transition-all duration-300 animate-bounce-slow" style="animation-delay: ${
+            <button class="balloon-target-btn relative group w-28 h-36 rounded-full bg-gradient-to-t from-orange-600 via-amber-400 to-yellow-200 border-4 border-white shadow-[0_0_30px_rgba(255,160,0,0.6)] flex flex-col items-center justify-center active:scale-75 transition-all duration-300 animate-bounce-slow cursor-pointer" style="animation-delay: ${
               idx * 0.3
             }s" data-char="${opt}">
               <span class="text-5xl font-black text-amber-950 drop-shadow">${opt}</span>
@@ -636,8 +692,8 @@ export class LearnModule extends BaseModule {
           </div>
           <h2 class="text-2xl font-black text-yellow-300 mb-2">神枪手！射击挑战大满贯！</h2>
           <p class="text-xs text-gray-300 mb-6 font-semibold">你已经彻底掌握了“${char.char}”字的辨识与发音！</p>
-          <button id="btn-next-to-write" class="bg-gradient-to-r from-emerald-400 to-emerald-600 text-white font-black text-sm px-10 py-3.5 rounded-full shadow-2xl border-2 border-white active:scale-95 transition-transform flex items-center gap-2">
-            <span>️</span> 去写字小画堂 
+          <button id="btn-next-to-write" class="bg-gradient-to-r from-emerald-400 to-emerald-600 text-white font-black text-sm px-10 py-3.5 rounded-full shadow-2xl border-2 border-white active:scale-95 transition-transform flex items-center gap-2 cursor-pointer">
+            <span>${window.GAME_ICONS ? window.GAME_ICONS.pen("w-4 h-4 inline-block") : ""}</span> 去写字小画堂 
           </button>
         </div>
 
@@ -654,7 +710,7 @@ export class LearnModule extends BaseModule {
         if (val === char.char) {
           hitCount++;
           soundAndFX.playLaserShoot();
-          soundAndFX.playPop();
+          soundAndFX.speakPriority(char.char, { kind: "char", priority: 1 });
           soundAndFX.triggerConfetti(this.container);
 
           btn.classList.add("scale-150", "opacity-0");
@@ -670,8 +726,9 @@ export class LearnModule extends BaseModule {
           }
         } else {
           soundAndFX.playSoftError();
+          soundAndFX.speakPriority(`这是“${val}”字，要找的是“${char.char}”字哦！`, { kind: "sentence", emotion: "correction" });
           btn.classList.add("animate-shake");
-          this._timeout(() => btn.classList.remove("animate-shake"), 500);
+          this._timeout(() => btn.classList.remove("animate-shake"), 600);
         }
       });
     });

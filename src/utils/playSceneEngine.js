@@ -47,11 +47,30 @@ export class PlaySceneEngine {
     this.done = false;
     this._cleanups = [];
     this._raf = null;
+    // 矩形缓存：避免 RAF 循环中频繁调用 getBoundingClientRect
+    this._rectCache = new WeakMap();
+    this._rectCacheTimer = null;
     this.render();
+  }
+
+  /** 获取并缓存元素矩形，100ms 内复用缓存结果 */
+  _getRect(el) {
+    const now = performance.now();
+    const cached = this._rectCache.get(el);
+    if (cached && now - cached.time < 100) return cached.rect;
+    const rect = this._getRect(el);
+    this._rectCache.set(el, { rect, time: now });
+    return rect;
+  }
+
+  /** 强制刷新所有缓存的矩形 */
+  _invalidateRects() {
+    this._rectCache.clear();
   }
 
   destroy() {
     if (this._raf) cancelAnimationFrame(this._raf);
+    if (this._rectCacheTimer) clearInterval(this._rectCacheTimer);
     this._cleanups.forEach((fn) => fn && fn());
     this._cleanups = [];
   }
@@ -190,7 +209,7 @@ export class PlaySceneEngine {
         
         // 
         if (Math.random() < 0.1) {
-          const rect = peak.el.getBoundingClientRect();
+          const rect = this._getRect(peak.el);
           this.spawnParticles(rect.left + Math.random()*rect.width, rect.bottom - 10, { colorClass: 'bg-slate-400', lift: 0, speed: () => Math.random()*30 });
         }
 
@@ -205,7 +224,7 @@ export class PlaySceneEngine {
           this.shakeScreen(); // 
           soundAndFX.playPop(); // 
           
-          const pRect = peak.el.getBoundingClientRect();
+          const pRect = this._getRect(peak.el);
           this.spawnScoreText(pRect.left + pRect.width/2 - 30, pRect.top - 20, "!");
           this.spawnParticles(pRect.left + pRect.width/2, pRect.bottom, { colorClass: 'bg-slate-300', count: 20, lift: 20 }); // 
 
@@ -311,7 +330,7 @@ export class PlaySceneEngine {
       stick.style.backgroundColor = heatRatio > 0.8 ? '#f87171' : (heatRatio > 0.5 ? '#fb923c' : '#fde68a');
 
       if (Math.random() < heatRatio * 0.5) {
-        const rect = fPoint.getBoundingClientRect();
+        const rect = this._getRect(fPoint);
         this.spawnParticles(rect.left + 20, rect.top, { colorClass: 'bg-orange-500', count: 2, lift: 80, speed: () => Math.random()*150 });
       }
       
@@ -397,7 +416,7 @@ export class PlaySceneEngine {
       points.push([e.clientX, e.clientY]);
       if (points.length > 10) points.shift(); // keep trail short
       
-      const rect = this.mount.getBoundingClientRect();
+      const rect = this._getRect(this.mount);
       const pts = points.map(p => `${p[0] - rect.left},${p[1] - rect.top}`).join(" ");
       trail.setAttribute("points", pts);
     });
@@ -416,7 +435,7 @@ export class PlaySceneEngine {
         soundAndFX.playStrokeSound();
         this.shakeScreen();
 
-        const rect = bush.getBoundingClientRect();
+        const rect = this._getRect(bush);
         this.spawnParticles(rect.left + rect.width/2, rect.top + rect.height/2, { colorClass: 'bg-emerald-400', count: 15, lift: 80 });
         this.spawnScoreText(rect.left + rect.width/2, rect.top, ["!", "!", "!"][i]);
 
@@ -598,7 +617,7 @@ export class PlaySceneEngine {
       this.shakeScreen();
 
       // 
-      const rect = shell.getBoundingClientRect();
+      const rect = this._getRect(shell);
       this.spawnParticles(e.clientX, e.clientY, { colorClass: 'bg-slate-500', count: 8, lift: 60, speed: () => Math.random()*80 + 50 });
 
       // 
@@ -714,10 +733,10 @@ export class PlaySceneEngine {
       }
 
       // 
-      const boatRect = boat.getBoundingClientRect();
+      const boatRect = this._getRect(boat);
       const checkCollision = (star, sX, sY, strokeEl) => {
         if (star.dataset.caught) return;
-        const sRect = star.getBoundingClientRect();
+        const sRect = this._getRect(star);
         // 
         if (sRect.bottom > boatRect.top + 40 && sRect.bottom < boatRect.bottom) {
           if (sRect.left > boatRect.left - 20 && sRect.right < boatRect.right + 20) {
@@ -842,7 +861,7 @@ export class PlaySceneEngine {
           this.flashScreen();
           soundAndFX.playPop(); // Splat 
           
-          const rect = balloon.getBoundingClientRect();
+          const rect = this._getRect(balloon);
           // 
           this.spawnParticles(window.innerWidth/2, 150, { colorClass: 'bg-blue-400', count: 40, lift: 150, speed: () => Math.random()*250 });
           this.spawnScoreText(window.innerWidth/2, 100, "!");
@@ -908,7 +927,7 @@ export class PlaySceneEngine {
       this.shakeScreen();
 
       // 爆出碎石粒子
-      const rect = shell.getBoundingClientRect();
+      const rect = this._getRect(shell);
       this.spawnParticles(e.clientX, e.clientY, { colorClass: 'bg-slate-500', count: 8, lift: 60, speed: () => Math.random()*80 + 50 });
 
       // 显示裂纹
@@ -1019,10 +1038,10 @@ export class PlaySceneEngine {
       }
 
       // 碰撞检测
-      const boatRect = boat.getBoundingClientRect();
+      const boatRect = this._getRect(boat);
       const checkCollision = (star, sX, sY, strokeEl) => {
         if (star.dataset.caught) return;
-        const sRect = star.getBoundingClientRect();
+        const sRect = this._getRect(star);
         // 如果星星落到底部区域并且在船的水平范围内
         if (sRect.bottom > boatRect.top + 40 && sRect.bottom < boatRect.bottom) {
           if (sRect.left > boatRect.left - 20 && sRect.right < boatRect.right + 20) {
@@ -1147,7 +1166,7 @@ export class PlaySceneEngine {
           this.flashScreen();
           soundAndFX.playPop(); // Splat 声音
           
-          const rect = balloon.getBoundingClientRect();
+          const rect = this._getRect(balloon);
           // 大量水花粒子喷射
           this.spawnParticles(window.innerWidth/2, 150, { colorClass: 'bg-blue-400', count: 40, lift: 150, speed: () => Math.random()*250 });
           this.spawnScoreText(window.innerWidth/2, 100, "水花四溅!");

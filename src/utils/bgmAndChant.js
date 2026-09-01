@@ -56,15 +56,15 @@ function solfegeToHz(solfege, base = "C4") {
 // 1. BGM 9  + 
 // ============================================================
 export const BGM_SCENES = Object.freeze({
-  map:     { label: "", bpm: 90,  defaultVolume: 0.45, color: "" },
-  learn:   { label: "",   bpm: 78,  defaultVolume: 0.38, color: "" },
-  arcade:  { label: "", bpm: 140, defaultVolume: 0.42, color: "" },
-  story:   { label: "", bpm: 60,  defaultVolume: 0.32, color: "" },
-  review:  { label: "",     bpm: 72,  defaultVolume: 0.35, color: "" },
-  battle:  { label: "",   bpm: 150, defaultVolume: 0.44, color: "" },
-  victory: { label: "",     bpm: 110, defaultVolume: 0.50, color: "[]" },
-  night:   { label: "",   bpm: 48,  defaultVolume: 0.25, color: "" },
-  silence: { label: "",     bpm: 0,   defaultVolume: 0.0,  color: "" },
+  map:     { label: "大地图漫游", bpm: 90,  defaultVolume: 0.45, color: "emerald" },
+  learn:   { label: "五步教学流", bpm: 78,  defaultVolume: 0.38, color: "amber" },
+  arcade:  { label: "太空游乐场", bpm: 140, defaultVolume: 0.42, color: "purple" },
+  story:   { label: "绘本伴读馆", bpm: 60,  defaultVolume: 0.32, color: "sky" },
+  review:  { label: "艾宾浩斯复习", bpm: 72,  defaultVolume: 0.35, color: "teal" },
+  battle:  { label: "Boss对决竞技场", bpm: 150, defaultVolume: 0.44, color: "rose" },
+  victory: { label: "胜利大通关", bpm: 110, defaultVolume: 0.50, color: "yellow" },
+  night:   { label: "夜间护眼休眠", bpm: 48,  defaultVolume: 0.25, color: "indigo" },
+  silence: { label: "静音模式", bpm: 0,   defaultVolume: 0.0,  color: "slate" },
 });
 
 export class BgmEngine {
@@ -73,10 +73,10 @@ export class BgmEngine {
   }
   setBpm(bpm) { this.bpmOverride = bpm; }
 
-  /**  () */
+  /** 获取场景列表 */
   listScenes() { return Object.entries(BGM_SCENES).map(([k, v]) => ({ key: k, ...v })); }
 
-  /**  BGM ( soundEngine._switchBGM + ) */
+  /** 切换场景 BGM */
   switchScene(nameKey) {
     if (!BGM_SCENES[nameKey]) return null;
     soundAndFX.playBGM(nameKey);
@@ -84,8 +84,7 @@ export class BgmEngine {
   }
 
   /**
-   * Task 7 AC-7 100  ( 40ms/)    bgmTimer  1 ()
-   * @returns {Promise<{pass:boolean, activeTimersDuring:number[], finalTimer:number, transitionsDone:number, errors:string[]}>}
+   * 压力测试
    */
   async run_AC_7_stressTest({ transitions = 100, switchIntervalMs = 40 } = {}) {
     const scenes = Object.keys(BGM_SCENES).filter(k => k !== "silence");
@@ -96,14 +95,12 @@ export class BgmEngine {
     for (let i = 0; i < transitions; i++) {
       const pick = scenes[Math.floor(Math.random() * scenes.length)];
       soundAndFX.playBGM(pick);
-      // 40ms  active
       await new Promise(r => setTimeout(r, switchIntervalMs));
       const snap = soundAndFX.getBusSnapshot();
       const active = soundAndFX.activeBgmTimerCount;
       snapshots.push(active);
       if (active > 1) errors.push(`iter=${i} activeTimers=${active} > 1`);
     }
-    //  2  fade 
     await new Promise(r => setTimeout(r, 2000));
     const finalActive = soundAndFX.activeBgmTimerCount;
     const maxConcurrent = snapshots.reduce((m, x) => Math.max(m, x), 0);
@@ -121,122 +118,114 @@ function distribution(arr) {
 }
 
 // ============================================================
-// 2.  (Task 8)
+// 2. 经典童谣识字快板与旋律
 // ============================================================
-/**
- *  = 1  ( tie / )
- *  {sol:"1", beats:1, :"", tone:1}  sol  1-7 .  ,  0=
- *  BPM :
- *  - Kick ( sine 60Hz × )
- *  - Woodblock ( click 2800Hz )
- *  -  (  +  + )
- */
 
 const CLASSIC_CHANTS = {
   twinkle: {
-    name: "",
+    name: "小星星 (识字韵律版)",
     bpm: 88,
     timeSig: "4/4",
     baseKey: "C4",
     // 1 1 5 5 6 6 5 - | 4 4 3 3 2 2 1 - | ...
     melody: [
-      {sol:"1", beats:1, lyric:"", tone:1}, {sol:"1", beats:1, lyric:"", tone:3},
-      {sol:"5", beats:1, lyric:"", tone:1}, {sol:"5", beats:1, lyric:"", tone:3},
-      {sol:"6", beats:1, lyric:"", tone:4}, {sol:"6", beats:1, lyric:"", tone:1},
-      {sol:"5", beats:2, lyric:"", tone:1},
-      {sol:"4", beats:1, lyric:"", tone:3}, {sol:"4", beats:1, lyric:"", tone:1},
-      {sol:"3", beats:1, lyric:"", tone:1}, {sol:"3", beats:1, lyric:"", tone:4},
-      {sol:"2", beats:1, lyric:"", tone:3}, {sol:"2", beats:1, lyric:"", tone:1},
-      {sol:"1", beats:2, lyric:"", tone:1},
-      {sol:"5", beats:1, lyric:"", tone:4}, {sol:"5", beats:1, lyric:"", tone:4},
-      {sol:"6", beats:1, lyric:"", tone:1}, {sol:"6", beats:1, lyric:"", tone:1},
-      {sol:"5", beats:2, lyric:"", tone:4},
-      {sol:"4", beats:1, lyric:"", tone:1}, {sol:"4", beats:1, lyric:"", tone:2},
-      {sol:"3", beats:1, lyric:"", tone:4}, {sol:"3", beats:1, lyric:"", tone:3},
-      {sol:"2", beats:1, lyric:"", tone:1}, {sol:"2", beats:1, lyric:"", tone:3},
-      {sol:"1", beats:2, lyric:"", tone:3},
+      {sol:"1", beats:1, lyric:"一", tone:1}, {sol:"1", beats:1, lyric:"闪", tone:3},
+      {sol:"5", beats:1, lyric:"一", tone:1}, {sol:"5", beats:1, lyric:"闪", tone:3},
+      {sol:"6", beats:1, lyric:"亮", tone:4}, {sol:"6", beats:1, lyric:"晶", tone:1},
+      {sol:"5", beats:2, lyric:"晶", tone:1},
+      {sol:"4", beats:1, lyric:"满", tone:3}, {sol:"4", beats:1, lyric:"天", tone:1},
+      {sol:"3", beats:1, lyric:"都", tone:1}, {sol:"3", beats:1, lyric:"是", tone:4},
+      {sol:"2", beats:1, lyric:"小", tone:3}, {sol:"2", beats:1, lyric:"星", tone:1},
+      {sol:"1", beats:2, lyric:"星", tone:1},
+      {sol:"5", beats:1, lyric:"挂", tone:4}, {sol:"5", beats:1, lyric:"在", tone:4},
+      {sol:"6", beats:1, lyric:"天", tone:1}, {sol:"6", beats:1, lyric:"上", tone:1},
+      {sol:"5", beats:2, lyric:"放", tone:4},
+      {sol:"4", beats:1, lyric:"光", tone:1}, {sol:"4", beats:1, lyric:"明", tone:2},
+      {sol:"3", beats:1, lyric:"好", tone:4}, {sol:"3", beats:1, lyric:"像", tone:3},
+      {sol:"2", beats:1, lyric:"许", tone:1}, {sol:"2", beats:1, lyric:"多", tone:3},
+      {sol:"1", beats:2, lyric:"眼", tone:3},
     ],
     chordPerBar: [["1","3","5"], ["1","3","5"], ["5","7","2."], ["5","7","2."],
-                  ["1","3","5"], ["5","7","2."], ["1","3","5"]], // 7 
+                  ["1","3","5"], ["5","7","2."], ["1","3","5"]],
   },
   tigers: {
-    name: "",
+    name: "两只老虎 (生字快板)",
     bpm: 108,
     timeSig: "4/4",
     baseKey: "C4",
     melody: [
-      {sol:"1", beats:1, lyric:"", tone:3}, {sol:"2", beats:1, lyric:"", tone:1},
-      {sol:"3", beats:1, lyric:"", tone:3}, {sol:"1", beats:1, lyric:"", tone:3},
-      {sol:"1", beats:1, lyric:"", tone:3}, {sol:"2", beats:1, lyric:"", tone:1},
-      {sol:"3", beats:1, lyric:"", tone:3}, {sol:"1", beats:1, lyric:"", tone:3},
-      {sol:"3", beats:1, lyric:"", tone:3}, {sol:"4", beats:1, lyric:"", tone:2},
-      {sol:"5", beats:2, lyric:"", tone:4},
-      {sol:"3", beats:1, lyric:"", tone:3}, {sol:"4", beats:1, lyric:"", tone:2},
-      {sol:"5", beats:2, lyric:"", tone:4},
-      {sol:"5", beats:0.5, lyric:"", tone:1}, {sol:"6", beats:0.5, lyric:"", tone:1},
-      {sol:"5", beats:0.5, lyric:"", tone:2}, {sol:"4", beats:0.5, lyric:"", tone:3},
-      {sol:"3", beats:1, lyric:"", tone:3}, {sol:"1", beats:1, lyric:"", tone:4},
-      {sol:"5", beats:0.5, lyric:"", tone:1}, {sol:"6", beats:0.5, lyric:"", tone:1},
-      {sol:"5", beats:0.5, lyric:"", tone:2}, {sol:"4", beats:0.5, lyric:"", tone:3},
-      {sol:"3", beats:1, lyric:"", tone:3}, {sol:"1", beats:1, lyric:"", tone:1},
-      {sol:"1", beats:1, lyric:"", tone:1}, {sol:"2", beats:1, lyric:"", tone:2},
-      {sol:"1", beats:2, lyric:"", tone:4},
+      {sol:"1", beats:1, lyric:"两", tone:3}, {sol:"2", beats:1, lyric:"只", tone:1},
+      {sol:"3", beats:1, lyric:"老", tone:3}, {sol:"1", beats:1, lyric:"虎", tone:3},
+      {sol:"1", beats:1, lyric:"两", tone:3}, {sol:"2", beats:1, lyric:"只", tone:1},
+      {sol:"3", beats:1, lyric:"老", tone:3}, {sol:"1", beats:1, lyric:"虎", tone:3},
+      {sol:"3", beats:1, lyric:"跑", tone:3}, {sol:"4", beats:1, lyric:"得", tone:2},
+      {sol:"5", beats:2, lyric:"快", tone:4},
+      {sol:"3", beats:1, lyric:"跑", tone:3}, {sol:"4", beats:1, lyric:"得", tone:2},
+      {sol:"5", beats:2, lyric:"快", tone:4},
+      {sol:"5", beats:0.5, lyric:"一", tone:1}, {sol:"6", beats:0.5, lyric:"只", tone:1},
+      {sol:"5", beats:0.5, lyric:"没", tone:2}, {sol:"4", beats:0.5, lyric:"有", tone:3},
+      {sol:"3", beats:1, lyric:"耳", tone:3}, {sol:"1", beats:1, lyric:"朵", tone:4},
+      {sol:"5", beats:0.5, lyric:"一", tone:1}, {sol:"6", beats:0.5, lyric:"只", tone:1},
+      {sol:"5", beats:0.5, lyric:"没", tone:2}, {sol:"4", beats:0.5, lyric:"有", tone:3},
+      {sol:"3", beats:1, lyric:"尾", tone:3}, {sol:"1", beats:1, lyric:"巴", tone:1},
+      {sol:"1", beats:1, lyric:"真", tone:1}, {sol:"2", beats:1, lyric:"奇", tone:2},
+      {sol:"1", beats:2, lyric:"怪", tone:4},
     ],
     chordPerBar: [["1","3","5"], ["1","3","5"], ["5","7","2."], ["5","7","2."], ["1","3","5"], ["1","3","5"]],
   },
   friends: {
-    name: "",
+    name: "找朋友 (汉字对对碰)",
     bpm: 120,
     timeSig: "2/4",
     baseKey: "C4",
     melody: [
-      {sol:"5", beats:1, lyric:"", tone:3}, {sol:"5", beats:1, lyric:"", tone:4},
-      {sol:"5", beats:1, lyric:"", tone:3}, {sol:"3", beats:1, lyric:"", tone:4},
-      {sol:"5", beats:1, lyric:"", tone:3}, {sol:"5", beats:1, lyric:"", tone:2},
-      {sol:"3", beats:1, lyric:"", tone:1}, {sol:"2", beats:1, lyric:"", tone:3},
-      {sol:"1", beats:1, lyric:"", tone:4}, {sol:"2", beats:1, lyric:"", tone:4},
-      {sol:"3", beats:1, lyric:"", tone:3}, {sol:"5", beats:1, lyric:"", tone:4},
-      {sol:"1", beats:1, lyric:"", tone:4}, {sol:"2", beats:1, lyric:"", tone:4},
-      {sol:"3", beats:1, lyric:"", tone:3}, {sol:"5", beats:1, lyric:"", tone:4},
-      {sol:"5", beats:1, lyric:"", tone:3}, {sol:"3", beats:1, lyric:"", tone:4},
-      {sol:"2", beats:1, lyric:"", tone:3}, {sol:"1", beats:1, lyric:"", tone:1},
-      {sol:"1", beats:2, lyric:"", tone:3},
+      {sol:"5", beats:1, lyric:"找", tone:3}, {sol:"5", beats:1, lyric:"呀", tone:4},
+      {sol:"5", beats:1, lyric:"找", tone:3}, {sol:"3", beats:1, lyric:"朋", tone:4},
+      {sol:"5", beats:1, lyric:"友", tone:3}, {sol:"5", beats:1, lyric:"找", tone:2},
+      {sol:"3", beats:1, lyric:"到", tone:1}, {sol:"2", beats:1, lyric:"一", tone:3},
+      {sol:"1", beats:1, lyric:"个", tone:4}, {sol:"2", beats:1, lyric:"好", tone:4},
+      {sol:"3", beats:1, lyric:"朋", tone:3}, {sol:"5", beats:1, lyric:"友", tone:4},
+      {sol:"1", beats:1, lyric:"敬", tone:4}, {sol:"2", beats:1, lyric:"个", tone:4},
+      {sol:"3", beats:1, lyric:"礼", tone:3}, {sol:"5", beats:1, lyric:"呀", tone:4},
+      {sol:"5", beats:1, lyric:"握", tone:3}, {sol:"3", beats:1, lyric:"握", tone:4},
+      {sol:"2", beats:1, lyric:"手", tone:3}, {sol:"1", beats:1, lyric:"好", tone:1},
+      {sol:"1", beats:2, lyric:"友", tone:3},
     ],
     chordPerBar: [["1","3","5"], ["5","7","2."], ["1","3","5"], ["5","7","2."], ["1","3","5"]],
   },
   radish: {
-    name: "",
+    name: "拔萝卜 (勤劳小儿歌)",
     bpm: 96,
     timeSig: "4/4",
     baseKey: "D4",
     melody: [
-      {sol:"5", beats:1, lyric:"", tone:2}, {sol:"3", beats:1, lyric:"", tone:2},
-      {sol:"5", beats:1, lyric:"", tone:4}, {sol:"3", beats:1, lyric:"", tone:4},
-      {sol:"5", beats:1, lyric:"", tone:1}, {sol:"5", beats:1, lyric:"", tone:1},
-      {sol:"2", beats:1, lyric:"", tone:1}, {sol:"3", beats:1, lyric:"", tone:1},
-      {sol:"1", beats:2, lyric:"", tone:4},
-      {sol:"5", beats:1, lyric:"", tone:4}, {sol:"5", beats:1, lyric:"", tone:2},
-      {sol:"6", beats:1, lyric:"", tone:4}, {sol:"5", beats:1, lyric:"", tone:2},
-      {sol:"1.", beats:2, lyric:"", tone:2},
+      {sol:"5", beats:1, lyric:"拔", tone:2}, {sol:"3", beats:1, lyric:"萝", tone:2},
+      {sol:"5", beats:1, lyric:"卜", tone:4}, {sol:"3", beats:1, lyric:"拔", tone:4},
+      {sol:"5", beats:1, lyric:"萝", tone:1}, {sol:"5", beats:1, lyric:"卜", tone:1},
+      {sol:"2", beats:1, lyric:"嘿", tone:1}, {sol:"3", beats:1, lyric:"呦", tone:1},
+      {sol:"1", beats:2, lyric:"嘿", tone:4},
+      {sol:"5", beats:1, lyric:"呦", tone:4}, {sol:"5", beats:1, lyric:"拔", tone:2},
+      {sol:"6", beats:1, lyric:"不", tone:4}, {sol:"5", beats:1, lyric:"动", tone:2},
+      {sol:"1.", beats:2, lyric:"呀", tone:2},
     ],
     chordPerBar: [["1","3","5"], ["5","7","2."], ["1","3","5"], ["5","7","2."], ["1","3","5"]],
   },
   newYear: {
-    name: "",
+    name: "新年好 (快乐识字歌)",
     bpm: 120,
     timeSig: "3/4",
     baseKey: "C4",
     melody: [
-      {sol:"1", beats:1, lyric:"", tone:1}, {sol:"1", beats:1, lyric:"", tone:2},
-      {sol:"1", beats:1, lyric:"", tone:3},
-      {sol:"1", beats:1, lyric:"", tone:5}, {sol:"1", beats:1, lyric:"", tone:1},
-      {sol:"1", beats:1, lyric:"", tone:2}, {sol:"5", beats:1, lyric:"", tone:3},
-      {sol:",,5", beats:1, lyric:"", tone:5}, //  (:  5 )
-      {sol:"1", beats:1, lyric:"", tone:1}, {sol:"3", beats:1, lyric:"", tone:2},
-      {sol:"5", beats:1, lyric:"", tone:4},
-      {sol:"3", beats:1, lyric:"", tone:4}, {sol:"2", beats:1, lyric:"", tone:4},
-      {sol:"1", beats:1, lyric:"", tone:1}, {sol:"2", beats:1, lyric:"", tone:1},
-      {sol:"3", beats:2, lyric:"", tone:2},
+      {sol:"1", beats:1, lyric:"新", tone:1}, {sol:"1", beats:1, lyric:"年", tone:2},
+      {sol:"1", beats:1, lyric:"好", tone:3},
+      {sol:"1", beats:1, lyric:"呀", tone:5}, {sol:"1", beats:1, lyric:"新", tone:1},
+      {sol:"1", beats:1, lyric:"年", tone:2}, {sol:"5", beats:1, lyric:"好", tone:3},
+      {sol:",,5", beats:1, lyric:"呀", tone:5},
+      {sol:"1", beats:1, lyric:"祝", tone:1}, {sol:"3", beats:1, lyric:"贺", tone:2},
+      {sol:"5", beats:1, lyric:"大", tone:4},
+      {sol:"3", beats:1, lyric:"家", tone:4}, {sol:"2", beats:1, lyric:"新", tone:4},
+      {sol:"1", beats:1, lyric:"年", tone:1}, {sol:"2", beats:1, lyric:"好", tone:1},
+      {sol:"3", beats:2, lyric:"呀", tone:2},
     ],
     chordPerBar: [["1","3","5"], ["5","7","2."], ["1","3","5"], ["5","7","2."], ["1","3","5"]],
   },

@@ -28,18 +28,47 @@ class CathyAppManager extends BaseModule {
     this._restModalEl = null;
     this._restCountdownTimer = null;
 
-    // 常驻模块实例
+    // 核心首屏模块立即初始化，其余次级模块按需懒加载 (Lazy Initialization)
     this.mapModule = new MapModule(this.container);
-    this.bookModule = new BookModule(this.container);
-    this.playModule = new PlayModule(this.container);
-    this.cardModule = new CardModule(this.container);
-    this.parentModule = new ParentModule(this.container);
-    this.rewardModule = new RewardModule(this.container);
-    this.reviewModule = new ReviewModule(this.container);
-    this.pkModule = new PKModule(this.container);
+    this._bookModule = null;
+    this._playModule = null;
+    this._cardModule = null;
+    this._parentModule = null;
+    this._rewardModule = null;
+    this._reviewModule = null;
+    this._pkModule = null;
     this.learnModule = null;
 
     this.init();
+  }
+
+  get bookModule() {
+    if (!this._bookModule) this._bookModule = new BookModule(this.container);
+    return this._bookModule;
+  }
+  get playModule() {
+    if (!this._playModule) this._playModule = new PlayModule(this.container);
+    return this._playModule;
+  }
+  get cardModule() {
+    if (!this._cardModule) this._cardModule = new CardModule(this.container);
+    return this._cardModule;
+  }
+  get parentModule() {
+    if (!this._parentModule) this._parentModule = new ParentModule(this.container);
+    return this._parentModule;
+  }
+  get rewardModule() {
+    if (!this._rewardModule) this._rewardModule = new RewardModule(this.container);
+    return this._rewardModule;
+  }
+  get reviewModule() {
+    if (!this._reviewModule) this._reviewModule = new ReviewModule(this.container);
+    return this._reviewModule;
+  }
+  get pkModule() {
+    if (!this._pkModule) this._pkModule = new PKModule(this.container);
+    return this._pkModule;
   }
 
   init() {

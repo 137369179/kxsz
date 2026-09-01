@@ -177,6 +177,9 @@ export class HanziEngine {
     if (distToEnd < 24 && this.userCurrentPath.length >= 3) {
       // 成功完成当前笔画！
       soundEngine.playStrokeSound();
+      if (targetStroke.name) {
+        soundEngine.speakPriority(targetStroke.name, { kind: "char", priority: 1 });
+      }
       this.completedStrokes.push(targetStroke);
       this.currentStrokeIndex++;
       this.userCurrentPath = [];
@@ -185,10 +188,10 @@ export class HanziEngine {
       if (this.currentStrokeIndex >= this.charData.strokes.length) {
         // 全部笔画写完！
         soundEngine.playSuccessSound();
-        soundEngine.playEncouragement();
+        soundEngine.speakPriority(`“${this.charData.char}”字写得真规范！太棒啦！`, { kind: "sentence", emotion: "excited" });
         if (this.onComplete) {
           if (this.completeTimer) clearTimeout(this.completeTimer);
-          this.completeTimer = setTimeout(() => this.onComplete(), 600);
+          this.completeTimer = setTimeout(() => this.onComplete(), 1000);
         }
       }
     } else {

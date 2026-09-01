@@ -36,7 +36,7 @@ export class EbbinghausManager {
       currentLevelIndex: 1,
       profile: {
         name: "凯茜小勇士",
-        avatar: "assets/images/cathy_mascot.jpg"
+        avatar: "assets/images/cathy_mascot.webp"
       },
       settings: {
         dailyCharTarget: 5,
@@ -50,6 +50,10 @@ export class EbbinghausManager {
         owned: ["av_cathy", "av_fairy", "av_hero", "frame_none"],
         equippedFrame: "frame_none"
       },
+      // 真实学习/签到日期 YYYY-MM-DD 列表 —— 奖励城堡「连胜日历」热力图数据源
+      attendance: { dates: [], streakDays: 0 },
+      seenMedals: [], // 已在奖励城堡亮过相的勋章 id，避免重复弹解锁提示
+      readBooks: [], // 已读绘本 id —— 绘本类勋章数据源
       charRecords: {
         char_001: {
           charId: "char_001",
@@ -83,7 +87,15 @@ export class EbbinghausManager {
         ...loaded,
         settings: { ...defaultState.settings, ...(loaded.settings || {}) },
         profile: { ...defaultState.profile, ...(loaded.profile || {}) },
-        shop: { ...defaultState.shop, ...(loaded.shop || {}) }
+        shop: { ...defaultState.shop, ...(loaded.shop || {}) },
+        attendance: {
+          dates: Array.isArray(loaded.attendance && loaded.attendance.dates)
+            ? loaded.attendance.dates
+            : [],
+          streakDays: (loaded.attendance && loaded.attendance.streakDays) || 0
+        },
+        seenMedals: Array.isArray(loaded.seenMedals) ? loaded.seenMedals : [],
+        readBooks: Array.isArray(loaded.readBooks) ? loaded.readBooks : []
       };
       // Daily reset: new day → reset today's counters
       if (merged.lastActiveDate !== today) {
@@ -91,6 +103,8 @@ export class EbbinghausManager {
         merged.todayLearnedCount = 0;
         merged.todaySignedIn = false;
       }
+      // 旧存档补齐：用真实日期列表重算连胜（比历史字段可靠）
+      merged.attendance.streakDays = this._calcStreak(merged.attendance.dates);
       return merged;
     }
 
@@ -102,6 +116,60 @@ export class EbbinghausManager {
       storageManager.putJSON(STORAGE_KEY, this.progress);
     } catch (e) {
       console.error("保存进度失败", e);
+    }
+  }
+
+  // ------------------------------------------------------------
+  // 打卡日历 / 连胜（奖励城堡数据源）
+  // 与签到连胜 signInStreak 互补：这里记录"真实学习日"，用于热力月历与坚持勋章
+  // ------------------------------------------------------------
+  _fmtKey(d) {
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  }
+
+  _todayKey() {
+    return this._fmtKey(new Date());
+  }
+
+  /** 由真实日期集合重算连续天数：今天还没学就从昨天起算，避免白天误判断签 */
+  _calcStreak(dates) {
+    const set = new Set(dates || []);
+    const cursor = new Date();
+    if (!set.has(this._todayKey())) cursor.setDate(cursor.getDate() - 1);
+    let streak = 0;
+    while (set.has(this._fmtKey(cursor))) {
+      streak += 1;
+      cursor.setDate(cursor.getDate() - 1);
+    }
+    return streak;
+  }
+
+  /** 记录一次真实学习行为（学字/签到都会调用），写入当日日期并重算连胜 */
+  markTodayActive() {
+    if (!this.progress.attendance) this.progress.attendance = { dates: [], streakDays: 0 };
+    const att = this.progress.attendance;
+    if (!Array.isArray(att.dates)) att.dates = [];
+    const key = this._todayKey();
+    if (!att.dates.includes(key)) att.dates.push(key);
+    att.streakDays = this._calcStreak(att.dates);
+    this.save();
+    return att;
+  }
+
+  /** 勋章解锁提示只弹一次 */
+  markMedalsSeen(ids) {
+    const merged = new Set([...(this.progress.seenMedals || []), ...ids]);
+    this.progress.seenMedals = Array.from(merged);
+    this.save();
+  }
+
+  /** 记录绘本已读（绘本类勋章数据源） */
+  markBookRead(bookId) {
+    if (!Array.isArray(this.progress.readBooks)) this.progress.readBooks = [];
+    if (!this.progress.readBooks.includes(bookId)) {
+      this.progress.readBooks.push(bookId);
+      this.save();
+      eventBus.emit(EVENTS.PROGRESS_CHANGED, { progress: this.progress });
     }
   }
 
@@ -126,6 +194,7 @@ export class EbbinghausManager {
     }
     this.progress.lastSignInDate = today;
     this.progress.todaySignedIn = true;
+    this.markTodayActive(); // 签到同样点亮热力日历
     // Bonus: 5 base + streak bonus
     const bonus = 5 + Math.min(this.progress.signInStreak - 1, 10);
     this.addCoins(bonus);
@@ -149,6 +218,7 @@ export class EbbinghausManager {
 
   // 完成一个汉字的学习
   completeCharacter(charId, starsEarned = 3) {
+    this.markTodayActive(); // 学字即打卡，点亮连胜日历
     const now = Date.now();
     const existing = this.progress.charRecords[charId] || {
       charId,
@@ -269,9 +339,7 @@ export class EbbinghausManager {
     return item ? item.price === 0 : (id === "av_cathy" || id === "frame_none");
   }
 
-  markMedalsSeen(_ids) {
-    // 标记勋章为已阅
-  }
+  // 注：markMedalsSeen 的真实实现在上方「打卡日历 / 连胜」小节（此处原为空壳重名方法，已移除以免覆盖）
 
   equipAvatar(value) {
     if (!this.progress.profile) this.progress.profile = {};

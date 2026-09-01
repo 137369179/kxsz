@@ -46,7 +46,7 @@ export class RewardModule extends BaseModule {
 
         <!--  -->
         <div class="relative mx-5 mt-20 rounded-3xl overflow-hidden border-4 border-amber-300/70 shadow-[0_18px_40px_rgba(0,0,0,0.55)]">
-          <img src="assets/images/cathy_island_life.jpg" alt="" class="absolute inset-0 w-full h-full object-cover opacity-40 pointer-events-none" />
+          <img src="assets/images/cathy_island_life.webp" alt="" class="absolute inset-0 w-full h-full object-cover opacity-40 pointer-events-none" />
           <div class="relative z-10 flex items-center justify-between gap-4 bg-gradient-to-r from-amber-950/80 via-amber-900/60 to-transparent px-6 py-5">
             <div>
               <h1 class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-b from-yellow-200 to-orange-400 drop-shadow flex items-center gap-2">

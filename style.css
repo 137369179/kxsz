@@ -105,15 +105,6 @@
 }
 
 /* 全局点击魔法粒子特效 */
-@keyframes particleFlyOut {
-  0% { transform: translate(-50%, -50%) scale(0.5); opacity: 1; }
-  100% { transform: translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) scale(1.5) rotate(calc(var(--rot) * 1deg)); opacity: 0; }
-}
-
-@keyframes rippleSpread {
-  0% { transform: scale(0); opacity: 0.6; }
-  100% { transform: scale(3); opacity: 0; }
-}
 
 .magic-particle {
   position: absolute;
@@ -164,44 +155,6 @@
 }
 
 /* 5. 动效系统 */
-@keyframes jellySquash {
-  0% { transform: scale(1, 1); }
-  25% { transform: scale(1.28, 0.76); }
-  50% { transform: scale(0.82, 1.25); }
-  70% { transform: scale(1.14, 0.9); }
-  85% { transform: scale(0.96, 1.05); }
-  100% { transform: scale(1, 1); }
-}
-
-@keyframes chestDropBounce {
-  0% { opacity: 0; transform: translateY(-350px) scale(0.5); }
-  45% { opacity: 1; transform: translateY(0) scale(1.35, 0.7); }
-  60% { transform: translateY(-55px) scale(0.85, 1.15); }
-  75% { transform: translateY(0) scale(1.12, 0.9); }
-  88% { transform: translateY(-18px) scale(0.96, 1.04); }
-  100% { transform: translateY(0) scale(1, 1); }
-}
-
-@keyframes stampThud {
-  0% { opacity: 0; transform: scale(3.5) rotate(-25deg); }
-  50% { opacity: 1; transform: scale(0.8) rotate(-4deg); }
-  75% { transform: scale(1.08) rotate(0deg); }
-  100% { opacity: 1; transform: scale(1) rotate(0deg); }
-}
-
-@keyframes radiantSpin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-@keyframes dashFlow {
-  to { stroke-dashoffset: -40; }
-}
-
-@keyframes beaconPulse {
-  0%, 100% { opacity: 0.3; transform: scaleX(1); }
-  50% { opacity: 0.9; transform: scaleX(1.45); }
-}
 
 @keyframes bounceSlow {
   0%, 100% { transform: translateY(0); }
@@ -218,11 +171,6 @@
   40% { opacity: 1; transform: scale(1.4) translateY(-10px); }
   70% { opacity: 1; transform: scale(1) translateY(-25px); }
   100% { opacity: 0; transform: scale(0.85) translateY(-55px); }
-}
-
-@keyframes shimmerSweep {
-  0% { transform: translateX(-150%) rotate(25deg); }
-  100% { transform: translateX(250%) rotate(25deg); }
 }
 
 .shimmer-badge {
@@ -249,23 +197,8 @@
   animation: glowPulse 2.4s infinite ease-in-out;
 }
 
-@keyframes ambientFloating {
-  0%, 100% { transform: translateY(0) rotate(0deg); }
-  33% { transform: translateY(-8px) rotate(1deg); }
-  66% { transform: translateY(6px) rotate(-1deg); }
-}
 .ambient-floating {
   animation: ambientFloating 4.5s infinite ease-in-out;
-}
-
-@keyframes damageFloat {
-  0% { opacity: 1; transform: scale(1.5) translateY(0); }
-  100% { opacity: 0; transform: scale(0.8) translateY(-70px); }
-}
-
-@keyframes pulseGlow {
-  0%, 100% { transform: scale(1); filter: drop-shadow(0 0 10px rgba(255, 179, 0, 0.6)); }
-  50% { transform: scale(1.05); filter: drop-shadow(0 0 25px rgba(255, 179, 0, 1)); }
 }
 
 .animate-jelly { animation: jellySquash 0.65s cubic-bezier(0.25, 1, 0.5, 1); }
@@ -309,19 +242,6 @@
   40%  { transform: translateX(8px); }
   60%  { transform: translateX(-5px); }
   80%  { transform: translateX(5px); }
-}
-@keyframes flyCoinArc {
-  0% {
-    opacity: 1;
-    transform: translate(0, 0) scale(1.4);
-  }
-  50% {
-    transform: translate(calc(var(--target-x) * 0.45), calc(var(--target-y) * 0.5 - 60px)) scale(1.2);
-  }
-  100% {
-    opacity: 0;
-    transform: translate(var(--target-x), var(--target-y)) scale(0.6);
-  }
 }
 
 .flying-coin-particle {
@@ -392,29 +312,17 @@ button:active, .cursor-pointer:active {
 }
 
 /* 提示气泡专用动画 */
-@keyframes floatBubble {
-  0%, 100% { transform: translateY(0) scale(1); }
-  50% { transform: translateY(-6px) scale(1.02); }
-}
+
 .game-tooltip {
   animation: floatBubble 2.5s ease-in-out infinite;
 }
 
 /* 环境氛围动画 */
-@keyframes riseEmbers {
-  0% { transform: translateY(0) scale(1); opacity: 0; }
-  20% { opacity: 0.8; }
-  100% { transform: translateY(-100px) scale(0.5); opacity: 0; }
-}
+
 .ember {
   animation: riseEmbers 3s infinite linear;
 }
 
-@keyframes waterWobble {
-  0%, 100% { border-radius: 40% 60% 60% 40% / 40% 50% 50% 60%; }
-  33% { border-radius: 60% 40% 40% 60% / 50% 60% 40% 50%; }
-  66% { border-radius: 50% 50% 60% 40% / 60% 40% 50% 40%; }
-}
 .water-wobble {
   animation: waterWobble 4s ease-in-out infinite;
 }
@@ -558,14 +466,6 @@ html[data-flip-dir="prev"] ::view-transition-new(root) {
 @keyframes page-flip-in-right {
   0% { transform: perspective(2000px) rotateY(-90deg); opacity: 0; filter: brightness(0.5); }
   100% { transform: perspective(2000px) rotateY(0deg); opacity: 1; filter: brightness(1); }
-}
-@keyframes fade-in-scale {
-  0% { opacity: 0; transform: scale(0.95); }
-  100% { opacity: 1; transform: scale(1); }
-}
-@keyframes fade-out-scale {
-  0% { opacity: 1; transform: scale(1); }
-  100% { opacity: 0; transform: scale(0.95); }
 }
 
 /* ==============================================================

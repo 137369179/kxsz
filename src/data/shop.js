@@ -7,12 +7,12 @@
  */
 
 export const SHOP_AVATARS = [
-  { id: "av_cathy",   type: "avatar", name: "凯茜",   icon: "assets/images/cathy_mascot.jpg",      value: "assets/images/cathy_mascot.jpg",      price: 0 },
-  { id: "av_fairy",   type: "avatar", name: "森林仙子",   icon: "assets/images/cathy_island_forest.jpg", value: "assets/images/cathy_island_forest.jpg", price: 0 },
-  { id: "av_hero",    type: "avatar", name: "冒险勇士",   icon: "assets/images/cathy_island_life.jpg",  value: "assets/images/cathy_island_life.jpg",   price: 0 },
-  { id: "av_unicorn", type: "avatar", name: "幻彩独角兽", svg: `<svg viewBox="0 0 100 100" class="w-full h-full"><circle cx="50" cy="50" r="45" fill="#fbcfe8"/><path d="M 40 40 L 50 15 L 60 40 Z" fill="#fcd34d"/><path d="M 25 50 Q 50 30 75 50 Q 50 70 25 50 Z" fill="white"/><circle cx="45" cy="50" r="4" fill="black"/><circle cx="55" cy="50" r="4" fill="black"/></svg>`, price: 200 },
-  { id: "av_panda",   type: "avatar", name: "功夫熊猫",   svg: `<svg viewBox="0 0 100 100" class="w-full h-full"><circle cx="50" cy="50" r="45" fill="#f1f5f9"/><circle cx="30" cy="30" r="15" fill="#1e293b"/><circle cx="70" cy="30" r="15" fill="#1e293b"/><ellipse cx="50" cy="60" rx="30" ry="25" fill="white"/><circle cx="40" cy="55" r="8" fill="#1e293b"/><circle cx="60" cy="55" r="8" fill="#1e293b"/><circle cx="50" cy="65" r="4" fill="black"/></svg>`, price: 260 },
-  { id: "av_dragon",  type: "avatar", name: "喷火神龙",   svg: `<svg viewBox="0 0 100 100" class="w-full h-full"><circle cx="50" cy="50" r="45" fill="#fef08a"/><path d="M 25 50 Q 50 10 75 50 Q 50 90 25 50 Z" fill="#ef4444"/><circle cx="40" cy="45" r="5" fill="#fcd34d"/><circle cx="60" cy="45" r="5" fill="#fcd34d"/><path d="M 30 65 Q 50 75 70 65" fill="none" stroke="#fcd34d" stroke-width="4"/></svg>`, price: 500 }
+  { id: "av_cathy",   type: "avatar", name: "凯茜",     icon: "assets/images/cathy_mascot.webp",        value: "assets/images/cathy_mascot.webp",        price: 0 },
+  { id: "av_fairy",   type: "avatar", name: "森林仙子", icon: "assets/images/cathy_island_forest.webp", value: "assets/images/cathy_island_forest.webp", price: 0 },
+  { id: "av_hero",    type: "avatar", name: "冒险勇士", icon: "assets/images/cathy_island_life.webp",   value: "assets/images/cathy_island_life.webp",   price: 0 },
+  { id: "av_unicorn", type: "avatar", name: "幻彩之星", icon: "assets/images/cathy_trophy_gold.webp",   value: "assets/images/cathy_trophy_gold.webp",   price: 200 },
+  { id: "av_panda",   type: "avatar", name: "星空先锋", icon: "assets/images/cathy_island_space.webp",  value: "assets/images/cathy_island_space.webp",  price: 260 },
+  { id: "av_dragon",  type: "avatar", name: "喷火霸王", icon: "assets/images/cathy_boss_monster.webp",  value: "assets/images/cathy_boss_monster.webp",  price: 500 }
 ];
 
 export const SHOP_FRAMES = [

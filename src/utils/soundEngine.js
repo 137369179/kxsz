@@ -487,7 +487,7 @@ class CathyAudioEngine {
       }, per);
     };
 
-    // ---- 降级路径: 系统 speechSynthesis ----
+    // ---- 降级路径: 系统 speechSynthesis (毫秒级字界事件同步) ----
     const runLegacySynth = () => {
       if (!this.synth) {
         return {
@@ -510,10 +510,43 @@ class CathyAudioEngine {
       utter.pitch = Math.max(0, Math.min(2.0, basePitch + pitchBias));
       utter.volume = 1.0;
 
+      const chars = [...text];
+      let boundaryFired = false;
+
+      utter.onstart = () => {
+        eventBus.emit(EVENTS.AUDIO_SPEAK_PROGRESS, {
+          char_index: 0,
+          char: chars[0] || "",
+          time_ms: 0,
+          total: chars.length
+        });
+        if (typeof opts.onProgress === "function") {
+          opts.onProgress({ char_index: 0, char: chars[0] || "" });
+        }
+      };
+
+      utter.onboundary = (event) => {
+        boundaryFired = true;
+        const charIdx = (event.charIndex !== undefined) ? event.charIndex : 0;
+        eventBus.emit(EVENTS.AUDIO_SPEAK_PROGRESS, {
+          char_index: charIdx,
+          char: chars[charIdx] || "",
+          elapsed_time_ms: event.elapsedTime || 0,
+          total: chars.length
+        });
+        if (typeof opts.onProgress === "function") {
+          opts.onProgress({ char_index: charIdx, char: chars[charIdx] || "" });
+        }
+      };
+
       let resolved = false;
       const resolve = (interrupted) => {
         if (resolved) return;
         resolved = true;
+        if (queueItem && queueItem._progressTimer) {
+          clearInterval(queueItem._progressTimer);
+          queueItem._progressTimer = null;
+        }
         if (duck) this.duckStack.pop(duck);
       };
       utter.onend = () => resolve(false);
@@ -521,12 +554,12 @@ class CathyAudioEngine {
 
       this.synth.speak(utter);
 
-      // 进度事件：按字符粗略估计进度
-      const chars = [...text];
-      const estCharMs = Math.max(120, 300 * utter.rate / baseRate);
+      // 兜底进度事件 (如果平台浏览器不支持 onboundary)
+      const estCharMs = Math.max(160, Math.round(280 / (utter.rate || 1)));
       let idx = 0;
       const total = chars.length * estCharMs;
       queueItem._progressTimer = setInterval(() => {
+        if (boundaryFired) return; // onboundary 正常工作时，兜底计时器不覆盖精准字界
         idx += 1;
         if (idx >= chars.length) { clearInterval(queueItem._progressTimer); return; }
         eventBus.emit(EVENTS.AUDIO_SPEAK_PROGRESS, {
@@ -535,11 +568,14 @@ class CathyAudioEngine {
           time_ms: idx * estCharMs,
           total,
         });
+        if (typeof opts.onProgress === "function") {
+          opts.onProgress({ char_index: idx, char: chars[idx] });
+        }
       }, estCharMs);
 
       return {
         cancel: () => {
-          clearInterval(queueItem._progressTimer);
+          if (queueItem && queueItem._progressTimer) clearInterval(queueItem._progressTimer);
           try { this.synth.cancel(); } catch {}
           resolve(true);
         },
@@ -1238,28 +1274,43 @@ class CathyAudioEngine {
   }
 
   // ----------------------------------------------------
-  // 7. 飞金币入顶栏动画与音效
+  // 7. 飞金币入顶栏动画与音效 (物理抛物线粒子)
   // ----------------------------------------------------
-  triggerCoinFly(container, startX, startY, count = 6) {
-    if (!container) return;
+  triggerCoinFly(container, startX = null, startY = null, count = 7) {
+    if (typeof window === "undefined" || !document.body) return;
+    const sx = (startX !== null && startX !== undefined) ? startX : window.innerWidth / 2;
+    const sy = (startY !== null && startY !== undefined) ? startY : window.innerHeight / 2;
     this.playCoinClink();
+
     for (let i = 0; i < count; i++) {
       const coin = document.createElement("div");
-      coin.textContent = "";
-      coin.style.cssText = `position:fixed;left:${startX}px;top:${startY}px;font-size:22px;pointer-events:none;z-index:60;transition:all .6s cubic-bezier(.22,.61,.36,1);opacity:1;`;
+      coin.className = "fixed pointer-events-none z-[9999] transition-all duration-700 ease-out";
+      coin.style.left = `${sx}px`;
+      coin.style.top = `${sy}px`;
+      coin.style.width = "32px";
+      coin.style.height = "32px";
+      coin.innerHTML = window.GAME_ICONS ? window.GAME_ICONS.coin("w-full h-full drop-shadow-[0_0_8px_rgba(251,191,36,0.9)]") : '<div class="w-full h-full rounded-full bg-gradient-to-tr from-yellow-300 via-amber-400 to-orange-500 border-2 border-white shadow-xl"></div>';
       document.body.appendChild(coin);
+
+      const burstX = (Math.random() - 0.5) * 200;
+      const burstY = -90 - Math.random() * 100;
+      const rot = Math.random() * 720 - 360;
+
       requestAnimationFrame(() => {
-        const tx = startX + (Math.random() - 0.5) * 120;
-        const ty = startY - 60 - Math.random() * 60;
-        coin.style.left = tx + "px";
-        coin.style.top = ty + "px";
+        coin.style.transform = `translate(${burstX}px, ${burstY}px) scale(1.3) rotate(${rot}deg)`;
+
         setTimeout(() => {
-          coin.style.left = (window.innerWidth - 80) + "px";
-          coin.style.top = "24px";
-          coin.style.opacity = "0.9";
-          coin.style.transform = "scale(.7)";
-          setTimeout(() => coin.remove(), 650);
-        }, 220);
+          coin.style.transition = "all 0.65s cubic-bezier(0.25, 0.46, 0.45, 0.94)";
+          coin.style.left = `${window.innerWidth - 110}px`;
+          coin.style.top = "20px";
+          coin.style.transform = "scale(0.5) rotate(0deg)";
+          coin.style.opacity = "0.8";
+
+          setTimeout(() => {
+            this.playCoinClink();
+            coin.remove();
+          }, 650);
+        }, 220 + i * 45);
       });
     }
   }

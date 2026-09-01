@@ -114,7 +114,7 @@ export class ReviewModule extends BaseModule {
     const options = shuffle([charData.char, ...(charData.confusingChars || ["日", "月", "木"]).slice(0, 3)]);
     const progress = this.currentIndex + 1;
 
-    soundAndFX.speak(`${charData.char}`);
+    soundAndFX.speakPriority(charData.char, { kind: "char", priority: 1 });
 
     this.container.innerHTML = `
       <div class="relative w-full h-full min-h-[640px] flex flex-col select-none overflow-hidden bg-gradient-to-b from-indigo-950 via-purple-950 to-slate-950">
@@ -192,7 +192,7 @@ export class ReviewModule extends BaseModule {
     if (replayBtn) {
       this._on(replayBtn, "click", () => {
         soundAndFX.playPop();
-        soundAndFX.speak(charData.char);
+        soundAndFX.speakPriority(charData.char, { kind: "char", priority: 1 });
       });
     }
 
@@ -216,12 +216,14 @@ export class ReviewModule extends BaseModule {
           ebbinghausManager.completeReview(charData.id, true);
           ebbinghausManager.addCoins(2);
           soundAndFX.playSuccessSound();
+          soundAndFX.speakPriority(`答对啦！“${charData.char}”字记牢了！`, { kind: "sentence", emotion: "excited" });
           btn.classList.add("ring-8", "ring-emerald-400");
           if (feedback) feedback.innerHTML = '<span class="text-emerald-300 text-lg"> 答对啦！记忆牢固！</span>';
         } else {
           this.wrongCount++;
           ebbinghausManager.completeReview(charData.id, false);
           soundAndFX.playSoftError();
+          soundAndFX.speakPriority(`不对哦，这是“${picked}”字，要找的是“${charData.char}”字！`, { kind: "sentence", emotion: "correction" });
           btn.classList.add("animate-shake", "ring-8", "ring-rose-400");
           if (feedback) feedback.innerHTML = `<span class="text-rose-300 text-lg">答错了，正确答案是：${charData.char}</span>`;
         }

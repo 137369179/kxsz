@@ -52,7 +52,7 @@ export class PKModule extends BaseModule {
            <!-- Player -->
            <div class="flex items-center gap-4">
               <div class="w-16 h-16 rounded-full bg-slate-200 border-4 border-emerald-400 shadow-[0_0_20px_rgba(52,211,153,0.6)] flex items-center justify-center text-2xl font-black overflow-hidden bg-cover bg-center">
-                 ${GAME_ICONS.sparkle ? GAME_ICONS.sparkle("w-10 h-10") : "⭐"}
+                 ${GAME_ICONS.sparkle("w-10 h-10")}
               </div>
               <div class="flex flex-col gap-1">
                  <span class="text-white font-black text-sm drop-shadow-md">凯茜冒险家</span>
@@ -67,7 +67,7 @@ export class PKModule extends BaseModule {
            <!-- Boss -->
            <div class="flex items-center gap-4 flex-row-reverse">
               <div class="w-16 h-16 rounded-full bg-slate-800 border-4 border-rose-500 shadow-[0_0_20px_rgba(244,63,94,0.6)] flex items-center justify-center text-3xl overflow-hidden text-white">
-                 ${GAME_ICONS.monster ? GAME_ICONS.monster("w-10 h-10") : ""}
+                 ${GAME_ICONS.monster("w-10 h-10")}
               </div>
               <div class="flex flex-col gap-1 items-end">
                  <span class="text-rose-200 font-black text-sm drop-shadow-md">糊涂魔王</span>
@@ -83,14 +83,14 @@ export class PKModule extends BaseModule {
            <!-- Battle Area -->
            <div class="absolute inset-0 flex items-center justify-between px-20">
               <div id="pk-player-sprite" class="w-40 h-40 bg-white/10 backdrop-blur-sm border-2 border-emerald-400/50 rounded-3xl animate-bounce-slow flex items-center justify-center text-6xl shadow-[0_20px_40px_rgba(0,0,0,0.3)] text-emerald-300">
-                 ${GAME_ICONS.sparkle ? GAME_ICONS.sparkle("w-20 h-20") : "⭐"}
+                 ${GAME_ICONS.sparkle("w-20 h-20")}
               </div>
               
               <!-- Projectile container -->
               <div id="pk-projectile-layer" class="absolute inset-0 pointer-events-none"></div>
 
               <div id="pk-boss-sprite" class="w-48 h-48 bg-black/40 backdrop-blur-md border-2 border-rose-500/50 rounded-3xl animate-bounce-slow flex items-center justify-center text-8xl shadow-[0_20px_40px_rgba(0,0,0,0.5)] text-rose-400" style="animation-delay: 0.5s">
-                 ${GAME_ICONS.monster ? GAME_ICONS.monster("w-28 h-28") : ""}
+                 ${GAME_ICONS.monster("w-28 h-28")}
               </div>
            </div>
 
@@ -171,6 +171,7 @@ export class PKModule extends BaseModule {
        targetBtn.classList.replace("text-slate-800", "text-emerald-600");
        targetBtn.classList.add("bg-emerald-50");
        soundAndFX.playSuccessSound();
+       soundAndFX.speakPriority(this.targetChar.char, { kind: "char", priority: 1 });
        
        await this.playAttackAnimation("player");
        this.bossHp = Math.max(0, this.bossHp - 25);
@@ -184,6 +185,7 @@ export class PKModule extends BaseModule {
        targetBtn.classList.replace("text-slate-800", "text-rose-600");
        targetBtn.classList.add("bg-rose-50");
        soundAndFX.playErrorSound();
+       soundAndFX.speakPriority(`这是“${selected.char}”字，要找的是“${this.targetChar.char}”字！`, { kind: "sentence", emotion: "correction" });
        
        // Show correct one
        const correctIdx = this.options.findIndex(o => o.id === this.targetChar.id);
@@ -258,7 +260,7 @@ export class PKModule extends BaseModule {
      if (won) {
         soundAndFX.playVictoryFanfare();
         soundAndFX.triggerConfetti(this.container);
-        
+        soundAndFX.triggerCoinFly(this.container);
         ebbinghausManager.addCoins(20);
      } else {
         soundAndFX.playErrorSound();

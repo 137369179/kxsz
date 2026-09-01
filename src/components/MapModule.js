@@ -103,8 +103,8 @@ export class MapModule extends BaseModule {
               : "from-indigo-900 via-purple-900 to-slate-950"
           } overflow-hidden">
             
-            <!-- 背景图层 -->
-            <img src="assets/images/cathy_world_map.jpg" alt="凯茜世界大地图" class="absolute inset-0 w-full h-full object-cover opacity-85 pointer-events-none filter contrast-110" />
+            <!-- 背景图层 (LCP 关键资源优化) -->
+            <img src="assets/images/cathy_world_map.webp" alt="凯茜世界大地图" fetchpriority="high" decoding="async" class="absolute inset-0 w-full h-full object-cover opacity-85 pointer-events-none filter contrast-110" />
 
             <!-- 地图氛围装饰云层与发光粒子 -->
             <div class="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/20 pointer-events-none"></div>
@@ -134,7 +134,7 @@ export class MapModule extends BaseModule {
                           <span class="flex items-center">${GAME_ICONS.star("w-3.5 h-3.5")}</span>
                           <span>凯茜：快来学“${charItem.char}”字！</span>
                         </div>
-                        <img src="assets/images/cathy_mascot.jpg" class="w-16 h-16 rounded-full border-4 border-white shadow-2xl object-cover ring-4 ring-orange-400/80" />
+                        <img src="assets/images/cathy_mascot.webp" class="w-16 h-16 rounded-full border-4 border-white shadow-2xl object-cover ring-4 ring-orange-400/80" />
                       </div>
                     `
                         : ""

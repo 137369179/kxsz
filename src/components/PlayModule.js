@@ -273,6 +273,12 @@ export class PlayModule extends BaseModule {
       `;
 
       const backBtn = this.container.querySelector("#btn-back-hub");
+      const bossBar = this.container.querySelector("#boss-hp-bar");
+      const hpVal = this.container.querySelector("#boss-hp-val");
+      const winModal = this.container.querySelector("#boss-win-modal");
+      const bossAvatar = this.container.querySelector("#boss-avatar");
+      const soundBtn = this.container.querySelector("#btn-boss-sound");
+
       if (backBtn) {
         this._on(backBtn, "click", () => {
           soundAndFX.playPop();
@@ -281,11 +287,6 @@ export class PlayModule extends BaseModule {
         });
       }
 
-      const bossAvatar = this.container.querySelector("#boss-avatar");
-      const bossBar = this.container.querySelector("#boss-hp-bar");
-      const hpVal = this.container.querySelector("#boss-hp-val");
-      const winModal = this.container.querySelector("#boss-win-modal");
-      const soundBtn = this.container.querySelector("#btn-boss-sound");
       if (soundBtn) {
         this._on(soundBtn, "click", () => {
           soundAndFX.toggleMute();
@@ -306,7 +307,7 @@ export class PlayModule extends BaseModule {
           const selected = btn.dataset.char;
           if (selected === curChar.char) {
             soundAndFX.playLaserShoot();
-            soundAndFX.playSuccessSound();
+            soundAndFX.speakPriority(curChar.char, { kind: "char", priority: 1 });
             soundAndFX.triggerConfetti(this.container);
 
             if (bossAvatar) {
@@ -330,11 +331,12 @@ export class PlayModule extends BaseModule {
             }
           } else {
             soundAndFX.playSoftError();
+            soundAndFX.speakPriority(`这是“${selected}”字，请释放“${curChar.char}”法术！`, { kind: "sentence", emotion: "correction" });
             btn.classList.add("animate-shake");
             this._timeout(() => {
               btn.classList.remove("animate-shake");
               answered = false;
-            }, 500);
+            }, 600);
           }
         });
       });
@@ -860,6 +862,8 @@ export class PlayModule extends BaseModule {
       </div>
     `;
 
+    soundAndFX.speakPriority(quiz.question, { kind: "sentence", emotion: "question" });
+
     const feedback = this.container.querySelector("#quiz-feedback");
     const winModal = this.container.querySelector("#idiom-win");
 
@@ -871,6 +875,7 @@ export class PlayModule extends BaseModule {
         if (idx === quiz.correctIndex) {
           btn.classList.add("ring-4", "ring-emerald-400", "bg-emerald-500/30");
           soundAndFX.playSuccessSound();
+          soundAndFX.speakPriority("完全正确！理解力超群！", { kind: "sentence", emotion: "excited" });
           soundAndFX.triggerConfetti(this.container);
           soundAndFX.triggerCoinFly(this.container);
           ebbinghausManager.addCoins(8);
@@ -879,6 +884,7 @@ export class PlayModule extends BaseModule {
         } else {
           btn.classList.add("animate-shake", "ring-4", "ring-rose-400");
           soundAndFX.playSoftError();
+          soundAndFX.speakPriority("再仔细想想哦，别灰心！", { kind: "sentence", emotion: "correction" });
           if (feedback) feedback.innerHTML = `<span class="text-rose-300">再想想哦，正确答案是 ${String.fromCharCode(65 + quiz.correctIndex)}</span>`;
           this._timeout(() => { btn.classList.remove("animate-shake"); answered = false; }, 800);
         }

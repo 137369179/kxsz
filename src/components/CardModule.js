@@ -430,10 +430,202 @@ export class CardModule extends BaseModule {
         e.stopPropagation();
         if (this.selectedCard) {
           soundAndFX.playPop();
-          soundAndFX.speak(`${this.selectedCard.char}，${this.selectedCard.pinyin}`);
+          soundAndFX.speakPriority(`${this.selectedCard.char}，${this.selectedCard.pinyin}`, { kind: "char", priority: 1 });
         }
       });
     }
+
+    // 笔顺演示按钮
+    const demoStrokesBtn = mainEl.querySelector("#btn-modal-demo-strokes");
+    if (demoStrokesBtn) {
+      this._on(demoStrokesBtn, "click", (e) => {
+        e.stopPropagation();
+        if (this.selectedCard) {
+          soundAndFX.playPop();
+          this.openStrokeDemoModal(this.selectedCard);
+        }
+      });
+    }
+
+    // 弹窗背面词组点击发音
+    mainEl.querySelectorAll(".card-modal-word-btn").forEach((btn) => {
+      this._on(btn, "click", (e) => {
+        e.stopPropagation();
+        const word = btn.dataset.word;
+        soundAndFX.playPop();
+        soundAndFX.speakPriority(word, { kind: "word", priority: 1 });
+        btn.classList.add("ring-2", "ring-orange-400");
+        this._timeout(() => btn.classList.remove("ring-2", "ring-orange-400"), 400);
+      });
+    });
+
+    // 弹窗背面例句点击发音
+    const sentenceBox = mainEl.querySelector("#card-modal-sentence");
+    if (sentenceBox) {
+      this._on(sentenceBox, "click", (e) => {
+        e.stopPropagation();
+        if (this.selectedCard && this.selectedCard.sentence) {
+          soundAndFX.playPop();
+          soundAndFX.speakPriority(this.selectedCard.sentence, { kind: "sentence", emotion: "gentle" });
+          sentenceBox.classList.add("ring-2", "ring-orange-400");
+          this._timeout(() => sentenceBox.classList.remove("ring-2", "ring-orange-400"), 600);
+        }
+      });
+    }
+  }
+
+  openStrokeDemoModal(c) {
+    const overlay = document.createElement("div");
+    overlay.id = "stroke-demo-overlay";
+    overlay.className = "fixed inset-0 z-[60] bg-black/80 backdrop-blur-md flex items-center justify-center p-4 animate-fade-in";
+    overlay.innerHTML = `
+      <div class="relative w-full max-w-sm bg-gradient-to-b from-amber-50 to-orange-50 rounded-3xl p-6 shadow-2xl border-4 border-amber-300 flex flex-col items-center">
+        <button id="btn-close-stroke-demo" class="absolute -top-12 right-0 w-9 h-9 rounded-full bg-white text-gray-800 font-extrabold text-lg flex items-center justify-center shadow-lg hover:bg-gray-100 active:scale-95 cursor-pointer">
+          ${GAME_ICONS.back("w-5 h-5")}
+        </button>
+
+        <div class="flex items-center justify-between w-full mb-3 pb-2 border-b border-amber-200">
+          <span class="text-sm font-black text-amber-900 flex items-center gap-1.5">
+            ${GAME_ICONS.brush("w-4 h-4")}
+            <span>标准笔顺演示 · “${c.char}” (${c.pinyin})</span>
+          </span>
+          <span id="demo-stroke-name" class="text-xs font-black bg-amber-200 text-amber-900 px-2.5 py-0.5 rounded-full">准备起笔</span>
+        </div>
+
+        <!-- 田字格 Canvas -->
+        <div class="relative w-64 h-64 bg-amber-50 rounded-2xl border-4 border-amber-400 shadow-inner overflow-hidden flex items-center justify-center my-2">
+          <canvas id="stroke-demo-canvas" width="256" height="256" class="w-full h-full"></canvas>
+        </div>
+
+        <div class="flex items-center gap-3 mt-4 w-full justify-center">
+          <button id="btn-replay-stroke-demo" class="btn-game-orange text-white text-xs font-black px-6 py-2.5 rounded-full shadow-lg active:scale-95 flex items-center gap-1.5 cursor-pointer">
+            ${GAME_ICONS.brush("w-4 h-4")}
+            <span>重新演示</span>
+          </button>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(overlay);
+
+    const closeBtn = overlay.querySelector("#btn-close-stroke-demo");
+    const replayBtn = overlay.querySelector("#btn-replay-stroke-demo");
+    const canvas = overlay.querySelector("#stroke-demo-canvas");
+    const strokeNameEl = overlay.querySelector("#demo-stroke-name");
+
+    let isPlaying = false;
+    let cancelCurrentAnim = false;
+
+    const playDemo = async () => {
+      if (isPlaying) return;
+      isPlaying = true;
+      cancelCurrentAnim = false;
+      const ctx = canvas.getContext("2d");
+      const w = canvas.width;
+      const h = canvas.height;
+
+      const drawGrid = () => {
+        ctx.clearRect(0, 0, w, h);
+        ctx.fillStyle = "#fffdf7";
+        ctx.fillRect(0, 0, w, h);
+        // 田字格虚线
+        ctx.strokeStyle = "#fed7aa";
+        ctx.lineWidth = 1.5;
+        ctx.setLineDash([4, 4]);
+        ctx.beginPath();
+        ctx.moveTo(w / 2, 0); ctx.lineTo(w / 2, h);
+        ctx.moveTo(0, h / 2); ctx.lineTo(w, h / 2);
+        ctx.moveTo(0, 0); ctx.lineTo(w, h);
+        ctx.moveTo(w, 0); ctx.lineTo(0, h);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        // 边框
+        ctx.strokeStyle = "#f97316";
+        ctx.lineWidth = 3;
+        ctx.strokeRect(0, 0, w, h);
+      };
+
+      const strokes = c.strokes || [];
+      drawGrid();
+
+      // 先画出浅灰色字底
+      ctx.fillStyle = "rgba(0,0,0,0.06)";
+      ctx.font = `bold ${w * 0.75}px sans-serif`;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText(c.char, w / 2, h / 2 + 10);
+
+      // 依次绘制笔画
+      for (let i = 0; i < strokes.length; i++) {
+        if (cancelCurrentAnim) break;
+        const s = strokes[i];
+        if (strokeNameEl) strokeNameEl.textContent = `第 ${i + 1} 笔：${s.name}`;
+        soundAndFX.playStrokeSound();
+        soundAndFX.speakPriority(s.name, { kind: "char", priority: 1 });
+
+        const startX = (s.start.x / 100) * w;
+        const startY = (s.start.y / 100) * h;
+        const endX = (s.end.x / 100) * w;
+        const endY = (s.end.y / 100) * h;
+        const cornerX = s.corner ? (s.corner.x / 100) * w : null;
+        const cornerY = s.corner ? (s.corner.y / 100) * h : null;
+
+        // 动画插值绘制该笔画
+        await new Promise((resolve) => {
+          let progress = 0;
+          const animStep = () => {
+            if (cancelCurrentAnim) { resolve(); return; }
+            progress += 0.08;
+            if (progress > 1) progress = 1;
+
+            ctx.strokeStyle = "#ea580c";
+            ctx.lineWidth = 12;
+            ctx.lineCap = "round";
+            ctx.lineJoin = "round";
+            ctx.beginPath();
+            ctx.moveTo(startX, startY);
+
+            if (cornerX !== null && cornerY !== null) {
+              if (progress <= 0.5) {
+                const segP = progress / 0.5;
+                ctx.lineTo(startX + (cornerX - startX) * segP, startY + (cornerY - startY) * segP);
+              } else {
+                ctx.lineTo(cornerX, cornerY);
+                const segP = (progress - 0.5) / 0.5;
+                ctx.lineTo(cornerX + (endX - cornerX) * segP, cornerY + (endY - cornerY) * segP);
+              }
+            } else {
+              ctx.lineTo(startX + (endX - startX) * progress, startY + (endY - startY) * progress);
+            }
+            ctx.stroke();
+
+            if (progress < 1) {
+              requestAnimationFrame(animStep);
+            } else {
+              setTimeout(resolve, 400);
+            }
+          };
+          requestAnimationFrame(animStep);
+        });
+      }
+
+      if (!cancelCurrentAnim) {
+        if (strokeNameEl) strokeNameEl.textContent = "演示完成！";
+        soundAndFX.playSuccessSound();
+      }
+      isPlaying = false;
+    };
+
+    closeBtn.addEventListener("click", () => {
+      cancelCurrentAnim = true;
+      overlay.remove();
+    });
+    replayBtn.addEventListener("click", () => {
+      cancelCurrentAnim = true;
+      setTimeout(playDemo, 100);
+    });
+
+    setTimeout(playDemo, 200);
   }
 
   renderCardDetailModal() {
@@ -445,8 +637,8 @@ export class CardModule extends BaseModule {
         <div class="relative w-full max-w-sm flex flex-col items-center">
           
           <!-- 关闭按钮 -->
-          <button id="btn-close-modal" class="absolute -top-12 right-0 w-9 h-9 rounded-full bg-white text-gray-800 font-extrabold text-lg flex items-center justify-center shadow-lg hover:bg-gray-100 active:scale-95 z-50" title="关闭">
-            ${GAME_ICONS.back ? GAME_ICONS.back("w-5 h-5") : "✕"}
+          <button id="btn-close-modal" class="absolute -top-12 right-0 w-9 h-9 rounded-full bg-white text-gray-800 font-extrabold text-lg flex items-center justify-center shadow-lg hover:bg-gray-100 active:scale-95 z-50 cursor-pointer" title="关闭">
+            ${GAME_ICONS.back("w-5 h-5")}
           </button>
 
           <!-- 3D 翻转卡片容器 -->
@@ -456,14 +648,27 @@ export class CardModule extends BaseModule {
             <div class="absolute inset-0 bg-gradient-to-b from-amber-50 to-orange-50 rounded-3xl shadow-2xl border-4 border-amber-300 p-6 flex flex-col justify-between backface-hidden ${this.isCardFlipped ? 'pointer-events-none' : ''}">
               <div class="flex items-center justify-between">
                 <span class="text-xs font-black bg-amber-200 text-amber-900 px-3 py-1 rounded-full">${c.radical}部 · ${c.strokeCount || 4}画</span>
-                <button id="btn-modal-speak-char" class="w-8 h-8 rounded-full bg-orange-500 text-white flex items-center justify-center shadow text-sm active:scale-90" title="朗读">
-                  ${GAME_ICONS.speaker ? GAME_ICONS.speaker("w-4 h-4") : "🔊"}
-                </button>
+                <div class="flex items-center gap-2">
+                  <button id="btn-modal-demo-strokes" class="flex items-center gap-1 bg-amber-200 hover:bg-amber-300 text-amber-900 px-3 py-1 rounded-full text-xs font-black shadow active:scale-90 transition-all cursor-pointer" title="笔顺笔画动画演示">
+                    <span class="flex items-center">${GAME_ICONS.brush("w-3.5 h-3.5")}</span>
+                    <span>笔顺</span>
+                  </button>
+                  <button id="btn-modal-speak-char" class="w-8 h-8 rounded-full bg-orange-500 text-white flex items-center justify-center shadow text-sm active:scale-90 cursor-pointer" title="朗读">
+                    ${GAME_ICONS.speaker("w-4 h-4")}
+                  </button>
+                </div>
               </div>
 
               <div class="flex flex-col items-center justify-center flex-1 my-2">
                 <span class="text-2xl font-black text-amber-700 mb-1">${c.pinyin}</span>
                 <span class="text-7xl font-black text-amber-950 drop-shadow glow-pulse">${c.char}</span>
+                
+                ${c.oracleGlyph ? `
+                  <div class="mt-2 flex items-center gap-1.5 bg-amber-200/60 px-3 py-1 rounded-full border border-amber-300">
+                    <span class="text-[10px] text-amber-800 font-black">甲骨文溯源:</span>
+                    <span class="text-base font-black text-amber-950">${c.oracleGlyph}</span>
+                  </div>
+                ` : ""}
               </div>
 
               <div class="w-full text-center">
@@ -476,29 +681,35 @@ export class CardModule extends BaseModule {
             <!-- 卡片背面 (Back Face) -->
             <div class="absolute inset-0 bg-gradient-to-b from-orange-50 to-amber-100 rounded-3xl shadow-2xl border-4 border-orange-300 p-6 flex flex-col justify-between backface-hidden rotate-y-180 ${!this.isCardFlipped ? 'pointer-events-none' : ''}">
               <div class="flex items-center justify-between pb-2 border-b border-amber-200">
-                <span class="text-xs font-black text-amber-900"> 组词造句本源</span>
+                <span class="text-xs font-black text-amber-900 flex items-center gap-1.5">
+                  ${GAME_ICONS.book("w-4 h-4")}
+                  <span>组词造句本源</span>
+                </span>
                 <span class="text-[10px] text-orange-600 font-bold">已翻转</span>
               </div>
 
               <div class="flex-1 my-3 flex flex-col justify-around text-left">
                 <div>
-                  <span class="text-[11px] font-black text-amber-800 block mb-1">常用词组：</span>
+                  <span class="text-[11px] font-black text-amber-800 block mb-1">常用词组 (点击朗读)：</span>
                   <div class="flex flex-wrap gap-1.5">
-                    ${(c.words || [{ word: `${c.char}子` }]).map(w => `<span class="bg-white text-amber-900 border border-amber-200 text-xs font-black px-2 py-0.5 rounded-md shadow-sm">${w.word || w}</span>`).join("")}
+                    ${(c.words || [{ word: `${c.char}子`, pinyin: "" }]).map(w => {
+                      const wordText = typeof w === "string" ? w : w.word;
+                      return `<button class="card-modal-word-btn bg-white hover:bg-amber-100 text-amber-900 border border-amber-200 text-xs font-black px-2.5 py-1 rounded-lg shadow-sm transition-all active:scale-95 cursor-pointer" data-word="${wordText}">${wordText}</button>`;
+                    }).join("")}
                   </div>
                 </div>
 
-                <div class="bg-white/90 p-2.5 rounded-xl border border-amber-200 text-xs text-amber-950 font-semibold leading-relaxed">
+                <div id="card-modal-sentence" class="bg-white/90 hover:bg-white p-2.5 rounded-xl border border-amber-200 text-xs text-amber-950 font-semibold leading-relaxed cursor-pointer transition-all active:scale-95" title="点击朗读例句">
                   <span class="font-black text-orange-600">生活例句：</span>
                   ${c.sentence || `${c.char}字天天见，学好汉字乐趣多`}
                 </div>
               </div>
 
               <div class="w-full flex items-center justify-between pt-2 border-t border-amber-200">
-                <button id="btn-toggle-difficult" data-char-id="${c.id}" class="text-xs font-black px-3.5 py-1.5 rounded-full shadow transition-all ${
+                <button id="btn-toggle-difficult" data-char-id="${c.id}" class="text-xs font-black px-3.5 py-1.5 rounded-full shadow transition-all cursor-pointer ${
                   isDiff ? "bg-rose-500 text-white animate-jelly" : "bg-amber-200 text-amber-900 hover:bg-amber-300"
                 }">
-                  ${isDiff ? " 已在难字本" : "+ 加入难字本"}
+                  ${isDiff ? "已在难字本" : "+ 加入难字本"}
                 </button>
                 <span class="text-[10px] text-gray-400 font-bold animate-pulse">点击返回正面</span>
               </div>

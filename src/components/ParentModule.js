@@ -373,7 +373,8 @@ export class ParentModule extends BaseModule {
         <!-- 4. 教学流程与防沉迷设置 -->
         <div class="bg-white/95 rounded-3xl p-6 shadow-xl border-2 border-amber-200">
           <h2 class="text-base font-black text-amber-950 mb-4 flex items-center gap-2">
-             教学闭环与护眼防沉迷设置
+            <span class="flex items-center">${GAME_ICONS.parent("w-5 h-5")}</span>
+            <span>教学闭环与护眼防沉迷设置</span>
           </h2>
 
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -411,8 +412,8 @@ export class ParentModule extends BaseModule {
           </div>
 
           <div class="mt-6 pt-4 border-t border-amber-100 flex items-center justify-end">
-            <button id="btn-save-settings" class="btn-game-orange text-white font-black text-xs px-8 py-2.5 rounded-full shadow-lg active:scale-95">
-               保存所有设置
+            <button id="btn-save-settings" class="btn-game-orange text-white font-black text-xs px-8 py-2.5 rounded-full shadow-lg active:scale-95 cursor-pointer">
+              保存所有设置
             </button>
           </div>
         </div>
