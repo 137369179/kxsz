@@ -113,22 +113,22 @@ export function getMedals() {
   const charsTotal = CHARACTER_DATABASE.length;
 
   const defs = [
-    { id: "first_char",   name: "识字萌新",   emoji: "", tier: "bronze",  desc: "学习第一个汉字",     current: Math.min(learned, 1),        target: 1 },
-    { id: "chars_10",     name: "小试牛刀",   emoji: "", tier: "bronze",  desc: "累计学习 10 字",   current: learned,                     target: 10 },
-    { id: "chars_50",     name: "渐入佳境", emoji: "", tier: "silver",  desc: "累计学习 50 字",   current: learned,                     target: 50 },
-    { id: "chars_100",    name: "百字达人",   emoji: "", tier: "gold",    desc: "累计学习 100 字",  current: learned,                     target: 100 },
-    { id: "chars_300",    name: "三百壮士",   emoji: "", tier: "gold",    desc: "累计学习 300 字",  current: learned,                     target: 300 },
-    { id: "chars_600",    name: "学富五车",   emoji: "", tier: "gold",   desc: "累计学习 600 字",  current: learned,                     target: 600 },
-    { id: "chars_1000",   name: "千字宗师",   emoji: "", tier: "rainbow", desc: "累计学习 1000 字", current: learned,                     target: 1000 },
-    { id: "chars_all",    name: "识字大王", emoji: "", tier: "rainbow", desc: `学完全部 ${charsTotal} 字`, current: learned,              target: charsTotal },
-    { id: "review_10",    name: "温故知新",   emoji: "", tier: "bronze",  desc: "复习汉字 10 次",     current: totalReviews,                target: 10 },
-    { id: "review_50",    name: "过目不忘",   emoji: "", tier: "gold",    desc: "复习汉字 50 次",     current: totalReviews,                target: 50 },
-    { id: "write_10",     name: "妙笔生花",   emoji: "", tier: "silver",  desc: "10次书写得分超95%", current: perfectWrites,       target: 10 },
-    { id: "star_100",     name: "满天星辰",   emoji: "", tier: "silver",  desc: "累计获得 100 颗星星",  current: p.stars || 0,                target: 100 },
-    { id: "streak_7",     name: "坚持不懈",   emoji: "", tier: "bronze",  desc: "连续打卡 7 天",      current: streak,                      target: 7 },
-    { id: "streak_30",    name: "自律王者",   emoji: "", tier: "gold",   desc: "连续打卡 30 天",     current: streak,                      target: 30 },
-    { id: "books_1",      name: "书香门第",   emoji: "", tier: "bronze",  desc: "阅读第一本绘本",     current: Math.min(booksRead, 1),      target: 1 },
-    { id: "books_all",    name: "博览群书",   emoji: "", tier: "rainbow", desc: `阅读全部 ${booksTotal} 本`, current: booksRead,        target: booksTotal }
+    { id: "first_char",   name: "识字萌新",   tier: "bronze",  desc: "学习第一个汉字",     current: Math.min(learned, 1),        target: 1 },
+    { id: "chars_10",     name: "小试牛刀",   tier: "bronze",  desc: "累计学习 10 字",     current: learned,                     target: 10 },
+    { id: "chars_50",     name: "渐入佳境",   tier: "silver",  desc: "累计学习 50 字",     current: learned,                     target: 50 },
+    { id: "chars_100",    name: "百字达人",   tier: "gold",    desc: "累计学习 100 字",    current: learned,                     target: 100 },
+    { id: "chars_300",    name: "三百壮士",   tier: "gold",    desc: "累计学习 300 字",    current: learned,                     target: 300 },
+    { id: "chars_600",    name: "学富五车",   tier: "gold",    desc: "累计学习 600 字",    current: learned,                     target: 600 },
+    { id: "chars_1000",   name: "千字宗师",   tier: "rainbow", desc: "累计学习 1000 字",   current: learned,                     target: 1000 },
+    { id: "chars_all",    name: "识字大王",   tier: "rainbow", desc: `学完全部 ${charsTotal} 字`, current: learned,              target: charsTotal },
+    { id: "review_10",    name: "温故知新",   tier: "bronze",  desc: "复习汉字 10 次",     current: totalReviews,                target: 10 },
+    { id: "review_50",    name: "过目不忘",   tier: "gold",    desc: "复习汉字 50 次",     current: totalReviews,                target: 50 },
+    { id: "write_10",     name: "妙笔生花",   tier: "silver",  desc: "10次书写得分超95%",   current: perfectWrites,               target: 10 },
+    { id: "star_100",     name: "满天星辰",   tier: "silver",  desc: "累计获得 100 颗星星", current: p.stars || 0,                target: 100 },
+    { id: "streak_7",     name: "坚持不懈",   tier: "bronze",  desc: "连续打卡 7 天",      current: streak,                      target: 7 },
+    { id: "streak_30",    name: "自律王者",   tier: "gold",    desc: "连续打卡 30 天",     current: streak,                      target: 30 },
+    { id: "books_1",      name: "书香门第",   tier: "bronze",  desc: "阅读第一本绘本",     current: Math.min(booksRead, 1),      target: 1 },
+    { id: "books_all",    name: "博览群书",   tier: "rainbow", desc: `阅读全部 ${booksTotal} 本`, current: booksRead,          target: booksTotal }
   ];
 
   const seen = new Set(ebbinghausManager.progress.seenMedals || []);
