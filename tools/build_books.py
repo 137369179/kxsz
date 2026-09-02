@@ -83,8 +83,19 @@ def main():
                          "pages": pages, "quiz": quiz})
 
     new_block = ",\n".join(json.dumps(g, ensure_ascii=False, indent=6) for g in generated)
-    src = open(SRC_PATH, encoding="utf-8").read()
-    src = re.sub(r"\n\]\;\s*$", ",\n" + new_block + "\n];\n", src.rstrip())
+
+    # 早期实现用正则 `\n\];\s*$` 盲目替换数组结尾，若上游文件最后一个绘本对象
+    # 未闭合（缺 `}`），会在其后再追加一段，产出无法解析的 books.js。
+    # 改为先剥离闭合符并显式校验上一个元素已闭合，任一条件不满足即中止。
+    src = open(SRC_PATH, encoding="utf-8").read().rstrip()
+    if not src.endswith("];"):
+        raise SystemExit(f"books.js 数组未正常闭合，结尾为: ...{src[-40:]!r}")
+    body = src[:-2].rstrip()
+    if body[-1] not in "}]":
+        raise SystemExit(
+            f"books.js 最后一个绘本对象未闭合（缺 }}），结尾为: ...{body[-40:]!r}"
+        )
+    src = body + ",\n" + new_block + "\n];\n"
     open(SRC_PATH, "w", encoding="utf-8").write(src)
     print(f"已写入 {len(generated)} 本新绘本 -> {SRC_PATH} ({len(src)/1024:.1f} KB)")
 
