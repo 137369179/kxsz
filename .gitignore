@@ -16,3 +16,4 @@ enhance_app_js.py
 .DS_Store
 .env
 node_modules/
+__pycache__/
