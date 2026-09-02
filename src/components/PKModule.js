@@ -38,6 +38,9 @@ export class PKModule extends BaseModule {
     this.bossHp = this.maxHp;
     this.currentRound = 1;
 
+    const profile = ebbinghausManager.progress.profile || { name: "凯茜小勇士", avatar: "assets/images/cathy_mascot.webp" };
+    const playerAvatarSrc = profile.avatar || "assets/images/cathy_mascot.webp";
+
     this.container.innerHTML = `
       <div class="relative w-full h-full min-h-[640px] bg-gradient-to-b from-indigo-950 via-purple-900 to-slate-900 overflow-hidden flex flex-col font-sans select-none">
         
@@ -51,23 +54,26 @@ export class PKModule extends BaseModule {
         <div class="relative z-10 w-full p-6 flex items-center justify-between pl-20">
            <!-- Player -->
            <div class="flex items-center gap-4">
-              <div class="w-16 h-16 rounded-full bg-slate-200 border-4 border-emerald-400 shadow-[0_0_20px_rgba(52,211,153,0.6)] flex items-center justify-center text-2xl font-black overflow-hidden bg-cover bg-center">
-                 ${GAME_ICONS.sparkle()}
+              <div class="w-16 h-16 rounded-full bg-slate-200 border-4 border-emerald-400 shadow-[0_0_20px_rgba(52,211,153,0.6)] flex items-center justify-center overflow-hidden">
+                 <img src="${playerAvatarSrc}" class="w-full h-full object-cover rounded-full" alt="player" onerror="this.src='assets/images/cathy_mascot.webp'" />
               </div>
               <div class="flex flex-col gap-1">
-                 <span class="text-white font-black text-sm drop-shadow-md">凯茜冒险家</span>
+                 <span class="text-white font-black text-sm drop-shadow-md">${profile.name || "凯茜小勇士"}</span>
                  <div class="w-48 h-5 bg-black/50 rounded-full border border-white/20 overflow-hidden">
                     <div id="pk-player-hp" class="h-full bg-gradient-to-r from-emerald-400 to-emerald-500 transition-all duration-300 w-full"></div>
                  </div>
               </div>
            </div>
 
-           <div class="text-4xl font-black text-yellow-400 italic drop-shadow-[0_4px_4px_rgba(0,0,0,0.8)]">VS</div>
+           <div class="text-4xl font-black text-yellow-400 italic drop-shadow-[0_4px_4px_rgba(0,0,0,0.8)] flex items-center gap-2">
+              <span class="flex items-center">${GAME_ICONS.swords('w-8 h-8')}</span>
+              <span>VS</span>
+           </div>
 
            <!-- Boss -->
            <div class="flex items-center gap-4 flex-row-reverse">
-              <div class="w-16 h-16 rounded-full bg-slate-800 border-4 border-rose-500 shadow-[0_0_20px_rgba(244,63,94,0.6)] flex items-center justify-center text-3xl overflow-hidden text-white">
-                 ${GAME_ICONS.monster()}
+              <div class="w-16 h-16 rounded-full bg-slate-800 border-4 border-rose-500 shadow-[0_0_20px_rgba(244,63,94,0.6)] flex items-center justify-center overflow-hidden">
+                 <img src="assets/images/cathy_boss_monster.webp" class="w-full h-full object-cover rounded-full" alt="boss" onerror="this.src='assets/images/icon_chest.webp'" />
               </div>
               <div class="flex flex-col gap-1 items-end">
                  <span class="text-rose-200 font-black text-sm drop-shadow-md">糊涂魔王</span>
@@ -82,15 +88,15 @@ export class PKModule extends BaseModule {
         <div class="relative flex-1 flex flex-col items-center justify-center z-10">
            <!-- Battle Area -->
            <div class="absolute inset-0 flex items-center justify-between px-20">
-              <div id="pk-player-sprite" class="w-40 h-40 bg-white/10 backdrop-blur-sm border-2 border-emerald-400/50 rounded-3xl animate-bounce-slow flex items-center justify-center text-6xl shadow-[0_20px_40px_rgba(0,0,0,0.3)] text-emerald-300">
-                 ${GAME_ICONS.sparkle()}
+              <div id="pk-player-sprite" class="w-40 h-40 bg-white/10 backdrop-blur-sm border-2 border-emerald-400/50 rounded-3xl animate-bounce-slow flex items-center justify-center shadow-[0_20px_40px_rgba(0,0,0,0.3)] overflow-hidden p-3">
+                 <img src="${playerAvatarSrc}" class="w-full h-full object-cover rounded-2xl" alt="player" onerror="this.src='assets/images/cathy_mascot.webp'" />
               </div>
               
               <!-- Projectile container -->
               <div id="pk-projectile-layer" class="absolute inset-0 pointer-events-none"></div>
 
-              <div id="pk-boss-sprite" class="w-48 h-48 bg-black/40 backdrop-blur-md border-2 border-rose-500/50 rounded-3xl animate-bounce-slow flex items-center justify-center text-8xl shadow-[0_20px_40px_rgba(0,0,0,0.5)] text-rose-400" style="animation-delay: 0.5s">
-                 ${GAME_ICONS.monster()}
+              <div id="pk-boss-sprite" class="w-48 h-48 bg-black/40 backdrop-blur-md border-2 border-rose-500/50 rounded-3xl animate-bounce-slow flex items-center justify-center shadow-[0_20px_40px_rgba(0,0,0,0.5)] overflow-hidden p-3" style="animation-delay: 0.5s">
+                 <img src="assets/images/cathy_boss_monster.webp" class="w-full h-full object-cover rounded-2xl" alt="boss" onerror="this.src='assets/images/icon_chest.webp'" />
               </div>
            </div>
 
@@ -216,8 +222,8 @@ export class PKModule extends BaseModule {
         proj.className = "absolute top-1/2 -translate-y-1/2 w-12 h-12 rounded-full shadow-[0_0_30px_rgba(255,255,255,1)] flex items-center justify-center text-3xl z-50";
         
         if (attacker === "player") {
-           proj.innerHTML = GAME_ICONS.sparkle ? GAME_ICONS.sparkle("w-full h-full") : "";
-           proj.classList.add("bg-emerald-400", "left-40");
+           proj.innerHTML = GAME_ICONS.swords ? GAME_ICONS.swords("w-full h-full") : "";
+           proj.classList.add("bg-amber-400", "left-40");
            layer.appendChild(proj);
            
            // Animate to right
@@ -234,7 +240,7 @@ export class PKModule extends BaseModule {
               resolve();
            };
         } else {
-           proj.innerHTML = GAME_ICONS.star ? GAME_ICONS.star("w-full h-full") : "";
+           proj.innerHTML = GAME_ICONS.monster ? GAME_ICONS.monster("w-full h-full") : "";
            proj.classList.add("bg-rose-500", "right-48");
            layer.appendChild(proj);
            

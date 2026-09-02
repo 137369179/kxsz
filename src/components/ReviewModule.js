@@ -1,12 +1,13 @@
 /**
- * 凯茜识字 (Cathy Literacy) - 1:1 艾宾浩斯复习调度组件
- * 纯正 3D 游戏 UI：待复习字库队列发音速辨星币结算与复习闭环
+ *  (Cathy Literacy) - 1:1 
+ *  3D  UI
  */
 
 import { CHARACTER_DATABASE } from "../data/characters.js";
 import { ebbinghausManager } from "../utils/ebbinghaus.js";
 import { soundAndFX } from "../utils/soundEngine.js";
 import { BaseModule } from "../utils/BaseModule.js";
+import { DrillEngine } from "../utils/drillEngine.js";
 import { EVENTS } from "../utils/eventBus.js";
 import { GAME_ICONS } from "../utils/gameIcons.js";
 
@@ -28,7 +29,7 @@ export class ReviewModule extends BaseModule {
       .map((id) => CHARACTER_DATABASE.find((c) => c.id === id))
       .filter(Boolean);
 
-    // 如果当前无到期生字，从已学或全部中抽取 4 个进行巩固
+    //  4 
     if (this.queue.length === 0) {
       const learnedIds = Object.keys(ebbinghausManager.progress.charRecords || {});
       if (learnedIds.length > 0) {
@@ -60,7 +61,7 @@ export class ReviewModule extends BaseModule {
         
         <header class="relative z-30 w-full px-6 py-3 flex items-center justify-between bg-black/40 backdrop-blur-md border-b border-white/20">
           <div class="flex items-center gap-2">
-            <button id="btn-review-empty-sound" class="w-10 h-10 bg-black/40 backdrop-blur-md rounded-full text-white flex items-center justify-center hover:bg-black/60 transition-transform active:scale-90 border border-white/30 shadow-lg" title="声音开关">
+            <button id="btn-review-empty-sound" class="w-10 h-10 bg-black/40 backdrop-blur-md rounded-full text-white flex items-center justify-center hover:bg-black/60 transition-transform active:scale-90 border border-white/30 shadow-lg" title="">
               ${__rvSpeakerIcon}
             </button>
           </div>
@@ -69,7 +70,7 @@ export class ReviewModule extends BaseModule {
               ${GAME_ICONS.coin()}<span>${__rvProgress.coins}</span>
             </div>
             <div class="candy-pill flex items-center gap-1.5 text-amber-300 font-black text-xs px-3 py-1 rounded-full">
-              ${GAME_ICONS.star(true)}<span>${__rvProgress.stars}</span>
+              ${GAME_ICONS.star(false)}<span>${__rvProgress.stars}</span>
             </div>
           </div>
         </header>
@@ -78,11 +79,11 @@ export class ReviewModule extends BaseModule {
 
         <div class="flex flex-col items-center text-center animate-scale-up">
           <div class="mb-4 flex items-center justify-center">${GAME_ICONS.reviewBell()}</div>
-          <h2 class="text-2xl font-black text-yellow-300 mb-2">太棒啦！</h2>
-          <p class="text-sm text-white/70 mb-8">当前记忆度满分，没有需要紧急复习的汉字哦</p>
+          <h2 class="text-2xl font-black text-yellow-300 mb-2"></h2>
+          <p class="text-sm text-white/70 mb-8"></p>
           <button id="btn-review-empty-back" class="btn-game-orange text-white font-black text-base px-10 py-3.5 rounded-full flex items-center gap-2">
             <span class="flex items-center">${GAME_ICONS.home()}</span>
-            <span>返回大地图</span>
+            <span></span>
           </button>
         </div>
       </main>
@@ -111,73 +112,40 @@ export class ReviewModule extends BaseModule {
     const __rvProgress = ebbinghausManager.progress;
     const __rvSpeakerIcon = soundAndFX.isMuted ? GAME_ICONS.speaker(true) : GAME_ICONS.speaker(false);
     const charData = this.queue[this.currentIndex];
-    const options = shuffle([charData.char, ...(charData.confusingChars || ["日", "月", "木"]).slice(0, 3)]);
     const progress = this.currentIndex + 1;
-
-    soundAndFX.speakPriority(charData.char, { kind: "char", priority: 1 });
 
     this.container.innerHTML = `
       <div class="relative w-full h-full min-h-[640px] flex flex-col select-none overflow-hidden bg-gradient-to-b from-indigo-950 via-purple-950 to-slate-950">
-
-        <!-- 顶部导航与复习数据看板 -->
+        <!--  -->
         <header class="relative z-30 w-full px-6 py-3 flex items-center justify-between bg-black/40 backdrop-blur-md border-b border-white/20">
           <button id="btn-review-quit" class="btn-game-wood text-white font-black text-xs px-4 py-1.5 rounded-2xl flex items-center gap-1.5">
             <span class="flex items-center">${GAME_ICONS.home()}</span>
-            <span>退出复习</span>
+            <span></span>
           </button>
 
           <div class="candy-pill flex items-center gap-3 px-6 py-1.5 rounded-full">
-            <span class="text-white font-black text-xs">复习进度</span>
+            <span class="text-white font-black text-xs"></span>
             <span class="text-yellow-300 font-black text-sm">${progress} / ${this.queue.length}</span>
           </div>
 
           <div class="flex items-center gap-2">
-            <button id="btn-review-sound" class="w-10 h-10 bg-black/40 backdrop-blur-md rounded-full text-white flex items-center justify-center hover:bg-black/60 transition-transform active:scale-90 border border-white/30 shadow-lg" title="声音开关">
+            <button id="btn-review-sound" class="w-10 h-10 bg-black/40 backdrop-blur-md rounded-full text-white flex items-center justify-center hover:bg-black/60 transition-transform active:scale-90 border border-white/30 shadow-lg" title="">
               ${__rvSpeakerIcon}
             </button>
             <div class="candy-pill flex items-center gap-1.5 text-yellow-300 font-black text-xs px-3 py-1 rounded-full">
               ${GAME_ICONS.coin()}<span>${__rvProgress.coins}</span>
             </div>
             <div class="candy-pill flex items-center gap-1.5 text-amber-300 font-black text-xs px-3 py-1 rounded-full">
-              ${GAME_ICONS.star(true)}<span>${__rvProgress.stars}</span>
-            </div>
-            <div class="candy-pill flex items-center gap-2 px-4 py-1.5 rounded-full text-white font-black text-xs">
-              <span class="text-emerald-400">正确 ${this.correctCount}</span>
-              <span class="text-rose-400">错误 ${this.wrongCount}</span>
+              ${GAME_ICONS.star(false)}<span>${__rvProgress.stars}</span>
             </div>
           </div>
         </header>
 
-        <!-- 辨字答题主舞台 -->
-        <main class="relative z-10 flex-1 flex items-center justify-center p-6">
-          <div class="relative w-full max-w-3xl bg-white/10 backdrop-blur-md rounded-3xl border-2 border-white/20 p-8 flex flex-col items-center animate-fade-in">
-
-            <button id="btn-review-replay" class="w-24 h-24 rounded-full btn-game-orange border-4 border-white flex items-center justify-center animate-bounce-slow mb-6 active:scale-95 shadow-xl">
-              <span class="flex items-center">${GAME_ICONS.speaker()}</span>
-            </button>
-            <p class="text-white font-black text-sm mb-8 drop-shadow">点击听音，找出读音对应的正确汉字</p>
-
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-5 w-full">
-              ${options
-                .map(
-                  (opt) => `
-                <button class="review-opt-btn btn-game-orange text-white font-black text-6xl h-28 rounded-3xl active:scale-95 shadow-xl transition-all" data-char="${opt}">
-                  ${opt}
-                </button>
-              `
-                )
-                .join("")}
-            </div>
-
-            <div id="review-feedback" class="h-8 mt-5 text-sm font-black"></div>
-          </div>
+        <!-- Drill Engine Container -->
+        <main id="drill-container" class="relative z-10 flex-1 w-full flex items-center justify-center p-6">
         </main>
-
       </div>
     `;
-
-    const feedback = this.container.querySelector("#review-feedback");
-    let answered = false;
 
     const quitBtn = this.container.querySelector("#btn-review-quit");
     if (quitBtn) {
@@ -185,14 +153,6 @@ export class ReviewModule extends BaseModule {
         soundAndFX.playPop();
         this._busEmit(EVENTS.REVIEW_FINISH, { correct: this.correctCount, total: this.queue.length });
         this._busEmit(EVENTS.SWITCH_MODE, { mode: "map" });
-      });
-    }
-
-    const replayBtn = this.container.querySelector("#btn-review-replay");
-    if (replayBtn) {
-      this._on(replayBtn, "click", () => {
-        soundAndFX.playPop();
-        soundAndFX.speakPriority(charData.char, { kind: "char", priority: 1 });
       });
     }
 
@@ -205,41 +165,28 @@ export class ReviewModule extends BaseModule {
       });
     }
 
-    this.container.querySelectorAll(".review-opt-btn").forEach((btn) => {
-      this._on(btn, "click", () => {
-        if (answered) return;
-        answered = true;
-
-        const picked = btn.dataset.char;
-        if (picked === charData.char) {
-          this.correctCount++;
-          ebbinghausManager.completeReview(charData.id, true);
-          ebbinghausManager.addCoins(2);
-          soundAndFX.playSuccessSound();
-          soundAndFX.speakPriority(`答对啦！“${charData.char}”字记牢了！`, { kind: "sentence", emotion: "excited" });
-          btn.classList.add("ring-8", "ring-emerald-400");
-          if (feedback) feedback.innerHTML = '<span class="text-emerald-300 text-lg"> 答对啦！记忆牢固！</span>';
-        } else {
-          this.wrongCount++;
-          ebbinghausManager.completeReview(charData.id, false);
-          soundAndFX.playSoftError();
-          soundAndFX.speakPriority(`不对哦，这是“${picked}”字，要找的是“${charData.char}”字！`, { kind: "sentence", emotion: "correction" });
-          btn.classList.add("animate-shake", "ring-8", "ring-rose-400");
-          if (feedback) feedback.innerHTML = `<span class="text-rose-300 text-lg">答错了，正确答案是：${charData.char}</span>`;
-        }
-
-        this._timeout(() => {
-          this.currentIndex++;
-          if (this.currentIndex < this.queue.length) {
-            this.renderRound();
-          } else {
-            this.renderSummary();
-          }
-        }, 1400);
-      });
+    const drillStage = this.container.querySelector("#drill-container");
+    this.drillEngine = new DrillEngine(drillStage, charData, () => {
+      // On Complete one character's drill
+      const perfect = this.drillEngine.bestCombo >= 3;
+      if (perfect) {
+        this.correctCount++;
+        ebbinghausManager.completeReview(charData.id, true);
+        ebbinghausManager.addCoins(5);
+      } else {
+        this.wrongCount++;
+        ebbinghausManager.completeReview(charData.id, false);
+        ebbinghausManager.addCoins(1);
+      }
+      
+      this.currentIndex++;
+      if (this.currentIndex < this.queue.length) {
+        this.renderRound();
+      } else {
+        this.renderSummary();
+      }
     });
   }
-
   renderSummary() {
     const __rvProgress = ebbinghausManager.progress;
     const __rvSpeakerIcon = soundAndFX.isMuted ? GAME_ICONS.speaker(true) : GAME_ICONS.speaker(false);
@@ -256,32 +203,32 @@ export class ReviewModule extends BaseModule {
       <div class="relative w-full h-full min-h-[640px] flex items-center justify-center bg-gradient-to-b from-purple-950 via-indigo-950 to-purple-900 select-none">
         <div class="flex flex-col items-center text-center text-white animate-scale-up bg-white/10 backdrop-blur-md rounded-3xl border-2 border-white/20 p-10 max-w-lg">
           <div class="mb-3 flex items-center justify-center">
-            ${perfect ? GAME_ICONS.trophy() : GAME_ICONS.star(true)}
+            ${perfect ? GAME_ICONS.trophy() : GAME_ICONS.star(false)}
           </div>
           <h2 class="text-2xl font-black text-yellow-300 mb-2">
-            ${perfect ? "完美通关！" : "复习完成！"}
+            ${perfect ? "" : ""}
           </h2>
           <p class="text-sm text-white/70 mb-5 font-bold">
-            总计 ${total} 个 · 正确 ${this.correctCount} 个 · 错误 ${this.wrongCount} 个
+             ${total}  ·  ${this.correctCount}  ·  ${this.wrongCount} 
           </p>
           <div class="flex items-center gap-2 mb-4">
-            <button id="btn-review-summary-sound" class="w-10 h-10 bg-black/40 backdrop-blur-md rounded-full text-white flex items-center justify-center hover:bg-black/60 transition-transform active:scale-90 border border-white/30 shadow-lg" title="声音开关">
+            <button id="btn-review-summary-sound" class="w-10 h-10 bg-black/40 backdrop-blur-md rounded-full text-white flex items-center justify-center hover:bg-black/60 transition-transform active:scale-90 border border-white/30 shadow-lg" title="">
               ${__rvSpeakerIcon}
             </button>
             <div class="candy-pill flex items-center gap-1.5 text-yellow-300 font-black text-xs px-3 py-1 rounded-full">
               ${GAME_ICONS.coin()}<span>${__rvProgress.coins}</span>
             </div>
             <div class="candy-pill flex items-center gap-1.5 text-amber-300 font-black text-xs px-3 py-1 rounded-full">
-              ${GAME_ICONS.star(true)}<span>${__rvProgress.stars}</span>
+              ${GAME_ICONS.star(false)}<span>${__rvProgress.stars}</span>
             </div>
           </div>
           <div class="candy-pill rounded-2xl px-6 py-3 mb-6 text-xs text-yellow-300 font-bold flex items-center gap-1.5">
             <span class="flex items-center">${GAME_ICONS.coin()}</span>
-            <span>获得 ${this.correctCount * 2} 凯茜星币</span>
+            <span> ${this.correctCount * 2} </span>
           </div>
           <button id="btn-review-done" class="btn-game-orange text-white font-black text-base px-12 py-3.5 rounded-full flex items-center gap-2">
             <span class="flex items-center">${GAME_ICONS.home()}</span>
-            <span>领取奖励并返回大地图</span>
+            <span></span>
           </button>
         </div>
       </div>

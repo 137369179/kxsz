@@ -1,31 +1,31 @@
 /**
- * 凯茜识字 (Cathy Literacy) - 1:1 洪恩识字级 多轨混音优先级队列 + 栈式闪避 音频引擎系统
+ *  (Cathy Literacy) - 1:1   +  
  *
- * 机制级架构 (对标 iHuman Chinese Audio Engine)：
- * 1. 六级总线管线Source  SubGain (×6)  CategoryGain (BGM/Voice/SFX)  DynamicsCompressor  MasterGain  Destination
- * 2. Voice 5 子通道 + 优先级队列tutor(1) > eval(2) > char(3) > word(4) > sentence(5) — 高优打断低优 + resumeStack 弹栈恢复
- * 3. 智能音频闪避 3 策略栈char_duck(-16.5dB) / tutor_duck(-12dB+SFX) / eval_duck(BGM=0) — 栈式 push/pop 无痕恢复
- * 4. 全局 DR Compressor-24dB / 4:1 / knee 30 防 32 路并发削波
- * 5. 程序化生成 BGM 引擎纯 Web Audio 实时合成五声童趣马林巴 9 场景 + 交叉淡入淡出
- * 6. 立体声声像 Spatial Panning笔顺滑行左右声道 3D 渲染
- * 7. 高并发复音池瞬时连击不吞音，节点注册 + onended 自动回收
- * 8. 神经童声引擎晓晓 zh-CN-XiaoxiaoNeural 经本地 voice-server(8766) 代理,
- *    优先神经合成(96kbps + 子句并行),失败自动降级 speechSynthesis
+ *  ( iHuman Chinese Audio Engine)
+ * 1. Source  SubGain (×6)  CategoryGain (BGM/Voice/SFX)  DynamicsCompressor  MasterGain  Destination
+ * 2. Voice 5  + tutor(1) > eval(2) > char(3) > word(4) > sentence(5) —  + resumeStack 
+ * 3.  3 char_duck(-16.5dB) / tutor_duck(-12dB+SFX) / eval_duck(BGM=0) —  push/pop 
+ * 4.  DR Compressor-24dB / 4:1 / knee 30  32 
+ * 5.  BGM  Web Audio  9  + 
+ * 6.  Spatial Panning 3D 
+ * 7.  + onended 
+ * 8.  zh-CN-XiaoxiaoNeural  voice-server(8766) ,
+ *    (96kbps + ), speechSynthesis
  *
- * ️ 向后兼容：所有旧 API (soundAndFX.speak / playJellyBoing / playBGM 等) 行为 100% 不变
+ *   API (soundAndFX.speak / playJellyBoing / playBGM )  100% 
  *
- * 2026-09-01 R3 重建说明：本文件曾被外部操作回退为 343 行原始版，
- * 本版本基于会话内架构记忆 + 原始 SFX 实现完整重建（六级总线/优先级队列/闪避栈/神经集成）
+ * 2026-09-01 R3  343 
+ *  +  SFX ///
  */
 
 import { EVENTS, eventBus } from "./eventBus.js";
 import { neuralVoice } from "./neuralVoice.js";
 
 // ============================================================
-// 0. 内部工具类：优先级队列栈式闪避调度节点注册表
+// 0. 
 // ============================================================
 
-/** 优先级语音队列项 */
+/**  */
 class SpeechQueueItem {
   constructor({ kind, priority, text, opts = {}, utteranceFactory, onEnd = null }) {
     this.kind = kind;                         // tutor | eval | char | word | sentence
@@ -44,16 +44,16 @@ class SpeechQueueItem {
 }
 
 /**
- * 优先级语音队列：
- * - enqueue 后按 priority 升序 (1 最高) 排队
- * - 高优先级可打断低优先级；被打断者进 resumeStack
- * - 当前项结束后从 resumeStack 弹出恢复（unshift 到队首）
+ * 
+ * - enqueue  priority  (1 ) 
+ * -  resumeStack
+ * -  resumeStack unshift 
  */
 class PrioritySpeechQueue {
   constructor(onBusChange) {
-    this.queue = [];        // 待播放
-    this.current = null;    // 播放中
-    this.resumeStack = [];  // 被打断待恢复
+    this.queue = [];        // 
+    this.current = null;    // 
+    this.resumeStack = [];  // 
     this.onBusChange = onBusChange || (() => {});
   }
 
@@ -73,14 +73,20 @@ class PrioritySpeechQueue {
       return;
     }
 
-    // 高优打断低优
-    if (next.priority < this.current.priority) {
+    // /0 
+    const isInteractiveClick = next.kind === "char" || next.kind === "word";
+    const shouldPreempt = (next.priority < this.current.priority) ||
+      (isInteractiveClick && (next.priority <= this.current.priority || this.current.kind === "tutor" || this.current.kind === "sentence"));
+
+    if (shouldPreempt) {
       const low = this.current;
       low.wasInterrupted = true;
-      // 计算 resume 偏移
       if (low.startedAt) low.resumeOffsetMs = performance.now() - low.startedAt;
       this._cancelCurrent(low);
-      this.resumeStack.push(low);
+      //  resumeStack
+      if (!isInteractiveClick && low.kind === "tutor") {
+        this.resumeStack.push(low);
+      }
       eventBus.emit(EVENTS.AUDIO_QUEUE_INTERRUPT, {
         high_priority_kind: next.kind,
         interrupted_kind: low.kind,
@@ -144,17 +150,17 @@ class PrioritySpeechQueue {
     }
     this.onBusChange(`speak-end:${item.kind}`);
 
-    // 被打断 -> 不走 resumeStack（已在打断时入栈）
+    //  ->  resumeStack
     if (interrupted) return;
 
-    // 正常结束 -> 弹栈恢复
+    //  -> 
     if (this.resumeStack.length > 0) {
       const resume = this.resumeStack.pop();
       eventBus.emit(EVENTS.AUDIO_QUEUE_RESUME, {
         kind: resume.kind,
         resumeOffsetMs: resume.resumeOffsetMs,
       });
-      // resume: 重新入队，优先级不变
+      // resume: 
       this.queue.unshift(resume);
       this.queue.sort((a, b) => a.priority - b.priority || a.createdAt - b.createdAt);
     }
@@ -171,7 +177,7 @@ class PrioritySpeechQueue {
   get resumeDepth() { return this.resumeStack.length; }
 }
 
-/** 栈式闪避调度器：多策略 push/pop，重复 push 不重复 ramp，弹栈后恢复 */
+/**  push/pop push  ramp */
 class DuckStack {
   /**
    * @param {{getAudioCtx: Function, getGainNodes: () => {bgmGain, sfxGain}, getBaseVolume: () => {bgm, sfx}}} deps
@@ -194,7 +200,7 @@ class DuckStack {
     const base = getBaseVolume();
     if (!ctx || !bgmGain) return;
 
-    // 栈顶策略生效：多策略取每个通道最激进的 mul (最小值)
+    //  mul ()
     let bgmMul = 1.0, sfxMul = 1.0;
     for (const s of this.stack) {
       bgmMul = Math.min(bgmMul, s.bgmTargetMul);
@@ -203,7 +209,7 @@ class DuckStack {
     const now = ctx.currentTime;
     const attackMs = this.stack.length ? this.stack[this.stack.length - 1].attackMs : 300;
     const releaseMs = this.stack.length ? this.stack[this.stack.length - 1].releaseMs : 300;
-    const rampMs = this.stack.length ? attackMs : releaseMs; // 入栈用 attack, 弹空用 release
+    const rampMs = this.stack.length ? attackMs : releaseMs; //  attack,  release
     const ramp = Math.max(0.01, rampMs / 1000);
 
     try {
@@ -220,7 +226,7 @@ class DuckStack {
 
   push(name) {
     const policy = DuckStack.POLICIES[name] || DuckStack.POLICIES.char_duck;
-    // 重复策略不重复压栈（嵌套时外层不重复调度）
+    // 
     if (this.stack.some(s => s.name === name)) return;
     this.stack.push({ name, ...policy });
     this._applyEffective();
@@ -238,7 +244,7 @@ class DuckStack {
   get names() { return this.stack.map(s => s.name); }
 }
 
-/** 节点注册表：复音池计数 + onended 自动回收（MEM-1 泄漏扫描数据源） */
+/**  + onended MEM-1  */
 class NodeRegistry {
   constructor() {
     this._store = new Map();
@@ -252,7 +258,7 @@ class NodeRegistry {
     const meta = { id, tag, createdAt: performance.now(), detached: false };
     this._store.set(id, meta);
     this._counts[tag] = (this._counts[tag] || 0) + 1;
-    // onended 自动回收
+    // onended 
     if (typeof node.onended !== "undefined") {
       node.onended = () => this.detach(id);
     } else if (node.addEventListener) {
@@ -277,37 +283,37 @@ class NodeRegistry {
 }
 
 // ============================================================
-// 1. 主引擎类
+// 1. 
 // ============================================================
 
 class CathyAudioEngine {
   constructor() {
-    // --- 基础 ---
+    // ---  ---
     this.audioCtx = null;
     this.compressor = null;
     this.synth = typeof window !== "undefined" ? (window.speechSynthesis || null) : null;
 
-    // --- Node 注册 ---
+    // --- Node  ---
     this.nodeRegistry = new NodeRegistry();
 
-    // --- 总线增益节点 ---
+    // ---  ---
     this.masterGain = null;
     this.bgmGain = null;
     this.sfxGain = null;
-    this.voiceGain = null;          // 语音 Category 节点
+    this.voiceGain = null;          //  Category 
     this.voiceCharGain = null;      // priority 3
     this.voiceWordGain = null;      // priority 4
     this.voiceSentenceGain = null;  // priority 5
     this.voiceTutorGain = null;     // priority 1
     this.voiceEvalGain = null;      // priority 2
 
-    // --- BGM 状态机 ---
+    // --- BGM  ---
     this.currentBgmType = null;
     this.bgmTimer = null;
     this.bgmStep = 0;
-    this._bgmActiveCount = 0;           // 用于 bgmTimer 计数检查
+    this._bgmActiveCount = 0;           //  bgmTimer 
 
-    // --- 音量与静音设置 ---
+    // ---  ---
     this.masterVolume = 1.0;
     this.bgmVolume = 0.45;
     this.sfxVolume = 0.85;
@@ -315,12 +321,12 @@ class CathyAudioEngine {
     this.isMuted = false;
     this.speechRate = 0.85;
 
-    // --- 神经童声 (晓晓 zh-CN-XiaoxiaoNeural, 经 voice-server:8766 代理) ---
-    // true: 优先神经童声, 不可用自动降级 speechSynthesis
-    // AC 验收场景会临时置 false 以保证时序稳定 (见 audioIntegrationSuite)
+    // ---  ( zh-CN-XiaoxiaoNeural,  voice-server:8766 ) ---
+    // true: ,  speechSynthesis
+    // AC  false  ( audioIntegrationSuite)
     this.neuralVoiceEnabled = true;
 
-    // --- 优先级队列 & 栈式闪避 ---
+    // ---  &  ---
     this.speechQueue = new PrioritySpeechQueue(() => this._emitBusChange("queue"));
     this.duckStack = new DuckStack({
       getAudioCtx: () => this.audioCtx,
@@ -331,7 +337,7 @@ class CathyAudioEngine {
     this._initDone = false;
   }
 
-  /** 音量档案 (动态 getter: 永远反映当前音量状态, audioSafety.save() 持久化用) */
+  /**  ( getter: , audioSafety.save() ) */
   get _audioProfile() {
     return {
       master: this.masterVolume,
@@ -356,8 +362,8 @@ class CathyAudioEngine {
     this.audioCtx = new AudioCtx();
     const ctx = this.audioCtx;
 
-    /* 六级管线拓扑：
-     * [Osc/BufferSource等] ---> [SubGain] ---> [CategoryGain (bgm/voice/sfx)]
+    /* 
+     * [Osc/BufferSource] ---> [SubGain] ---> [CategoryGain (bgm/voice/sfx)]
      *                                                     |
      *                                                     v
      *                                             DynamicsCompressor
@@ -369,7 +375,7 @@ class CathyAudioEngine {
      *                                                 Destination
      */
 
-    // 最后两级
+    // 
     this.masterGain = ctx.createGain();
     this.masterGain.gain.setValueAtTime(this.isMuted ? 0 : this.masterVolume, ctx.currentTime);
 
@@ -383,7 +389,7 @@ class CathyAudioEngine {
     this.compressor.connect(this.masterGain);
     this.masterGain.connect(ctx.destination);
 
-    // 三类 Category Gain -> compressor
+    //  Category Gain -> compressor
     this.bgmGain = ctx.createGain();
     this.bgmGain.gain.setValueAtTime(this.bgmVolume, ctx.currentTime);
     this.bgmGain.connect(this.compressor);
@@ -396,7 +402,7 @@ class CathyAudioEngine {
     this.voiceGain.gain.setValueAtTime(this.voiceVolume, ctx.currentTime);
     this.voiceGain.connect(this.compressor);
 
-    // 语音 5 子通道 -> voiceGain
+    //  5  -> voiceGain
     const makeVoiceSub = () => {
       const g = ctx.createGain();
       g.gain.setValueAtTime(1.0, ctx.currentTime);
@@ -410,10 +416,27 @@ class CathyAudioEngine {
     this.voiceSentenceGain = makeVoiceSub();  // priority 5 (lowest)
 
     this._initDone = true;
+    this._setupVisibilityRecovery();
     this._emitBusChange("init");
   }
 
-  // 页面前台/后台自动静音
+  /**  (AudioContext Resiliency) */
+  _setupVisibilityRecovery() {
+    if (typeof document === "undefined" || this._visibilityBound) return;
+    this._visibilityBound = true;
+    const resumeAudio = () => {
+      if (this.audioCtx && this.audioCtx.state === "suspended") {
+        this.audioCtx.resume().catch(() => {});
+      }
+    };
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "visible") resumeAudio();
+    });
+    window.addEventListener("focus", resumeAudio);
+    window.addEventListener("pageshow", resumeAudio);
+  }
+
+  // /
   initVisibilityListener() {
     if (typeof document === "undefined") return;
     document.addEventListener("visibilitychange", () => {
@@ -432,7 +455,7 @@ class CathyAudioEngine {
   }
 
   // ----------------------------------------------------
-  // 1.2 优先级队列：speak 核心封装
+  // 1.2 speak 
   // ----------------------------------------------------
   _voiceGainForKind(kind) {
     switch (kind) {
@@ -450,12 +473,17 @@ class CathyAudioEngine {
   }
 
   /**
-   * 通用优先级 speak 入口
+   *  speak 
    * @param {string} text
    * @param {{kind?:string, emotion?:string, pitchOffset?:number, rateMul?:number, duckStrategy?:string|null, onEnd?:Function, useNeural?:boolean}} opts
    */
   speakPriority(text, opts = {}) {
-    if (this.isMuted) return;
+    if (this.isMuted) {
+      if (typeof opts.onEnd === "function") {
+        setTimeout(opts.onEnd, 50);
+      }
+      return;
+    }
     this.init();
     const kind = opts.kind || "char";
     const priority = this._priorityForKind(kind);
@@ -465,11 +493,11 @@ class CathyAudioEngine {
 
     const pitchBias = opts.pitchOffset || 0;    // Task4 emotion
     const rateMul = opts.rateMul || 1.0;
-    const basePitch = 1.35;                      // 洪恩童声 sweet spot (speechSynthesis 降级路径)
+    const basePitch = 1.35;                      //  sweet spot (speechSynthesis )
     const baseRate = this.speechRate;
     const useNeural = this.neuralVoiceEnabled !== false && opts.useNeural !== false;
 
-    // ---- 进度事件 (真实时长版) ----
+    // ----  () ----
     const startProgress = (durationMs) => {
       const chars = [...text];
       const total = Math.max(1, durationMs);
@@ -487,7 +515,7 @@ class CathyAudioEngine {
       }, per);
     };
 
-    // ---- 降级路径: 系统 speechSynthesis (毫秒级字界事件同步) ----
+    // ---- :  speechSynthesis () ----
     const runLegacySynth = () => {
       if (!this.synth) {
         return {
@@ -554,12 +582,12 @@ class CathyAudioEngine {
 
       this.synth.speak(utter);
 
-      // 兜底进度事件 (如果平台浏览器不支持 onboundary)
+      //  ( onboundary)
       const estCharMs = Math.max(160, Math.round(280 / (utter.rate || 1)));
       let idx = 0;
       const total = chars.length * estCharMs;
       queueItem._progressTimer = setInterval(() => {
-        if (boundaryFired) return; // onboundary 正常工作时，兜底计时器不覆盖精准字界
+        if (boundaryFired) return; // onboundary 
         idx += 1;
         if (idx >= chars.length) { clearInterval(queueItem._progressTimer); return; }
         eventBus.emit(EVENTS.AUDIO_SPEAK_PROGRESS, {
@@ -588,34 +616,70 @@ class CathyAudioEngine {
       };
     };
 
-    // ---- 惰性 handle: 先试神经童声, 失败降级 speechSynthesis ----
-    let activeHandle = null;      // neural handle 或 legacy handle
+    // ----  handle: ,  speechSynthesis ----
+    let activeHandle = null;      // neural handle  legacy handle
     let cancelledEarly = false;
-    let queueItem = null;         // _play 注入
+    let queueItem = null;         // _play 
 
     const factory = (qi) => {
       queueItem = qi;
       const onEndPromise = (async () => {
         if (useNeural && this.audioCtx) {
-          try {
-            const dest = this._voiceGainForKind(kind);
-            const h = await neuralVoice.play({
-              text,
-              ctx: this.audioCtx,
-              dest,
-              emotion: opts.emotion || "neutral",
-              pitchOffset: pitchBias,
-              rateMul,
-              volume: 1,
-            });
-            if (h) {
-              if (cancelledEarly) { h.cancel(); return { interrupted: true }; }
-              activeHandle = h;
-              startProgress(h.durationMs);
-              return await h.onEndPromise;
+          const isCached = neuralVoice.hasCached(text, opts.emotion || "neutral", pitchBias, rateMul);
+          if (isCached) {
+            // 0ms  Web Audio 
+            try {
+              const dest = this._voiceGainForKind(kind);
+              const h = await neuralVoice.play({
+                text,
+                ctx: this.audioCtx,
+                dest,
+                emotion: opts.emotion || "neutral",
+                pitchOffset: pitchBias,
+                rateMul,
+                volume: 1,
+              });
+              if (h) {
+                if (cancelledEarly) { h.cancel(); return { interrupted: true }; }
+                activeHandle = h;
+                startProgress(h.durationMs);
+                return await h.onEndPromise;
+              }
+            } catch (e) {
+              // 
             }
-          } catch (e) {
-            // neural 不可用  降级
+          } else if (kind === "char" || kind === "word") {
+            // /(500~1500ms)0ms  TTS 
+            // 
+            neuralVoice.prefetch(text, this.audioCtx, opts.emotion || "neutral", pitchBias, rateMul);
+            if (cancelledEarly) return { interrupted: true };
+            const lh = runLegacySynth();
+            activeHandle = lh;
+            return await lh.onEndPromise;
+          } else {
+            // / ( 150ms  neural  neural TTS)
+            try {
+              const dest = this._voiceGainForKind(kind);
+              const timeoutPromise = new Promise((resolve) => setTimeout(() => resolve(null), 150));
+              const neuralPromise = neuralVoice.play({
+                text,
+                ctx: this.audioCtx,
+                dest,
+                emotion: opts.emotion || "neutral",
+                pitchOffset: pitchBias,
+                rateMul,
+                volume: 1,
+              });
+              const h = await Promise.race([neuralPromise, timeoutPromise]);
+              if (h) {
+                if (cancelledEarly) { h.cancel(); return { interrupted: true }; }
+                activeHandle = h;
+                startProgress(h.durationMs);
+                return await h.onEndPromise;
+              }
+            } catch (e) {
+              // 
+            }
           }
         }
         if (cancelledEarly) return { interrupted: true };
@@ -654,30 +718,30 @@ class CathyAudioEngine {
   }
 
   // ----------------------------------------------------
-  // 1.3b 智能情绪路由 (Scene Emotion Router)
-  // 旧 speak(text) 调用零改动即获得场景化情绪韵律:
-  // 神经童声把情绪映射为 SSML prosody, 系统 TTS 映射为 pitch/rate 偏移
+  // 1.3b  (Scene Emotion Router)
+  //  speak(text) :
+  //  SSML prosody,  TTS  pitch/rate 
   // ----------------------------------------------------
   static EMOTION_KEYWORDS = [
-    // 提问引导 (最优先: 问句语境中的奖励词多为干扰, 提问特征词优先命中)
-    { emotion: "question",      words: ["哪一个", "找一找", "想一想", "你知道吗", "猜猜", "哪个是", "请找出"] },
-    // 奖励/通关 (教学正反馈核心)
-    { emotion: "excited",       words: ["太棒啦", "太棒了", "真棒", "厉害", "好厉害", "通关", "成功", "全对", "满分", "冠军"] },
-    { emotion: "encouragement", words: ["做得好", "答对了", "对了", "正确", "好样的", "真聪明", "继续保持", "进步"] },
-    // 纠错引导 (温柔不挫败)
-    { emotion: "correction",    words: ["再试一次", "再试试", "没关系", "别灰心", "不对哦", "错了", "差一点", "加油"] },
-    // 书写/描红 (沉稳耐心)
-    { emotion: "gentle",        words: ["毛笔", "笔顺", "描红", "书写", "写字", "按照笔顺", "一笔"] },
-    // 故事/睡前
-    { emotion: "bedtime",       words: ["故事", "睡前", "晚安", "从前", "很久以前", "休息"] },
+    //  (: , )
+    { emotion: "question",      words: ["", "", "", "", "", "", ""] },
+    // / ()
+    { emotion: "excited",       words: ["", "", "", "", "", "", "", "", "", ""] },
+    { emotion: "encouragement", words: ["", "", "", "", "", "", "", ""] },
+    //  ()
+    { emotion: "correction",    words: ["", "", "", "", "", "", "", ""] },
+    // / ()
+    { emotion: "gentle",        words: ["", "", "", "", "", "", ""] },
+    // /
+    { emotion: "bedtime",       words: ["", "", "", "", "", ""] },
   ];
 
-  /** 根据文本关键词推断教学情绪; 无命中返回 neutral */
+  /** ;  neutral */
   _detectEmotion(text) {
     if (!text) return "neutral";
-    // 问号结尾  提问语气
-    if (/[?？]\s*$/.test(text.trim())) return "question";
-    // 感叹号 + 奖励词  更兴奋
+    //   
+    if (/[?]\s*$/.test(text.trim())) return "question";
+    //  +   
     for (const rule of CathyAudioEngine.EMOTION_KEYWORDS) {
       for (const w of rule.words) {
         if (text.includes(w)) return rule.emotion;
@@ -687,25 +751,25 @@ class CathyAudioEngine {
   }
 
   // ----------------------------------------------------
-  // 1.3 向后兼容：旧 speak() 映射为 sentence 通道 (自动带情绪)
+  // 1.3  speak()  sentence  ()
   // ----------------------------------------------------
   speak(text, onEnd = null) {
     return this.speakPriority(text, {
       kind: "sentence",
       duckStrategy: "tutor_duck",
-      emotion: this._detectEmotion(text),   // 智能情绪路由 (优化后新设计声音默认路径)
+      emotion: this._detectEmotion(text),   //  ()
       onEnd: ({ interrupted }) => { if (onEnd && !interrupted) onEnd(); },
     });
   }
 
   // ----------------------------------------------------
-  // 1.4 旧 闪避接口 (backward compat)
+  // 1.4   (backward compat)
   // ----------------------------------------------------
   duckBGM() { this.duckStack.push("tutor_duck"); }
   restoreBGM() { this.duckStack.pop("tutor_duck"); }
 
   // ----------------------------------------------------
-  // 1.5 总线事件
+  // 1.5 
   // ----------------------------------------------------
   _emitBusChange(cause) {
     eventBus.emit(EVENTS.AUDIO_BUS_STATE_CHANGE, {
@@ -745,7 +809,7 @@ class CathyAudioEngine {
   }
 
   // ----------------------------------------------------
-  // 1.6 AC-1 自测场景：run_AC_1_scenario()
+  // 1.6 AC-1 run_AC_1_scenario()
   // ----------------------------------------------------
   /** @returns {Promise<{interruptOk:boolean, duckOrderOk:boolean, resumeOk:boolean, log:string[]}>} */
   async run_AC_1_scenario() {
@@ -754,12 +818,12 @@ class CathyAudioEngine {
     const push = (m) => { log.push(m); };
     const snap = () => this.getBusSnapshot();
 
-    // 1. BGM learn 场景启动
+    // 1. BGM learn 
     this.playBGM("learn");
     await new Promise(r => setTimeout(r, 320));
     push(`after bgm start: duck=[${snap().duckStack.join(',')}]`);
 
-    // 事件采集（限制上限防止内存无限增长）
+    // 
     const MAX_EVENTS = 2000;
     const events = [];
     const pushEvent = (ev) => {
@@ -775,7 +839,7 @@ class CathyAudioEngine {
 
     // 2. speakWord (priority 4)
     push("--- enqueue word (p=4) ---");
-    this.speakPriority("这是一个词组示例", {
+    this.speakPriority("", {
       kind: "word",
       duckStrategy: "char_duck",
       onEnd: ({ interrupted }) => {
@@ -786,9 +850,9 @@ class CathyAudioEngine {
     await new Promise(r => setTimeout(r, 120));
     push(`after word 120ms: duck=[${snap().duckStack.join(',')}] qDepth=${snap().queueDepth}`);
 
-    // 3. 立即 speakTutor (p=1)
+    // 3.  speakTutor (p=1)
     push("--- enqueue tutor (p=1) ---");
-    this.speakPriority("小朋友们好", {
+    this.speakPriority("", {
       kind: "tutor",
       onEnd: ({ interrupted }) => {
         tutorEnded = true;
@@ -799,7 +863,7 @@ class CathyAudioEngine {
     const interruptOk = events.some(ev => ev.type === "interrupt" && ev.e.interrupted_kind === "word" && ev.e.high_priority_kind === "tutor");
     push(`interrupt detected=${interruptOk}`);
 
-    // tutor 期间 duck 应该包含 tutor_duck (在 char_duck 之上)
+    // tutor  duck  tutor_duck ( char_duck )
     const duckDuringTutor = [...snap().duckStack];
     const duckOrderOk = duckDuringTutor.includes("char_duck") && duckDuringTutor.includes("tutor_duck");
     push(`duck during tutor: [${duckDuringTutor.join(',')}] ok=${duckOrderOk}`);
@@ -808,7 +872,7 @@ class CathyAudioEngine {
     this.playPop();
     await new Promise(r => setTimeout(r, 150));
 
-    // 5. 等待 tutor 结束 + word resume
+    // 5.  tutor  + word resume
     const t0 = performance.now();
     while (performance.now() - t0 < 6000 && !(tutorEnded && wordEnded)) {
       await new Promise(r => setTimeout(r, 60));
@@ -816,7 +880,7 @@ class CathyAudioEngine {
     const resumeOk = events.some(ev => ev.type === "resume" && ev.e.kind === "word");
     push(`resume detected=${resumeOk}  tutorEnded=${tutorEnded}  wordEnded=${wordEnded}`);
 
-    // 恢复 BGM duck 应都为空
+    //  BGM duck 
     await new Promise(r => setTimeout(r, 500));
     push(`final duck: [${snap().duckStack.join(',')}]`);
 
@@ -828,8 +892,8 @@ class CathyAudioEngine {
   }
 
   // ----------------------------------------------------
-  // 2. BGM 引擎 (程序化五声童趣马林巴 + 交叉淡入淡出)
-  //    注：9 场景完整版/压测在 bgmAndChant.js (bgmEngine)，此处为基础版供 AC-1 与主应用使用
+  // 2. BGM  ( + )
+  //    9 / bgmAndChant.js (bgmEngine) AC-1 
   // ----------------------------------------------------
   static BGM_SCENES = {
     map:      { bpm: 92,  notes: [523.25, 587.33, 659.25, 783.99], wave: "triangle" },
@@ -853,7 +917,7 @@ class CathyAudioEngine {
     if (!this.audioCtx) return;
     const oldType = this.currentBgmType;
 
-    // 交叉淡出旧场景 (600ms 指数衰减)
+    //  (600ms )
     if (this.bgmTimer && this.bgmGain) {
       const ctx = this.audioCtx;
       const now = ctx.currentTime;
@@ -870,9 +934,9 @@ class CathyAudioEngine {
     this.currentBgmType = newType;
     if (!newType) return;
 
-    // 新场景 600ms 淡入
+    //  600ms 
     const scene = CathyAudioEngine.BGM_SCENES[newType] || CathyAudioEngine.BGM_SCENES.map;
-    const intervalMs = Math.round(60000 / scene.bpm / 2); // 八分音符
+    const intervalMs = Math.round(60000 / scene.bpm / 2); // 
     const ctx = this.audioCtx;
     const now = ctx.currentTime;
 
@@ -888,7 +952,7 @@ class CathyAudioEngine {
       if (!this.audioCtx || !this.bgmGain) { clearInterval(this.bgmTimer); return; }
       const t = this.audioCtx.currentTime;
       const freq = scene.notes[this.bgmStep % scene.notes.length];
-      // 五声童趣马林巴: 短促衰减正弦 + 高八度泛音
+      // :  + 
       const osc = this.audioCtx.createOscillator();
       const g = this.audioCtx.createGain();
       osc.type = scene.wave;
@@ -916,11 +980,11 @@ class CathyAudioEngine {
     this.currentBgmType = null;
   }
 
-  /** 当前活跃 BGM 定时器计数 (bgmAndChant/audioSafety 泄漏检查用) */
+  /**  BGM  (bgmAndChant/audioSafety ) */
   get activeBgmTimerCount() { return this.bgmTimer ? 1 : 0; }
 
   // ----------------------------------------------------
-  // 3. SFX 工具基座：输出统一路由 sfxGain (经 Compressor)
+  // 3. SFX  sfxGain ( Compressor)
   // ----------------------------------------------------
   _sfxOut() {
     this.init();
@@ -946,7 +1010,7 @@ class CathyAudioEngine {
     gain.gain.exponentialRampToValueAtTime(0.001, now + dur);
 
     let lastNode = gain;
-    // 立体声声像 (Spatial Panning)
+    //  (Spatial Panning)
     if (pan !== 0 && ctx.createStereoPanner) {
       const panner = ctx.createStereoPanner();
       panner.pan.value = Math.max(-1, Math.min(1, pan));
@@ -962,7 +1026,7 @@ class CathyAudioEngine {
     osc.stop(now + dur + 0.05);
   }
 
-  /** 毛笔宣纸笔顺音 (空间声像: 笔顺滑行左右声道) */
+  /**  (: ) */
   playStrokeSound(pan = 0) {
     if (this.isMuted) return;
     this.init();
@@ -970,7 +1034,7 @@ class CathyAudioEngine {
     const ctx = this.audioCtx;
     const now = ctx.currentTime;
 
-    // 短噪声突发模拟宣纸摩擦 + lowpass 扫频
+    //  + lowpass 
     const dur = 0.18;
     const buf = ctx.createBuffer(1, Math.ceil(ctx.sampleRate * dur), ctx.sampleRate);
     const data = buf.getChannelData(0);
@@ -1004,21 +1068,21 @@ class CathyAudioEngine {
   }
 
   // ----------------------------------------------------
-  // 4. 18 项 SFX（与原 soundEngine 1:1 完全一致，仅输出路由通过新总线 compressor）
+  // 4. 18  SFX soundEngine 1:1  compressor
   // ----------------------------------------------------
 
-  // 1. Q弹果冻触碰音效 (Bloop / Boing)
+  // 1. Q (Bloop / Boing)
   playJellyBoing() {
     this._tone({ type: "sine", from: 300, to: 750, dur: 0.08, vol: 0.3 });
     this._tone({ type: "sine", from: 450, to: 320, dur: 0.14, vol: 0.18, delay: 0.08 });
   }
 
-  // 2. 泡泡点击/按键音效 (Pop)
+  // 2. / (Pop)
   playPop() {
     this._tone({ type: "sine", from: 600, to: 1200, dur: 0.08, vol: 0.25 });
   }
 
-  // 3. 升日/破晓旭日光芒音效
+  // 3. /
   playSunRise() {
     const chord = [261.63, 329.63, 392.0, 523.25, 659.25, 783.99];
     chord.forEach((freq, idx) => {
@@ -1026,36 +1090,36 @@ class CathyAudioEngine {
     });
   }
 
-  // 4. 清脆流水声/水滴声
+  // 4. /
   playWaterDrop() {
     this._tone({ type: "sine", from: 1400, to: 600, dur: 0.2, vol: 0.3 });
   }
 
-  // 5. 营火点燃/火花噼啪
+  // 5. /
   playFireIgnite() {
     this._tone({ type: "sawtooth", from: 180, to: 400, dur: 0.35, vol: 0.2 });
   }
 
-  // 6. 星星入槽音效 (Duang)
+  // 6.  (Duang)
   playStarEarned(starIndex = 1) {
     const freqs = [523.25, 659.25, 783.99];
     const targetFreq = freqs[Math.min(starIndex - 1, freqs.length - 1)];
     this._tone({ type: "triangle", from: targetFreq * 0.8, to: targetFreq * 1.5, dur: 0.5, vol: 0.35 });
   }
 
-  // 7. 宝箱开启与金币喷涌
+  // 7. 
   playChestOpen() {
     for (let i = 0; i < 6; i++) {
       this._tone({ type: "sine", from: 987.77 + i * 120, dur: 0.25, vol: 0.2, delay: i * 0.06 });
     }
   }
 
-  // 8. 倒笔画/错误柔和提示音
+  // 8. /
   playSoftError() {
     this._tone({ type: "sine", from: 280, to: 180, dur: 0.3, vol: 0.2 });
   }
 
-  // 9. 礼炮欢呼大音效 (通关结算)
+  // 9.  ()
   playVictoryFanfare() {
     const melody = [
       { f: 523.25, t: 0.0, d: 0.15 },
@@ -1070,24 +1134,24 @@ class CathyAudioEngine {
     });
   }
 
-  // 10. 成功答对音 (上行双音 C5G5)
+  // 10.  ( C5G5)
   playSuccessSound() {
     this._tone({ type: "sine", from: 523.25, dur: 0.12, vol: 0.28 });
     this._tone({ type: "sine", from: 783.99, dur: 0.22, vol: 0.26, delay: 0.1 });
   }
 
-  // 11. 错误提示音 (下行小二度)
+  // 11.  ()
   playErrorSound() {
     this._tone({ type: "sine", from: 392.0, to: 349.23, dur: 0.28, vol: 0.22 });
   }
 
-  // 12. 星星铃铛音 (高频泛音)
+  // 12.  ()
   playStarChime() {
     this._tone({ type: "sine", from: 1567.98, dur: 0.3, vol: 0.18 });
     this._tone({ type: "sine", from: 2093.0, dur: 0.4, vol: 0.12, delay: 0.06 });
   }
 
-  // 13. 卡牌翻面音 (白噪短促)
+  // 13.  ()
   playCardFlip() {
     if (this.isMuted) return;
     this.init();
@@ -1114,26 +1178,26 @@ class CathyAudioEngine {
     src.start(now); src.stop(now + dur);
   }
 
-  // 13.5 激光射击/射击气球音 (快速下行调频)
+  // 13.5 / ()
   playLaserShoot() {
     this._tone({ type: "sawtooth", from: 1200, to: 200, dur: 0.12, vol: 0.2 });
     this._tone({ type: "sine", from: 800, to: 150, dur: 0.08, vol: 0.15 });
   }
 
-  // 14. 攻击命中音 (方波打击)
+  // 14.  ()
   playAttackHit() {
     this._tone({ type: "square", from: 220, to: 80, dur: 0.15, vol: 0.22 });
     this._tone({ type: "triangle", from: 660, to: 330, dur: 0.1, vol: 0.15 });
   }
 
-  // 15. 温柔鼓励琶音 (C-E-G)
+  // 15.  (C-E-G)
   playEncouragement() {
     [523.25, 659.25, 783.99].forEach((f, i) => {
       this._tone({ type: "sine", from: f, dur: 0.35, vol: 0.18, delay: i * 0.09 });
     });
   }
 
-  // 16. 连击递增三连音
+  // 16. 
   playCombo(combo = 1) {
     const base = 523.25 * Math.pow(1.06, Math.min(combo, 8));
     [0, 1, 2].forEach((i) => {
@@ -1141,13 +1205,13 @@ class CathyAudioEngine {
     });
   }
 
-  // 17. 金币叮当 (金属双音)
+  // 17.  ()
   playCoinClink() {
     this._tone({ type: "sine", from: 1318.5, dur: 0.15, vol: 0.2 });
     this._tone({ type: "sine", from: 1975.5, dur: 0.25, vol: 0.15, delay: 0.05 });
   }
 
-  // 18. 全屏五彩纸屑与金星粒子特效 (Canvas Confetti)
+  // 18.  (Canvas Confetti)
   triggerConfetti(container) {
     const canvas = document.createElement("canvas");
     canvas.className = "fixed inset-0 pointer-events-none z-50 w-full h-full";
@@ -1206,39 +1270,26 @@ class CathyAudioEngine {
   }
 
   // ----------------------------------------------------
-  // 5. 音量 / 静音 / 持久化
+  // 5.  /  / 
   // ----------------------------------------------------
-  setMasterVolume(val) {
-    this.masterVolume = Math.max(0, Math.min(1, val));
-    if (this.masterGain && this.audioCtx) {
-      this.masterGain.gain.setValueAtTime(this.isMuted ? 0 : this.masterVolume, this.audioCtx.currentTime);
+  /** setXxxVolume helpers — unified implementation via _setChannelVol */
+  setMasterVolume(val) { this._setChannelVol("master", val); }
+  setBGMVolume(val)    { this._setChannelVol("bgm",    val); }
+  setSFXVolume(val)    { this._setChannelVol("sfx",    val); }
+  setVoiceVolume(val)  { this._setChannelVol("voice",  val); }
+
+  _setChannelVol(channel, val) {
+    const clamped = Math.max(0, Math.min(1, val));
+    const gainMap = { master: "masterGain", bgm: "bgmGain", sfx: "sfxGain", voice: "voiceGain" };
+    const propMap = { master: "masterVolume", bgm: "bgmVolume", sfx: "sfxVolume", voice: "voiceVolume" };
+    const ducked  = ["bgm", "sfx"].includes(channel) && this.duckStack.depth > 0;
+    this[propMap[channel]] = clamped;
+    const gainNode = this[gainMap[channel]];
+    if (gainNode && this.audioCtx && !ducked) {
+      const effective = channel === "master" && this.isMuted ? 0 : clamped;
+      gainNode.gain.setValueAtTime(effective, this.audioCtx.currentTime);
     }
-    eventBus.emit(EVENTS.AUDIO_VOLUME_CHANGED, { channel: "master", value: this.masterVolume, profile: this._audioProfile });
-  }
-  setBGMVolume(val) {
-    this.bgmVolume = Math.max(0, Math.min(1, val));
-    if (this.bgmGain && this.audioCtx) {
-      if (this.duckStack.depth === 0) {
-        this.bgmGain.gain.setValueAtTime(this.bgmVolume, this.audioCtx.currentTime);
-      }
-    }
-    eventBus.emit(EVENTS.AUDIO_VOLUME_CHANGED, { channel: "bgm", value: this.bgmVolume, profile: this._audioProfile });
-  }
-  setSFXVolume(val) {
-    this.sfxVolume = Math.max(0, Math.min(1, val));
-    if (this.sfxGain && this.audioCtx) {
-      if (this.duckStack.depth === 0) {
-        this.sfxGain.gain.setValueAtTime(this.sfxVolume, this.audioCtx.currentTime);
-      }
-    }
-    eventBus.emit(EVENTS.AUDIO_VOLUME_CHANGED, { channel: "sfx", value: this.sfxVolume, profile: this._audioProfile });
-  }
-  setVoiceVolume(val) {
-    this.voiceVolume = Math.max(0, Math.min(1, val));
-    if (this.voiceGain && this.audioCtx) {
-      this.voiceGain.gain.setValueAtTime(this.voiceVolume, this.audioCtx.currentTime);
-    }
-    eventBus.emit(EVENTS.AUDIO_VOLUME_CHANGED, { channel: "voice", value: this.voiceVolume, profile: this._audioProfile });
+    eventBus.emit(EVENTS.AUDIO_VOLUME_CHANGED, { channel, value: clamped, profile: this._audioProfile });
   }
   toggleMute() {
     this.isMuted = !this.isMuted;
@@ -1251,14 +1302,14 @@ class CathyAudioEngine {
   }
 
   // ----------------------------------------------------
-  // 6. 神经童声控制 (晓依真人级童声)
+  // 6.  ()
   // ----------------------------------------------------
-  /** 开关神经童声 (关闭后走系统 speechSynthesis) */
+  /**  ( speechSynthesis) */
   setNeuralVoice(on) {
     this.neuralVoiceEnabled = !!on;
     return this.neuralVoiceEnabled;
   }
-  /** 语音引擎状态 (调试/诊断) */
+  /**  (/) */
   async getVoiceStatus() {
     const neuralOk = await neuralVoice.probe();
     return {
@@ -1274,7 +1325,7 @@ class CathyAudioEngine {
   }
 
   // ----------------------------------------------------
-  // 7. 飞金币入顶栏动画与音效 (物理抛物线粒子)
+  // 7.  ()
   // ----------------------------------------------------
   triggerCoinFly(container, startX = null, startY = null, count = 7) {
     if (typeof window === "undefined" || !document.body) return;
@@ -1317,13 +1368,13 @@ class CathyAudioEngine {
 }
 
 // ============================================================
-// 导出（双名单导出，全部调用点兼容）
+// 
 // ============================================================
 export const soundAndFX = new CathyAudioEngine();
 export const soundEngine = soundAndFX;
 export default soundAndFX;
 
-// 全局调试句柄
+// 
 if (typeof window !== "undefined") {
   window.__soundEngine = soundAndFX;
 }

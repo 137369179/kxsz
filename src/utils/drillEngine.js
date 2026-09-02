@@ -122,7 +122,7 @@ export class DrillEngine {
           </div>
           <div id="combo-badge-anchor" class="h-6 flex items-center justify-center font-black text-sm text-yellow-300"></div>
           <div class="text-xs font-black text-cyan-300 flex items-center gap-1">
-            <span> </span>
+            <span>正确</span>
             <span id="drill-correct" class="text-yellow-400 text-base font-black">${this.correctCount}</span> / ${this.queue.length}
           </div>
         </div>
@@ -150,7 +150,7 @@ export class DrillEngine {
 
     if (type === "audio_choice") {
       return `
-        <button id="btn-replay-audio" class="group w-28 h-28 rounded-full bg-gradient-to-tr from-cyan-400 to-blue-600 border-4 border-white shadow-[0_0_45px_rgba(6,182,212,0.8)] flex items-center justify-center active:scale-90 transition-transform animate-bounce-slow">
+        <button id="btn-replay-audio" class="group w-28 h-28 rounded-full bg-gradient-to-tr from-cyan-400 to-blue-600 border-4 border-white shadow-[0_0_45px_rgba(6,182,212,0.8)] flex items-center justify-center active:scale-90 transition-transform animate-bounce-slow" title="">
           ${GAME_ICONS.speaker("w-14 h-14")}
         </button>
         <p class="text-white font-black text-sm">${meta.tip}</p>
@@ -159,8 +159,15 @@ export class DrillEngine {
     }
 
     if (type === "image_choice") {
+      // 不使用 Emoji，改用汉字象形甲骨文图示卡片
+      const glyphDisplay = c.oracleGlyph || c.char;
+      const radicalBadge = c.radical ? `<span class="absolute top-1 right-1 text-[9px] font-black text-amber-600 bg-amber-100 px-1 rounded">${c.radical}</span>` : "";
       return `
-        <div class="w-32 h-32 rounded-3xl bg-white/95 border-4 border-amber-300 shadow-2xl flex items-center justify-center text-7xl">${c.emoji}</div>
+        <div class="relative w-36 h-36 rounded-3xl bg-gradient-to-br from-amber-50 to-orange-100 border-4 border-amber-400 shadow-2xl flex flex-col items-center justify-center gap-1">
+          ${radicalBadge}
+          <span class="text-5xl font-black text-amber-900 drop-shadow">${glyphDisplay}</span>
+          <span class="text-[10px] text-amber-700 font-bold">${c.pinyin}</span>
+        </div>
         <p class="text-white font-black text-sm">${meta.tip}</p>
       `;
     }
@@ -168,7 +175,7 @@ export class DrillEngine {
     if (type === "similar_pick") {
       return `
         <div class="bg-black/50 border border-white/25 rounded-2xl px-8 py-3 flex flex-col items-center gap-1">
-          <span class="text-[11px] text-white/60 font-bold"></span>
+          <span class="text-[11px] text-white/60 font-bold">拼音</span>
           <span class="text-4xl font-black text-yellow-300">${c.pinyin}</span>
         </div>
         <p class="text-white font-black text-sm">${meta.tip}</p>
@@ -177,23 +184,23 @@ export class DrillEngine {
 
     if (type === "word_fill") {
       const w = (c.words || []).find((x) => x.word.includes(c.char)) || { word: c.char, pinyin: c.pinyin };
-      const blanked = w.word.split(c.char).join("");
+      const blanked = w.word.split(c.char).join(" ( ? ) ");
       return `
         <div class="flex flex-col items-center gap-2">
           <span class="text-[11px] text-cyan-200 font-bold">${w.pinyin}</span>
-          <div class="text-6xl font-black text-white tracking-[0.3em] bg-black/40 px-8 py-4 rounded-3xl border-2 border-amber-300">${blanked}</div>
+          <div class="text-5xl font-black text-white tracking-widest bg-black/40 px-8 py-4 rounded-3xl border-2 border-amber-300">${blanked}</div>
         </div>
-        <p class="text-white font-black text-sm">${meta.tip}</p>
+        <p class="text-white font-black text-sm mt-1">${meta.tip}</p>
       `;
     }
 
     if (type === "sentence_fill") {
-      const blanked = (c.sentence || "").split(c.char).join("");
+      const blanked = (c.sentence || "").split(c.char).join(" ? ");
       return `
-        <div class="max-w-2xl text-2xl font-black text-white leading-relaxed tracking-wider bg-black/40 px-8 py-5 rounded-3xl border-2 border-amber-300 text-center">
+        <div class="max-w-2xl text-xl font-black text-white leading-relaxed tracking-wider bg-black/40 px-8 py-5 rounded-3xl border-2 border-amber-300 text-center">
           ${blanked}
         </div>
-        <p class="text-white font-black text-sm">${meta.tip}</p>
+        <p class="text-white font-black text-sm mt-1">${meta.tip}</p>
       `;
     }
 
@@ -201,10 +208,10 @@ export class DrillEngine {
     return `
       <div class="flex flex-col items-center gap-2">
         <span class="bg-black/50 text-yellow-300 font-black text-lg px-6 py-2 rounded-full border border-amber-300">
-          ${c.char}
+           ${c.char} 
         </span>
         <p class="text-white font-black text-sm">${meta.tip}</p>
-        <p class="text-[11px] text-cyan-200/80"> <b id="balloon-left">3</b> </p>
+        <p class="text-[11px] text-cyan-200/80"> <b id="balloon-left" class="text-yellow-300 text-sm">3</b> </p>
       </div>
     `;
   }
@@ -216,7 +223,7 @@ export class DrillEngine {
       return opts
         .map(
           (opt, idx) => `
-        <button class="drill-opt balloon-target-btn relative w-28 h-36 rounded-full bg-gradient-to-t from-orange-600 via-amber-400 to-yellow-200 border-4 border-white shadow-[0_0_30px_rgba(255,160,0,0.6)] flex flex-col items-center justify-center active:scale-75 transition-all duration-300 animate-bounce-slow"
+        <button class="drill-opt balloon-target-btn relative w-28 h-36 rounded-full bg-gradient-to-t from-orange-600 via-amber-400 to-yellow-200 border-4 border-white shadow-[0_0_30px_rgba(255,160,0,0.6)] flex flex-col items-center justify-center active:scale-75 transition-all duration-300 animate-bounce-slow cursor-pointer"
                 style="animation-delay:${idx * 0.28}s" data-char="${opt}">
           <span class="text-5xl font-black text-amber-950 drop-shadow">${opt}</span>
         </button>
@@ -228,7 +235,7 @@ export class DrillEngine {
     return opts
       .map(
         (opt) => `
-      <button class="drill-opt relative group bg-gradient-to-b from-amber-200 to-amber-400 text-amber-950 font-black text-5xl w-28 h-28 rounded-[30px] border-b-[8px] border-amber-600 shadow-[0_10px_20px_rgba(0,0,0,0.4)] hover:from-orange-300 hover:to-orange-500 hover:border-orange-700 active:border-b-0 active:translate-y-[8px] transition-all flex items-center justify-center overflow-hidden" data-char="${opt}">
+      <button class="drill-opt relative group bg-gradient-to-b from-amber-200 to-amber-400 text-amber-950 font-black text-5xl w-28 h-28 rounded-[30px] border-b-[8px] border-amber-600 shadow-[0_10px_20px_rgba(0,0,0,0.4)] hover:from-orange-300 hover:to-orange-500 hover:border-orange-700 active:border-b-0 active:translate-y-[8px] transition-all flex items-center justify-center overflow-hidden cursor-pointer" data-char="${opt}">
         <div class="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
         <div class="absolute top-2 left-2 w-10 h-3 bg-white/50 rounded-full rotate-45 blur-[1px]"></div>
         <span class="relative z-10 drop-shadow-sm">${opt}</span>
@@ -240,17 +247,15 @@ export class DrillEngine {
 
   announce(type) {
     const c = this.char;
-    if (type === "audio_choice") {
-      soundAndFX.speakPriority(c.char, { kind: "char", priority: 1 });
-    } else if (type === "image_choice") {
-      soundAndFX.speakPriority("", { kind: "char", priority: 1 });
-    } else if (type === "similar_pick") {
-      soundAndFX.speakPriority(c.pinyin, { kind: "char", priority: 1 });
-    } else if (type === "word_fill" || type === "sentence_fill") {
-      soundAndFX.speakPriority("", { kind: "char", priority: 1 });
-    } else {
-      soundAndFX.speakPriority(c.char, { kind: "char", priority: 1 });
-    }
+    const text = {
+      audio_choice: `“${c.char}”`,
+      image_choice: `“${c.char}”`,
+      similar_pick: `“${c.pinyin}”“${c.char}”`,
+      word_fill: `“${c.char}”`,
+      sentence_fill: `“${c.char}”`,
+      balloon_pop: `“${c.char}”`,
+    }[type] ?? c.char;
+    soundAndFX.speakPriority(text, { kind: "sentence", emotion: "gentle" });
   }
 
   // ------------------------------------------------------------------
@@ -344,12 +349,12 @@ export class DrillEngine {
       <div class="relative w-full max-w-4xl h-[480px] bg-gradient-to-b from-slate-950 via-indigo-950 to-slate-900 rounded-3xl overflow-hidden shadow-2xl border-4 border-amber-300 flex flex-col items-center justify-center p-8 animate-fade-in text-center">
 
         <div class="mb-3 animate-bounce-slow flex items-center justify-center">
-          ${GAME_ICONS.trophy("w-20 h-20")}
+          ${window.GAME_ICONS ? window.GAME_ICONS.trophy("w-20 h-20") : ""}
         </div>
         <h2 class="text-2xl font-black text-yellow-300 mb-2">
           ${perfect ? "" : ""}
         </h2>
-        <p class="text-xs text-gray-300 mb-4">
+        <p class="text-xs text-gray-300 mb-4 font-bold">
           “<b class="text-amber-300 text-base">${c.char}</b>”
         </p>
 
@@ -370,15 +375,19 @@ export class DrillEngine {
           </div>
         </div>
 
-        <button id="btn-goto-write-step" class="btn-game-orange text-white font-black text-base px-10 py-3.5 rounded-full shadow-2xl shimmer-badge flex items-center gap-2">
-          <span class="flex items-center">${GAME_ICONS.brush("w-5 h-5")}</span>  
+        <button id="btn-goto-write-step" class="btn-game-orange text-white font-black text-base px-10 py-3.5 rounded-full shadow-2xl shimmer-badge flex items-center gap-2 cursor-pointer active:scale-95 transition-transform">
+          <span class="flex items-center">${window.GAME_ICONS ? window.GAME_ICONS.sparkle("w-5 h-5") : ""}</span> 
+          <span></span> 
         </button>
       </div>
     `;
 
-    this.mount.querySelector("#btn-goto-write-step").addEventListener("click", () => {
-      soundAndFX.playPop();
-      if (this.onComplete) this.onComplete();
-    });
+    const nextBtn = this.mount.querySelector("#btn-goto-write-step");
+    if (nextBtn) {
+      nextBtn.addEventListener("click", () => {
+        soundAndFX.playPop();
+        if (this.onComplete) this.onComplete();
+      });
+    }
   }
 }

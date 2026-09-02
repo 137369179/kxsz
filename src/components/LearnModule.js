@@ -1,11 +1,12 @@
 /**
- * 凯茜识字 (Cathy Literacy) - 1:1 沉浸式五步闭环教学引擎
+ * 凯茜识字 (Cathy Literacy) - 1:1 沉浸式六步闭环教学引擎
  * 核心特色：
- * 1. 玩8大汉字专属物理情景交互（拉绳升日擦云见月涌泉流水摩擦点火敲石成山浇水长木跨栏成人喂食成口）+ 4阶段象形蜕变
- * 2. 认3D Q弹果冻大字 + 偏旁部首拆解 + 词组实物小剧场
- * 3. 练太空战机射击 / 飞翔气球小游戏
- * 4. 写AI 魔法星光毛笔描红 + 严格倒笔画阻断拦截 + 全屏 Confetti 礼炮
- * 5. 测闪电速测 + 黄金宝箱降落 + 三星飞入“Duang! Duang! Duang!”
+ * 1. 玩：8大汉字专属物理情景交互 + 4阶段象形蜕变
+ * 2. 认：3D Q弹果冻大字 + 偏旁部首拆解 + 词组例句实物小剧场
+ * 3. 读：智能语音评测 + 麦克风动态声浪与倒计时 + 真实打分 + 双轨发音对比
+ * 4. 练：太空战机激光射击 / 飞翔气球小游戏
+ * 5. 写：AI 魔法星光毛笔描红 + 严格倒笔画阻断拦截 + 全屏 Confetti 礼炮
+ * 6. 测：闪电速测 + 黄金宝箱降落 + 三星飞入“Duang! Duang! Duang!”
  */
 
 import { HanziEngine } from "../utils/hanziEngine.js";
@@ -14,6 +15,7 @@ import { ebbinghausManager } from "../utils/ebbinghaus.js";
 import { BaseModule } from "../utils/BaseModule.js";
 import { EVENTS } from "../utils/eventBus.js";
 import { GAME_ICONS } from "../utils/gameIcons.js";
+import { pronunciationEval } from "../utils/pronunciationEval.js";
 
 export class LearnModule extends BaseModule {
   constructor(container, charData, onFinishCallback, onBackToMapCallback) {
@@ -22,14 +24,18 @@ export class LearnModule extends BaseModule {
     this.onFinish = onFinishCallback;
     this.onBackToMap = onBackToMapCallback;
 
-    this.currentStep = 1; // 1:玩, 2:认, 3:练, 4:写, 5:测
+    this.currentStep = 1; // 1:玩, 2:认, 3:读, 4:练, 5:写, 6:测
     this.hanziEngine = null;
+    this._isRecordingTransition = false;
   }
 
   destroy() {
     if (this.hanziEngine) {
       this.hanziEngine.destroy();
       this.hanziEngine = null;
+    }
+    if (this.drillEngine) {
+      this.drillEngine = null;
     }
     super.destroy();
   }
@@ -52,29 +58,30 @@ export class LearnModule extends BaseModule {
             <span>返回地图</span>
           </button>
 
-          <!-- 五步发光水晶连珠 (玩认练写测) -->
-          <div class="flex items-center gap-3 bg-black/60 px-6 py-1.5 rounded-full border border-white/30 shadow-2xl">
+          <!-- 六步发光水晶连珠 (玩认读练写测) -->
+          <div class="flex items-center gap-2.5 bg-black/60 px-5 py-1.5 rounded-full border border-white/30 shadow-2xl">
             ${[
               { step: 1, name: "玩", iconSvg: (cls) => GAME_ICONS.gem(cls) },
               { step: 2, name: "认", iconSvg: (cls) => GAME_ICONS.cards(cls) },
-              { step: 3, name: "练", iconSvg: (cls) => GAME_ICONS.arcade(cls) },
-              { step: 4, name: "写", iconSvg: (cls) => GAME_ICONS.brush(cls) },
-              { step: 5, name: "测", iconSvg: (cls) => GAME_ICONS.trophy(cls) }
+              { step: 3, name: "读", iconSvg: (cls) => GAME_ICONS.speaker(cls) },
+              { step: 4, name: "练", iconSvg: (cls) => GAME_ICONS.arcade(cls) },
+              { step: 5, name: "写", iconSvg: (cls) => GAME_ICONS.brush(cls) },
+              { step: 6, name: "测", iconSvg: (cls) => GAME_ICONS.chest(cls) }
             ]
               .map(
                 (s) => `
-              <div class="flex items-center gap-1.5">
-                <div class="w-8 h-8 rounded-full flex items-center justify-center font-black text-xs transition-all duration-500 ${
+              <div class="flex items-center gap-1">
+                <div class="w-7 h-7 rounded-full flex items-center justify-center font-black text-xs transition-all duration-500 ${
                   s.step === this.currentStep
                     ? "bg-gradient-to-tr from-yellow-300 via-orange-500 to-red-500 text-white shadow-[0_0_15px_rgba(255,160,0,0.9)] scale-125 ring-4 ring-yellow-300/80 animate-pulse"
                     : s.step < this.currentStep
                     ? "bg-emerald-500 text-white shadow-md"
                     : "bg-white/20 text-white/40"
                 }">
-                  ${s.step < this.currentStep ? `<span class="flex items-center">${GAME_ICONS.star(true)}</span>` : `<span class="flex items-center">${s.iconSvg("w-4 h-4")}</span>`}
+                  ${s.step < this.currentStep ? `<span class="flex items-center">${GAME_ICONS.star(true)}</span>` : `<span class="flex items-center">${s.iconSvg("w-3.5 h-3.5")}</span>`}
                 </div>
                 <span class="text-xs font-black ${s.step === this.currentStep ? "text-yellow-300 drop-shadow" : "text-white/60"}">${s.name}</span>
-                ${s.step < 5 ? `<div class="w-4 h-0.5 ${s.step < this.currentStep ? "bg-emerald-400" : "bg-white/20"}"></div>` : ""}
+                ${s.step < 6 ? `<div class="w-3 h-0.5 ${s.step < this.currentStep ? "bg-emerald-400" : "bg-white/20"}"></div>` : ""}
               </div>
             `
               )
@@ -94,7 +101,7 @@ export class LearnModule extends BaseModule {
               ${GAME_ICONS.coin()}<span>${__lnProgress.coins}</span>
             </div>
             <div class="candy-pill flex items-center gap-1.5 text-amber-300 font-black text-xs px-3 py-1 rounded-full bg-black/40 border border-white/30">
-              ${GAME_ICONS.star(true)}<span>${__lnProgress.stars}</span>
+              ${GAME_ICONS.star(false)}<span>${__lnProgress.stars}</span>
             </div>
           </div>
 
@@ -127,6 +134,14 @@ export class LearnModule extends BaseModule {
         else this._busEmit(EVENTS.SWITCH_MODE, { mode: "map" });
       });
     }
+
+    const soundBtn = this.container.querySelector("#btn-learn-sound");
+    if (soundBtn) {
+      this._on(soundBtn, "click", () => {
+        const muted = soundAndFX.toggleMute();
+        soundBtn.innerHTML = muted ? GAME_ICONS.speaker(true) : GAME_ICONS.speaker(false);
+      });
+    }
   }
 
   renderCurrentStep() {
@@ -146,12 +161,15 @@ export class LearnModule extends BaseModule {
         this.renderStepRecognize(stage);
         break;
       case 3:
-        this.renderStepPractice(stage);
+        this.renderStepRead(stage);
         break;
       case 4:
-        this.renderStepWrite(stage);
+        this.renderStepPractice(stage);
         break;
       case 5:
+        this.renderStepWrite(stage);
+        break;
+      case 6:
         this.renderStepTestAndChest(stage);
         break;
     }
@@ -310,23 +328,23 @@ export class LearnModule extends BaseModule {
 
           <!-- 象形蜕变全屏卡片 (交互完成后显示) -->
           <div id="evolution-reveal-box" class="absolute inset-0 bg-black/85 backdrop-blur-md rounded-3xl p-8 flex flex-col items-center justify-center text-white hidden animate-scale-up z-30">
-            <span class="bg-orange-500 text-white font-black text-xs px-4 py-1 rounded-full mb-3 shadow">象形 4 阶段蜕变完成！</span>
+            <span class="bg-orange-500 text-white font-black text-xs px-4 py-1 rounded-full mb-3 shadow">象形 3 阶段蜕变完成！</span>
             
             <div class="flex items-center gap-6 my-4">
               <div class="flex flex-col items-center">
-                <span class="text-xs text-yellow-300 font-bold mb-1">1. 甲骨文字形</span>
+                <span class="text-xs text-yellow-300 font-bold mb-1">1. 甲骨文</span>
                 <div class="w-20 h-20 rounded-2xl bg-amber-100 text-amber-950 flex items-center justify-center text-3xl font-black shadow-inner border-2 border-amber-300">
                   ${char.oracleGlyph || char.char}
                 </div>
               </div>
-              <span class="text-2xl text-orange-400 font-black"></span>
+              <span class="text-2xl text-orange-400 font-black">-&gt;</span>
               <div class="flex flex-col items-center">
-                <span class="text-xs text-yellow-300 font-bold mb-1">2. 小篆演变</span>
+                <span class="text-xs text-yellow-300 font-bold mb-1">2. 小篆</span>
                 <div class="w-20 h-20 rounded-2xl bg-amber-200 text-amber-950 flex items-center justify-center text-3xl font-black shadow-inner border-2 border-amber-400">
                   ${char.bronzeGlyph || char.char}
                 </div>
               </div>
-              <span class="text-2xl text-orange-400 font-black"></span>
+              <span class="text-2xl text-orange-400 font-black">-&gt;</span>
               <div class="flex flex-col items-center">
                 <span class="text-xs text-yellow-300 font-bold mb-1">3. 楷体规范字</span>
                 <div class="w-24 h-24 rounded-3xl bg-gradient-to-tr from-yellow-400 to-orange-500 text-white flex items-center justify-center text-5xl font-black shadow-2xl border-4 border-white animate-pulse">
@@ -335,8 +353,8 @@ export class LearnModule extends BaseModule {
               </div>
             </div>
 
-            <button id="btn-next-to-rec" class="mt-4 bg-gradient-to-r from-emerald-400 to-emerald-600 text-white font-black text-sm px-8 py-3 rounded-full shadow-2xl border-2 border-white active:scale-95 transition-transform flex items-center gap-2">
-              <span></span> 去认字大剧场 
+            <button id="btn-next-to-rec" class="mt-4 bg-gradient-to-r from-emerald-400 to-emerald-600 text-white font-black text-sm px-8 py-3 rounded-full shadow-2xl border-2 border-white active:scale-95 transition-transform flex items-center gap-2 cursor-pointer">
+              <span class="flex items-center">${window.GAME_ICONS ? window.GAME_ICONS.sparkle("w-4 h-4") : ""}</span> 去认字大剧场
             </button>
           </div>
 
@@ -481,63 +499,150 @@ export class LearnModule extends BaseModule {
     }
   }
 
-
   // ----------------------------------------------------------------
-  // STEP 3: 读 (智能语音评测)
+  // STEP 3: 读 (智能语音评测 - 洪恩识字 1:1 沉浸式录音与回放系统)
   // ----------------------------------------------------------------
   renderStepRead(stage) {
     const char = this.charData;
     soundAndFX.speakPriority(`读一读：“${char.char}”，点击麦克风大声朗读！`, { kind: "sentence", emotion: "gentle" });
-    
+
     stage.innerHTML = `
-      <div class="relative w-full max-w-4xl h-[480px] bg-gradient-to-b from-blue-900 via-indigo-900 to-slate-950 rounded-3xl overflow-hidden shadow-2xl border-4 border-sky-300 flex items-center justify-between p-8 animate-fade-in select-none">
+      <div class="relative w-full max-w-4xl h-[480px] bg-gradient-to-b from-indigo-950 via-purple-900 to-slate-950 rounded-3xl overflow-hidden shadow-2xl border-4 border-sky-300 flex items-center justify-between p-8 animate-fade-in select-none">
         
-        <div class="flex-1 flex flex-col items-center justify-center">
-          <div class="text-xl text-sky-200 font-black tracking-widest mb-6">
-            请大声朗读这个字
+        <!-- 左侧：3D 果冻字卡与示范发音台 -->
+        <div class="flex-1 flex flex-col items-center justify-center pr-6 border-r border-white/10">
+          <div class="text-3xl text-yellow-300 font-black tracking-widest mb-3 bg-black/40 px-6 py-1.5 rounded-full border border-white/20 animate-pulse">
+            ${char.pinyin}
           </div>
 
-          <button id="read-char-circle" class="relative w-48 h-48 rounded-full bg-gradient-to-tr from-sky-400 via-blue-500 to-indigo-600 border-4 border-white shadow-[0_0_60px_rgba(56,189,248,0.8)] flex items-center justify-center text-8xl font-black text-white active:scale-95 transition-transform cursor-pointer" title="点击听示范发音">
+          <button id="read-char-circle" class="relative group w-44 h-44 rounded-3xl bg-gradient-to-tr from-sky-400 via-blue-500 to-indigo-600 border-4 border-white shadow-[0_0_50px_rgba(56,189,248,0.7)] flex items-center justify-center text-8xl font-black text-white active:scale-95 transition-all cursor-pointer animate-bounce-cathy" title="点击听示范发音">
             ${char.char}
-            <div class="absolute -bottom-2 bg-blue-900 text-sky-200 text-[10px] font-black px-3 py-0.5 rounded-full border border-sky-400">
-              示范发音 ${window.GAME_ICONS ? window.GAME_ICONS.speaker("w-3.5 h-3.5 inline-block") : ""}
+            <div class="absolute -bottom-2.5 bg-blue-950 text-sky-200 text-[10px] font-black px-3.5 py-0.5 rounded-full border border-sky-400 flex items-center gap-1 shadow-md">
+              <span>示范发音</span>
+              <span class="w-3.5 h-3.5 inline-block">${window.GAME_ICONS ? window.GAME_ICONS.speaker("w-3.5 h-3.5") : ""}</span>
             </div>
           </button>
-          
-          <div id="read-score-display" class="mt-8 text-3xl font-black text-yellow-300 opacity-0 transition-opacity">
-            评分: <span id="read-score-num">0</span> 分！
+
+          <div class="flex items-center gap-3 mt-6">
+            <span class="bg-white/15 text-white/90 text-xs font-black px-3.5 py-1 rounded-full border border-white/20">部首：${char.radical}</span>
+            <span class="bg-white/15 text-white/90 text-xs font-black px-3.5 py-1 rounded-full border border-white/20">笔画：${char.strokeCount || 4}画</span>
           </div>
         </div>
 
-        <div class="w-80 flex flex-col justify-between h-full bg-white/10 backdrop-blur-md rounded-3xl p-6 border-2 border-white/30 text-center">
-          <div>
-            <h3 class="text-sm font-black text-white mb-6">语音评测挑战</h3>
-            <p class="text-xs text-sky-200 mb-8 leading-relaxed">
-              点击下方按钮，对着麦克风大声朗读“<strong class="text-yellow-300 text-base">${char.char}</strong>”凯茜会为你打分哦！
+        <!-- 右侧：洪恩风格麦克风评测与结算台 -->
+        <div id="read-eval-panel" class="w-[380px] flex flex-col justify-between h-full bg-white/10 backdrop-blur-xl rounded-3xl p-6 border-2 border-white/30 text-center relative overflow-hidden">
+          
+          <!-- 顶部状态提示标题 -->
+          <div class="z-10">
+            <h3 id="read-panel-title" class="text-base font-black text-yellow-300 mb-1 flex items-center justify-center gap-1.5">
+              <span>${window.GAME_ICONS ? window.GAME_ICONS.audio("w-4 h-4 inline-block") : ""} 语音评测挑战</span>
+            </h3>
+            <p id="record-guide-text" class="text-xs text-sky-100 font-bold leading-relaxed">
+              点击麦克风，大声读出“<strong class="text-yellow-300 text-sm font-black">${char.char}</strong>”！
             </p>
-            
-            <button id="btn-start-record" class="w-24 h-24 mx-auto rounded-full bg-gradient-to-tr from-rose-400 to-red-500 shadow-[0_10px_20px_rgba(244,63,94,0.6)] flex items-center justify-center border-4 border-white active:scale-90 transition-all hover:scale-105 cursor-pointer">
-               <div class="w-12 h-12">${window.GAME_ICONS ? window.GAME_ICONS.audio("w-full h-full") : ""}</div>
-            </button>
-            <div id="record-status" class="mt-4 text-xs font-bold text-rose-200">
-              点击开始录音
-            </div>
           </div>
 
-          <button id="btn-finish-read-step" class="mt-4 w-full bg-gradient-to-r from-blue-500 to-sky-500 text-white font-black text-sm py-3 rounded-full shadow-lg border border-white active:scale-95 transition-all flex items-center justify-center gap-2 opacity-50 pointer-events-none">
-            <span>${window.GAME_ICONS ? window.GAME_ICONS.sparkle("w-4 h-4 inline-block") : ""}</span> 去练字小游戏 
-          </button>
+          <!-- 中部：动态大麦克风与声浪可视化区 / 评测结果卡片 -->
+          <div class="my-auto flex flex-col items-center justify-center relative py-2 z-10 w-full">
+            
+            <!-- 录音区容器 -->
+            <div id="mic-interaction-zone" class="flex flex-col items-center justify-center relative w-full">
+              <!-- 录音中的声波扩散涟漪光环 (3层) -->
+              <div id="mic-wave-ripples" class="absolute w-32 h-32 rounded-full bg-rose-500/30 -z-0 pointer-events-none hidden">
+                <div class="absolute inset-0 rounded-full bg-rose-400/20 animate-ping"></div>
+                <div class="absolute -inset-4 rounded-full bg-rose-400/15 animate-ping" style="animation-delay: 0.3s"></div>
+              </div>
+
+              <!-- 麦克风核心按钮外圈 SVG 倒计时圆环 -->
+              <div class="relative w-28 h-28 flex items-center justify-center">
+                <svg id="record-svg-ring" class="absolute inset-0 w-full h-full -rotate-90 pointer-events-none z-20 hidden">
+                  <circle cx="56" cy="56" r="48" stroke="rgba(255,255,255,0.2)" stroke-width="4" fill="transparent" />
+                  <circle id="record-countdown-ring" cx="56" cy="56" r="48" stroke="#34d399" stroke-width="5" fill="transparent" stroke-linecap="round" stroke-dasharray="301.6" stroke-dashoffset="0" class="transition-all duration-100" />
+                </svg>
+
+                <!-- 麦克风核心主按钮 -->
+                <button id="btn-start-record" class="relative z-10 w-24 h-24 rounded-full bg-gradient-to-tr from-rose-500 via-red-500 to-orange-400 shadow-[0_10px_30px_rgba(244,63,94,0.7)] flex items-center justify-center border-4 border-white active:scale-90 transition-all hover:scale-105 cursor-pointer">
+                  <div id="mic-icon-wrapper" class="w-12 h-12 text-white flex items-center justify-center pointer-events-none">
+                    ${window.GAME_ICONS ? window.GAME_ICONS.audio("w-12 h-12") : ""}
+                  </div>
+                </button>
+              </div>
+
+              <!-- 实时 7 柱动态跳动音频频谱 -->
+              <div id="record-vol-bars" class="flex items-center gap-1.5 mt-4 h-6 hidden">
+                <div class="vol-bar w-1.5 bg-emerald-400 rounded-full transition-all duration-75" style="height: 20%"></div>
+                <div class="vol-bar w-1.5 bg-lime-300 rounded-full transition-all duration-75" style="height: 50%"></div>
+                <div class="vol-bar w-1.5 bg-yellow-300 rounded-full transition-all duration-75" style="height: 80%"></div>
+                <div class="vol-bar w-1.5 bg-amber-400 rounded-full transition-all duration-75" style="height: 90%"></div>
+                <div class="vol-bar w-1.5 bg-yellow-300 rounded-full transition-all duration-75" style="height: 70%"></div>
+                <div class="vol-bar w-1.5 bg-lime-300 rounded-full transition-all duration-75" style="height: 40%"></div>
+                <div class="vol-bar w-1.5 bg-emerald-400 rounded-full transition-all duration-75" style="height: 20%"></div>
+              </div>
+
+              <!-- 动态检测到声音提示微胶囊 -->
+              <div id="record-audio-cue" class="mt-2 text-[11px] font-black text-emerald-300 hidden animate-bounce bg-emerald-950/80 border border-emerald-400/50 px-3 py-0.5 rounded-full shadow-lg">
+                听到声音啦，继续读！
+              </div>
+
+              <!-- 动态状态提示文字 -->
+              <div id="record-status" class="mt-2 text-xs font-black text-rose-200 tracking-wider">
+                点击开始录音
+              </div>
+            </div>
+
+            <!-- 评测结果展示区 (默认隐藏，打分后显现) -->
+            <div id="read-result-box" class="hidden w-full flex flex-col items-center animate-scale-up bg-black/30 backdrop-blur-md rounded-2xl p-4 border border-white/20 shadow-xl">
+              <!-- 3 颗旋转飞入金星 -->
+              <div id="read-stars-container" class="flex items-center justify-center gap-2 mb-1.5">
+                <div class="star-item text-3xl animate-bounce" style="animation-delay: 0.1s">${GAME_ICONS.star(false)}</div>
+                <div class="star-item text-4xl animate-bounce" style="animation-delay: 0.2s">${GAME_ICONS.star(false)}</div>
+                <div class="star-item text-3xl animate-bounce" style="animation-delay: 0.3s">${GAME_ICONS.star(false)}</div>
+              </div>
+              <!-- 分数徽章 -->
+              <div class="text-3xl font-black text-yellow-300 drop-shadow-md">
+                <span id="read-score-num">100</span> <span class="text-sm font-bold">分</span>
+              </div>
+              <div id="read-praise-text" class="text-xs font-black text-white/90 mt-1 leading-relaxed text-center">
+                发音真标准，太厉害了！
+              </div>
+              
+              <!-- 听我的声音 + 听示范发音 双轨回放 -->
+              <div class="flex items-center gap-2.5 mt-3 w-full justify-center">
+                <button id="btn-replay-my-voice" class="bg-amber-400 hover:bg-amber-300 text-amber-950 text-xs font-black px-3.5 py-1.5 rounded-full shadow-md border border-white flex items-center gap-1 active:scale-95 transition-all cursor-pointer" title="听听刚刚录下的发音">
+                  <span id="replay-voice-icon" class="w-3.5 h-3.5 inline-block">${window.GAME_ICONS ? window.GAME_ICONS.speaker("w-3.5 h-3.5") : ""}</span>
+                  <span id="replay-voice-text">听我的声音</span>
+                </button>
+                <button id="btn-play-standard-voice" class="bg-sky-500 hover:bg-sky-400 text-white text-xs font-black px-3 py-1.5 rounded-full border border-white/50 flex items-center gap-1 active:scale-95 transition-all cursor-pointer" title="听老师标准发音">
+                  <span>${window.GAME_ICONS ? window.GAME_ICONS.speaker("w-3.5 h-3.5 inline-block") : ""} 听示范</span>
+                </button>
+                <button id="btn-retry-record" class="bg-white/20 hover:bg-white/30 text-white text-xs font-black px-3 py-1.5 rounded-full border border-white/30 active:scale-95 transition-all cursor-pointer">
+                  <span>重录</span>
+                </button>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- 底部：完成去练字按钮 -->
+          <div class="z-10">
+            <button id="btn-finish-read-step" class="w-full bg-gradient-to-r from-orange-500 via-amber-500 to-yellow-400 text-white font-black text-sm py-3 rounded-full shadow-lg border-2 border-white active:scale-95 transition-all flex items-center justify-center gap-2 opacity-50 pointer-events-none cursor-pointer">
+              <span class="w-4 h-4 inline-block">${window.GAME_ICONS ? window.GAME_ICONS.sparkle("w-4 h-4") : ""}</span>
+              <span>开启特训练字 (+5 金币)</span> 
+            </button>
+          </div>
+
         </div>
 
       </div>
     `;
 
     const btnRecord = stage.querySelector("#btn-start-record");
-    const statusTxt = stage.querySelector("#record-status");
-    const finishBtn = stage.querySelector("#btn-finish-read-step");
-    const scoreDisplay = stage.querySelector("#read-score-display");
-    const scoreNum = stage.querySelector("#read-score-num");
     const charCircle = stage.querySelector("#read-char-circle");
+    const finishBtn = stage.querySelector("#btn-finish-read-step");
+    const retryRecordBtn = stage.querySelector("#btn-retry-record");
+    const replayVoiceBtn = stage.querySelector("#btn-replay-my-voice");
+    const standardVoiceBtn = stage.querySelector("#btn-play-standard-voice");
+    const replayVoiceText = stage.querySelector("#replay-voice-text");
 
     if (charCircle) {
       this._on(charCircle, "click", () => {
@@ -546,96 +651,299 @@ export class LearnModule extends BaseModule {
       });
     }
 
-    this._on(btnRecord, "click", async () => {
-      // 停止所有发音，防止麦克风录入合成语音
-      if (soundAndFX.synth) soundAndFX.synth.cancel();
+    // 录音触发与逻辑绑定
+    if (btnRecord) {
+      this._on(btnRecord, "click", () => {
+        if (soundAndFX.synth) soundAndFX.synth.cancel();
+        this.executeRecordToggle(stage);
+      });
+    }
 
-      if (typeof window.pronunciationEval === 'undefined') {
-        import('../utils/pronunciationEval.js').then(m => {
-           window.pronunciationEval = m.pronunciationEval || m.default;
-           this.handleRecordToggle(btnRecord, statusTxt, finishBtn, scoreDisplay, scoreNum);
-        }).catch((err) => {
-          console.error("[LearnModule] pronunciationEval load failed:", err);
-          statusTxt.textContent = "发音评测模块加载失败，请稍后重试";
-        });
-      } else {
-        this.handleRecordToggle(btnRecord, statusTxt, finishBtn, scoreDisplay, scoreNum);
-      }
-    });
+    // 听我的声音回放
+    if (replayVoiceBtn) {
+      this._on(replayVoiceBtn, "click", () => {
+        soundAndFX.playPop();
+        const pe = pronunciationEval || window.pronunciationEval;
+        if (pe && pe._lastResult && pe._lastResult.audioUrl) {
+          const audio = new Audio(pe._lastResult.audioUrl);
+          replayVoiceBtn.classList.add("ring-4", "ring-yellow-300", "scale-105");
+          if (replayVoiceText) replayVoiceText.textContent = "正在播放原声...";
+          
+          const resetReplayBtn = () => {
+            replayVoiceBtn.classList.remove("ring-4", "ring-yellow-300", "scale-105");
+            if (replayVoiceText) replayVoiceText.textContent = "听我的声音";
+          };
+          audio.onended = resetReplayBtn;
+          audio.onerror = () => {
+            resetReplayBtn();
+            soundAndFX.speakPriority(char.char, { kind: "char", priority: 1 });
+          };
+          audio.play().catch(() => {
+            resetReplayBtn();
+            soundAndFX.speakPriority(char.char, { kind: "char", priority: 1 });
+          });
+        } else {
+          soundAndFX.speakPriority(char.char, { kind: "char", priority: 1 });
+        }
+      });
+    }
 
-    this._on(finishBtn, "click", () => {
-      soundAndFX.playPop();
-      this.currentStep = 4;
-      this.render();
-    });
+    // 听示范发音
+    if (standardVoiceBtn) {
+      this._on(standardVoiceBtn, "click", () => {
+        soundAndFX.playPop();
+        soundAndFX.speakPriority(`${char.char}，${char.pinyin}`, { kind: "char", priority: 1 });
+      });
+    }
+
+    // 重新录制
+    if (retryRecordBtn) {
+      this._on(retryRecordBtn, "click", () => {
+        soundAndFX.playPop();
+        const resultBox = stage.querySelector("#read-result-box");
+        const micZone = stage.querySelector("#mic-interaction-zone");
+        const statusTxt = stage.querySelector("#record-status");
+        if (resultBox) resultBox.classList.add("hidden");
+        if (micZone) micZone.classList.remove("hidden");
+        if (statusTxt) {
+          statusTxt.textContent = "点击开始录音";
+          statusTxt.className = "mt-2 text-xs font-black text-rose-200 tracking-wider";
+        }
+        this.executeRecordToggle(stage);
+      });
+    }
+
+    // 完成读字，奖励金币并进入第 4 步（练字）
+    if (finishBtn) {
+      this._on(finishBtn, "click", () => {
+        soundAndFX.playSuccessSound();
+        ebbinghausManager.addCoins(5);
+        ebbinghausManager.save();
+        soundAndFX.triggerCoinFly(finishBtn, 5);
+        this._timeout(() => {
+          this.currentStep = 4;
+          this.render();
+        }, 500);
+      });
+    }
   }
 
-  async handleRecordToggle(btnRecord, statusTxt, finishBtn, scoreDisplay, scoreNum) {
+  /**
+   * 洪恩风格交互录音状态机执行器
+   */
+  async executeRecordToggle(stage) {
+    if (this._isRecordingTransition) return;
     const char = this.charData;
-    const pe = window.pronunciationEval;
-    
+    const pe = pronunciationEval || window.pronunciationEval;
     if (!pe) return;
 
-    if (pe.state === "IDLE" || pe.state === "RESULT" || pe.state === "ERROR") {
-      // Start
-      window.soundAndFX.playPop();
-      statusTxt.textContent = "正在聆听...";
-      statusTxt.classList.replace("text-rose-200", "text-emerald-300");
-      btnRecord.classList.add("animate-pulse", "ring-4", "ring-emerald-400");
-      
-      scoreDisplay.classList.remove("opacity-100");
-      scoreDisplay.classList.add("opacity-0");
+    const btnRecord = stage.querySelector("#btn-start-record");
+    const statusTxt = stage.querySelector("#record-status");
+    const ripples = stage.querySelector("#mic-wave-ripples");
+    const volBars = stage.querySelector("#record-vol-bars");
+    const svgRing = stage.querySelector("#record-svg-ring");
+    const countdownRing = stage.querySelector("#record-countdown-ring");
+    const audioCue = stage.querySelector("#record-audio-cue");
+    const resultBox = stage.querySelector("#read-result-box");
+    const micZone = stage.querySelector("#mic-interaction-zone");
 
-      try {
-        await pe.startEvaluation({ text: char.char });
-      } catch (e) {
-        statusTxt.textContent = "麦克风权限失败";
-        btnRecord.classList.remove("animate-pulse", "ring-4", "ring-emerald-400");
+    // 1. 若当前正在录音，点击提前停止并立即结算评测
+    if (pe.state === "listening") {
+      this._isRecordingTransition = true;
+      if (statusTxt) {
+        statusTxt.textContent = "正在计算发音评分...";
+        statusTxt.className = "mt-2 text-xs font-black text-amber-300 animate-pulse";
       }
-      
-      // Auto stop after 3 seconds for kids
-      this._timeout(async () => {
-         if (pe.state === "LISTENING") {
-            statusTxt.textContent = "评测中...";
-            btnRecord.classList.remove("animate-pulse", "ring-4", "ring-emerald-400");
-            try {
-               await pe.stopAndEvaluate();
-            } catch (e) {}
-         }
-      }, 3000);
-      
+      if (this._volMeterTimer) { clearInterval(this._volMeterTimer); this._volMeterTimer = null; }
+      if (this._countTimer) { clearInterval(this._countTimer); this._countTimer = null; }
+      ripples?.classList.add("hidden");
+      volBars?.classList.add("hidden");
+      svgRing?.classList.add("hidden");
+      audioCue?.classList.add("hidden");
+      try {
+        const res = await pe.stopAndEvaluate();
+        if (res) this._showEvalResult(stage, res);
+      } catch (e) {}
+      this._isRecordingTransition = false;
+      return;
     }
-    
-    // Listen to events
-    if (!this._evalListenerBound) {
-      this._evalListenerBound = true;
-      window.eventBus.on(EVENTS.AUDIO_EVAL_RESULT, (res) => {
-         if (this.currentStep !== 3) return; // Prevent memory leak cross-screens
-         
-         const score = res.totalScore || 0;
-         scoreNum.textContent = score;
-         scoreDisplay.classList.remove("opacity-0");
-         scoreDisplay.classList.add("opacity-100");
-         
-         statusTxt.textContent = score >= 80 ? "太棒了！发音很准！" : "再试一次吧！";
-         statusTxt.classList.replace("text-emerald-300", "text-yellow-300");
-         
-         if (score >= 60) {
-            window.soundAndFX.playSuccessSound();
-            window.soundAndFX.speakPriority(`太棒了！发音得到${score}分！`, { kind: "sentence", emotion: "excited" });
-            finishBtn.classList.remove("opacity-50", "pointer-events-none");
-         } else {
-            window.soundAndFX.playEncouragement();
-            window.soundAndFX.speakPriority(`再试一次吧，请读“${char.char}”！`, { kind: "sentence", emotion: "correction" });
-         }
-         btnRecord.classList.remove("animate-pulse", "ring-4", "ring-emerald-400");
-      });
+
+    // 2. 开启录音流程
+    this._isRecordingTransition = true;
+    soundAndFX.playPop();
+    resultBox?.classList.add("hidden");
+    micZone?.classList.remove("hidden");
+    ripples?.classList.remove("hidden");
+    volBars?.classList.remove("hidden");
+    svgRing?.classList.remove("hidden");
+    audioCue?.classList.add("hidden");
+    if (btnRecord) {
+      btnRecord.className = "relative z-10 w-24 h-24 rounded-full bg-gradient-to-tr from-emerald-500 via-teal-500 to-green-400 shadow-[0_10px_30px_rgba(16,185,129,0.7)] flex items-center justify-center border-4 border-white active:scale-90 transition-all hover:scale-105 cursor-pointer ring-4 ring-emerald-300";
+    }
+
+    if (statusTxt) {
+      statusTxt.textContent = "正在启动麦克风...";
+      statusTxt.className = "mt-2 text-xs font-black text-yellow-300 animate-pulse";
+    }
+
+    try {
+      await pe.startEvaluation({ text: char.char, mode: "char" });
+    } catch (e) {
+      console.warn("[LearnModule] startEvaluation error:", e);
+    }
+    this._isRecordingTransition = false;
+
+    // 麦克风已成功接入，正式开始 3.2 秒倒计时与实时声学动态频谱
+    const totalDuration = 3200;
+    const startTime = performance.now();
+    let countdown = 3;
+    if (statusTxt) {
+      statusTxt.textContent = `正在听你读 (${countdown}s)... 大声读【${char.char}】`;
+      statusTxt.className = "mt-2 text-xs font-black text-emerald-300 animate-pulse";
+    }
+
+    if (this._volMeterTimer) clearInterval(this._volMeterTimer);
+    const bars = volBars?.querySelectorAll(".vol-bar");
+    const circumference = 301.6;
+
+    this._volMeterTimer = setInterval(() => {
+      if (pe.state !== "listening") return;
+      const elapsed = performance.now() - startTime;
+      const progress = Math.min(1, elapsed / totalDuration);
       
-      window.eventBus.on(EVENTS.AUDIO_EVAL_ERROR, () => {
-         if (this.currentStep !== 3) return;
-         statusTxt.textContent = "录音失败，点击重试";
-         btnRecord.classList.remove("animate-pulse", "ring-4", "ring-emerald-400");
-      });
+      // 更新 SVG 倒计时环
+      if (countdownRing) {
+        countdownRing.style.strokeDashoffset = String(circumference * progress);
+      }
+
+      // 实时音频音量分析
+      const vol = pe.getLiveVolume();
+      if (bars) {
+        bars.forEach((bar, idx) => {
+          const height = Math.max(15, Math.min(100, vol * (0.8 + idx * 0.1) + Math.random() * 20));
+          bar.style.height = `${height}%`;
+        });
+      }
+
+      // 实时声音检测指示微气泡
+      if (audioCue) {
+        if (vol > 15) {
+          audioCue.classList.remove("hidden");
+        }
+      }
+    }, 50);
+    this._addCleanup(() => clearInterval(this._volMeterTimer));
+
+    // 倒计时每秒更新
+    if (this._countTimer) clearInterval(this._countTimer);
+    this._countTimer = setInterval(() => {
+      countdown--;
+      if (countdown > 0 && pe.state === "listening") {
+        if (statusTxt) statusTxt.textContent = `正在听你读 (${countdown}s)... 大声读【${char.char}】`;
+      } else {
+        clearInterval(this._countTimer);
+        this._countTimer = null;
+      }
+    }, 1000);
+    this._addCleanup(() => clearInterval(this._countTimer));
+
+    // 3.2 秒后自动收音完成并展现打分结果
+    this._timeout(async () => {
+      if (pe.state === "listening") {
+        if (statusTxt) {
+          statusTxt.textContent = "AI 评测打分中，请稍候...";
+          statusTxt.className = "mt-2 text-xs font-black text-amber-300 animate-pulse";
+        }
+        if (this._volMeterTimer) { clearInterval(this._volMeterTimer); this._volMeterTimer = null; }
+        if (this._countTimer) { clearInterval(this._countTimer); this._countTimer = null; }
+        ripples?.classList.add("hidden");
+        volBars?.classList.add("hidden");
+        svgRing?.classList.add("hidden");
+        audioCue?.classList.add("hidden");
+        if (btnRecord) {
+          btnRecord.className = "relative z-10 w-24 h-24 rounded-full bg-gradient-to-tr from-rose-500 via-red-500 to-orange-400 shadow-[0_10px_30px_rgba(244,63,94,0.7)] flex items-center justify-center border-4 border-white active:scale-90 transition-all hover:scale-105 cursor-pointer";
+        }
+        try {
+          const res = await pe.stopAndEvaluate();
+          if (res) this._showEvalResult(stage, res);
+        } catch (e) {}
+      }
+    }, totalDuration);
+  }
+
+  /**
+   * 渲染美化后的语音评测结果卡片
+   */
+  _showEvalResult(stage, res) {
+    if (this.currentStep !== 3) return;
+    const char = this.charData;
+
+    const micZone = stage.querySelector("#mic-interaction-zone");
+    const resultBox = stage.querySelector("#read-result-box");
+    const scoreNum = stage.querySelector("#read-score-num");
+    const praiseTxt = stage.querySelector("#read-praise-text");
+    const starsContainer = stage.querySelector("#read-stars-container");
+    const finishBtn = stage.querySelector("#btn-finish-read-step");
+    const retryBtn = stage.querySelector("#btn-retry-record");
+
+    const score = typeof res.totalScore === "number" ? res.totalScore : (typeof res.score === "number" ? res.score : 0);
+    const stars = typeof res.stars === "number" ? res.stars : (score >= 85 ? 3 : (score >= 60 ? 2 : (score >= 35 ? 1 : 0)));
+
+    if (micZone) micZone.classList.add("hidden");
+    if (resultBox) resultBox.classList.remove("hidden");
+    if (scoreNum) scoreNum.textContent = score;
+
+    // 依据真实评测得分分档美化呈现
+    if (score >= 85) {
+      // 满分/优秀 (3星)
+      if (praiseTxt) {
+        praiseTxt.innerHTML = `<span class="text-emerald-300 font-bold">发音超级标准！太厉害了！</span><br/><span class="text-white/80 text-[11px]">声母韵母饱满，获得 3 颗星与 5 金币！</span>`;
+      }
+      soundAndFX.playVictoryFanfare();
+      soundAndFX.triggerConfetti(stage);
+      soundAndFX.speakPriority(`太棒啦！“${char.char}”字读得真准，得到${score}分！`, { kind: "sentence", emotion: "excited" });
+      if (finishBtn) {
+        finishBtn.innerHTML = `<span>${window.GAME_ICONS ? window.GAME_ICONS.sparkle("w-4 h-4 inline-block") : ""} 开启特训练字 (+5 金币)</span>`;
+        finishBtn.classList.remove("opacity-50", "pointer-events-none");
+        finishBtn.className = "w-full bg-gradient-to-r from-amber-400 to-yellow-400 hover:from-amber-300 hover:to-yellow-300 text-amber-950 font-black py-3 rounded-full shadow-lg border-2 border-white flex items-center justify-center gap-2 active:scale-95 transition-all text-sm cursor-pointer ring-4 ring-yellow-300 animate-pulse";
+      }
+    } else if (score >= 60) {
+      // 良好 (2星)
+      if (praiseTxt) {
+        praiseTxt.innerHTML = `<span class="text-amber-300 font-bold">读得很棒！声音再清晰一点就满分啦！</span><br/><span class="text-white/80 text-[11px]">获得 2 颗星，再练一次可拿满分哦！</span>`;
+      }
+      soundAndFX.playSuccessSound();
+      soundAndFX.speakPriority(`读得不错！得到${score}分，再练一次拿3颗星吧！`, { kind: "sentence", emotion: "happy" });
+      if (finishBtn) {
+        finishBtn.innerHTML = `<span>${window.GAME_ICONS ? window.GAME_ICONS.sparkle("w-4 h-4 inline-block") : ""} 开启特训练字 (+3 金币)</span>`;
+        finishBtn.classList.remove("opacity-50", "pointer-events-none");
+        finishBtn.className = "w-full bg-gradient-to-r from-amber-400 to-yellow-400 text-amber-950 font-black py-3 rounded-full shadow border border-white text-sm active:scale-95 transition-all cursor-pointer";
+      }
+    } else {
+      // 不准 / 读错 (0~1星)
+      const heard = res.hypothesis || "未检测到清晰发音";
+      if (praiseTxt) {
+        praiseTxt.innerHTML = `<div class="bg-rose-950/60 border border-rose-400/40 rounded-xl px-3 py-1.5 mb-1"><span class="text-yellow-300 font-bold">识别到读音：“${heard}”</span></div><span class="text-rose-200 text-xs">没有读准哦，请点击【听示范】并大声朗读【${char.char}】！</span>`;
+      }
+      soundAndFX.playSoftError();
+      soundAndFX.speakPriority(`好像读成了“${heard}”啦，请跟我大声读“${char.char}”，再试一次吧！`, { kind: "sentence", emotion: "correction" });
+      if (retryBtn) {
+        retryBtn.className = "bg-gradient-to-r from-amber-400 to-yellow-400 text-amber-950 text-xs font-black px-3.5 py-1.5 rounded-full shadow-lg border border-white active:scale-95 transition-all cursor-pointer ring-4 ring-yellow-400 animate-pulse";
+      }
+      if (finishBtn) {
+        finishBtn.innerHTML = `<span>跳过此步 (0 金币)</span>`;
+        finishBtn.classList.remove("opacity-50", "pointer-events-none");
+        finishBtn.className = "w-full bg-white/20 hover:bg-white/30 text-white font-bold py-2.5 rounded-full border border-white/30 text-xs active:scale-95 transition-all cursor-pointer mt-1";
+      }
+    }
+
+    // 更新 3 颗金色大星星（逐颗旋转弹入动画）
+    if (starsContainer) {
+      starsContainer.innerHTML = Array.from({ length: 3 }).map((_, i) => `
+        <div class="star-item text-4xl animate-bounce" style="animation-delay: ${0.15 * i}s">
+          ${GAME_ICONS.star(i >= stars)}
+        </div>
+      `).join("");
     }
   }
 
@@ -760,8 +1068,8 @@ export class LearnModule extends BaseModule {
 
         <div class="w-72 flex flex-col justify-between h-full bg-white/80 backdrop-blur-md rounded-3xl p-6 border-2 border-amber-200 shadow-xl text-center">
           <div>
-            <span class="bg-amber-100 text-amber-800 text-xs font-black px-4 py-1 rounded-full mb-3 inline-block">
-              ️ 魔法星光笔描红
+            <span class="bg-amber-100 text-amber-800 text-xs font-black px-4 py-1 rounded-full mb-3 inline-block flex items-center justify-center gap-1">
+              ${window.GAME_ICONS ? window.GAME_ICONS.pen("w-3.5 h-3.5 inline-block") : ""} 魔法星光笔描红
             </span>
             <h3 class="text-lg font-black text-amber-950 mb-2">规范笔顺写好字</h3>
             <p class="text-xs text-gray-600 leading-relaxed font-semibold">
@@ -804,7 +1112,7 @@ export class LearnModule extends BaseModule {
     if (nextBtn) {
       this._on(nextBtn, "click", () => {
         soundAndFX.playPop();
-        this.currentStep = 5;
+        this.currentStep = 6;
         this.render();
       });
     }

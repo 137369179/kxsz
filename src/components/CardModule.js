@@ -136,7 +136,7 @@ export class CardModule extends BaseModule {
               ${[
                 { key: "all", label: "全阶段" },
                 { key: "1", label: " 识字启蒙 (1-200)" },
-                { key: "2", label: "️ 生活常用 (201-600)" },
+                { key: "2", label: " 生活常用 (201-600)" },
                 { key: "3", label: " 进阶提升 (601-1300)" }
               ]
                 .map(
