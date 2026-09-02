@@ -167,7 +167,7 @@ export class MapModule extends BaseModule {
                     ${
                       isCurrent
                         ? `
-                      <div id="cathy-mascot-anchor" class="absolute z-30 flex flex-col items-center animate-bounce-cathy pointer-events-none" style="bottom: calc(100% + 20px); left: 50%; transform: translateX(-50%);">
+                      <div data-mascot-anchor="true" class="absolute z-30 flex flex-col items-center animate-bounce-cathy pointer-events-none" style="bottom: calc(100% + 20px); left: 50%; transform: translateX(-50%);">
                         <!-- 对话气泡 -->
                         <div class="bg-gradient-to-r from-orange-500 to-amber-500 text-white text-xs sm:text-sm font-black px-4 py-1.5 rounded-full shadow-2xl whitespace-nowrap mb-2 border-2 border-white animate-pulse flex items-center gap-1.5">
                           <span class="flex items-center">${GAME_ICONS.sparkle('w-4 h-4')}</span>
@@ -337,7 +337,7 @@ export class MapModule extends BaseModule {
   }
 
   autoScrollToCurrent() {
-    const mascot = this.container.querySelector("#cathy-mascot-anchor");
+    const mascot = this.container.querySelector("[data-mascot-anchor]");
     const viewport = this.container.querySelector("#map-scroll-viewport");
     if (mascot && viewport) {
       this._timeout(() => {
