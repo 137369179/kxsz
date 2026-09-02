@@ -8073,4 +8073,55 @@ export const PINYIN_DICT = {
   ]
 };
 
+/* ----------------------------------------------------------------------
+ * 拼音音系标准表（声母 / 韵母 / 整体认读音节 / 声调）
+ * 依据《汉语拼音方案》与小学语文教学规范，供声母韵母专项练习使用。
+ * 由「声母韵母城堡互动」模块消费。
+ * -------------------------------------------------------------------- */
+
+/** 23 个声母（含 y/w 零声母记法，与《汉语拼音方案》教学口径一致） */
+export const PINYIN_INITIALS = [
+  { pinyin: "b" }, { pinyin: "p" }, { pinyin: "m" }, { pinyin: "f" },
+  { pinyin: "d" }, { pinyin: "t" }, { pinyin: "n" }, { pinyin: "l" },
+  { pinyin: "g" }, { pinyin: "k" }, { pinyin: "h" },
+  { pinyin: "j" }, { pinyin: "q" }, { pinyin: "x" },
+  { pinyin: "zh" }, { pinyin: "ch" }, { pinyin: "sh" }, { pinyin: "r" },
+  { pinyin: "z" }, { pinyin: "c" }, { pinyin: "s" },
+  { pinyin: "y" }, { pinyin: "w" }
+];
+
+/** 24 个韵母，按类别分组：单韵母/复韵母/特殊韵母/前鼻韵母/后鼻韵母 */
+export const PINYIN_FINALS = [
+  { pinyin: "a", category: "simple" }, { pinyin: "o", category: "simple" },
+  { pinyin: "e", category: "simple" }, { pinyin: "i", category: "simple" },
+  { pinyin: "u", category: "simple" }, { pinyin: "ü", category: "simple" },
+  { pinyin: "ai", category: "compound" }, { pinyin: "ei", category: "compound" },
+  { pinyin: "ui", category: "compound" }, { pinyin: "ao", category: "compound" },
+  { pinyin: "ou", category: "compound" }, { pinyin: "iu", category: "compound" },
+  { pinyin: "ie", category: "compound" }, { pinyin: "üe", category: "compound" },
+  { pinyin: "er", category: "special" },
+  { pinyin: "an", category: "front_nasal" }, { pinyin: "en", category: "front_nasal" },
+  { pinyin: "in", category: "front_nasal" }, { pinyin: "un", category: "front_nasal" },
+  { pinyin: "ün", category: "front_nasal" },
+  { pinyin: "ang", category: "back_nasal" }, { pinyin: "eng", category: "back_nasal" },
+  { pinyin: "ing", category: "back_nasal" }, { pinyin: "ong", category: "back_nasal" }
+];
+
+/** 16 个整体认读音节 */
+export const PINYIN_OVERALL_READINGS = [
+  "zhi", "chi", "shi", "ri",
+  "zi", "ci", "si",
+  "yi", "wu", "yu",
+  "ye", "yue", "yuan",
+  "yin", "yun", "ying"
+];
+
+/** 4 个声调（名称含平/升/降，便于教学口诀记忆） */
+export const PINYIN_TONES = [
+  { name: "一声·阴平", mark: "ˉ", desc: "高而平，起音高，保持平稳（ā）", example: "ā" },
+  { name: "二声·阳平", mark: "ˊ", desc: "中升调，从中间往上升（á）", example: "á" },
+  { name: "三声·上声", mark: "ˇ", desc: "降升调，先降后升（ǎ）", example: "ǎ" },
+  { name: "四声·去声·全降", mark: "ˋ", desc: "全降调，从高降到低（à）", example: "à" }
+];
+
 export default PINYIN_DICT;
