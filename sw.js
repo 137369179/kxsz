@@ -30,9 +30,16 @@ const CORE_ASSETS = [
   "./src/data/books.js",
   "./src/data/idioms.js",
   "./src/data/shop.js",
-  // 核心图片资源
+  // 核心图片资源 (100% 本地 3D 渲染质感位图，支持完全离线学习)
   "./assets/images/cathy_mascot.webp",
   "./assets/images/cathy_world_map.webp",
+  "./assets/images/cathy_arcade_cover.webp",
+  "./assets/images/cathy_boss_monster.webp",
+  "./assets/images/cathy_golden_chest.webp",
+  "./assets/images/cathy_island_forest.webp",
+  "./assets/images/cathy_island_life.webp",
+  "./assets/images/cathy_storybook_cover.webp",
+  "./assets/images/cathy_trophy_gold.webp",
   "./assets/images/icon_star.webp",
   "./assets/images/icon_coin.webp",
   "./assets/images/icon_trophy.webp",
@@ -41,10 +48,25 @@ const CORE_ASSETS = [
   "./assets/images/icon_cards.webp",
   "./assets/images/icon_pen.webp",
   "./assets/images/icon_speaker.webp",
+  "./assets/images/icon_speaker_muted.webp",
+  "./assets/images/icon_bell.webp",
+  "./assets/images/icon_brush.webp",
+  "./assets/images/icon_calendar.webp",
+  "./assets/images/icon_chest.webp",
+  "./assets/images/icon_compass.webp",
+  "./assets/images/icon_crown.webp",
+  "./assets/images/icon_gear.webp",
+  "./assets/images/icon_gem.webp",
+  "./assets/images/icon_lock.webp",
+  "./assets/images/icon_mic.webp",
+  "./assets/images/icon_parent.webp",
+  "./assets/images/icon_scroll.webp",
+  "./assets/images/icon_sparkle.webp",
+  "./assets/images/icon_swords.webp"
 ];
 
-// 静态资源走 Cache-First（离线秒开）
-const STATIC_CACHEABLE = /\.(js|css|html|json|jpg|jpeg|png|gif|svg|woff2?|ttf|ico)$/i;
+// 静态资源走 Cache-First（离线秒开，支持 webp 图像格式）
+const STATIC_CACHEABLE = /\.(js|css|html|json|jpg|jpeg|png|gif|svg|webp|woff2?|ttf|ico)$/i;
 
 self.addEventListener("install", (event) => {
   event.waitUntil(

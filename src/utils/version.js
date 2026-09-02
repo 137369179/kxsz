@@ -1,3 +1,3 @@
-export const APP_VERSION = "2.7.7";
+export const APP_VERSION = "2.8.0";
 export const CACHE_VERSION = `cathy-literacy-v${APP_VERSION.replace(/\./g, "-")}`;
-export const VERSION_QUAL = "20260901";
+export const VERSION_QUAL = "20260902";
