@@ -5,7 +5,7 @@ const CACHE_NAME = `cathy-literacy-v${_ver.replace(/\./g, "-")}`; // 动态读�
 // 核心数据文件预缓存列表（install 阶段离线就绪）
 const CORE_ASSETS = [
   "./index.html",
-  `./style.css?v=${_ver}`,
+  `./assets/css/prod.css?v=${_ver}`,
   `./src/app.js?v=${_ver}`,
   "./src/utils/eventBus.js",
   "./src/utils/storageManager.js",
@@ -28,8 +28,6 @@ const CORE_ASSETS = [
   "./src/utils/playSceneEngine.js",
   "./src/data/characters.js",
   "./src/data/books.js",
-  "./src/data/hanzi_strokes.js",
-  "./src/data/strokes_29.js",
   "./src/data/idioms.js",
   "./src/data/shop.js",
   // 核心图片资源
@@ -74,6 +72,9 @@ self.addEventListener("fetch", (event) => {
   // 仅缓存 http 和 https 请求，拦截 chrome-extension:// 等不受支持的 scheme
   const url = event.request.url;
   if (!url.startsWith("http://") && !url.startsWith("https://")) return;
+
+  // 忽略本地 voice-server (8766) 请求，直接走网络直连，不经过 SW 拦截与重复缓存
+  if (url.includes(":8766")) return;
 
   const isStatic = STATIC_CACHEABLE.test(url);
 
