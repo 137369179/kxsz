@@ -58,4 +58,27 @@ describe('StorageManager', () => {
     expect(noStorage.getItem('any')).toBeNull()
     expect(noStorage.putJSON('any', { a: 1 })).toBe(false)
   })
+
+  it('should manage multi-child profiles correctly', () => {
+    expect(sm.getActiveProfileId()).toBe('child_1')
+    sm.setActiveProfileId('child_2')
+    expect(sm.getActiveProfileId()).toBe('child_2')
+
+    const profiles = sm.listProfiles()
+    expect(profiles.length).toBeGreaterThanOrEqual(2)
+  })
+
+  it('should export and import progress JSON correctly', () => {
+    sm.putJSON('CATHY_LITERACY_USER_PROGRESS_V1', { coins: 88, stars: 20 })
+    const exported = sm.exportProgressJSON()
+    expect(exported).toContain('88')
+    expect(exported).toContain('version')
+
+    // Reset storage and import
+    Object.keys(mockStorage).forEach(k => delete mockStorage[k])
+    const success = sm.importProgressJSON(exported)
+    expect(success).toBe(true)
+    const importedProgress = sm.getJSON('CATHY_LITERACY_USER_PROGRESS_V1')
+    expect(importedProgress.coins).toBe(88)
+  })
 })
