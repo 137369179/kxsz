@@ -1197,15 +1197,73 @@ class CathyAudioEngine {
     });
   }
 
-  // 16. 
+  // 16. 连击阶梯琶音
   playCombo(combo = 1) {
-    const base = 523.25 * Math.pow(1.06, Math.min(combo, 8));
-    [0, 1, 2].forEach((i) => {
-      this._tone({ type: "triangle", from: base * (1 + i * 0.25), dur: 0.1, vol: 0.2, delay: i * 0.05 });
+    const base = 523.25 * Math.pow(1.08, Math.min(combo, 12));
+    [0, 1, 2, 3].forEach((i) => {
+      this._tone({ type: "triangle", from: base * (1 + i * 0.25), dur: 0.12, vol: 0.22, delay: i * 0.04 });
     });
   }
 
-  // 17.  ()
+  // 16.5 连击高光大星芒 (Ascending Musical Star Burst)
+  playStarPopCombo(combo = 1) {
+    const baseFreq = 659.25 * Math.pow(1.1, Math.min(combo, 10)); // E5 起始
+    const chord = [baseFreq, baseFreq * 1.25, baseFreq * 1.5, baseFreq * 2.0];
+    chord.forEach((f, idx) => {
+      this._tone({ type: "sine", from: f, to: f * 1.05, dur: 0.25, vol: 0.2, delay: idx * 0.05 });
+    });
+  }
+
+  // 16.6 皇家金冠加冕号角 (Royal Crown Fanfare)
+  playCrownFanfare() {
+    // 经典明亮皇室号角和弦: C5 -> E5 -> G5 -> C6 大三和弦琶音
+    const notes = [523.25, 659.25, 783.99, 1046.5];
+    notes.forEach((f, i) => {
+      this._tone({ type: "triangle", from: f, dur: 0.45, vol: 0.25, delay: i * 0.08 });
+      this._tone({ type: "sine", from: f * 2, dur: 0.25, vol: 0.12, delay: i * 0.08 });
+    });
+    // 结尾辉煌双音长鸣
+    setTimeout(() => {
+      this._tone({ type: "triangle", from: 1046.5, dur: 0.8, vol: 0.3 });
+      this._tone({ type: "sine", from: 1318.5, dur: 0.8, vol: 0.22 });
+    }, 360);
+  }
+
+  // 16.7 Boss 巨兽重击与咆哮 (Boss Impact & Roar)
+  playBossImpact() {
+    this._tone({ type: "sawtooth", from: 160, to: 40, dur: 0.35, vol: 0.35 });
+    this._tone({ type: "square", from: 240, to: 60, dur: 0.25, vol: 0.28 });
+    this._tone({ type: "triangle", from: 80, to: 30, dur: 0.5, vol: 0.4, delay: 0.05 });
+  }
+
+  playBossRoar() {
+    this._tone({ type: "sawtooth", from: 90, to: 45, dur: 0.7, vol: 0.3 });
+    this._tone({ type: "square", from: 120, to: 55, dur: 0.6, vol: 0.25, delay: 0.1 });
+  }
+
+  // 16.8 亲子欢呼与鼓励鼓掌 (Parent Cheer & Victory)
+  playParentCheer() {
+    // 明亮温馨欢庆大和弦
+    const chords = [523.25, 659.25, 783.99, 987.77, 1046.5];
+    chords.forEach((freq, idx) => {
+      this._tone({ type: "sine", from: freq, dur: 0.6, vol: 0.22, delay: idx * 0.06 });
+    });
+    // 掌声轻快节奏模拟 (高频白噪节拍)
+    [0.2, 0.32, 0.42, 0.52, 0.62, 0.72].forEach((del) => {
+      this._tone({ type: "triangle", from: 1200 + Math.random() * 400, to: 600, dur: 0.06, vol: 0.12, delay: del });
+    });
+  }
+
+  // 16.9 亲子录音提示倒计时晶体音 (Family Record Chime)
+  playFamilyRecordChime(isStart = false) {
+    if (isStart) {
+      this._tone({ type: "sine", from: 880, to: 1760, dur: 0.3, vol: 0.25 });
+    } else {
+      this._tone({ type: "sine", from: 880, dur: 0.12, vol: 0.2 });
+    }
+  }
+
+  // 17. 星币叮当声 (Coin Clink)
   playCoinClink() {
     this._tone({ type: "sine", from: 1318.5, dur: 0.15, vol: 0.2 });
     this._tone({ type: "sine", from: 1975.5, dur: 0.25, vol: 0.15, delay: 0.05 });

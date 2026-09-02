@@ -55,4 +55,14 @@ describe('SoundEngine Core', () => {
     expect(typeof mod.soundAndFX.speechQueue).toBeDefined()
     expect(typeof mod.soundAndFX.speechQueue.depth).toBe('number')
   })
+
+  it('should have custom exclusive game sound methods defined', async () => {
+    const mod = await import('../../src/utils/soundEngine.js')
+    expect(typeof mod.soundAndFX.playCrownFanfare).toBe('function')
+    expect(typeof mod.soundAndFX.playBossImpact).toBe('function')
+    expect(typeof mod.soundAndFX.playBossRoar).toBe('function')
+    expect(typeof mod.soundAndFX.playStarPopCombo).toBe('function')
+    expect(typeof mod.soundAndFX.playParentCheer).toBe('function')
+    expect(typeof mod.soundAndFX.playFamilyRecordChime).toBe('function')
+  })
 })

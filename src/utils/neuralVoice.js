@@ -149,6 +149,39 @@ class NeuralVoiceEngine {
   }
 
   /**
+   * 查询指定文本在当前情绪/语调参数下是否已有缓存音频（供 soundEngine 决策走缓存即时播放）。
+   * 参数与 play() 的情绪链路保持一致：emotion + pitchOffset + rateMul → emotionToProsody → 缓存键。
+   */
+  hasCached(text, emotion = "neutral", pitchOffset = 0, rateMul = 1) {
+    try {
+      const pros = emotionToProsody(emotion, pitchOffset, rateMul);
+      return this._mem.has(this._key(text, pros.rate, pros.pitch));
+    } catch {
+      return false;
+    }
+  }
+
+  /**
+   * 预热缓存：后台拉取并解码指定文本的 TTS 音频（供 soundEngine 空闲期 prefetch）。
+   * 已命中缓存或服务不可用时静默返回，绝不抛错。
+   * @returns {Promise<boolean>} 是否成功就绪（命中或拉取成功）
+   */
+  async prefetch(text, ctx, emotion = "neutral", pitchOffset = 0, rateMul = 1) {
+    try {
+      if (!ctx || !text) return false;
+      const pros = emotionToProsody(emotion, pitchOffset, rateMul);
+      const key = this._key(text, pros.rate, pros.pitch);
+      if (this._mem.has(key)) return true;
+      const ok = await this.probe();
+      if (!ok) return false;
+      const buf = await this.getBuffer(ctx, text, pros.rate, pros.pitch);
+      return !!buf;
+    } catch {
+      return false;
+    }
+  }
+
+  /**
    *  DSP  (, ·Web Audio )
    * source  [HighShelf 3.2kHz +2dB]  [Peaking 2.8kHz +1dB Q1.4]  outGain  dest
    */

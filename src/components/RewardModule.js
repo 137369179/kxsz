@@ -1,9 +1,10 @@
 /**
- *  (Cathy Literacy) - 
+ * 凯茜识字 (Cathy Literacy) - 奖励城堡与装扮商城
  * ------------------------------------------------------------
- * 1.  ——  + 
- * 2.  —— 16 
- * 3.  ——  + / + 
+ * 1. 贴纸墙 —— 汉字贴纸收集册 + 进度条
+ * 2. 荣誉室 —— 12+ 荣耀成就勋章墙
+ * 3. 装扮商城 —— 稀有头像 + 个性边框 / 星币兑换
+ * 4. 打卡日历 —— 连续打卡记录与月度日历
  */
 
 import { ebbinghausManager } from "../utils/ebbinghaus.js";
@@ -112,21 +113,181 @@ export class RewardModule extends BaseModule {
 
   /**  */
   _renderStickerWall(panel) {
-        const __lockIcon = GAME_ICONS.shieldLock();
+    const __lockIcon = GAME_ICONS.shieldLock();
     const __sparkleIcon = GAME_ICONS.star();
 
     const s = getStickers();
     const ratio = s.total ? Math.round((s.earnedCount / s.total) * 100) : 0;
 
+    if (this.isScrapbookMode) {
+      // 贴纸手帐 DIY 创作画板
+      const currentBg = this.scrapbookBg || "assets/images/cathy_island_forest.webp";
+      this.scrapbookStickers = this.scrapbookStickers || [];
+
+      panel.innerHTML = `
+        <div class="bg-white/5 backdrop-blur-md rounded-3xl border border-white/15 p-5 flex flex-col gap-4 animate-fade-in">
+          
+          <div class="flex items-center justify-between flex-wrap gap-2">
+            <div class="flex items-center gap-2">
+              <button id="btn-exit-scrapbook" class="btn-game-wood text-white font-black text-xs px-3.5 py-1.5 rounded-full flex items-center gap-1 cursor-pointer">
+                <span>← 返回贴纸墙</span>
+              </button>
+              <h2 class="font-black text-amber-200 text-sm flex items-center gap-1.5">
+                <span class="flex items-center">${GAME_ICONS.cards("w-4 h-4")}</span>
+                <span>贴纸手帐 DIY 创作台</span>
+              </h2>
+            </div>
+
+            <!-- 背景切换与保存 -->
+            <div class="flex items-center gap-2 flex-wrap">
+              <div class="flex items-center gap-1 bg-black/40 p-1 rounded-full border border-white/10 text-xs">
+                <button class="bg-choice-btn px-2.5 py-1 rounded-full text-[11px] font-bold ${currentBg.includes("forest") ? "bg-amber-400 text-amber-950 font-black" : "text-white/70"}" data-bg="assets/images/cathy_island_forest.webp">
+                  🌲 森林
+                </button>
+                <button class="bg-choice-btn px-2.5 py-1 rounded-full text-[11px] font-bold ${currentBg.includes("life") ? "bg-amber-400 text-amber-950 font-black" : "text-white/70"}" data-bg="assets/images/cathy_island_life.webp">
+                  🏘️ 小镇
+                </button>
+                <button class="bg-choice-btn px-2.5 py-1 rounded-full text-[11px] font-bold ${currentBg.includes("space") ? "bg-amber-400 text-amber-950 font-black" : "text-white/70"}" data-bg="assets/images/cathy_island_space.webp">
+                  🪐 星空
+                </button>
+              </div>
+
+              <button id="btn-clear-scrapbook" class="bg-white/10 hover:bg-white/20 text-white font-black text-xs px-3 py-1.5 rounded-full border border-white/20 active:scale-95 cursor-pointer">
+                清空
+              </button>
+
+              <button id="btn-save-scrapbook" class="btn-game-orange text-white font-black text-xs px-5 py-1.5 rounded-full shadow-lg active:scale-95 cursor-pointer flex items-center gap-1">
+                <span>📸 保存作品</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- 手帐主画布 (DIY Canvas) -->
+          <div id="scrapbook-canvas" class="relative w-full h-80 sm:h-96 rounded-2xl overflow-hidden border-4 border-amber-300/80 shadow-2xl bg-slate-900 group">
+            <img id="scrapbook-bg-img" src="${currentBg}" alt="" class="absolute inset-0 w-full h-full object-cover pointer-events-none opacity-90 transition-all" />
+            
+            <div id="canvas-sticker-layer" class="absolute inset-0 z-10">
+              ${this.scrapbookStickers
+                .map(
+                  (st, idx) => `
+                <div class="canvas-placed-sticker absolute flex flex-col items-center p-2 rounded-2xl bg-gradient-to-b from-amber-100 to-amber-300 border-2 border-amber-400 shadow-2xl cursor-pointer select-none animate-scale-up hover:scale-125 transition-transform" style="top: ${st.y}; left: ${st.x};" data-char="${st.char}" data-pinyin="${st.pinyin}" data-idx="${idx}">
+                  <span class="text-xl font-black text-amber-950 leading-tight">${st.char}</span>
+                  <span class="text-[9px] font-black text-amber-700">${st.pinyin}</span>
+                </div>
+              `
+                )
+                .join("")}
+            </div>
+
+            <div class="absolute bottom-2 left-3 z-20 bg-black/60 backdrop-blur-md text-white text-[11px] font-bold px-3 py-1 rounded-full pointer-events-none border border-white/20">
+              💡 点击下方贴纸贴到画布上，点击画布贴纸可发音朗读！
+            </div>
+          </div>
+
+          <!-- 底部贴纸抽屉 (Sticker Tray) -->
+          <div class="bg-black/40 p-3 rounded-2xl border border-white/10">
+            <div class="text-xs font-black text-amber-200 mb-2">我的贴纸库 (点击贴入手帐)：</div>
+            <div class="flex items-center gap-2 overflow-x-auto no-scrollbar py-1">
+              ${
+                s.earned.length === 0
+                  ? `<div class="text-xs text-white/50 py-2">还没有收集到贴纸，先去关卡中认字通关吧！</div>`
+                  : s.earned
+                      .map(
+                        (st) => `
+                <button class="tray-sticker-btn shrink-0 flex flex-col items-center p-2 rounded-2xl bg-gradient-to-b from-amber-100 to-amber-300 border-2 border-amber-400 shadow-md hover:scale-110 active:scale-95 transition-transform cursor-pointer" data-char="${st.char}" data-pinyin="${st.pinyin}">
+                  <span class="text-lg font-black text-amber-950 leading-tight">${st.char}</span>
+                  <span class="text-[8px] font-black text-amber-700">${st.pinyin}</span>
+                </button>
+              `
+                      )
+                      .join("")
+              }
+            </div>
+          </div>
+
+        </div>
+      `;
+
+      // 绑定手帐画板交互
+      const exitBtn = panel.querySelector("#btn-exit-scrapbook");
+      if (exitBtn) {
+        exitBtn.addEventListener("click", () => {
+          soundAndFX.playPop();
+          this.isScrapbookMode = false;
+          this._renderStickerWall(panel);
+        });
+      }
+
+      panel.querySelectorAll(".bg-choice-btn").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          soundAndFX.playPop();
+          this.scrapbookBg = btn.dataset.bg;
+          this._renderStickerWall(panel);
+        });
+      });
+
+      panel.querySelectorAll(".tray-sticker-btn").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const char = btn.dataset.char;
+          const pinyin = btn.dataset.pinyin;
+          const x = `${Math.floor(Math.random() * 70) + 15}%`;
+          const y = `${Math.floor(Math.random() * 60) + 20}%`;
+          this.scrapbookStickers.push({ char, pinyin, x, y });
+          soundAndFX.playPop();
+          soundAndFX.speakPriority(char, { kind: "char", priority: 1 });
+          this._renderStickerWall(panel);
+        });
+      });
+
+      panel.querySelectorAll(".canvas-placed-sticker").forEach((stEl) => {
+        stEl.addEventListener("click", (e) => {
+          e.stopPropagation();
+          const char = stEl.dataset.char;
+          const pinyin = stEl.dataset.pinyin;
+          soundAndFX.speakPriority(`${char}，${pinyin}`, { kind: "char", priority: 1 });
+          soundAndFX.playStarPopCombo();
+        });
+      });
+
+      const clearBtn = panel.querySelector("#btn-clear-scrapbook");
+      if (clearBtn) {
+        clearBtn.addEventListener("click", () => {
+          soundAndFX.playPop();
+          this.scrapbookStickers = [];
+          this._renderStickerWall(panel);
+        });
+      }
+
+      const saveBtn = panel.querySelector("#btn-save-scrapbook");
+      if (saveBtn) {
+        saveBtn.addEventListener("click", () => {
+          soundAndFX.playCrownFanfare();
+          soundAndFX.triggerConfetti(this.container);
+          rewardEngine.addCoins(30);
+          showGameToast(this.container, "🎨 专属贴纸手帐作品已保存！奖励 +30 星币！", "success");
+        });
+      }
+
+      return;
+    }
+
     panel.innerHTML = `
       <div class="bg-white/5 backdrop-blur-md rounded-3xl border border-white/15 p-5">
-        <div class="flex items-center justify-between mb-2">
-          <h2 class="font-black text-amber-200 flex items-center gap-2">
-            <span class="flex items-center">${GAME_ICONS.cards()}</span>
-            <span>汉字贴纸收藏册</span>
-          </h2>
-          <span class="text-xs font-black text-white/50">已收集 <b class="text-amber-300">${s.earnedCount}</b> / ${s.total} </span>
+        <div class="flex items-center justify-between mb-2 flex-wrap gap-2">
+          <div>
+            <h2 class="font-black text-amber-200 flex items-center gap-2">
+              <span class="flex items-center">${GAME_ICONS.cards()}</span>
+              <span>汉字贴纸收藏册</span>
+            </h2>
+            <span class="text-xs font-black text-white/50">已收集 <b class="text-amber-300">${s.earnedCount}</b> / ${s.total} </span>
+          </div>
+
+          <button id="btn-open-scrapbook" class="btn-game-orange text-white font-black text-xs px-4 py-2 rounded-full shadow-md active:scale-95 transition-all flex items-center gap-1.5 cursor-pointer">
+            <span class="flex items-center">${GAME_ICONS.brush("w-3.5 h-3.5")}</span>
+            <span>🎨 贴纸手帐 DIY 创作台</span>
+          </button>
         </div>
+
         <div class="w-full h-3 bg-black/40 rounded-full overflow-hidden border border-white/10 mb-1.5">
           <div class="h-full bg-gradient-to-r from-yellow-400 via-amber-400 to-orange-500 rounded-full transition-all duration-700" style="width:${ratio}%"></div>
         </div>
@@ -169,6 +330,25 @@ export class RewardModule extends BaseModule {
         }
       </div>
     `;
+
+    const openScrapbookBtn = panel.querySelector("#btn-open-scrapbook");
+    if (openScrapbookBtn) {
+      openScrapbookBtn.addEventListener("click", () => {
+        soundAndFX.playPop();
+        this.isScrapbookMode = true;
+        this._renderStickerWall(panel);
+      });
+    }
+
+    panel.querySelectorAll(".sticker-cell").forEach((cell) => {
+      cell.addEventListener("click", () => {
+        const char = cell.querySelector("span.text-lg")?.textContent;
+        if (char) {
+          soundAndFX.playPop();
+          soundAndFX.speakPriority(char, { kind: "char", priority: 1 });
+        }
+      });
+    });
   }
 
   /** 荣誉勋章墙 */
@@ -329,19 +509,19 @@ export class RewardModule extends BaseModule {
     panel.innerHTML = `
       <div class="bg-white/5 backdrop-blur-md rounded-3xl border border-white/15 p-5">
 
-        <!--  -->
-        <div class="grid grid-cols-3 gap-2 mb-4">
+        <!-- 打卡统计卡片 -->
+        <div class="grid grid-cols-3 gap-3 mb-4">
           <div class="bg-gradient-to-b from-orange-500/30 to-red-600/20 border border-orange-400/40 rounded-2xl p-3 text-center">
             <div class="text-[10px] text-white/60 font-black">当前连续打卡</div>
-            <div class="text-xl font-black text-orange-300">${cal.current}  <div class=\"w-5 h-5 inline-block align-middle text-orange-500\">${__sparkleIcon}</div></div>
+            <div class="text-xl font-black text-orange-300 mt-1">${cal.current} <span class="text-xs text-white/60 font-bold">天</span></div>
           </div>
           <div class="bg-gradient-to-b from-yellow-500/30 to-amber-600/20 border border-yellow-400/40 rounded-2xl p-3 text-center">
             <div class="text-[10px] text-white/60 font-black">最高连续打卡</div>
-            <div class="text-xl font-black text-yellow-300">${cal.best}  <div class=\"w-6 h-6 inline-block align-middle\">${__trophyIcon}</div></div>
+            <div class="text-xl font-black text-yellow-300 mt-1">${cal.best} <span class="text-xs text-white/60 font-bold">天</span></div>
           </div>
           <div class="bg-gradient-to-b from-emerald-500/30 to-teal-600/20 border border-emerald-400/40 rounded-2xl p-3 text-center">
             <div class="text-[10px] text-white/60 font-black">累计打卡天数</div>
-            <div class="text-xl font-black text-emerald-300">${cal.totalActiveDays} 天</div>
+            <div class="text-xl font-black text-emerald-300 mt-1">${cal.totalActiveDays} <span class="text-xs text-white/60 font-bold">天</span></div>
           </div>
         </div>
 

@@ -353,6 +353,52 @@ export class PronunciationAssessmentEngine {
   }
 
   /**
+   * 一次性评测便捷入口（供 BookModule 绘本朗读等场景）：
+   * 开始录音 → 引擎按 maxSeconds/静音自动收音 → 等待结算 → 返回结果对象。
+   * 任何启动失败都返回降级结果（score=0 + error 原因），绝不向上抛错卡死 UI 流程。
+   * @param {string} text 期望朗读的文本
+   * @param {Object} [opts] { mode, maxSeconds=5, onResult }
+   * @returns {Promise<Object>} 与 stopAndEvaluate 相同形状的结果
+   */
+  async evaluate(text, opts = {}) {
+    if (this.state === STATES.LISTENING) {
+      try { await this.stopAndEvaluate(); } catch {}
+    }
+    const maxSeconds = Math.max(2, opts.maxSeconds || 5);
+    const fallback = {
+      score: 0, totalScore: 0, stars: 0, target: text || "",
+      hypothesis: "", isCorrect: false, perCharReport: [],
+      audioUrl: null, audioBlob: null, manual: false,
+    };
+
+    let startRes = null;
+    try {
+      startRes = await this.startEvaluation({
+        text: text || "",
+        mode: opts.mode || "sentence",
+        maxDurationMs: maxSeconds * 1000,
+        silenceTimeoutMs: Math.max(1500, maxSeconds * 1000 - 1500),
+        onResult: opts.onResult,
+      });
+    } catch (e) {
+      return { ...fallback, error: "start_exception" };
+    }
+    if (!startRes || startRes.ok === false) {
+      return { ...fallback, error: startRes?.reason || "start_failed" };
+    }
+
+    // 等待引擎自动收音结算（AUDIO_EVAL_RESULT），兜底超时后主动 stopAndEvaluate
+    return await new Promise((resolve) => {
+      let settled = false;
+      const finish = (val) => { if (!settled) { settled = true; off(); clearTimeout(guard); resolve(val); } };
+      const off = eventBus.on(EVENTS.AUDIO_EVAL_RESULT, (res) => finish(res));
+      const guard = setTimeout(async () => {
+        try { finish(await this.stopAndEvaluate()); } catch { finish(fallback); }
+      }, (maxSeconds + 2.5) * 1000);
+    });
+  }
+
+  /**
    * 开始一次发音评测录音。
    * @param {Object} opts
    * @param {string} opts.text            期望朗读的文本

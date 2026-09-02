@@ -118,13 +118,19 @@ export class CardModule extends BaseModule {
               <span class="flex items-center">${GAME_ICONS.cards()}</span>
               <div>
                 <h1 class="text-base font-black text-amber-950">生词字卡库 · 偏旁部首专项板块</h1>
-                <p class="text-xs text-amber-700 font-semibold">1800 汉字造字本源解析3D 翻转卡片偏旁归纳与组词例句</p>
+                <p class="text-xs text-amber-700 font-semibold">1300 汉字造字本源解析 · 3D 翻转卡片 · 偏旁归纳与组词例句</p>
               </div>
             </div>
 
-            <!-- 搜索框 (带智能防抖) -->
-            <div class="relative w-full sm:w-64">
-              <input id="card-search-input" type="text" value="${this.searchQuery}" placeholder="搜索汉字或拼音 (如: 日 / ri)" class="w-full bg-amber-50 border-2 border-amber-300 rounded-full px-4 py-1.5 text-xs font-black text-amber-950 focus:outline-none focus:ring-2 focus:ring-orange-400 placeholder:text-amber-400" />
+            <!-- 搜索框与沉浸式闪卡轮播 -->
+            <div class="flex items-center gap-2 w-full sm:w-auto">
+              <button id="btn-start-slideshow" class="btn-game-orange text-white font-black text-xs px-4 py-2 rounded-full shadow-md active:scale-95 transition-all flex items-center gap-1.5 cursor-pointer whitespace-nowrap">
+                <span class="flex items-center">${GAME_ICONS.sparkle("w-3.5 h-3.5")}</span>
+                <span>▶️ 闪卡轮播</span>
+              </button>
+              <div class="relative w-full sm:w-56">
+                <input id="card-search-input" type="text" value="${this.searchQuery}" placeholder="搜索汉字或拼音 (如: 日 / ri)" class="w-full bg-amber-50 border-2 border-amber-300 rounded-full px-4 py-1.5 text-xs font-black text-amber-950 focus:outline-none focus:ring-2 focus:ring-orange-400 placeholder:text-amber-400" />
+              </div>
             </div>
           </div>
 
@@ -135,9 +141,9 @@ export class CardModule extends BaseModule {
             <div class="flex items-center gap-1 bg-amber-50 p-1 rounded-full border border-amber-200">
               ${[
                 { key: "all", label: "全阶段" },
-                { key: "1", label: " 识字启蒙 (1-200)" },
-                { key: "2", label: " 生活常用 (201-600)" },
-                { key: "3", label: " 进阶提升 (601-1300)" }
+                { key: "1", label: "第1阶·启蒙 (1-200)" },
+                { key: "2", label: "第2阶·常用 (201-600)" },
+                { key: "3", label: "第3阶·进阶 (601-1300)" }
               ]
                 .map(
                   (st) => `
@@ -179,7 +185,7 @@ export class CardModule extends BaseModule {
 
           <!-- 筛选第二行：偏旁部首专项横向胶囊专区 -->
           <div class="flex items-center gap-2 pt-2 border-t border-amber-100 overflow-x-auto no-scrollbar py-1">
-            <span class="text-xs font-black text-amber-950 whitespace-nowrap"> 偏旁专区：</span>
+            <span class="text-xs font-black text-amber-950 whitespace-nowrap">偏旁专区：</span>
             ${popularRadicals.map((rad) => `
               <button class="radical-tag-btn px-3 py-1 rounded-full text-xs font-black whitespace-nowrap transition-all ${
                 this.selectedRadical === rad
@@ -286,6 +292,20 @@ export class CardModule extends BaseModule {
   }
 
   bindEvents(mainEl) {
+    // 沉浸式闪卡轮播
+    const startSlideshowBtn = mainEl.querySelector("#btn-start-slideshow");
+    if (startSlideshowBtn) {
+      this._on(startSlideshowBtn, "click", () => {
+        soundAndFX.playPop();
+        const chars = this.getFilteredList();
+        if (chars.length === 0) {
+          showGameToast(this.container, "当前筛选条件下没有字卡哦！", "info");
+          return;
+        }
+        this.openFlashcardSlideshowModal(chars);
+      });
+    }
+
     // 搜索框防抖处理 (150ms)
     const searchInput = mainEl.querySelector("#card-search-input");
     if (searchInput) {
@@ -723,4 +743,259 @@ export class CardModule extends BaseModule {
       </div>
     `;
   }
+
+  openFlashcardSlideshowModal(chars) {
+    if (!chars || chars.length === 0) return;
+
+    let currentIndex = 0;
+    let isFlipped = false;
+    let isAutoPlaying = false;
+    let autoPlayTimer = null;
+
+    const overlay = document.createElement("div");
+    overlay.id = "flashcard-slideshow-overlay";
+    overlay.className = "fixed inset-0 z-[70] bg-slate-950/90 backdrop-blur-xl flex flex-col items-center justify-between p-4 sm:p-6 select-none text-white animate-fade-in";
+
+    document.body.appendChild(overlay);
+
+    const renderCurrentCard = () => {
+      const c = chars[currentIndex];
+      const isDiff = ebbinghausManager.isDifficultChar(c.id);
+
+      overlay.innerHTML = `
+        <!-- 顶栏：进度与控制 -->
+        <header class="w-full max-w-3xl flex items-center justify-between border-b border-white/10 pb-3">
+          <div class="flex items-center gap-3">
+            <button id="btn-close-slideshow" class="btn-game-wood text-white font-black text-xs px-3.5 py-1.5 rounded-full flex items-center gap-1 cursor-pointer">
+              <span>✕ 退出轮播</span>
+            </button>
+            <span class="text-xs sm:text-sm font-black text-amber-300">
+              第 <b class="text-yellow-300 text-base sm:text-lg">${currentIndex + 1}</b> / ${chars.length} 张字卡
+            </span>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <button id="btn-toggle-autoplay" class="px-3.5 py-1.5 rounded-full text-xs font-black transition-all border ${
+              isAutoPlaying
+                ? "bg-emerald-500 border-emerald-400 text-white animate-pulse"
+                : "bg-white/10 border-white/20 text-white/80 hover:bg-white/20"
+            } cursor-pointer">
+              ${isAutoPlaying ? "⏸️ 暂停自动轮播" : "▶️ 开启 3秒轮播"}
+            </button>
+          </div>
+        </header>
+
+        <!-- 中间：3D 巨幅闪卡主体 -->
+        <main class="flex-1 flex items-center justify-center w-full max-w-lg my-3">
+          <div id="slideshow-card-box" class="relative w-full aspect-[4/5] max-h-[460px] preserve-3d transition-transform duration-500 cursor-pointer ${
+            isFlipped ? "rotate-y-180" : ""
+          }">
+            
+            <!-- 正面 -->
+            <div class="absolute inset-0 bg-gradient-to-b from-amber-50 to-orange-50 rounded-3xl shadow-2xl border-4 border-amber-300 p-6 flex flex-col justify-between backface-hidden text-amber-950 ${
+              isFlipped ? "pointer-events-none" : ""
+            }">
+              <div class="flex items-center justify-between">
+                <span class="text-xs sm:text-sm font-black bg-amber-200 text-amber-950 px-3.5 py-1 rounded-full shadow-sm">${c.radical}部 · ${c.strokeCount || 4}画</span>
+                <button id="btn-slideshow-speak" class="w-9 h-9 rounded-full bg-orange-500 text-white flex items-center justify-center shadow-md active:scale-90 cursor-pointer">
+                  ${GAME_ICONS.speaker("w-4 h-4")}
+                </button>
+              </div>
+
+              <div class="flex flex-col items-center justify-center flex-1 my-2">
+                <span class="text-3xl sm:text-4xl font-black text-amber-700 mb-1 font-mono">${c.pinyin}</span>
+                <span class="text-8xl sm:text-9xl font-black text-amber-950 drop-shadow-md font-serif">${c.char}</span>
+                ${
+                  c.oracleGlyph
+                    ? `<div class="mt-2 text-xs font-bold text-amber-800 bg-amber-200/60 px-3 py-1 rounded-full">甲骨文: ${c.oracleGlyph}</div>`
+                    : ""
+                }
+              </div>
+
+              <div class="text-center">
+                <span class="text-[11px] font-bold text-amber-800 bg-white/80 px-4 py-1 rounded-full shadow-sm">
+                  👆 点击卡片翻转查看词组造句
+                </span>
+              </div>
+            </div>
+
+            <!-- 背面 -->
+            <div class="absolute inset-0 bg-gradient-to-b from-orange-50 to-amber-100 rounded-3xl shadow-2xl border-4 border-orange-300 p-6 flex flex-col justify-between backface-hidden rotate-y-180 text-amber-950 ${
+              !isFlipped ? "pointer-events-none" : ""
+            }">
+              <div class="flex items-center justify-between pb-2 border-b border-amber-200">
+                <span class="text-xs sm:text-sm font-black text-amber-950">常用词组与造句</span>
+                <span class="text-[10px] text-orange-600 font-bold bg-orange-100 px-2.5 py-0.5 rounded-full">背面</span>
+              </div>
+
+              <div class="flex-1 my-3 flex flex-col justify-around text-left">
+                <div>
+                  <span class="text-xs font-black text-amber-900 block mb-1.5">词组推荐：</span>
+                  <div class="flex flex-wrap gap-2">
+                    ${(c.words || [{ word: `${c.char}子`, pinyin: "" }])
+                      .map((w) => {
+                        const wordText = typeof w === "string" ? w : w.word;
+                        return `<button class="slideshow-word-btn bg-white hover:bg-amber-100 text-amber-950 border border-amber-300 text-xs sm:text-sm font-black px-3 py-1.5 rounded-xl shadow-sm active:scale-95 cursor-pointer" data-word="${wordText}">${wordText}</button>`;
+                      })
+                      .join("")}
+                  </div>
+                </div>
+
+                <div class="bg-white/95 p-3 rounded-xl border border-amber-200 text-xs text-amber-950 leading-relaxed font-semibold">
+                  <span class="font-black text-orange-600">造句：</span>
+                  ${c.sentence || `${c.char}字天天见，学好汉字乐趣多`}
+                </div>
+              </div>
+
+              <div class="text-center">
+                <span class="text-[11px] font-bold text-amber-800 bg-white/80 px-4 py-1 rounded-full shadow-sm">
+                  👆 点击卡片翻回正面
+                </span>
+              </div>
+            </div>
+
+          </div>
+        </main>
+
+        <!-- 底栏：翻页与操作 -->
+        <footer class="w-full max-w-lg flex items-center justify-between gap-2 border-t border-white/10 pt-3">
+          <button id="btn-slideshow-prev" class="btn-game-wood text-white font-black text-xs px-4 py-2 rounded-full cursor-pointer active:scale-95 disabled:opacity-40 disabled:pointer-events-none" ${
+            currentIndex === 0 ? "disabled" : ""
+          }>
+            ← 上一张
+          </button>
+
+          <div class="flex items-center gap-2">
+            <button id="btn-slideshow-flip" class="bg-amber-400 hover:bg-amber-300 text-amber-950 font-black text-xs px-4 py-2 rounded-full shadow-md active:scale-95 cursor-pointer">
+              🔄 翻转卡片
+            </button>
+            <button id="btn-slideshow-diff" class="text-xs font-black px-3.5 py-2 rounded-full shadow-md active:scale-95 cursor-pointer ${
+              isDiff ? "bg-rose-500 text-white" : "bg-white/10 text-white hover:bg-white/20"
+            }">
+              ${isDiff ? "❤️ 已标难字" : "🤍 标为难字"}
+            </button>
+          </div>
+
+          <button id="btn-slideshow-next" class="btn-game-orange text-white font-black text-xs px-5 py-2 rounded-full shadow-lg cursor-pointer active:scale-95 disabled:opacity-40 disabled:pointer-events-none" ${
+            currentIndex === chars.length - 1 ? "disabled" : ""
+          }>
+            下一张 →
+          </button>
+        </footer>
+      `;
+
+      // 自动朗读当前汉字发音
+      soundAndFX.speakPriority(`${c.char}，${c.pinyin}`, { kind: "char", priority: 1 });
+
+      // 绑定交互
+      const closeBtn = overlay.querySelector("#btn-close-slideshow");
+      if (closeBtn) {
+        closeBtn.addEventListener("click", () => {
+          if (autoPlayTimer) clearInterval(autoPlayTimer);
+          soundAndFX.playPop();
+          overlay.remove();
+        });
+      }
+
+      const cardBox = overlay.querySelector("#slideshow-card-box");
+      const flipBtn = overlay.querySelector("#btn-slideshow-flip");
+      const toggleFlip = () => {
+        isFlipped = !isFlipped;
+        soundAndFX.playCardFlip();
+        if (cardBox) {
+          cardBox.classList.toggle("rotate-y-180", isFlipped);
+        }
+      };
+      if (cardBox) cardBox.addEventListener("click", toggleFlip);
+      if (flipBtn) flipBtn.addEventListener("click", (e) => { e.stopPropagation(); toggleFlip(); });
+
+      const prevBtn = overlay.querySelector("#btn-slideshow-prev");
+      if (prevBtn) {
+        prevBtn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          if (currentIndex > 0) {
+            currentIndex--;
+            isFlipped = false;
+            soundAndFX.playPop();
+            renderCurrentCard();
+          }
+        });
+      }
+
+      const nextBtn = overlay.querySelector("#btn-slideshow-next");
+      if (nextBtn) {
+        nextBtn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          if (currentIndex < chars.length - 1) {
+            currentIndex++;
+            isFlipped = false;
+            soundAndFX.playPop();
+            renderCurrentCard();
+          }
+        });
+      }
+
+      const speakBtn = overlay.querySelector("#btn-slideshow-speak");
+      if (speakBtn) {
+        speakBtn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          soundAndFX.playPop();
+          soundAndFX.speakPriority(`${c.char}，${c.pinyin}`, { kind: "char", priority: 1 });
+        });
+      }
+
+      const diffBtn = overlay.querySelector("#btn-slideshow-diff");
+      if (diffBtn) {
+        diffBtn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          const curDiff = ebbinghausManager.isDifficultChar(c.id);
+          if (curDiff) {
+            ebbinghausManager.removeDifficultChar(c.id);
+          } else {
+            ebbinghausManager.addDifficultChar(c.id);
+          }
+          soundAndFX.playPop();
+          renderCurrentCard();
+        });
+      }
+
+      overlay.querySelectorAll(".slideshow-word-btn").forEach((btn) => {
+        btn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          const word = btn.dataset.word;
+          soundAndFX.playPop();
+          soundAndFX.speakPriority(word, { kind: "word", priority: 1 });
+        });
+      });
+
+      const autoPlayBtn = overlay.querySelector("#btn-toggle-autoplay");
+      if (autoPlayBtn) {
+        autoPlayBtn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          isAutoPlaying = !isAutoPlaying;
+          soundAndFX.playPop();
+
+          if (isAutoPlaying) {
+            autoPlayTimer = setInterval(() => {
+              if (currentIndex < chars.length - 1) {
+                currentIndex++;
+                isFlipped = false;
+                renderCurrentCard();
+              } else {
+                clearInterval(autoPlayTimer);
+                isAutoPlaying = false;
+                renderCurrentCard();
+              }
+            }, 3200);
+          } else {
+            if (autoPlayTimer) clearInterval(autoPlayTimer);
+          }
+          renderCurrentCard();
+        });
+      }
+    };
+
+    renderCurrentCard();
+  }
 }
+

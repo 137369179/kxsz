@@ -148,7 +148,7 @@ function startCountdown(seconds, onTick, onTimeout) {
 export class PlayModule extends BaseModule {
   constructor(container) {
     super(container);
-    this.currentMode = null; // null: 大厅, "boss": 难字歼灭, "match": 消消乐, "pk": 竞技PK, "idiom": 成语馆
+    this.currentMode = null; // null: 大厅, "boss": 难字歼灭, "match": 消消乐, "fusion": 汉字拼拼乐, "pk": 竞技PK, "idiom": 成语馆
   }
 
   render() {
@@ -159,6 +159,8 @@ export class PlayModule extends BaseModule {
       this.renderBossBattle();
     } else if (this.currentMode === "match") {
       this.renderMatchGame();
+    } else if (this.currentMode === "fusion") {
+      this.renderFusionLab();
     } else if (this.currentMode === "pk") {
       this.renderPkArena();
     } else if (this.currentMode === "idiom") {
@@ -188,16 +190,16 @@ export class PlayModule extends BaseModule {
           <div class="relative z-10 text-white">
             <div class="flex items-center gap-3 mb-1">
               <span class="flex items-center">${GAME_ICONS.arcade()}</span>
-              <h1 class="text-2xl font-black drop-shadow-md">凯茜游乐场 (全能拓展竞技馆)</h1>
+              <h1 class="text-2xl font-black drop-shadow-md">凯茜游乐场 · 拓展竞技馆</h1>
             </div>
             <p class="text-xs text-yellow-200 font-bold">
-              趣味游戏化巩固复习，消灭生字怪兽双人对决国学成语，赢取海量凯茜星币！
+              趣味游戏化巩固复习 · 难字歼灭 · 汉字消消乐 · 部首拼拼乐 · 双人对决 · 国学成语
             </p>
           </div>
         </div>
 
-        <!-- 四大游乐场模块入口卡片 (巨幅 3D 视觉大图标) -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        <!-- 五大游乐场模块入口卡片 (巨幅 3D 视觉大图标) -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           
           <!-- 1. 难字歼灭战 -->
           <div class="mode-card group bg-white/95 backdrop-blur-md rounded-3xl p-6 shadow-xl border-4 border-rose-200 hover:border-rose-400 cursor-pointer transition-all duration-300 hover:scale-105 flex flex-col justify-between" data-mode="boss">
@@ -223,7 +225,7 @@ export class PlayModule extends BaseModule {
               </div>
               <h3 class="text-xl font-black text-gray-900 group-hover:text-amber-600 transition-colors">汉字消消乐</h3>
               <p class="text-xs text-gray-500 mt-1.5 leading-relaxed font-semibold">
-                听音辨形，拼音与汉字 3D 翻转对对碰快速消除
+                听音辨形，拼音与汉字 3D 翻转对对碰快速消除！
               </p>
             </div>
             <button class="mt-4 bg-gradient-to-r from-amber-500 to-yellow-500 text-white text-xs sm:text-sm font-black py-3 rounded-full shadow-md active:scale-95 transition-transform flex items-center justify-center gap-1.5 cursor-pointer">
@@ -231,7 +233,23 @@ export class PlayModule extends BaseModule {
             </button>
           </div>
 
-          <!-- 3. 双人竞技场 -->
+          <!-- 3. 汉字拼拼乐 (部首魔法屋) -->
+          <div class="mode-card group bg-white/95 backdrop-blur-md rounded-3xl p-6 shadow-xl border-4 border-purple-200 hover:border-purple-400 cursor-pointer transition-all duration-300 hover:scale-105 flex flex-col justify-between" data-mode="fusion">
+            <div>
+              <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-3xl bg-gradient-to-tr from-purple-500 to-indigo-500 text-white flex items-center justify-center shadow-lg mb-4">
+                ${GAME_ICONS.sparkle("w-10 h-10 sm:w-12 sm:h-12")}
+              </div>
+              <h3 class="text-xl font-black text-gray-900 group-hover:text-purple-600 transition-colors">汉字拼拼乐</h3>
+              <p class="text-xs text-gray-500 mt-1.5 leading-relaxed font-semibold">
+                偏旁部首魔法合成！投入神奇炼金锅，合成目标汉字！
+              </p>
+            </div>
+            <button class="mt-4 bg-gradient-to-r from-purple-500 to-indigo-500 text-white text-xs sm:text-sm font-black py-3 rounded-full shadow-md active:scale-95 transition-transform flex items-center justify-center gap-1.5 cursor-pointer">
+              <span>开启炼金</span>
+            </button>
+          </div>
+
+          <!-- 4. 双人竞技场 -->
           <div class="mode-card group bg-white/95 backdrop-blur-md rounded-3xl p-6 shadow-xl border-4 border-blue-200 hover:border-blue-400 cursor-pointer transition-all duration-300 hover:scale-105 flex flex-col justify-between" data-mode="pk">
             <div>
               <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-3xl bg-gradient-to-tr from-blue-500 to-cyan-400 text-white flex items-center justify-center shadow-lg mb-4">
@@ -239,7 +257,7 @@ export class PlayModule extends BaseModule {
               </div>
               <h3 class="text-xl font-black text-gray-900 group-hover:text-blue-600 transition-colors">双人竞技场</h3>
               <p class="text-xs text-gray-500 mt-1.5 leading-relaxed font-semibold">
-                双人同屏/人机对战，听发音抢拍气球比拼手速！
+                双人极速对决 & 亲子让步欢乐PK，听发音抢拍汉字！
               </p>
             </div>
             <button class="mt-4 bg-gradient-to-r from-blue-500 to-cyan-500 text-white text-xs sm:text-sm font-black py-3 rounded-full shadow-md active:scale-95 transition-transform flex items-center justify-center gap-1.5 cursor-pointer">
@@ -247,7 +265,7 @@ export class PlayModule extends BaseModule {
             </button>
           </div>
 
-          <!-- 4. 成语国学馆 -->
+          <!-- 5. 成语国学馆 -->
           <div class="mode-card group bg-white/95 backdrop-blur-md rounded-3xl p-6 shadow-xl border-4 border-emerald-200 hover:border-emerald-400 cursor-pointer transition-all duration-300 hover:scale-105 flex flex-col justify-between" data-mode="idiom">
             <div>
               <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-3xl bg-gradient-to-tr from-emerald-500 to-green-400 text-white flex items-center justify-center shadow-lg mb-4">
@@ -255,7 +273,7 @@ export class PlayModule extends BaseModule {
               </div>
               <h3 class="text-xl font-black text-gray-900 group-hover:text-emerald-600 transition-colors">成语国学馆</h3>
               <p class="text-xs text-gray-500 mt-1.5 leading-relaxed font-semibold">
-                80+ 经典成语趣味微课堂生动典故与互动小问答
+                80+ 经典成语趣味微课堂，生动典故与互动小问答！
               </p>
             </div>
             <button class="mt-4 bg-gradient-to-r from-emerald-500 to-green-500 text-white text-xs sm:text-sm font-black py-3 rounded-full shadow-md active:scale-95 transition-transform flex items-center justify-center gap-1.5 cursor-pointer">
@@ -829,15 +847,238 @@ export class PlayModule extends BaseModule {
   }
 
   // ----------------------------------------------------
+  // 3. 汉字拼拼乐 (部首魔法合成屋)
+  // ----------------------------------------------------
+  renderFusionLab() {
+    const FUSION_RECIPES = [
+      { target: "明", pinyin: "míng", parts: ["日", "月"], desc: "太阳和月亮放在一起，大放光明", words: "明亮、明天" },
+      { target: "休", pinyin: "xiū", parts: ["亻", "木"], desc: "人靠在树木旁，停下来休息", words: "休息、休假" },
+      { target: "林", pinyin: "lín", parts: ["木", "木"], desc: "很多树木在一起，长成茂密树林", words: "树林、森林" },
+      { target: "鸣", pinyin: "míng", parts: ["口", "鸟"], desc: "鸟儿张开嘴巴，欢快鸣叫", words: "鸣叫、百鸟争鸣" },
+      { target: "尖", pinyin: "jiān", parts: ["小", "大"], desc: "上面小下面大，形成尖尖的形状", words: "尖锐、笔尖" },
+      { target: "男", pinyin: "nán", parts: ["田", "力"], desc: "在田地里出力气劳作的人", words: "男生、男孩" },
+      { target: "好", pinyin: "hǎo", parts: ["女", "子"], desc: "女子与孩子相亲相爱，美好幸福", words: "好事、美好" },
+      { target: "沐", pinyin: "mù", parts: ["氵", "木"], desc: "用水润泽树木，沐浴清风", words: "沐浴、如沐春风" },
+      { target: "间", pinyin: "jiān", parts: ["门", "日"], desc: "门缝中照进阳光，形成空间", words: "房间、时间" },
+      { target: "从", pinyin: "cóng", parts: ["人", "人"], desc: "一个人跟着另一个人走", words: "从前、跟从" },
+      { target: "秋", pinyin: "qiū", parts: ["禾", "火"], desc: "禾苗成熟金黄如火的秋天", words: "秋天、金秋" },
+      { target: "看", pinyin: "kàn", parts: ["手", "目"], desc: "把手搭在眼睛上方远望", words: "看见、看着" },
+      { target: "采", pinyin: "cǎi", parts: ["爫", "木"], desc: "用手在树木上采摘果实", words: "采摘、采取" },
+      { target: "早", pinyin: "zǎo", parts: ["日", "十"], desc: "清晨太阳升起十丈高", words: "早上、早安" },
+      { target: "地", pinyin: "dì", parts: ["土", "也"], desc: "大地生养万物", words: "大地、地面" },
+    ];
+
+    const DISTRACTORS_POOL = ["氵", "艹", "口", "木", "日", "月", "人", "女", "田", "力", "门", "鸟", "手", "目", "土", "心"];
+
+    let currentRound = 1;
+    const totalRounds = 5;
+    const shuffledRecipes = shuffle([...FUSION_RECIPES]).slice(0, totalRounds);
+    let selectedParts = [];
+    let score = 0;
+
+    const renderRound = () => {
+      const cur = shuffledRecipes[currentRound - 1];
+      selectedParts = [];
+
+      // 组装 6 个部件选项 (2 个正确 + 4 个干扰)
+      const distractors = shuffle(DISTRACTORS_POOL.filter(d => !cur.parts.includes(d))).slice(0, 4);
+      const options = shuffle([...cur.parts, ...distractors]);
+
+      soundAndFX.speakPriority(`请选择部件合成汉字：“${cur.target}”`, { kind: "sentence", priority: 1 });
+
+      this.container.innerHTML = `
+        <div id="fusion-lab-arena" class="relative w-full h-full min-h-[640px] flex flex-col justify-between select-none overflow-hidden bg-gradient-to-b from-indigo-950 via-purple-950 to-slate-950 text-white animate-fade-in">
+          
+          <!-- 顶栏 -->
+          <header class="relative z-30 w-full px-6 py-3 flex items-center justify-between bg-black/50 backdrop-blur-md border-b border-purple-400/20">
+            <button id="btn-fusion-back" class="btn-game-wood text-white font-black text-xs px-4 py-2 rounded-full flex items-center gap-1.5 cursor-pointer">
+              <span class="flex items-center">${GAME_ICONS.home("w-4 h-4")}</span>
+              <span>退出魔法屋</span>
+            </button>
+
+            <div class="flex items-center gap-2 text-purple-300 font-black text-sm">
+              <span class="flex items-center">${GAME_ICONS.sparkle("w-5 h-5")}</span>
+              <span>魔法合成 第 ${currentRound} / ${totalRounds} 关</span>
+            </div>
+
+            <div class="candy-pill flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-black text-yellow-300">
+              ${GAME_ICONS.coin("w-4 h-4")}
+              <span>炼金得分: ${score}</span>
+            </div>
+          </header>
+
+          <!-- 中间主炼金舞台 -->
+          <main class="relative z-10 flex-1 flex flex-col items-center justify-center p-4 text-center">
+            
+            <!-- 目标汉字气泡 -->
+            <div class="mb-4 bg-purple-900/60 px-6 py-2 rounded-full border-2 border-purple-400/50 shadow-2xl flex items-center gap-3">
+              <span class="text-xs font-bold text-purple-200">目标合成字：</span>
+              <span class="text-3xl font-black text-yellow-300 font-serif">${cur.target}</span>
+              <span class="text-xs font-bold text-purple-300">(${cur.pinyin})</span>
+            </div>
+
+            <!-- 魔法炼金大铜锅 -->
+            <div class="relative w-48 h-48 sm:w-56 sm:h-56 mb-4 flex flex-col items-center justify-center">
+              <div id="cauldron-glow" class="absolute inset-0 rounded-full bg-gradient-to-tr from-purple-500/40 via-fuchsia-500/40 to-cyan-500/40 blur-2xl animate-pulse"></div>
+              
+              <!-- 锅身 -->
+              <div class="relative z-10 w-44 h-44 sm:w-52 sm:h-52 rounded-full bg-gradient-to-b from-purple-800 via-indigo-900 to-slate-950 border-4 border-amber-300/80 shadow-[0_0_50px_rgba(168,85,247,0.5)] flex flex-col items-center justify-center p-4">
+                
+                <!-- 已放入的部件槽位 -->
+                <div class="flex items-center gap-2 mb-2">
+                  <div id="slot-1" class="w-14 h-14 rounded-2xl bg-black/50 border-2 border-dashed border-purple-300 flex items-center justify-center text-2xl font-black text-yellow-300">
+                    ?
+                  </div>
+                  <span class="text-xl font-black text-purple-300">+</span>
+                  <div id="slot-2" class="w-14 h-14 rounded-2xl bg-black/50 border-2 border-dashed border-purple-300 flex items-center justify-center text-2xl font-black text-yellow-300">
+                    ?
+                  </div>
+                </div>
+
+                <span class="text-[10px] text-purple-200 font-bold">请点击下方 2 个部件投入锅中</span>
+              </div>
+            </div>
+
+            <!-- 底部 6 大可选部件抽屉 -->
+            <div class="grid grid-cols-3 sm:grid-cols-6 gap-3 w-full max-w-xl">
+              ${options
+                .map(
+                  (part) => `
+                <button class="fusion-part-btn h-16 sm:h-20 rounded-2xl bg-gradient-to-br from-purple-500/80 to-indigo-600/80 border-2 border-purple-300 hover:border-yellow-300 text-white font-black text-3xl sm:text-4xl shadow-xl active:scale-90 transition-all flex items-center justify-center cursor-pointer hover:scale-105" data-part="${part}">
+                  ${part}
+                </button>
+              `
+                )
+                .join("")}
+            </div>
+
+          </main>
+
+          <!-- 成功合成弹窗 -->
+          <div id="fusion-success-modal" class="absolute inset-0 bg-black/85 backdrop-blur-md flex flex-col items-center justify-center text-white hidden animate-scale-up z-50 p-6 text-center">
+            <div class="w-24 h-24 rounded-full bg-gradient-to-tr from-amber-400 to-yellow-300 text-amber-950 flex items-center justify-center text-5xl font-black shadow-2xl mb-4 font-serif border-4 border-white animate-bounce">
+              ${cur.target}
+            </div>
+            <h3 class="text-2xl font-black text-yellow-300 mb-1">🎉 魔法合成成功！【${cur.target}】</h3>
+            <p class="text-xs text-purple-200 font-bold mb-3">${cur.pinyin} · ${cur.parts.join(" + ")}</p>
+            <div class="max-w-md bg-white/10 rounded-2xl p-4 border border-purple-300/30 text-xs text-white/90 leading-relaxed font-semibold mb-5">
+              <p class="text-amber-300 font-black mb-1">【字源奥秘】${cur.desc}</p>
+              <p class="text-purple-200">【常用词组】${cur.words}</p>
+            </div>
+            <button id="btn-next-fusion" class="btn-game-orange text-white font-black text-base px-10 py-3 rounded-full shadow-2xl active:scale-95 cursor-pointer">
+              ${currentRound < totalRounds ? "下一道魔法题 →" : "完成全部炼金 · 领奖"}
+            </button>
+          </div>
+
+          <!-- 通关总结算弹窗 -->
+          <div id="fusion-complete-modal" class="absolute inset-0 bg-black/90 backdrop-blur-md flex flex-col items-center justify-center text-white hidden animate-scale-up z-50 p-6 text-center">
+            <div class="mb-4 flex items-center justify-center">${GAME_ICONS.trophy("w-24 h-24")}</div>
+            <h2 class="text-3xl font-black text-yellow-300 mb-2">🏅 汉字炼金大宗师！</h2>
+            <p class="text-xs text-purple-200 mb-4 font-bold">太聪明啦！成功完成了全部 ${totalRounds} 道汉字部首魔法合成！</p>
+            <div class="candy-pill rounded-full px-6 py-2.5 mb-6 text-sm text-yellow-300 font-black flex items-center gap-2">
+              ${GAME_ICONS.coin("w-5 h-5")}<span>获得 25 凯茜星币奖励</span>
+            </div>
+            <button id="btn-claim-fusion" class="btn-game-orange text-white font-black text-base px-10 py-3 rounded-full cursor-pointer">
+              领取星币返回游乐场
+            </button>
+          </div>
+
+        </div>
+      `;
+
+      const backBtn = this.container.querySelector("#btn-fusion-back");
+      if (backBtn) {
+        this._on(backBtn, "click", () => {
+          soundAndFX.playPop();
+          this.currentMode = null;
+          this.render();
+        });
+      }
+
+      const slot1 = this.container.querySelector("#slot-1");
+      const slot2 = this.container.querySelector("#slot-2");
+      const successModal = this.container.querySelector("#fusion-success-modal");
+      const completeModal = this.container.querySelector("#fusion-complete-modal");
+      const nextBtn = this.container.querySelector("#btn-next-fusion");
+      const claimBtn = this.container.querySelector("#btn-claim-fusion");
+
+      this.container.querySelectorAll(".fusion-part-btn").forEach((btn) => {
+        this._on(btn, "click", () => {
+          const part = btn.dataset.part;
+          soundAndFX.playPop();
+
+          if (selectedParts.length === 0) {
+            selectedParts.push(part);
+            if (slot1) { slot1.textContent = part; slot1.classList.add("bg-purple-600/60", "border-solid", "border-yellow-300"); }
+            btn.classList.add("opacity-40", "pointer-events-none");
+          } else if (selectedParts.length === 1) {
+            selectedParts.push(part);
+            if (slot2) { slot2.textContent = part; slot2.classList.add("bg-purple-600/60", "border-solid", "border-yellow-300"); }
+            btn.classList.add("opacity-40", "pointer-events-none");
+
+            // 判定是否匹配当前公式（顺序不限）
+            const isCorrect = (selectedParts[0] === cur.parts[0] && selectedParts[1] === cur.parts[1]) ||
+                              (selectedParts[0] === cur.parts[1] && selectedParts[1] === cur.parts[0]);
+
+            if (isCorrect) {
+              score += 20;
+              soundAndFX.playStarPopCombo();
+              soundAndFX.triggerConfetti(this.container);
+              soundAndFX.speakPriority(`${cur.target}，${cur.pinyin}。${cur.desc}`, { kind: "sentence", priority: 1 });
+              if (successModal) successModal.classList.remove("hidden");
+            } else {
+              soundAndFX.playSoftError();
+              spawnFloatingText(this.container.querySelector("#fusion-lab-arena"), "❌ 差一点，再试一次！", "fusion-err", { color: "#f87171", top: 40 });
+              this._timeout(() => {
+                selectedParts = [];
+                if (slot1) { slot1.textContent = "?"; slot1.classList.remove("bg-purple-600/60", "border-solid", "border-yellow-300"); }
+                if (slot2) { slot2.textContent = "?"; slot2.classList.remove("bg-purple-600/60", "border-solid", "border-yellow-300"); }
+                this.container.querySelectorAll(".fusion-part-btn").forEach((b) => b.classList.remove("opacity-40", "pointer-events-none"));
+              }, 800);
+            }
+          }
+        });
+      });
+
+      if (nextBtn) {
+        this._on(nextBtn, "click", () => {
+          soundAndFX.playPop();
+          if (successModal) successModal.classList.add("hidden");
+          if (currentRound < totalRounds) {
+            currentRound++;
+            renderRound();
+          } else {
+            soundAndFX.playCrownFanfare();
+            soundAndFX.triggerConfetti(this.container);
+            rewardEngine.addCoins(25);
+            if (completeModal) completeModal.classList.remove("hidden");
+          }
+        });
+      }
+
+      if (claimBtn) {
+        this._on(claimBtn, "click", () => {
+          soundAndFX.playPop();
+          this.currentMode = null;
+          this.render();
+        });
+      }
+    };
+
+    renderRound();
+  }
+
+  // ----------------------------------------------------
   // 4. 双人对战竞技场 (PK Arena)
   // ----------------------------------------------------
   renderPkArena() {
     const __pmProgress = ebbinghausManager.progress;
     const __pmSpeakerIcon = soundAndFX.isMuted ? GAME_ICONS.speaker("w-5 h-5", true) : GAME_ICONS.speaker("w-5 h-5", false);
+    let isFamilyMode = true; // 默认开启亲子欢乐对决模式
     let p1Score = 0;
     let p2Score = 0;
-    let p1Streak = 0;     // 红队连胜（连续答对）
-    let p2Streak = 0;     // 蓝队（AI）连胜
+    let p1Streak = 0;     // 宝贝/红队连胜
+    let p2Streak = 0;     // 家长/蓝队连胜
     let currentRound = 1;
     const totalRounds = 5;
     let stopTimer = null;
@@ -865,14 +1106,22 @@ export class PlayModule extends BaseModule {
       const r = roundData[(currentRound - 1) % roundData.length];
       soundAndFX.speakPriority(`抢拍汉字：“${r.char}”`, { kind: "sentence", priority: 1 });
 
+      const p1Label = isFamilyMode ? "👧 宝贝" : "🔴 红队";
+      const p2Label = isFamilyMode ? "👨 家长" : "🔵 蓝队";
+
       this.container.innerHTML = `
         <div id="pk-arena" class="relative w-full h-full min-h-[640px] flex flex-col justify-between select-none overflow-hidden bg-gradient-to-b from-slate-950 via-indigo-950 to-slate-950 text-white">
           
-          <header class="relative z-30 w-full px-6 py-3 flex items-center justify-between bg-black/50 backdrop-blur-md border-b border-white/20">
-            <button id="btn-pk-back" class="btn-game-wood text-white font-black text-xs px-4 py-2 rounded-full flex items-center gap-1.5">
-              <span class="flex items-center">${GAME_ICONS.home("w-4 h-4")}</span>
-              <span>退出竞技</span>
-            </button>
+          <header class="relative z-30 w-full px-6 py-3 flex items-center justify-between bg-black/50 backdrop-blur-md border-b border-white/20 flex-wrap gap-2">
+            <div class="flex items-center gap-2">
+              <button id="btn-pk-back" class="btn-game-wood text-white font-black text-xs px-4 py-2 rounded-full flex items-center gap-1.5 cursor-pointer">
+                <span class="flex items-center">${GAME_ICONS.home("w-4 h-4")}</span>
+                <span>退出竞技</span>
+              </button>
+              <button id="btn-pk-toggle-mode" class="px-3.5 py-1.5 rounded-full text-xs font-black transition-all cursor-pointer ${isFamilyMode ? "bg-amber-400 text-amber-950 font-black shadow-lg" : "bg-white/20 text-white"}">
+                ${isFamilyMode ? "👨‍👩‍👧 亲子让步模式 (开启)" : "🥊 极速对决模式"}
+              </button>
+            </div>
 
             <div class="flex items-center gap-2 text-yellow-300 font-black text-sm">
               <span class="flex items-center">${GAME_ICONS.pen("w-6 h-6")}</span>
@@ -880,8 +1129,8 @@ export class PlayModule extends BaseModule {
             </div>
 
             <div class="candy-pill flex items-center gap-4 px-5 py-1.5 rounded-full text-xs font-black">
-              <span class="text-rose-400"> 红队: ${p1Score}${p1Streak >= 2 ? `  x${p1Streak}` : ""}</span>
-              <span class="text-cyan-400"> 蓝队: ${p2Score}${p2Streak >= 2 ? `  x${p2Streak}` : ""}</span>
+              <span class="text-rose-400 font-black">${p1Label}: ${p1Score}${p1Streak >= 2 ? `  x${p1Streak}` : ""}</span>
+              <span class="text-cyan-400 font-black">${p2Label}: ${p2Score}${p2Streak >= 2 ? `  x${p2Streak}` : ""}</span>
             </div>
           </header>
 
@@ -889,12 +1138,12 @@ export class PlayModule extends BaseModule {
             <!-- 顶行：抢答倒计时 -->
             <div class="flex items-center gap-3 mb-3">
               <div class="timer-ring ticking bg-black/50 border-2 border-indigo-400 text-indigo-100 font-black text-lg" id="pk-timer">
-                <span id="pk-timer-val">5</span>
+                <span id="pk-timer-val">${isFamilyMode ? "7" : "5"}</span>
                 <span class="text-[8px] absolute -bottom-1 left-1/2 -translate-x-1/2 text-indigo-300">抢答</span>
               </div>
               <div class="text-left">
-                <div class="text-[10px] text-slate-400 font-bold">谁先抢拍？</div>
-                <div class="text-[10px] text-indigo-300 font-black">5 秒内选对即夺分</div>
+                <div class="text-[10px] text-slate-400 font-bold">${isFamilyMode ? "宝贝与家长谁先抢拍？" : "谁先抢拍？"}</div>
+                <div class="text-[10px] text-indigo-300 font-black">${isFamilyMode ? "让步模式：宝贝优先识别" : "5 秒内选对即夺分"}</div>
               </div>
             </div>
 
@@ -905,11 +1154,14 @@ export class PlayModule extends BaseModule {
             <div id="pk-grid" class="grid grid-cols-2 sm:grid-cols-4 gap-4 w-full max-w-2xl">
               ${r.opts
                 .map(
-                  (opt) => `
-                <button class="pk-opt-btn h-24 rounded-3xl btn-game-orange text-white font-black text-5xl shadow-2xl active:scale-90 transition-all flex items-center justify-center" data-char="${opt}">
-                  ${opt}
-                </button>
-              `
+                  (opt) => {
+                    const isHint = isFamilyMode && p2Score > p1Score && opt === r.char;
+                    return `
+                      <button class="pk-opt-btn h-24 rounded-3xl btn-game-orange text-white font-black text-5xl shadow-2xl active:scale-90 transition-all flex items-center justify-center ${isHint ? "ring-4 ring-amber-300 shadow-amber-400/50" : ""}" data-char="${opt}">
+                        ${opt}
+                      </button>
+                    `;
+                  }
                 )
                 .join("")}
             </div>
@@ -917,13 +1169,13 @@ export class PlayModule extends BaseModule {
 
           <div id="pk-win-modal" class="absolute inset-0 bg-black/85 backdrop-blur-md flex flex-col items-center justify-center text-white hidden animate-scale-up z-50">
             <div class="mb-4 flex items-center justify-center">${GAME_ICONS.trophy("w-24 h-24")}</div>
-            <h2 class="text-3xl font-black text-yellow-300 mb-2">对决大获全胜！</h2>
-            <p class="text-xs text-gray-300 mb-2 font-semibold">最终比分：红队 ${p1Score} - 蓝队 ${p2Score}</p>
+            <h2 class="text-3xl font-black text-yellow-300 mb-2">${isFamilyMode ? "🎉 最佳亲子默契拍档！" : "对决大获全胜！"}</h2>
+            <p class="text-xs text-gray-300 mb-2 font-semibold">最终比分：${p1Label} ${p1Score} - ${p2Label} ${p2Score}</p>
             <div id="pk-win-crown" class="text-sm font-black text-yellow-300 mb-4"></div>
             <div id="pk-win-reward" class="candy-pill rounded-full px-5 py-2 mb-6 text-xs text-yellow-300 font-bold flex items-center gap-2">
               ${GAME_ICONS.coin("w-5 h-5")}<span>获得星币奖励</span>
             </div>
-            <button id="btn-pk-claim" class="btn-game-orange text-white font-black text-base px-10 py-3 rounded-full">
+            <button id="btn-pk-claim" class="btn-game-orange text-white font-black text-base px-10 py-3 rounded-full cursor-pointer">
               领取星币返回
             </button>
           </div>
@@ -941,12 +1193,13 @@ export class PlayModule extends BaseModule {
         });
       }
 
-      const soundBtn = this.container.querySelector("#btn-pk-sound");
-      if (soundBtn) {
-        this._on(soundBtn, "click", () => {
-          soundAndFX.toggleMute();
-          const ic = soundAndFX.isMuted ? GAME_ICONS.speaker("w-5 h-5", true) : GAME_ICONS.speaker("w-5 h-5", false);
-          soundBtn.innerHTML = ic;
+      const toggleModeBtn = this.container.querySelector("#btn-pk-toggle-mode");
+      if (toggleModeBtn) {
+        this._on(toggleModeBtn, "click", () => {
+          if (stopTimer) stopTimer();
+          isFamilyMode = !isFamilyMode;
+          soundAndFX.playPop();
+          renderRound();
         });
       }
 
@@ -958,10 +1211,10 @@ export class PlayModule extends BaseModule {
 
       let answered = false;
 
-      // ===== 抢答倒计时：5 秒未答 → 蓝队（AI）夺 5 分 =====
+      // ===== 抢答倒计时：亲子模式 7s / 极速模式 5s =====
       if (stopTimer) stopTimer();
       const startRoundTimer = () => {
-        let sec = 5;
+        let sec = isFamilyMode ? 7 : 5;
         if (timerValEl) timerValEl.textContent = sec;
         if (timerEl) { timerEl.classList.add("ticking"); timerEl.style.borderColor = ""; }
         stopTimer = startCountdown(sec, (remain) => {
@@ -971,14 +1224,14 @@ export class PlayModule extends BaseModule {
         }, () => {
           if (answered) return;
           answered = true;
-          // 超时：蓝队 AI 抢拍得 5 分
+          // 超时：蓝队/家长得 5 分
           p2Score += 5;
           p2Streak++;
           p1Streak = 0;
           soundAndFX.playSoftError();
-          spawnFloatingText(arena, "⏰ 超时！蓝队夺 5 分", "pk-timeout", { color: "#22d3ee", top: 34, size: 22 });
+          spawnFloatingText(arena, `⏰ 超时！${p2Label} 夺 5 分`, "pk-timeout", { color: "#22d3ee", top: 34, size: 22 });
           const c = CHARACTER_DATABASE.find((x) => x.char === r.char);
-          if (c) ebbinghausManager.completeReview(c.id, false); // 超时视同复习失败
+          if (c) ebbinghausManager.completeReview(c.id, false);
           this._timeout(() => { answered = false; nextRound(); }, 900);
         });
       };
@@ -988,18 +1241,30 @@ export class PlayModule extends BaseModule {
           currentRound++;
           renderRound();
         } else {
-          soundAndFX.playVictoryFanfare();
+          if (isFamilyMode) {
+            soundAndFX.playParentCheer();
+          } else {
+            soundAndFX.playVictoryFanfare();
+          }
           const crownEl = this.container.querySelector("#pk-win-crown");
           const rewardEl = this.container.querySelector("#pk-win-reward");
-          const winner = p1Score > p2Score ? "红队" : p1Score < p2Score ? "蓝队" : "平局";
-          if (crownEl) crownEl.textContent = winner === "红队" ? "红队获得冠军皇冠！" : winner === "蓝队" ? "蓝队获得冠军皇冠！" : "势均力敌，握手言和！";
-          // 奖励：基础 15 币 + 胜方加成 + 连胜加成
-          let reward = 15;
-          if (p1Score > p2Score) reward += 5 + Math.min(p1Streak * 2, 6);
-          else if (p1Score < p2Score) reward += 2;
-          else reward += 3;
+          const winner = p1Score > p2Score ? p1Label : p1Score < p2Score ? p2Label : "平局";
+          if (crownEl) {
+            crownEl.textContent = isFamilyMode
+              ? "🌟 亲子默契大圆满！全家一起识字棒棒哒！"
+              : winner === p1Label
+              ? `${p1Label} 获得冠军皇冠！`
+              : winner === p2Label
+              ? `${p2Label} 获得冠军皇冠！`
+              : "势均力敌，握手言和！";
+          }
+          // 奖励：基础 20 币 + 胜方加成 + 连胜加成
+          let reward = 20;
+          if (p1Score > p2Score) reward += 10 + Math.min(p1Streak * 2, 6);
+          else if (p1Score < p2Score) reward += 5;
+          else reward += 8;
           ebbinghausManager.addCoins(reward);
-          if (rewardEl) rewardEl.innerHTML = `${GAME_ICONS.coin("w-5 h-5")}<span>获得 ${reward} 凯茜星币 · 红队 ${p1Score} - 蓝队 ${p2Score}</span>`;
+          if (rewardEl) rewardEl.innerHTML = `${GAME_ICONS.coin("w-5 h-5")}<span>获得 ${reward} 凯茜星币 · ${p1Label} ${p1Score} - ${p2Label} ${p2Score}</span>`;
           if (winModal) winModal.classList.remove("hidden");
         }
       };
@@ -1018,7 +1283,7 @@ export class PlayModule extends BaseModule {
             soundAndFX.playSuccessSound();
             soundAndFX.triggerConfetti(this.container);
             btn.classList.add("ring-8", "ring-emerald-400");
-            spawnFloatingText(arena, `红队 +10${p1Streak >= 2 ? ` 连胜 x${p1Streak}` : ""}`, "pk-ok", { color: "#fb7185", top: 34, size: 22 });
+            spawnFloatingText(arena, `${p1Label} +10${p1Streak >= 2 ? ` 连胜 x${p1Streak}` : ""}`, "pk-ok", { color: "#fb7185", top: 34, size: 22 });
             // ===== 艾宾浩斯复习闭环：抢拍正确 = 复习成功 =====
             const c = CHARACTER_DATABASE.find((x) => x.char === r.char);
             if (c) ebbinghausManager.completeReview(c.id, true);
@@ -1028,7 +1293,7 @@ export class PlayModule extends BaseModule {
             p1Streak = 0;
             soundAndFX.playSoftError();
             btn.classList.add("ring-8", "ring-rose-400");
-            spawnFloatingText(arena, "蓝队 +10", "pk-miss", { color: "#22d3ee", top: 34, size: 20 });
+            spawnFloatingText(arena, `${p2Label} +10`, "pk-miss", { color: "#22d3ee", top: 34, size: 20 });
             // ===== 闭环：抢拍错误 = 标记难字 =====
             const c = CHARACTER_DATABASE.find((x) => x.char === r.char);
             if (c) ebbinghausManager.completeReview(c.id, false);

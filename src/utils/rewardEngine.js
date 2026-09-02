@@ -193,3 +193,25 @@ export function getShopData() {
     equippedFrame: p.shop.equippedFrame
   };
 }
+
+// ---------------------------------------------------------------------------
+// rewardEngine 单例导出
+// ---------------------------------------------------------------------------
+export const rewardEngine = {
+  addCoins(amount) {
+    ebbinghausManager.addCoins(amount);
+    ebbinghausManager.save();
+  },
+  getStickers,
+  getMedals,
+  getCalendar,
+  getNewMedalIds,
+  getShopData,
+};
+
+if (typeof window !== "undefined") {
+  window.rewardEngine = rewardEngine;
+}
+
+export default rewardEngine;
+

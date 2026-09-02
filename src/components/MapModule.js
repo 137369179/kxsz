@@ -163,19 +163,19 @@ export class MapModule extends BaseModule {
                   return `
                   <div class="relative flex flex-col items-center justify-center group level-node${isCurrent ? ' is-current' : ''} cursor-pointer transition-transform duration-300 hover:scale-125" style="transform: translateY(${yOffset}px)" data-char-id="${charItem.id}">
                     
-                    <!-- 伴学主角凯茜小精灵站立在当前关卡上 (巨幅伴学导引，超高悬浮) -->
+                    <!-- 伴学主角凯茜小精灵站立在当前关卡上 (巨幅伴学导引，严格居中对齐字卡中轴) -->
                     ${
                       isCurrent
                         ? `
-                      <!-- 凯茜小精灵：外层容器负责波浪位置抵消，内层负责弹跳动画 (避免 transform 冲突) -->
-                      <div style="bottom: calc(100% + 20px); left: 50%; transform: translateX(-50%) translateY(${-yOffset}px);" class="absolute z-30 pointer-events-none">
+                      <div id="cathy-mascot-anchor" class="absolute z-30 flex flex-col items-center pointer-events-none" style="bottom: calc(100% + 12px); left: 50%; transform: translateX(-50%);">
                         <div class="animate-bounce-cathy flex flex-col items-center">
-                          <!-- 对话气泡 -->
-                          <div class="bg-gradient-to-r from-orange-500 to-amber-500 text-white text-xs sm:text-sm font-black px-4 py-1.5 rounded-full shadow-2xl whitespace-nowrap mb-2 border-2 border-white animate-pulse flex items-center gap-1.5">
+                          <!-- 对话气泡：居中对齐 -->
+                          <div class="bg-gradient-to-r from-orange-500 to-amber-500 text-white text-xs sm:text-sm font-black px-3.5 py-1.5 rounded-full shadow-2xl whitespace-nowrap mb-2 border-2 border-white animate-pulse flex items-center gap-1.5">
                             <span class="flex items-center">${GAME_ICONS.sparkle('w-4 h-4')}</span>
-                            <span>凯茜：快来学"${charItem.char}"字！</span>
+                            <span class="leading-none">凯茜：快来学“${charItem.char}”字！</span>
                           </div>
-                          <img src="assets/images/cathy_mascot.webp" class="w-24 h-24 sm:w-28 sm:h-28 rounded-full border-4 border-white shadow-2xl object-cover ring-4 ring-orange-400/80 aspect-square shrink-0" alt="凯茜" onerror="this.src='assets/images/icon_star.webp'" />
+                          <!-- 伴学小精灵头像：居中正对字卡中轴 -->
+                          <img src="assets/images/cathy_mascot.webp" class="w-20 h-20 sm:w-24 sm:h-24 rounded-full border-4 border-white shadow-2xl object-cover ring-4 ring-orange-400/80 aspect-square shrink-0" alt="凯茜" onerror="this.src='assets/images/icon_star.webp'" />
                         </div>
                       </div>
                     `

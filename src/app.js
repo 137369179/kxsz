@@ -17,6 +17,7 @@ import { neuralVoice } from "./utils/neuralVoice.js";
 import { CHARACTER_DATABASE } from "./data/characters.js";
 import { EVENTS, eventBus } from "./utils/eventBus.js";
 import { storageManager } from "./utils/storageManager.js";
+import { eyeCareManager } from "./utils/eyeCareManager.js";
 
 import { BaseModule } from "./utils/BaseModule.js";
 
@@ -208,92 +209,11 @@ class CathyAppManager extends BaseModule {
   }
 
   _initAntiAddiction() {
-    this.sessionStartTime = Date.now();
-    this.restModalShown = false;
-    this._antiAddictionTimer = this._interval(() => {
-      if (this.restModalShown) return;
-      const elapsedMinutes = (Date.now() - this.sessionStartTime) / 60000;
-      if (elapsedMinutes >= 20) {
-        this.showRestModal();
-      }
-    }, 60000);
+    eyeCareManager.start();
   }
 
   showRestModal() {
-    if (this.restModalShown) return;
-    this.restModalShown = true;
-
-    // 
-    if (this._antiAddictionTimer) {
-      clearInterval(this._antiAddictionTimer);
-      this._antiAddictionTimer = null;
-    }
-
-    const REST_DURATION_MS = 5 * 60 * 1000;
-    const modal = document.createElement("div");
-    modal.setAttribute("data-modal", "true");
-    modal.id = "rest-modal";
-    modal.className = "fixed inset-0 z-[999999] bg-black/90 backdrop-blur-xl flex flex-col items-center justify-center animate-fade-in";
-    document.body.appendChild(modal);
-
-    const startTime = Date.now();
-
-    const updateCountdown = () => {
-      const remaining = Math.max(0, Math.ceil((startTime + REST_DURATION_MS - Date.now()) / 1000));
-      const min = Math.floor(remaining / 60);
-      const sec = remaining % 60;
-      const countdownEl = modal.querySelector("#rest-countdown");
-      const buttonEl = modal.querySelector("#btn-rest-dismiss");
-      if (countdownEl) countdownEl.textContent = `(${min}${sec.toString().padStart(2, "0")})`;
-      if (buttonEl) buttonEl.disabled = remaining > 0;
-    };
-
-    const closeModal = () => {
-      this.restModalShown = false;
-      modal.remove();
-      if (this._antiAddictionTimer) return; // 
-      this._antiAddictionTimer = this._interval(() => {
-        if (this.restModalShown) return;
-        const elapsedMinutes = (Date.now() - this.sessionStartTime) / 60000;
-        if (elapsedMinutes >= 20) this.showRestModal();
-      }, 60000);
-    };
-
-    modal.innerHTML = `
-      <div class="bg-white/10 border-2 border-white/20 p-10 rounded-3xl flex flex-col items-center text-center shadow-2xl max-w-lg">
-        <div class="w-32 h-32 mb-6 bg-emerald-100 rounded-full flex items-center justify-center border-4 border-emerald-400 shadow-[0_0_40px_rgba(52,211,153,0.8)]">
-           ${window.GAME_ICONS ? window.GAME_ICONS.home("w-20 h-20") : ""}
-        </div>
-        <h2 class="text-3xl font-black text-emerald-400 mb-4 tracking-widest"></h2>
-        <p class="text-white text-lg font-bold mb-8 leading-relaxed">
-           20 <br/>
-          
-        </p>
-        <div id="rest-countdown" class="text-emerald-200 text-sm font-bold mb-6 animate-pulse">...</div>
-        <button id="btn-rest-dismiss" class="bg-emerald-500 hover:bg-emerald-400 disabled:bg-white/20 disabled:cursor-not-allowed text-white font-black px-8 py-3 rounded-full border-2 border-emerald-300 transition-all" disabled>
-          ...
-        </button>
-      </div>
-    `;
-
-    modal.querySelector("#btn-rest-dismiss").addEventListener("click", closeModal);
-
-    if (soundAndFX) {
-      soundAndFX.playEncouragement();
-      soundAndFX.speakPriority("", { kind: "sentence", priority: 2 });
-    }
-
-    // 
-    const timer = setInterval(() => {
-      updateCountdown();
-      if (Date.now() >= startTime + REST_DURATION_MS) {
-        clearInterval(timer);
-        updateCountdown();
-        const btn = modal.querySelector("#btn-rest-dismiss");
-        if (btn) { btn.disabled = false; btn.textContent = ""; }
-      }
-    }, 1000);
-    this._addCleanup(() => clearInterval(timer));
+    eyeCareManager.triggerRestModal();
   }
 
 

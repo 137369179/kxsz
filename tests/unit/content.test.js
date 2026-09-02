@@ -5,8 +5,14 @@ import { IDIOMS_DATABASE } from "../../src/data/idioms.js";
 describe("Educational Content & Storybook Database", () => {
   it("should validate all storybooks in STORYBOOKS_DATABASE", () => {
     expect(STORYBOOKS_DATABASE.length).toBeGreaterThanOrEqual(10);
+
+    // ID 支持两种命名约定：数字序列 (book_001) 与主题语义 (book_theme_midautumn)
+    // 真正的不变量是「非空 + 唯一」——BookModule 用 id 做 DOM data 属性与 progressMap 键。
+    const seenIds = new Set();
     for (const book of STORYBOOKS_DATABASE) {
-      expect(book.id).toMatch(/^book_\d+/);
+      expect(book.id).toMatch(/^book_[a-z0-9_]+$/);
+      expect(seenIds.has(book.id)).toBe(false); // ID 必须唯一
+      seenIds.add(book.id);
       expect(book.title).toBeTruthy();
       expect(book.stage).toBeGreaterThanOrEqual(1);
       expect(Array.isArray(book.targetChars)).toBe(true);

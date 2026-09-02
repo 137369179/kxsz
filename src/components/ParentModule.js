@@ -81,7 +81,7 @@ export class ParentModule extends BaseModule {
           <input id="gate-answer-input" type="number" placeholder="请输入数字答案" class="w-full text-center text-2xl font-black py-3 px-4 rounded-2xl border-2 border-amber-300 focus:outline-none focus:ring-4 focus:ring-orange-200 mb-4 bg-amber-50/50 text-amber-950" />
 
           <button id="btn-submit-gate" class="w-full btn-game-orange text-white font-black text-sm py-3.5 rounded-2xl shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2">
-            <span>验证并进入 </span>
+            <span>验证并进入家长中心</span>
           </button>
         </div>
 
@@ -138,21 +138,22 @@ export class ParentModule extends BaseModule {
             <span class="flex items-center">${GAME_ICONS.shieldLock()}</span>
             <div>
               <h1 class="text-base font-black text-amber-950">凯茜识字 · 家长督学与设置中心</h1>
-              <p class="text-xs text-amber-700 font-semibold">学习遗忘罗盘监控12 勋章成长墙A4 田字格字帖打印与防沉迷设置</p>
+              <p class="text-xs text-amber-700 font-semibold">学习遗忘罗盘监控 · 12 勋章成长墙 · A4 田字格字帖打印 · 防沉迷设置</p>
             </div>
           </div>
 
-          <!-- 四大标签切换组 -->
+          <!-- 五大标签切换组 -->
           <div class="flex items-center gap-1.5 bg-amber-50 p-1.5 rounded-full border border-amber-200">
             ${[
               { key: "dashboard", label: "数据罗盘", icon: (cls) => GAME_ICONS.compass(cls) },
+              { key: "family", label: "亲子互动房", icon: (cls) => GAME_ICONS.swords(cls) },
               { key: "trophies", label: "荣誉勋章墙", icon: (cls) => GAME_ICONS.trophy(cls) },
               { key: "print", label: "字帖打印", icon: (cls) => GAME_ICONS.print(cls) },
               { key: "settings", label: "督学设置", icon: (cls) => GAME_ICONS.gear(cls) }
             ]
               .map(
                 (tab) => `
-              <button class="parent-tab-btn px-4 py-1.5 rounded-full text-xs font-black transition-all active:scale-95 flex items-center gap-1.5 ${
+              <button class="parent-tab-btn px-3.5 py-1.5 rounded-full text-xs font-black transition-all active:scale-95 flex items-center gap-1.5 ${
                 this.currentTab === tab.key
                   ? "bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-md"
                   : "text-amber-900 hover:bg-amber-100"
@@ -368,6 +369,102 @@ export class ParentModule extends BaseModule {
       `;
     }
 
+    if (this.currentTab === "family") {
+      const learnedIds = Object.keys(progress.learnedChars || {});
+      const pool = CHARACTER_DATABASE.filter((c) => learnedIds.includes(c.id));
+      const gameChars = (pool.length >= 12 ? pool : CHARACTER_DATABASE).slice(0, 16);
+
+      const quests = [
+        { id: "q1", title: "造句大擂台", desc: "和爸爸妈妈各用今天学过的汉字造一个生动的句子", reward: 30, icon: "pen" },
+        { id: "q2", title: "生活寻宝记", desc: "在家里找出一件与汉字相关的实物（如：书、杯、水）", reward: 40, icon: "compass" },
+        { id: "q3", title: "宝贝小老师", desc: "宝贝当小老师，把字卡上的笔顺一笔一画教给家长", reward: 50, icon: "brush" },
+        { id: "q4", title: "亲子击掌秀", desc: "在双人竞技场中完成一局亲子对决，并默契击掌！", reward: 50, icon: "swords" },
+      ];
+
+      return `
+        <!-- 亲子互动房：家庭识字飞行棋 + 寻宝任务卡 -->
+        <div class="flex flex-col gap-6">
+          
+          <!-- 1. 家庭识字飞行棋 -->
+          <div class="bg-gradient-to-br from-amber-50 to-orange-50 rounded-3xl p-6 shadow-xl border-2 border-amber-300">
+            <div class="flex items-center justify-between mb-4 flex-wrap gap-3">
+              <div>
+                <h2 class="text-base font-black text-amber-950 flex items-center gap-2">
+                  <span class="flex items-center">${GAME_ICONS.swords("w-5 h-5")}</span>
+                  <span>家庭识字飞行棋 (亲子互动大闯关)</span>
+                </h2>
+                <p class="text-xs text-amber-800 font-semibold">轮流掷骰子走棋，走到哪格读出哪格，全家一起玩中学！</p>
+              </div>
+
+              <div class="flex items-center gap-3">
+                <button id="btn-roll-dice" class="btn-game-orange text-white font-black text-xs px-6 py-2.5 rounded-full shadow-lg active:scale-95 flex items-center gap-2 cursor-pointer">
+                  <span>🎲 掷骰子走棋</span>
+                  <span id="dice-result-badge" class="bg-white/30 px-2 py-0.5 rounded-full text-xs">? 点</span>
+                </button>
+                <button id="btn-print-ludo" class="bg-white border-2 border-amber-400 hover:bg-amber-100 text-amber-900 font-black text-xs px-4 py-2 rounded-full shadow-sm flex items-center gap-1.5 cursor-pointer">
+                  <span class="flex items-center">${GAME_ICONS.print("w-3.5 h-3.5")}</span>
+                  <span>打印棋盘</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- 棋盘网格 -->
+            <div id="ludo-board-grid" class="grid grid-cols-4 sm:grid-cols-8 gap-3 bg-white/80 p-4 rounded-2xl border border-amber-200 shadow-inner">
+              ${gameChars
+                .map(
+                  (c, idx) => `
+                <div class="ludo-tile relative p-2.5 rounded-2xl bg-amber-100/70 border-2 border-amber-300 flex flex-col items-center justify-center transition-all cursor-pointer hover:bg-amber-200" data-idx="${idx}" data-char="${c.char}" data-pinyin="${c.pinyin}">
+                  <span class="text-[10px] font-black text-amber-800 absolute top-1 left-2">#${idx + 1}</span>
+                  <span class="text-xs text-amber-700 font-bold mb-0.5">${c.pinyin}</span>
+                  <span class="text-2xl font-black text-amber-950 font-serif">${c.char}</span>
+                  <div class="ludo-pawn hidden absolute -top-3 -right-2 bg-gradient-to-r from-rose-500 to-orange-500 text-white text-[10px] font-black px-2 py-0.5 rounded-full shadow-lg animate-bounce">
+                    小鹿
+                  </div>
+                </div>
+              `
+                )
+                .join("")}
+            </div>
+
+            <div id="ludo-prompt-bar" class="mt-4 p-3 bg-white rounded-2xl border border-amber-300 flex items-center justify-between text-xs font-bold text-amber-950">
+              <span id="ludo-status-text">点击【掷骰子】开始棋局，看看今天谁先到达终点！</span>
+              <span class="text-orange-600 font-black">目标：读出汉字并组词</span>
+            </div>
+          </div>
+
+          <!-- 2. 亲子寻宝任务卡 -->
+          <div class="bg-white/95 rounded-3xl p-6 shadow-xl border-2 border-amber-200">
+            <h2 class="text-base font-black text-amber-950 mb-4 flex items-center gap-2">
+              <span class="flex items-center">${GAME_ICONS.compass("w-5 h-5")}</span>
+              <span>今日亲子打卡任务卡</span>
+            </h2>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              ${quests
+                .map(
+                  (q) => `
+                <div class="p-4 rounded-2xl bg-amber-50/80 border border-amber-200 flex items-start justify-between gap-3">
+                  <div class="flex-1">
+                    <div class="flex items-center gap-2 mb-1">
+                      <span class="text-xs font-black text-amber-950">${q.title}</span>
+                      <span class="text-[10px] bg-amber-200 text-amber-900 px-2 py-0.5 rounded-full font-bold">+${q.reward} 星币</span>
+                    </div>
+                    <p class="text-xs text-amber-800 font-medium leading-relaxed">${q.desc}</p>
+                  </div>
+                  <button class="btn-quest-complete btn-game-orange text-white text-xs font-black px-3.5 py-1.5 rounded-full shadow active:scale-95 shrink-0" data-qid="${q.id}" data-reward="${q.reward}">
+                    完成打卡
+                  </button>
+                </div>
+              `
+                )
+                .join("")}
+            </div>
+          </div>
+
+        </div>
+      `;
+    }
+
     if (this.currentTab === "settings") {
       return `
         <!-- 4. 教学流程与防沉迷设置 -->
@@ -443,7 +540,7 @@ export class ParentModule extends BaseModule {
       });
     }
 
-    // 打印字帖
+    // 打印字帖与棋盘
     const printBtn = mainEl.querySelector("#btn-trigger-print");
     if (printBtn) {
       this._on(printBtn, "click", () => {
@@ -451,6 +548,77 @@ export class ParentModule extends BaseModule {
         window.print();
       });
     }
+
+    const printLudoBtn = mainEl.querySelector("#btn-print-ludo");
+    if (printLudoBtn) {
+      this._on(printLudoBtn, "click", () => {
+        soundAndFX.playPop();
+        window.print();
+      });
+    }
+
+    // 亲子飞行棋：掷骰子
+    let currentLudoPos = 0;
+    const rollDiceBtn = mainEl.querySelector("#btn-roll-dice");
+    if (rollDiceBtn) {
+      const tiles = mainEl.querySelectorAll(".ludo-tile");
+      if (tiles.length > 0) {
+        tiles[0].querySelector(".ludo-pawn")?.classList.remove("hidden");
+      }
+
+      this._on(rollDiceBtn, "click", () => {
+        const roll = Math.floor(Math.random() * 6) + 1;
+        const diceBadge = mainEl.querySelector("#dice-result-badge");
+        if (diceBadge) diceBadge.textContent = `${roll} 点`;
+
+        soundAndFX.playPop();
+        currentLudoPos = (currentLudoPos + roll) % tiles.length;
+
+        tiles.forEach((t, idx) => {
+          const pawn = t.querySelector(".ludo-pawn");
+          if (idx === currentLudoPos) {
+            pawn?.classList.remove("hidden");
+            t.classList.add("ring-4", "ring-orange-400", "bg-orange-200");
+            const ch = t.dataset.char;
+            const py = t.dataset.pinyin;
+            soundAndFX.speakPriority(`走到第 ${idx + 1} 格：“${ch}”，拼音 ${py}`, { kind: "sentence", priority: 1 });
+            soundAndFX.playStarPopCombo(roll);
+
+            const statusText = mainEl.querySelector("#ludo-status-text");
+            if (statusText) {
+              statusText.innerHTML = `前进到第 <b>${idx + 1}</b> 格：<b>【${ch}】(${py})</b>，请宝贝和家长一起大声读并造句！`;
+            }
+          } else {
+            pawn?.classList.add("hidden");
+            t.classList.remove("ring-4", "ring-orange-400", "bg-orange-200");
+          }
+        });
+      });
+
+      tiles.forEach((tile) => {
+        this._on(tile, "click", () => {
+          const ch = tile.dataset.char;
+          const py = tile.dataset.pinyin;
+          soundAndFX.speakPriority(`${ch}，${py}`, { kind: "char", priority: 2 });
+          soundAndFX.playPop();
+        });
+      });
+    }
+
+    // 亲子任务卡打卡
+    mainEl.querySelectorAll(".btn-quest-complete").forEach((btn) => {
+      this._on(btn, "click", () => {
+        const reward = parseInt(btn.dataset.reward, 10) || 30;
+        rewardEngine.addCoins(reward);
+        soundAndFX.playParentCheer();
+        soundAndFX.triggerConfetti(this.container);
+        showGameToast(this.container, `太棒了！完成亲子打卡，奖励 +${reward} 星币！`, "success");
+        btn.textContent = "已打卡 ✓";
+        btn.disabled = true;
+        btn.classList.remove("btn-game-orange");
+        btn.classList.add("bg-emerald-500", "cursor-default");
+      });
+    });
 
     // 保存设置
     const saveBtn = mainEl.querySelector("#btn-save-settings");
