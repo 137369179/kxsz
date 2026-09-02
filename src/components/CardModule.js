@@ -481,27 +481,27 @@ export class CardModule extends BaseModule {
     overlay.id = "stroke-demo-overlay";
     overlay.className = "fixed inset-0 z-[60] bg-black/80 backdrop-blur-md flex items-center justify-center p-4 animate-fade-in";
     overlay.innerHTML = `
-      <div class="relative w-full max-w-sm bg-gradient-to-b from-amber-50 to-orange-50 rounded-3xl p-6 shadow-2xl border-4 border-amber-300 flex flex-col items-center">
-        <button id="btn-close-stroke-demo" class="absolute -top-12 right-0 w-9 h-9 rounded-full bg-white text-gray-800 font-extrabold text-lg flex items-center justify-center shadow-lg hover:bg-gray-100 active:scale-95 cursor-pointer">
-          ${GAME_ICONS.back()}
+      <div class="relative w-full max-w-md sm:max-w-lg bg-gradient-to-b from-amber-50 to-orange-50 rounded-3xl p-8 shadow-2xl border-4 border-amber-300 flex flex-col items-center select-none">
+        <button id="btn-close-stroke-demo" class="absolute -top-14 right-0 w-11 h-11 rounded-full bg-white text-gray-800 font-extrabold text-xl flex items-center justify-center shadow-2xl hover:bg-gray-100 active:scale-90 cursor-pointer border-2 border-amber-300" title="关闭">
+          ${GAME_ICONS.back("w-6 h-6")}
         </button>
 
-        <div class="flex items-center justify-between w-full mb-3 pb-2 border-b border-amber-200">
-          <span class="text-sm font-black text-amber-900 flex items-center gap-1.5">
-            ${GAME_ICONS.brush()}
+        <div class="flex items-center justify-between w-full mb-4 pb-3 border-b border-amber-200">
+          <span class="text-base sm:text-lg font-black text-amber-950 flex items-center gap-2">
+            <span class="flex items-center">${GAME_ICONS.brush("w-6 h-6")}</span>
             <span>标准笔顺演示 · “${c.char}” (${c.pinyin})</span>
           </span>
-          <span id="demo-stroke-name" class="text-xs font-black bg-amber-200 text-amber-900 px-2.5 py-0.5 rounded-full">准备起笔</span>
+          <span id="demo-stroke-name" class="text-xs sm:text-sm font-black bg-amber-200 text-amber-950 px-3 py-1 rounded-full shadow-sm">准备起笔</span>
         </div>
 
-        <!-- 田字格 Canvas -->
-        <div class="relative w-64 h-64 bg-amber-50 rounded-2xl border-4 border-amber-400 shadow-inner overflow-hidden flex items-center justify-center my-2">
-          <canvas id="stroke-demo-canvas" width="256" height="256" class="w-full h-full"></canvas>
+        <!-- 田字格 Canvas (巨幅高清演示台) -->
+        <div class="relative w-72 h-72 sm:w-80 sm:h-80 bg-amber-50 rounded-3xl border-4 border-amber-400 shadow-2xl overflow-hidden flex items-center justify-center my-3">
+          <canvas id="stroke-demo-canvas" width="320" height="320" class="w-full h-full"></canvas>
         </div>
 
         <div class="flex items-center gap-3 mt-4 w-full justify-center">
-          <button id="btn-replay-stroke-demo" class="btn-game-orange text-white text-xs font-black px-6 py-2.5 rounded-full shadow-lg active:scale-95 flex items-center gap-1.5 cursor-pointer">
-            ${GAME_ICONS.brush()}
+          <button id="btn-replay-stroke-demo" class="btn-game-orange text-white text-sm font-black px-8 py-3 rounded-full shadow-lg active:scale-95 flex items-center gap-2 cursor-pointer">
+            <span class="flex items-center">${GAME_ICONS.brush("w-5 h-5")}</span>
             <span>重新演示</span>
           </button>
         </div>
@@ -635,85 +635,85 @@ export class CardModule extends BaseModule {
     const isDiff = ebbinghausManager.isDifficultChar(c.id);
 
     return `
-      <div id="card-modal-backdrop" class="fixed inset-0 z-50 bg-black/75 backdrop-blur-md flex items-center justify-center p-4 animate-fade-in perspective-1000">
-        <div class="relative w-full max-w-sm flex flex-col items-center">
+      <div id="card-modal-backdrop" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 animate-fade-in perspective-1000 select-none">
+        <div class="relative w-full max-w-md sm:max-w-lg flex flex-col items-center">
           
-          <!-- 关闭按钮 -->
-          <button id="btn-close-modal" class="absolute -top-12 right-0 w-9 h-9 rounded-full bg-white text-gray-800 font-extrabold text-lg flex items-center justify-center shadow-lg hover:bg-gray-100 active:scale-95 z-50 cursor-pointer" title="关闭">
-            ${GAME_ICONS.back()}
+          <!-- 关闭按钮 (大触控靶心) -->
+          <button id="btn-close-modal" class="absolute -top-14 right-0 w-11 h-11 rounded-full bg-white text-gray-800 font-extrabold text-xl flex items-center justify-center shadow-2xl hover:bg-gray-100 active:scale-90 z-50 cursor-pointer border-2 border-amber-300" title="关闭">
+            ${GAME_ICONS.back("w-6 h-6")}
           </button>
 
-          <!-- 3D 翻转卡片容器 -->
-          <div id="flip-card" class="relative w-full h-96 cursor-pointer preserve-3d transition-transform duration-500 ease-out ${this.isCardFlipped ? 'rotate-y-180' : ''}">
+          <!-- 3D 翻转卡片容器 (巨幕 3D 字卡) -->
+          <div id="flip-card" class="relative w-full h-[460px] sm:h-[480px] cursor-pointer preserve-3d transition-transform duration-500 ease-out ${this.isCardFlipped ? 'rotate-y-180' : ''}">
             
             <!-- 卡片正面 (Front Face) -->
-            <div class="absolute inset-0 bg-gradient-to-b from-amber-50 to-orange-50 rounded-3xl shadow-2xl border-4 border-amber-300 p-6 flex flex-col justify-between backface-hidden ${this.isCardFlipped ? 'pointer-events-none' : ''}">
+            <div class="absolute inset-0 bg-gradient-to-b from-amber-50 to-orange-50 rounded-3xl shadow-2xl border-4 border-amber-300 p-8 flex flex-col justify-between backface-hidden ${this.isCardFlipped ? 'pointer-events-none' : ''}">
               <div class="flex items-center justify-between">
-                <span class="text-xs font-black bg-amber-200 text-amber-900 px-3 py-1 rounded-full">${c.radical}部 · ${c.strokeCount || 4}画</span>
-                <div class="flex items-center gap-2">
-                  <button id="btn-modal-demo-strokes" class="flex items-center gap-1 bg-amber-200 hover:bg-amber-300 text-amber-900 px-3 py-1 rounded-full text-xs font-black shadow active:scale-90 transition-all cursor-pointer" title="笔顺笔画动画演示">
-                    <span class="flex items-center">${GAME_ICONS.brush()}</span>
+                <span class="text-xs sm:text-sm font-black bg-amber-200 text-amber-950 px-4 py-1.5 rounded-full shadow-sm">${c.radical}部 · ${c.strokeCount || 4}画</span>
+                <div class="flex items-center gap-2.5">
+                  <button id="btn-modal-demo-strokes" class="flex items-center gap-1.5 bg-amber-200 hover:bg-amber-300 text-amber-950 px-4 py-1.5 rounded-full text-xs sm:text-sm font-black shadow-md active:scale-90 transition-all cursor-pointer" title="笔顺笔画动画演示">
+                    <span class="flex items-center">${GAME_ICONS.brush("w-4 h-4 sm:w-5 sm:h-5")}</span>
                     <span>笔顺</span>
                   </button>
-                  <button id="btn-modal-speak-char" class="w-8 h-8 rounded-full bg-orange-500 text-white flex items-center justify-center shadow text-sm active:scale-90 cursor-pointer" title="朗读">
-                    ${GAME_ICONS.speaker()}
+                  <button id="btn-modal-speak-char" class="w-10 h-10 rounded-full bg-orange-500 text-white flex items-center justify-center shadow-lg text-sm active:scale-90 cursor-pointer" title="朗读">
+                    ${GAME_ICONS.speaker("w-5 h-5")}
                   </button>
                 </div>
               </div>
 
-              <div class="flex flex-col items-center justify-center flex-1 my-2">
-                <span class="text-2xl font-black text-amber-700 mb-1">${c.pinyin}</span>
-                <span class="text-7xl font-black text-amber-950 drop-shadow glow-pulse">${c.char}</span>
+              <div class="flex flex-col items-center justify-center flex-1 my-3">
+                <span class="text-3xl sm:text-4xl font-black text-amber-700 mb-2">${c.pinyin}</span>
+                <span class="text-8xl sm:text-9xl font-black text-amber-950 drop-shadow-md glow-pulse">${c.char}</span>
                 
                 ${c.oracleGlyph ? `
-                  <div class="mt-2 flex items-center gap-1.5 bg-amber-200/60 px-3 py-1 rounded-full border border-amber-300">
-                    <span class="text-[10px] text-amber-800 font-black">甲骨文溯源:</span>
-                    <span class="text-base font-black text-amber-950">${c.oracleGlyph}</span>
+                  <div class="mt-3 flex items-center gap-2 bg-amber-200/70 px-4 py-1.5 rounded-full border border-amber-300 shadow-inner">
+                    <span class="text-xs text-amber-900 font-black">甲骨文演变:</span>
+                    <span class="text-2xl font-black text-amber-950">${c.oracleGlyph}</span>
                   </div>
                 ` : ""}
               </div>
 
               <div class="w-full text-center">
-                <span class="text-[11px] text-gray-500 font-bold bg-white/80 px-4 py-1 rounded-full shadow-inner animate-pulse">
-                   点击卡片翻转查看字源与组词
+                <span class="text-xs text-amber-800 font-bold bg-white/90 px-5 py-1.5 rounded-full shadow-sm animate-pulse border border-amber-200">
+                  👆 点击卡片翻转查看字源与常用组词
                 </span>
               </div>
             </div>
 
             <!-- 卡片背面 (Back Face) -->
             <div class="absolute inset-0 bg-gradient-to-b from-orange-50 to-amber-100 rounded-3xl shadow-2xl border-4 border-orange-300 p-6 flex flex-col justify-between backface-hidden rotate-y-180 ${!this.isCardFlipped ? 'pointer-events-none' : ''}">
-              <div class="flex items-center justify-between pb-2 border-b border-amber-200">
-                <span class="text-xs font-black text-amber-900 flex items-center gap-1.5">
-                  ${GAME_ICONS.book()}
-                  <span>组词造句本源</span>
+              <div class="flex items-center justify-between pb-3 border-b border-amber-200">
+                <span class="text-sm font-black text-amber-950 flex items-center gap-2">
+                  <span class="flex items-center">${GAME_ICONS.book("w-5 h-5")}</span>
+                  <span>常用词组与造句</span>
                 </span>
-                <span class="text-[10px] text-orange-600 font-bold">已翻转</span>
+                <span class="text-xs text-orange-600 font-bold bg-orange-100 px-3 py-0.5 rounded-full">已翻转</span>
               </div>
 
-              <div class="flex-1 my-3 flex flex-col justify-around text-left">
+              <div class="flex-1 my-4 flex flex-col justify-around text-left">
                 <div>
-                  <span class="text-[11px] font-black text-amber-800 block mb-1">常用词组 (点击朗读)：</span>
-                  <div class="flex flex-wrap gap-1.5">
+                  <span class="text-xs sm:text-sm font-black text-amber-900 block mb-2">常用词组 (点击朗读)：</span>
+                  <div class="flex flex-wrap gap-2">
                     ${(c.words || [{ word: `${c.char}子`, pinyin: "" }]).map(w => {
                       const wordText = typeof w === "string" ? w : w.word;
-                      return `<button class="card-modal-word-btn bg-white hover:bg-amber-100 text-amber-900 border border-amber-200 text-xs font-black px-2.5 py-1 rounded-lg shadow-sm transition-all active:scale-95 cursor-pointer" data-word="${wordText}">${wordText}</button>`;
+                      return `<button class="card-modal-word-btn bg-white hover:bg-amber-100 text-amber-950 border-2 border-amber-300 text-sm sm:text-base font-black px-4 py-2 rounded-xl shadow-md transition-all active:scale-95 cursor-pointer" data-word="${wordText}">${wordText}</button>`;
                     }).join("")}
                   </div>
                 </div>
 
-                <div id="card-modal-sentence" class="bg-white/90 hover:bg-white p-2.5 rounded-xl border border-amber-200 text-xs text-amber-950 font-semibold leading-relaxed cursor-pointer transition-all active:scale-95" title="点击朗读例句">
+                <div id="card-modal-sentence" class="bg-white/95 hover:bg-white p-4 rounded-2xl border-2 border-amber-300 text-xs sm:text-sm text-amber-950 font-semibold leading-relaxed cursor-pointer transition-all active:scale-95 shadow-md" title="点击朗读例句">
                   <span class="font-black text-orange-600">生活例句：</span>
                   ${c.sentence || `${c.char}字天天见，学好汉字乐趣多`}
                 </div>
               </div>
 
-              <div class="w-full flex items-center justify-between pt-2 border-t border-amber-200">
-                <button id="btn-toggle-difficult" data-char-id="${c.id}" class="text-xs font-black px-3.5 py-1.5 rounded-full shadow transition-all cursor-pointer ${
-                  isDiff ? "bg-rose-500 text-white animate-jelly" : "bg-amber-200 text-amber-900 hover:bg-amber-300"
+              <div class="w-full flex items-center justify-between pt-3 border-t border-amber-200">
+                <button id="btn-toggle-difficult" data-char-id="${c.id}" class="text-xs sm:text-sm font-black px-4 py-2 rounded-full shadow-md transition-all cursor-pointer ${
+                  isDiff ? "bg-rose-500 text-white animate-jelly" : "bg-amber-200 text-amber-950 hover:bg-amber-300"
                 }">
                   ${isDiff ? "已在难字本" : "+ 加入难字本"}
                 </button>
-                <span class="text-[10px] text-gray-400 font-bold animate-pulse">点击返回正面</span>
+                <span class="text-xs text-gray-500 font-bold animate-pulse">点击返回正面</span>
               </div>
             </div>
 

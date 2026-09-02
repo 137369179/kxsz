@@ -145,10 +145,10 @@ export class ParentModule extends BaseModule {
           <!-- 四大标签切换组 -->
           <div class="flex items-center gap-1.5 bg-amber-50 p-1.5 rounded-full border border-amber-200">
             ${[
-              { key: "dashboard", label: "数据罗盘", icon: (cls) => GAME_ICONS.sparkle(cls) },
+              { key: "dashboard", label: "数据罗盘", icon: (cls) => GAME_ICONS.compass(cls) },
               { key: "trophies", label: "荣誉勋章墙", icon: (cls) => GAME_ICONS.trophy(cls) },
               { key: "print", label: "字帖打印", icon: (cls) => GAME_ICONS.print(cls) },
-              { key: "settings", label: "督学设置", icon: (cls) => GAME_ICONS.shieldLock(cls) }
+              { key: "settings", label: "督学设置", icon: (cls) => GAME_ICONS.gear(cls) }
             ]
               .map(
                 (tab) => `
@@ -193,33 +193,33 @@ export class ParentModule extends BaseModule {
       const maxCount = Math.max(5, ...history.map(h => h.count));
 
       return `
-        <!-- 1. 学习罗盘概览卡片 -->
-        <div class="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-6">
-          <div class="bg-white/95 rounded-3xl p-5 shadow-lg border-2 border-orange-200 text-center">
-            <span class="text-xs text-gray-500 font-bold">已掌握总字数</span>
-            <div class="text-3xl font-black text-orange-600 my-1">${charCount} / 1300</div>
-            <span class="text-[10px] text-emerald-600 font-bold">超越 96% 同龄小勇士</span>
+        <!-- 1. 学习罗盘概览卡片 (大数字大卡片) -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-6">
+          <div class="bg-white/95 rounded-3xl p-6 shadow-xl border-2 border-orange-200 text-center">
+            <span class="text-xs sm:text-sm text-gray-500 font-bold">已掌握总字数</span>
+            <div class="text-4xl font-black text-orange-600 my-2">${charCount} / 1300</div>
+            <span class="text-xs text-emerald-600 font-bold bg-emerald-50 px-3 py-1 rounded-full">超越 96% 同龄小勇士</span>
           </div>
 
-          <div class="bg-white/95 rounded-3xl p-5 shadow-lg border-2 border-amber-200 text-center">
-            <span class="text-xs text-gray-500 font-bold">今日已学字数</span>
-            <div class="text-3xl font-black text-amber-600 my-1">${progress.todayLearnedCount || charCount}</div>
-            <span class="text-[10px] text-amber-700 font-bold">每日目标: ${settings.dailyCharTarget || 5} 字</span>
+          <div class="bg-white/95 rounded-3xl p-6 shadow-xl border-2 border-amber-200 text-center">
+            <span class="text-xs sm:text-sm text-gray-500 font-bold">今日已学字数</span>
+            <div class="text-4xl font-black text-amber-600 my-2">${progress.todayLearnedCount || charCount}</div>
+            <span class="text-xs text-amber-700 font-bold bg-amber-50 px-3 py-1 rounded-full">每日目标: ${settings.dailyCharTarget || 5} 字</span>
           </div>
 
-          <div class="bg-white/95 rounded-3xl p-5 shadow-lg border-2 border-emerald-200 text-center">
-            <span class="text-xs text-gray-500 font-bold">累计收集之星</span>
-            <div class="text-3xl font-black text-emerald-600 my-1 flex items-center justify-center gap-1">
+          <div class="bg-white/95 rounded-3xl p-6 shadow-xl border-2 border-emerald-200 text-center">
+            <span class="text-xs sm:text-sm text-gray-500 font-bold">累计收集之星</span>
+            <div class="text-4xl font-black text-emerald-600 my-2 flex items-center justify-center gap-1.5">
               <span>${progress.stars || (charCount * 3)}</span>
-              <span class="flex items-center">${GAME_ICONS.star(false)}</span>
+              <span class="flex items-center">${GAME_ICONS.star("w-7 h-7", false)}</span>
             </div>
-            <span class="text-[10px] text-emerald-700 font-bold">星币余额: ${progress.coins || 60}</span>
+            <span class="text-xs text-emerald-700 font-bold bg-emerald-50 px-3 py-1 rounded-full">星币余额: ${progress.coins || 60}</span>
           </div>
 
-          <div class="bg-white/95 rounded-3xl p-5 shadow-lg border-2 border-rose-200 text-center">
-            <span class="text-xs text-gray-500 font-bold">难字本重点巩固</span>
-            <div class="text-3xl font-black text-rose-600 my-1">${diffCount} 个</div>
-            <span class="text-[10px] text-rose-700 font-bold">已安排至艾宾浩斯复习流</span>
+          <div class="bg-white/95 rounded-3xl p-6 shadow-xl border-2 border-rose-200 text-center">
+            <span class="text-xs sm:text-sm text-gray-500 font-bold">难字本重点巩固</span>
+            <div class="text-4xl font-black text-rose-600 my-2">${diffCount} 个</div>
+            <span class="text-xs text-rose-700 font-bold bg-rose-50 px-3 py-1 rounded-full">已安排至艾宾浩斯复习流</span>
           </div>
         </div>
 
@@ -227,20 +227,20 @@ export class ParentModule extends BaseModule {
         <div class="bg-white/95 rounded-3xl p-6 shadow-xl border-2 border-amber-200 mb-6">
           <div class="flex items-center justify-between mb-4">
             <div class="flex items-center gap-2">
-              <span class="flex items-center">${GAME_ICONS.calendar()}</span>
-              <h3 class="text-sm font-black text-amber-950">近 7 日识字趋势统计</h3>
+              <span class="flex items-center">${GAME_ICONS.calendar("w-5 h-5")}</span>
+              <h3 class="text-base font-black text-amber-950">近 7 日识字趋势统计</h3>
             </div>
-            <span class="text-xs text-amber-700 font-bold">本周总计: ${history.reduce((a,b) => a + b.count, 0)} 字</span>
+            <span class="text-xs sm:text-sm text-amber-700 font-bold">本周总计: ${history.reduce((a,b) => a + b.count, 0)} 字</span>
           </div>
 
-          <div class="flex items-end justify-between gap-3 h-36 pt-4 px-4 bg-amber-50/50 rounded-2xl border border-amber-200">
+          <div class="flex items-end justify-between gap-3 h-40 pt-4 px-4 bg-amber-50/50 rounded-2xl border border-amber-200">
             ${history.map(item => {
               const heightPct = Math.max(12, Math.round((item.count / maxCount) * 100));
               return `
                 <div class="flex-1 flex flex-col items-center gap-2 h-full justify-end group">
-                  <span class="text-[10px] font-black text-amber-900 opacity-0 group-hover:opacity-100 transition-opacity">${item.count}字</span>
-                  <div class="w-full max-w-[36px] bg-gradient-to-t from-orange-500 to-amber-400 rounded-t-xl transition-all duration-500 hover:brightness-110 shadow-sm" style="height: ${heightPct}%"></div>
-                  <span class="text-[10px] font-bold text-gray-600">${item.date}</span>
+                  <span class="text-xs font-black text-amber-900 opacity-0 group-hover:opacity-100 transition-opacity">${item.count}字</span>
+                  <div class="w-full max-w-[40px] bg-gradient-to-t from-orange-500 to-amber-400 rounded-t-xl transition-all duration-500 hover:brightness-110 shadow-md" style="height: ${heightPct}%"></div>
+                  <span class="text-xs font-bold text-gray-600">${item.date}</span>
                 </div>
               `;
             }).join("")}
@@ -250,10 +250,10 @@ export class ParentModule extends BaseModule {
         <!-- 艾宾浩斯复习计划卡片 -->
         <div class="bg-white/95 rounded-3xl p-6 shadow-xl border-2 border-amber-200">
           <div class="flex items-center gap-2 mb-2">
-            <span class="flex items-center">${GAME_ICONS.sparkle()}</span>
-            <h3 class="text-sm font-black text-amber-950">艾宾浩斯智能复习调度系统</h3>
+            <span class="flex items-center">${GAME_ICONS.sparkle("w-5 h-5")}</span>
+            <h3 class="text-base font-black text-amber-950">艾宾浩斯智能复习调度系统</h3>
           </div>
-          <p class="text-xs text-gray-600 leading-relaxed font-semibold">
+          <p class="text-xs sm:text-sm text-gray-600 leading-relaxed font-semibold">
             系统严格按照 1天、2天、4天、7天、15天 艾宾浩斯黄金记忆周期自动规划复习任务。当前遗忘预防健康度达 <b class="text-emerald-600">98.4%</b>，处于极佳记忆保持状态！
           </p>
         </div>
@@ -262,27 +262,27 @@ export class ParentModule extends BaseModule {
 
     if (this.currentTab === "trophies") {
       return `
-        <!-- 2. 12 勋章墙 -->
-        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+        <!-- 2. 12 勋章墙 (巨幅 3D 荣耀勋章) -->
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5">
           ${TROPHY_LIST.map((t, idx) => {
             const isUnlocked = idx < Math.max(3, Math.floor(charCount / 2));
             const iconSvg = GAME_ICONS[t.icon] || GAME_ICONS.trophy;
 
             return `
-              <div class="bg-white/95 backdrop-blur-md rounded-3xl p-5 shadow-lg border-2 ${
-                isUnlocked ? "border-amber-400 ring-2 ring-amber-300/40" : "border-gray-200 opacity-60"
+              <div class="bg-white/95 backdrop-blur-md rounded-3xl p-6 shadow-xl border-2 ${
+                isUnlocked ? "border-amber-400 ring-4 ring-amber-300/30" : "border-gray-200 opacity-60"
               } flex flex-col items-center text-center justify-between">
                 
-                <div class="w-16 h-16 rounded-full ${
-                  isUnlocked ? "bg-gradient-to-tr from-yellow-300 to-amber-500 text-white shadow-xl" : "bg-gray-200 text-gray-400"
-                } flex items-center justify-center mb-3">
-                  <span class="flex items-center">${iconSvg("w-8 h-8", isUnlocked)}</span>
+                <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-full ${
+                  isUnlocked ? "bg-gradient-to-tr from-yellow-300 via-amber-400 to-orange-500 text-white shadow-2xl ring-4 ring-white" : "bg-gray-200 text-gray-400"
+                } flex items-center justify-center mb-4 aspect-square shrink-0">
+                  <span class="flex items-center">${iconSvg("w-12 h-12 sm:w-14 sm:h-14", isUnlocked)}</span>
                 </div>
 
-                <h4 class="text-sm font-black text-amber-950 mb-1">${t.name}</h4>
-                <p class="text-[11px] text-gray-600 mb-2 font-semibold">${t.desc}</p>
+                <h4 class="text-base font-black text-amber-950 mb-1">${t.name}</h4>
+                <p class="text-xs text-gray-600 mb-3 font-semibold leading-relaxed">${t.desc}</p>
                 
-                <span class="text-[10px] font-black px-3 py-0.5 rounded-full ${
+                <span class="text-xs font-black px-4 py-1 rounded-full shadow-sm ${
                   isUnlocked ? "bg-emerald-100 text-emerald-800" : "bg-gray-100 text-gray-500"
                 }">
                   ${isUnlocked ? "已解锁" : `解锁条件: ${t.req}`}

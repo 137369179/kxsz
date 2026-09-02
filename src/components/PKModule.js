@@ -53,8 +53,8 @@ export class PKModule extends BaseModule {
         <!-- Header: Health Bars -->
         <div class="relative z-10 w-full p-6 flex items-center justify-between pl-20">
            <!-- Player -->
-           <div class="flex items-center gap-4">
-              <div class="w-16 h-16 rounded-full bg-slate-200 border-4 border-emerald-400 shadow-[0_0_20px_rgba(52,211,153,0.6)] flex items-center justify-center overflow-hidden">
+           <div class="flex items-center gap-3 sm:gap-4">
+              <div class="w-14 h-14 sm:w-16 sm:h-16 aspect-square rounded-full bg-slate-200 border-4 border-emerald-400 shadow-[0_0_20px_rgba(52,211,153,0.6)] flex items-center justify-center overflow-hidden shrink-0">
                  <img src="${playerAvatarSrc}" class="w-full h-full object-cover rounded-full" alt="player" onerror="this.src='assets/images/cathy_mascot.webp'" />
               </div>
               <div class="flex flex-col gap-1">
@@ -71,8 +71,8 @@ export class PKModule extends BaseModule {
            </div>
 
            <!-- Boss -->
-           <div class="flex items-center gap-4 flex-row-reverse">
-              <div class="w-16 h-16 rounded-full bg-slate-800 border-4 border-rose-500 shadow-[0_0_20px_rgba(244,63,94,0.6)] flex items-center justify-center overflow-hidden">
+           <div class="flex items-center gap-3 sm:gap-4 flex-row-reverse">
+              <div class="w-14 h-14 sm:w-16 sm:h-16 aspect-square rounded-full bg-slate-800 border-4 border-rose-500 shadow-[0_0_20px_rgba(244,63,94,0.6)] flex items-center justify-center overflow-hidden shrink-0">
                  <img src="assets/images/cathy_boss_monster.webp" class="w-full h-full object-cover rounded-full" alt="boss" onerror="this.src='assets/images/icon_chest.webp'" />
               </div>
               <div class="flex flex-col gap-1 items-end">
@@ -150,7 +150,7 @@ export class PKModule extends BaseModule {
 
     const grid = this.container.querySelector("#pk-options-grid");
     grid.innerHTML = this.options.map((opt, i) => `
-      <button class="pk-option-btn w-32 h-32 bg-gradient-to-tr from-slate-100 to-white rounded-3xl border-4 border-slate-300 shadow-xl flex items-center justify-center text-6xl font-black text-slate-800 hover:border-amber-400 hover:scale-105 active:scale-95 transition-all" data-idx="${i}">
+      <button class="pk-option-btn w-36 h-36 sm:w-44 sm:h-44 bg-gradient-to-tr from-slate-100 to-white rounded-3xl border-4 border-slate-300 shadow-2xl flex items-center justify-center text-6xl sm:text-7xl font-black text-slate-800 hover:border-amber-400 hover:scale-105 active:scale-95 transition-all cursor-pointer aspect-square shrink-0" data-idx="${i}">
          ${opt.char}
       </button>
     `).join("");

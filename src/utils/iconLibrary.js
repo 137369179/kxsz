@@ -40,6 +40,7 @@ export const Icons = {
   brush: GAME_ICONS.brush(DEFAULT_CLS),
   
   // Status & General
+  check: GAME_ICONS.check(DEFAULT_CLS),
   calendar: GAME_ICONS.calendar(DEFAULT_CLS),
   bell: GAME_ICONS.reviewBell(DEFAULT_CLS),
   swords: GAME_ICONS.swords(DEFAULT_CLS),

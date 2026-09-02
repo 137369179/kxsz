@@ -23,34 +23,34 @@ export function mountGameShell(container, { activeMode, heading }) {
         <!-- 3D HUD (Head-Up Display) -->
         <div class="absolute top-4 left-4 right-4 z-40 flex items-center justify-between pointer-events-none" role="toolbar" aria-label="顶部导航栏">
 
-          <!-- 返回 / 家长入口 -->
+          <!-- 返回 / 家长入口 (大触控大图标) -->
           <div class="flex items-center gap-3 pointer-events-auto">
             ${
               activeMode !== "map"
-              ? `<button data-nav="map" class="shell-nav-btn w-12 h-12 bg-black/40 backdrop-blur-md rounded-full text-white flex items-center justify-center hover:bg-black/60 transition-transform active:scale-90 border-2 border-amber-300 shadow-xl" title="返回地图" aria-label="返回世界地图">
-                  ${GAME_ICONS.home()}
+              ? `<button data-nav="map" class="shell-nav-btn w-12 h-12 sm:w-14 sm:h-14 bg-black/50 backdrop-blur-md rounded-full text-white flex items-center justify-center hover:bg-black/70 transition-transform active:scale-90 border-2 border-amber-300 shadow-2xl cursor-pointer" title="返回地图" aria-label="返回世界地图">
+                  ${GAME_ICONS.home("w-7 h-7 sm:w-8 sm:h-8")}
                  </button>`
-              : `<button data-nav="parent" class="shell-nav-btn w-12 h-12 bg-gradient-to-tr from-amber-600 to-orange-500 rounded-full text-white flex items-center justify-center hover:scale-105 transition-transform active:scale-90 border-2 border-white shadow-[0_4px_12px_rgba(0,0,0,0.4)]" title="家长中心" aria-label="进入家长中心">
-                  ${GAME_ICONS.shieldLock()}
+              : `<button data-nav="parent" class="shell-nav-btn w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-tr from-amber-600 to-orange-500 rounded-full text-white flex items-center justify-center hover:scale-105 transition-transform active:scale-90 border-2 border-white shadow-[0_4px_16px_rgba(0,0,0,0.5)] cursor-pointer" title="家长中心" aria-label="进入家长中心">
+                  ${GAME_ICONS.shieldLock("w-7 h-7 sm:w-8 sm:h-8")}
                  </button>`
             }
 
-            <button id="shell-btn-sound-toggle" class="w-11 h-11 bg-black/40 backdrop-blur-md rounded-full text-white flex items-center justify-center hover:bg-black/60 transition-transform active:scale-90 border border-white/30 shadow-lg" title="声音开关" aria-label="切换声音开关">
-              <span id="shell-sound-icon-container" class="flex items-center justify-center" aria-hidden="true">
-                ${soundAndFX.isMuted ? GAME_ICONS.speaker(true) : GAME_ICONS.speaker(false)}
+            <button id="shell-btn-sound-toggle" class="w-12 h-12 sm:w-14 sm:h-14 bg-black/50 backdrop-blur-md rounded-full text-white flex items-center justify-center hover:bg-black/70 transition-transform active:scale-90 border-2 border-white/40 shadow-xl cursor-pointer" title="声音开关" aria-label="切换声音开关">
+              <span id="shell-sound-icon-container" class="flex items-center justify-center shrink-0" aria-hidden="true">
+                ${soundAndFX.isMuted ? GAME_ICONS.speaker("w-7 h-7 sm:w-8 sm:h-8", true) : GAME_ICONS.speaker("w-7 h-7 sm:w-8 sm:h-8", false)}
               </span>
             </button>
           </div>
 
-          <!-- 星星 & 金币 -->
+          <!-- 星星 & 金币 (大图大药丸) -->
           <div class="flex items-center gap-3 pointer-events-auto">
-            <div class="candy-pill flex items-center gap-2 text-yellow-300 font-black text-sm px-4 py-1.5 rounded-full border-2 border-yellow-300 shadow-lg" title="星星" aria-label="星星数量">
-              ${GAME_ICONS.star(false)}
+            <div class="candy-pill flex items-center gap-2 text-yellow-300 font-black text-sm sm:text-base px-4 sm:px-5 py-1.5 sm:py-2 rounded-full border-2 border-yellow-300 shadow-xl bg-black/50 backdrop-blur-md" title="星星" aria-label="星星数量">
+              ${GAME_ICONS.star("w-6 h-6 sm:w-7 sm:h-7", false)}
               <span id="shell-stars-count" aria-live="polite">${progress.stars}</span>
             </div>
 
-            <div class="candy-pill flex items-center gap-2 text-amber-300 font-black text-sm px-4 py-1.5 rounded-full border-2 border-amber-300 shadow-lg relative" title="金币" aria-label="金币数量">
-              ${GAME_ICONS.coin()}
+            <div class="candy-pill flex items-center gap-2 text-amber-300 font-black text-sm sm:text-base px-4 sm:px-5 py-1.5 sm:py-2 rounded-full border-2 border-amber-300 shadow-xl bg-black/50 backdrop-blur-md relative" title="金币" aria-label="金币数量">
+              ${GAME_ICONS.coin("w-6 h-6 sm:w-7 sm:h-7")}
               <span id="shell-coins-count" class="relative z-10 font-black text-yellow-200" aria-live="polite">${progress.coins}</span>
               <div id="shell-coins-target-anchor" class="absolute left-4 top-4 w-1 h-1"></div>
             </div>

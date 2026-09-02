@@ -47,3 +47,23 @@
 .animate-slide-up {
   animation: slideUp 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
 }
+
+/* Positional Utility Fixes for Map & Node Overlays */
+.bottom-full { bottom: 100% !important; }
+.top-full { top: 100% !important; }
+.-top-4 { top: -1rem !important; }
+.-top-6 { top: -1.5rem !important; }
+.-top-8 { top: -2rem !important; }
+.-top-10 { top: -2.5rem !important; }
+.-top-12 { top: -3rem !important; }
+.-top-14 { top: -3.5rem !important; }
+.-top-16 { top: -4rem !important; }
+.-top-20 { top: -5rem !important; }
+.-top-24 { top: -6rem !important; }
+.-top-28 { top: -7rem !important; }
+.-top-32 { top: -8rem !important; }
+.-top-36 { top: -9rem !important; }
+.-top-40 { top: -10rem !important; }
+.-top-44 { top: -11rem !important; }
+.-top-48 { top: -12rem !important; }
+.-top-56 { top: -14rem !important; }

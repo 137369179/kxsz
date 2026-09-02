@@ -189,7 +189,7 @@ export class LearnModule extends BaseModule {
         guide = "向上拉动金色法绳，升起灿烂红日！";
         sceneHTML = `
           <div id="interactive-actor" class="relative flex flex-col items-center cursor-pointer group">
-            <div id="play-target-anim" class="w-36 h-36 rounded-full bg-gradient-to-tr from-yellow-300 via-orange-400 to-red-500 shadow-[0_0_70px_rgba(255,160,0,1)] flex items-center justify-center text-7xl text-white font-black border-4 border-white transition-all duration-1000 transform translate-y-16 scale-75">
+            <div id="play-target-anim" class="w-52 h-52 sm:w-60 sm:h-60 rounded-full bg-gradient-to-tr from-yellow-300 via-orange-400 to-red-500 shadow-[0_0_70px_rgba(255,160,0,1)] flex items-center justify-center text-8xl sm:text-9xl text-white font-black border-4 border-white transition-all duration-1000 transform translate-y-16 scale-75">
               ${char.oracleGlyph || "日"}
             </div>
             <div class="w-2.5 h-28 bg-amber-800 border-2 border-yellow-300 rounded-full flex items-center justify-center mt-2 animate-pulse">
@@ -204,7 +204,7 @@ export class LearnModule extends BaseModule {
         guide = "划动手指擦除夜空乌云，找到皎洁月亮！";
         sceneHTML = `
           <div id="interactive-actor" class="relative flex flex-col items-center cursor-pointer group">
-            <div id="play-target-anim" class="w-40 h-40 rounded-full bg-slate-900 border-4 border-slate-700 flex items-center justify-center text-7xl text-yellow-300 font-black transition-all duration-1000">
+            <div id="play-target-anim" class="w-52 h-52 sm:w-60 sm:h-60 rounded-full bg-slate-900 border-4 border-slate-700 flex items-center justify-center text-8xl sm:text-9xl text-yellow-300 font-black transition-all duration-1000">
               ${char.oracleGlyph || "月"}
             </div>
             <span class="text-xs text-yellow-200 mt-3 bg-black/40 px-3 py-1 rounded-full border border-white/20">划开云雾</span>
@@ -215,7 +215,7 @@ export class LearnModule extends BaseModule {
         guide = "点击疏通清澈泉眼，让甘甜河水奔流！";
         sceneHTML = `
           <div id="interactive-actor" class="relative flex flex-col items-center cursor-pointer group">
-            <div id="play-target-anim" class="w-40 h-40 rounded-3xl bg-cyan-600/80 border-4 border-cyan-300 shadow-[0_0_50px_rgba(0,188,212,0.8)] flex items-center justify-center text-7xl text-white font-black transition-all duration-1000">
+            <div id="play-target-anim" class="w-52 h-52 sm:w-60 sm:h-60 rounded-3xl bg-cyan-600/80 border-4 border-cyan-300 shadow-[0_0_50px_rgba(0,188,212,0.8)] flex items-center justify-center text-8xl sm:text-9xl text-white font-black transition-all duration-1000">
               ${char.oracleGlyph || "水"}
             </div>
             <span class="text-xs text-cyan-200 mt-3 bg-black/40 px-3 py-1 rounded-full border border-white/20">点击喷泉</span>
@@ -226,7 +226,7 @@ export class LearnModule extends BaseModule {
         guide = "快速滑动摩擦取火，点燃温暖的篝火！";
         sceneHTML = `
           <div id="interactive-actor" class="relative flex flex-col items-center cursor-pointer group">
-            <div id="play-target-anim" class="w-40 h-40 rounded-3xl bg-amber-950 border-4 border-orange-500 shadow-[0_0_50px_rgba(255,87,34,0.8)] flex items-center justify-center text-7xl text-yellow-400 font-black transition-all duration-1000">
+            <div id="play-target-anim" class="w-52 h-52 sm:w-60 sm:h-60 rounded-3xl bg-amber-950 border-4 border-orange-500 shadow-[0_0_50px_rgba(255,87,34,0.8)] flex items-center justify-center text-8xl sm:text-9xl text-yellow-400 font-black transition-all duration-1000">
               ${char.oracleGlyph || "火"}
             </div>
             <span class="text-xs text-orange-200 mt-3 bg-black/40 px-3 py-1 rounded-full border border-white/20">摩擦点火</span>
@@ -237,7 +237,7 @@ export class LearnModule extends BaseModule {
         guide = "依次敲击三块奇石，唤醒巍峨大山！";
         sceneHTML = `
           <div id="interactive-actor" class="relative flex flex-col items-center cursor-pointer group">
-            <div id="play-target-anim" class="w-44 h-36 rounded-3xl bg-stone-700 border-4 border-stone-400 shadow-[0_0_50px_rgba(100,100,100,0.8)] flex items-center justify-center text-7xl text-amber-200 font-black transition-all duration-1000">
+            <div id="play-target-anim" class="w-56 h-48 sm:w-64 sm:h-52 rounded-3xl bg-stone-700 border-4 border-stone-400 shadow-[0_0_50px_rgba(100,100,100,0.8)] flex items-center justify-center text-8xl sm:text-9xl text-amber-200 font-black transition-all duration-1000">
               ${char.oracleGlyph || "山"}
             </div>
             <span class="text-xs text-stone-200 mt-3 bg-black/40 px-3 py-1 rounded-full border border-white/20">敲击唤醒</span>
@@ -248,7 +248,7 @@ export class LearnModule extends BaseModule {
         guide = "拖动喷壶给小嫩芽浇水，长成参天大树！";
         sceneHTML = `
           <div id="interactive-actor" class="relative flex flex-col items-center cursor-pointer group">
-            <div id="play-target-anim" class="w-40 h-40 rounded-3xl bg-emerald-900 border-4 border-emerald-400 shadow-[0_0_50px_rgba(76,175,80,0.8)] flex items-center justify-center text-7xl text-emerald-200 font-black transition-all duration-1000">
+            <div id="play-target-anim" class="w-52 h-52 sm:w-60 sm:h-60 rounded-3xl bg-emerald-900 border-4 border-emerald-400 shadow-[0_0_50px_rgba(76,175,80,0.8)] flex items-center justify-center text-8xl sm:text-9xl text-emerald-200 font-black transition-all duration-1000">
               ${char.oracleGlyph || "木"}
             </div>
             <span class="text-xs text-emerald-200 mt-3 bg-black/40 px-3 py-1 rounded-full border border-white/20">浇水成长</span>
@@ -259,7 +259,7 @@ export class LearnModule extends BaseModule {
         guide = "帮助小勇士迈开双腿跨栏赛跑！";
         sceneHTML = `
           <div id="interactive-actor" class="relative flex flex-col items-center cursor-pointer group">
-            <div id="play-target-anim" class="w-40 h-40 rounded-3xl bg-orange-950 border-4 border-orange-400 shadow-[0_0_50px_rgba(255,107,0,0.8)] flex items-center justify-center text-7xl text-yellow-300 font-black transition-all duration-1000">
+            <div id="play-target-anim" class="w-52 h-52 sm:w-60 sm:h-60 rounded-3xl bg-orange-950 border-4 border-orange-400 shadow-[0_0_50px_rgba(255,107,0,0.8)] flex items-center justify-center text-8xl sm:text-9xl text-yellow-300 font-black transition-all duration-1000">
               ${char.oracleGlyph || "人"}
             </div>
             <span class="text-xs text-orange-200 mt-3 bg-black/40 px-3 py-1 rounded-full border border-white/20">迈步向前</span>
@@ -270,7 +270,7 @@ export class LearnModule extends BaseModule {
         guide = "把美味草莓喂进小怪兽的大嘴巴里！";
         sceneHTML = `
           <div id="interactive-actor" class="relative flex flex-col items-center cursor-pointer group">
-            <div id="play-target-anim" class="w-40 h-40 rounded-3xl bg-pink-950 border-4 border-pink-400 shadow-[0_0_50px_rgba(233,30,99,0.8)] flex items-center justify-center text-7xl text-pink-200 font-black transition-all duration-1000">
+            <div id="play-target-anim" class="w-52 h-52 sm:w-60 sm:h-60 rounded-3xl bg-pink-950 border-4 border-pink-400 shadow-[0_0_50px_rgba(233,30,99,0.8)] flex items-center justify-center text-8xl sm:text-9xl text-pink-200 font-black transition-all duration-1000">
               ${char.oracleGlyph || "口"}
             </div>
             <span class="text-xs text-pink-200 mt-3 bg-black/40 px-3 py-1 rounded-full border border-white/20">喂食大口</span>
@@ -281,7 +281,7 @@ export class LearnModule extends BaseModule {
         guide = "轻抚大地唤醒春风，吹绿大树萌发嫩芽！";
         sceneHTML = `
           <div id="interactive-actor" class="relative flex flex-col items-center cursor-pointer group">
-            <div id="play-target-anim" class="w-40 h-40 rounded-3xl bg-emerald-700 border-4 border-emerald-300 shadow-[0_0_50px_rgba(16,185,129,0.8)] flex items-center justify-center text-7xl text-emerald-100 font-black transition-all duration-1000">
+            <div id="play-target-anim" class="w-52 h-52 sm:w-60 sm:h-60 rounded-3xl bg-emerald-700 border-4 border-emerald-300 shadow-[0_0_50px_rgba(16,185,129,0.8)] flex items-center justify-center text-8xl sm:text-9xl text-emerald-100 font-black transition-all duration-1000">
               ${char.oracleGlyph || "春"}
             </div>
             <span class="text-xs text-emerald-200 mt-3 bg-black/40 px-3 py-1 rounded-full border border-white/20">迎春拂晓</span>
@@ -292,7 +292,7 @@ export class LearnModule extends BaseModule {
         guide = "滚动雪球堆起可爱的冬日小雪人！";
         sceneHTML = `
           <div id="interactive-actor" class="relative flex flex-col items-center cursor-pointer group">
-            <div id="play-target-anim" class="w-40 h-40 rounded-3xl bg-sky-900 border-4 border-cyan-300 shadow-[0_0_50px_rgba(56,189,248,0.8)] flex items-center justify-center text-7xl text-sky-100 font-black transition-all duration-1000">
+            <div id="play-target-anim" class="w-52 h-52 sm:w-60 sm:h-60 rounded-3xl bg-sky-900 border-4 border-cyan-300 shadow-[0_0_50px_rgba(56,189,248,0.8)] flex items-center justify-center text-8xl sm:text-9xl text-sky-100 font-black transition-all duration-1000">
               ${char.oracleGlyph || "冬"}
             </div>
             <span class="text-xs text-sky-200 mt-3 bg-black/40 px-3 py-1 rounded-full border border-white/20">堆小雪人</span>
@@ -303,7 +303,7 @@ export class LearnModule extends BaseModule {
         guide = `点击神奇魔法光球，探索“${char.char}”字的古老起源！`;
         sceneHTML = `
           <div id="interactive-actor" class="relative flex flex-col items-center cursor-pointer group">
-            <div id="play-target-anim" class="w-40 h-40 rounded-3xl bg-gradient-to-tr from-amber-600 to-orange-500 border-4 border-amber-300 shadow-[0_0_50px_rgba(245,158,11,0.8)] flex items-center justify-center text-7xl text-white font-black transition-all duration-1000">
+            <div id="play-target-anim" class="w-52 h-52 sm:w-60 sm:h-60 rounded-3xl bg-gradient-to-tr from-amber-600 to-orange-500 border-4 border-amber-300 shadow-[0_0_50px_rgba(245,158,11,0.8)] flex items-center justify-center text-8xl sm:text-9xl text-white font-black transition-all duration-1000">
               ${char.oracleGlyph || char.char}
             </div>
             <span class="text-xs text-yellow-200 mt-3 bg-black/40 px-3 py-1 rounded-full border border-white/20">点击解密起源</span>
@@ -315,7 +315,7 @@ export class LearnModule extends BaseModule {
     soundAndFX.speakPriority(guide, { kind: "sentence", priority: 1 });
 
     stage.innerHTML = `
-      <div class="relative w-full max-w-4xl h-[480px] bg-gradient-to-b from-sky-400 via-amber-200 to-orange-300 rounded-3xl overflow-hidden shadow-2xl border-4 border-amber-300 flex flex-col items-center justify-between p-6 animate-fade-in text-center">
+      <div class="relative w-full max-w-5xl h-[520px] sm:h-[560px] bg-gradient-to-b from-sky-400 via-amber-200 to-orange-300 rounded-3xl overflow-hidden shadow-2xl border-4 border-amber-300 flex flex-col items-center justify-between p-6 animate-fade-in text-center">
         
         <!-- 顶部指引横幅 -->
         <div class="relative z-20 bg-black/60 backdrop-blur-md text-yellow-300 border-2 border-yellow-400 font-black text-sm px-6 py-2 rounded-full shadow-2xl animate-bounce-slow">
@@ -333,21 +333,21 @@ export class LearnModule extends BaseModule {
             <div class="flex items-center gap-6 my-4">
               <div class="flex flex-col items-center">
                 <span class="text-xs text-yellow-300 font-bold mb-1">1. 甲骨文</span>
-                <div class="w-20 h-20 rounded-2xl bg-amber-100 text-amber-950 flex items-center justify-center text-3xl font-black shadow-inner border-2 border-amber-300">
+                <div class="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl bg-amber-100 text-amber-950 flex items-center justify-center text-5xl sm:text-6xl font-black shadow-inner border-2 border-amber-300">
                   ${char.oracleGlyph || char.char}
                 </div>
               </div>
               <span class="text-2xl text-orange-400 font-black">-&gt;</span>
               <div class="flex flex-col items-center">
                 <span class="text-xs text-yellow-300 font-bold mb-1">2. 小篆</span>
-                <div class="w-20 h-20 rounded-2xl bg-amber-200 text-amber-950 flex items-center justify-center text-3xl font-black shadow-inner border-2 border-amber-400">
+                <div class="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl bg-amber-200 text-amber-950 flex items-center justify-center text-5xl sm:text-6xl font-black shadow-inner border-2 border-amber-400">
                   ${char.bronzeGlyph || char.char}
                 </div>
               </div>
               <span class="text-2xl text-orange-400 font-black">-&gt;</span>
               <div class="flex flex-col items-center">
                 <span class="text-xs text-yellow-300 font-bold mb-1">3. 楷体规范字</span>
-                <div class="w-24 h-24 rounded-3xl bg-gradient-to-tr from-yellow-400 to-orange-500 text-white flex items-center justify-center text-5xl font-black shadow-2xl border-4 border-white animate-pulse">
+                <div class="w-32 h-32 sm:w-36 sm:h-36 rounded-3xl bg-gradient-to-tr from-yellow-400 to-orange-500 text-white flex items-center justify-center text-7xl sm:text-8xl font-black shadow-2xl border-4 border-white animate-pulse">
                   ${char.char}
                 </div>
               </div>
@@ -401,7 +401,7 @@ export class LearnModule extends BaseModule {
     soundAndFX.speakPriority(`认一认：“${char.char}”，拼音读作 ${char.pinyin}。点击大字听发音！`, { kind: "sentence", emotion: "gentle" });
 
     stage.innerHTML = `
-      <div class="relative w-full max-w-4xl h-[480px] bg-gradient-to-b from-purple-900 via-indigo-900 to-slate-950 rounded-3xl overflow-hidden shadow-2xl border-4 border-amber-300 flex items-center justify-between p-8 animate-fade-in select-none">
+      <div class="relative w-full max-w-5xl h-[520px] sm:h-[560px] bg-gradient-to-b from-purple-900 via-indigo-900 to-slate-950 rounded-3xl overflow-hidden shadow-2xl border-4 border-amber-300 flex items-center justify-between p-8 animate-fade-in select-none">
         
         <!-- 左侧：3D 果冻大字交互展示 -->
         <div class="flex-1 flex flex-col items-center justify-center">
@@ -409,7 +409,7 @@ export class LearnModule extends BaseModule {
             ${char.pinyin}
           </div>
 
-          <button id="btn-jelly-char" class="relative group w-48 h-48 rounded-3xl bg-gradient-to-tr from-amber-400 via-orange-500 to-yellow-300 border-4 border-white shadow-[0_0_60px_rgba(255,160,0,0.8)] flex items-center justify-center text-8xl font-black text-white active:scale-90 transition-transform cursor-pointer animate-bounce-cathy">
+          <button id="btn-jelly-char" class="relative group w-56 h-56 sm:w-64 sm:h-64 rounded-3xl bg-gradient-to-tr from-amber-400 via-orange-500 to-yellow-300 border-4 border-white shadow-[0_0_60px_rgba(255,160,0,0.8)] flex items-center justify-center text-9xl sm:text-[10rem] font-black text-white active:scale-90 transition-transform cursor-pointer animate-bounce-cathy">
             ${char.char}
             <div class="absolute -bottom-2 bg-amber-900 text-yellow-200 text-[10px] font-black px-3 py-0.5 rounded-full border border-yellow-400">
               点击发音 ${window.GAME_ICONS ? window.GAME_ICONS.speaker("w-4 h-4 inline-block") : ""}
@@ -423,10 +423,10 @@ export class LearnModule extends BaseModule {
         </div>
 
         <!-- 右侧：词语百宝箱与生活例句卡 -->
-        <div class="w-80 flex flex-col justify-between h-full bg-white/10 backdrop-blur-md rounded-3xl p-6 border-2 border-white/30">
+        <div class="w-88 sm:w-96 flex flex-col justify-between h-full bg-white/10 backdrop-blur-md rounded-3xl p-6 border-2 border-white/30">
           <div>
             <h3 class="text-xs font-black text-yellow-300 mb-3 flex items-center gap-1.5">
-              <span class="flex items-center">${GAME_ICONS.chest()}</span>
+              <span class="flex items-center">${GAME_ICONS.chest("w-28 h-28 sm:w-36 sm:h-36")}</span>
               <span>常用词语拓展：</span>
             </h3>
             
@@ -507,7 +507,7 @@ export class LearnModule extends BaseModule {
     soundAndFX.speakPriority(`读一读：“${char.char}”，点击麦克风大声朗读！`, { kind: "sentence", emotion: "gentle" });
 
     stage.innerHTML = `
-      <div class="relative w-full max-w-4xl h-[480px] bg-gradient-to-b from-indigo-950 via-purple-900 to-slate-950 rounded-3xl overflow-hidden shadow-2xl border-4 border-sky-300 flex items-center justify-between p-8 animate-fade-in select-none">
+      <div class="relative w-full max-w-5xl h-[520px] sm:h-[560px] bg-gradient-to-b from-indigo-950 via-purple-900 to-slate-950 rounded-3xl overflow-hidden shadow-2xl border-4 border-sky-300 flex items-center justify-between p-8 animate-fade-in select-none">
         
         <!-- 左侧：3D 果冻字卡与示范发音台 -->
         <div class="flex-1 flex flex-col items-center justify-center pr-6 border-r border-white/10">
@@ -515,7 +515,7 @@ export class LearnModule extends BaseModule {
             ${char.pinyin}
           </div>
 
-          <button id="read-char-circle" class="relative group w-44 h-44 rounded-3xl bg-gradient-to-tr from-sky-400 via-blue-500 to-indigo-600 border-4 border-white shadow-[0_0_50px_rgba(56,189,248,0.7)] flex items-center justify-center text-8xl font-black text-white active:scale-95 transition-all cursor-pointer animate-bounce-cathy" title="点击听示范发音">
+          <button id="read-char-circle" class="relative group w-52 h-52 sm:w-60 sm:h-60 rounded-3xl bg-gradient-to-tr from-sky-400 via-blue-500 to-indigo-600 border-4 border-white shadow-[0_0_50px_rgba(56,189,248,0.7)] flex items-center justify-center text-9xl sm:text-[10rem] font-black text-white active:scale-95 transition-all cursor-pointer animate-bounce-cathy" title="点击听示范发音">
             ${char.char}
             <div class="absolute -bottom-2.5 bg-blue-950 text-sky-200 text-[10px] font-black px-3.5 py-0.5 rounded-full border border-sky-400 flex items-center gap-1 shadow-md">
               <span>示范发音</span>
@@ -561,7 +561,7 @@ export class LearnModule extends BaseModule {
                 </svg>
 
                 <!-- 麦克风核心主按钮 -->
-                <button id="btn-start-record" class="relative z-10 w-24 h-24 rounded-full bg-gradient-to-tr from-rose-500 via-red-500 to-orange-400 shadow-[0_10px_30px_rgba(244,63,94,0.7)] flex items-center justify-center border-4 border-white active:scale-90 transition-all hover:scale-105 cursor-pointer">
+                <button id="btn-start-record" class="relative z-10 w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-gradient-to-tr from-rose-500 via-red-500 to-orange-400 shadow-[0_10px_30px_rgba(244,63,94,0.7)] flex items-center justify-center border-4 border-white active:scale-90 transition-all hover:scale-105 cursor-pointer">
                   <div id="mic-icon-wrapper" class="w-12 h-12 text-white flex items-center justify-center pointer-events-none">
                     ${window.GAME_ICONS ? window.GAME_ICONS.audio("w-12 h-12") : ""}
                   </div>
@@ -861,7 +861,7 @@ export class LearnModule extends BaseModule {
         svgRing?.classList.add("hidden");
         audioCue?.classList.add("hidden");
         if (btnRecord) {
-          btnRecord.className = "relative z-10 w-24 h-24 rounded-full bg-gradient-to-tr from-rose-500 via-red-500 to-orange-400 shadow-[0_10px_30px_rgba(244,63,94,0.7)] flex items-center justify-center border-4 border-white active:scale-90 transition-all hover:scale-105 cursor-pointer";
+          btnRecord.className = "relative z-10 w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-gradient-to-tr from-rose-500 via-red-500 to-orange-400 shadow-[0_10px_30px_rgba(244,63,94,0.7)] flex items-center justify-center border-4 border-white active:scale-90 transition-all hover:scale-105 cursor-pointer";
         }
         try {
           const res = await pe.stopAndEvaluate();
@@ -958,7 +958,7 @@ export class LearnModule extends BaseModule {
     soundAndFX.speakPriority(`瞄准射击！请击中带有“${char.char}”字的太空发光气球！`, { kind: "sentence", emotion: "excited" });
 
     stage.innerHTML = `
-      <div class="relative w-full max-w-4xl h-[480px] bg-gradient-to-b from-slate-950 via-indigo-950 to-slate-900 rounded-3xl overflow-hidden shadow-2xl border-4 border-amber-300 flex flex-col justify-between p-6 animate-fade-in select-none">
+      <div class="relative w-full max-w-5xl h-[520px] sm:h-[560px] bg-gradient-to-b from-slate-950 via-indigo-950 to-slate-900 rounded-3xl overflow-hidden shadow-2xl border-4 border-amber-300 flex flex-col justify-between p-6 animate-fade-in select-none">
         
         <div class="w-full flex items-center justify-between bg-black/60 px-6 py-2.5 rounded-full border border-white/30 text-white">
           <div class="flex items-center gap-2 text-xs font-black text-yellow-300">
@@ -975,10 +975,10 @@ export class LearnModule extends BaseModule {
           ${(char.gameConfig && char.gameConfig.options ? char.gameConfig.options : [char.char, "月", "山"])
             .map(
               (opt, idx) => `
-            <button class="balloon-target-btn relative group w-28 h-36 rounded-full bg-gradient-to-t from-orange-600 via-amber-400 to-yellow-200 border-4 border-white shadow-[0_0_30px_rgba(255,160,0,0.6)] flex flex-col items-center justify-center active:scale-75 transition-all duration-300 animate-bounce-slow cursor-pointer" style="animation-delay: ${
+            <button class="balloon-target-btn relative group w-32 h-44 sm:w-40 sm:h-52 rounded-full bg-gradient-to-t from-orange-600 via-amber-400 to-yellow-200 border-4 border-white shadow-[0_0_30px_rgba(255,160,0,0.6)] flex flex-col items-center justify-center active:scale-75 transition-all duration-300 animate-bounce-slow cursor-pointer" style="animation-delay: ${
               idx * 0.3
             }s" data-char="${opt}">
-              <span class="text-5xl font-black text-amber-950 drop-shadow">${opt}</span>
+              <span class="text-6xl sm:text-7xl font-black text-amber-950 drop-shadow">${opt}</span>
               <div class="w-1.5 h-12 bg-white/40 absolute -bottom-10 rounded-full"></div>
             </button>
           `
@@ -1058,10 +1058,10 @@ export class LearnModule extends BaseModule {
     soundAndFX.speakPriority(`魔法毛笔描红！请从发光起点开始，按照笔顺书写“${char.char}”字！`, { kind: "sentence", priority: 1 });
 
     stage.innerHTML = `
-      <div class="relative w-full max-w-4xl h-[480px] bg-gradient-to-b from-amber-50 via-orange-50 to-amber-100 rounded-3xl overflow-hidden shadow-2xl border-4 border-amber-300 flex items-center justify-between p-8 animate-fade-in">
+      <div class="relative w-full max-w-5xl h-[520px] sm:h-[560px] bg-gradient-to-b from-amber-50 via-orange-50 to-amber-100 rounded-3xl overflow-hidden shadow-2xl border-4 border-amber-300 flex items-center justify-between p-8 animate-fade-in">
         
         <div class="flex-1 flex flex-col items-center justify-center">
-          <div class="relative w-[340px] h-[340px] rounded-3xl overflow-hidden shadow-2xl border-4 border-amber-400 bg-white">
+          <div class="relative w-[360px] h-[360px] sm:w-[400px] sm:h-[400px] rounded-3xl overflow-hidden shadow-2xl border-4 border-amber-400 bg-white">
             <canvas id="hanzi-magic-canvas" class="w-full h-full cursor-crosshair"></canvas>
           </div>
         </div>
@@ -1083,7 +1083,7 @@ export class LearnModule extends BaseModule {
             </button>
 
             <button id="btn-finish-write-step" class="w-full bg-gradient-to-r from-orange-500 to-amber-500 text-white font-black text-sm py-3.5 rounded-full shadow-xl border border-white active:scale-95 transition-all flex items-center justify-center gap-2 hidden animate-bounce-slow">
-              <span class="flex items-center">${GAME_ICONS.chest()}</span>
+              <span class="flex items-center">${GAME_ICONS.chest("w-28 h-28 sm:w-36 sm:h-36")}</span>
               <span>书写满分！去开宝箱 </span>
             </button>
           </div>
@@ -1125,26 +1125,26 @@ export class LearnModule extends BaseModule {
     const char = this.charData;
 
     stage.innerHTML = `
-      <div class="relative w-full max-w-4xl h-[480px] bg-gradient-to-b from-purple-950 via-indigo-950 to-purple-900 rounded-3xl overflow-hidden shadow-2xl border-4 border-amber-300 flex flex-col items-center justify-center p-8 animate-fade-in text-center text-white">
+      <div class="relative w-full max-w-5xl h-[520px] sm:h-[560px] bg-gradient-to-b from-purple-950 via-indigo-950 to-purple-900 rounded-3xl overflow-hidden shadow-2xl border-4 border-amber-300 flex flex-col items-center justify-center p-8 animate-fade-in text-center text-white">
         
         <div id="golden-chest-stage" class="flex flex-col items-center">
           
           <!-- 三颗金色大星槽 (Duang! Duang! Duang!) -->
           <div class="flex items-center gap-4 mb-4">
-            <div id="star-slot-1" class="w-14 h-14 rounded-full bg-white/10 border-2 border-white/30 flex items-center justify-center transition-all duration-500">
+            <div id="star-slot-1" class="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-white/10 border-2 border-white/30 flex items-center justify-center transition-all duration-500">
               <span class="flex items-center">${GAME_ICONS.star(false)}</span>
             </div>
-            <div id="star-slot-2" class="w-16 h-16 rounded-full bg-white/10 border-2 border-white/30 flex items-center justify-center -translate-y-2 transition-all duration-500">
+            <div id="star-slot-2" class="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-white/10 border-2 border-white/30 flex items-center justify-center -translate-y-2 transition-all duration-500">
               <span class="flex items-center">${GAME_ICONS.star(false)}</span>
             </div>
-            <div id="star-slot-3" class="w-14 h-14 rounded-full bg-white/10 border-2 border-white/30 flex items-center justify-center transition-all duration-500">
+            <div id="star-slot-3" class="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-white/10 border-2 border-white/30 flex items-center justify-center transition-all duration-500">
               <span class="flex items-center">${GAME_ICONS.star(false)}</span>
             </div>
           </div>
 
           <!-- 黄金大宝箱 (点击开启) -->
-          <button id="btn-open-golden-chest" class="group relative w-36 h-36 rounded-3xl bg-gradient-to-tr from-amber-400 via-yellow-300 to-amber-600 border-4 border-white shadow-[0_0_60px_rgba(255,235,59,0.8)] flex items-center justify-center active:scale-90 transition-transform cursor-pointer animate-bounce-slow">
-            <span class="flex items-center">${GAME_ICONS.chest()}</span>
+          <button id="btn-open-golden-chest" class="group relative w-48 h-48 sm:w-56 sm:h-56 rounded-3xl bg-gradient-to-tr from-amber-400 via-yellow-300 to-amber-600 border-4 border-white shadow-[0_0_60px_rgba(255,235,59,0.8)] flex items-center justify-center active:scale-90 transition-transform cursor-pointer animate-bounce-slow">
+            <span class="flex items-center">${GAME_ICONS.chest("w-28 h-28 sm:w-36 sm:h-36")}</span>
             <div class="absolute -bottom-3 bg-red-600 text-white font-black text-xs px-4 py-1 rounded-full shadow-lg border border-white">
               点击开启通关宝箱！
             </div>
@@ -1156,7 +1156,7 @@ export class LearnModule extends BaseModule {
         </div>
 
         <div id="chest-reward-card" class="absolute inset-0 bg-black/85 backdrop-blur-md rounded-3xl p-8 flex flex-col items-center justify-center text-white hidden animate-scale-up z-30">
-          <div class="w-24 h-24 rounded-3xl bg-gradient-to-tr from-orange-500 to-amber-400 border-4 border-white text-6xl font-black flex items-center justify-center shadow-2xl mb-4 animate-bounce-cathy">
+          <div class="w-32 h-32 sm:w-40 sm:h-40 rounded-3xl bg-gradient-to-tr from-orange-500 to-amber-400 border-4 border-white text-7xl sm:text-8xl font-black flex items-center justify-center shadow-2xl mb-4 animate-bounce-cathy">
             ${char.char}
           </div>
 

@@ -196,21 +196,21 @@ export class PlayModule extends BaseModule {
           </div>
         </div>
 
-        <!-- 四大游乐场模块入口卡片 -->
+        <!-- 四大游乐场模块入口卡片 (巨幅 3D 视觉大图标) -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
           
           <!-- 1. 难字歼灭战 -->
           <div class="mode-card group bg-white/95 backdrop-blur-md rounded-3xl p-6 shadow-xl border-4 border-rose-200 hover:border-rose-400 cursor-pointer transition-all duration-300 hover:scale-105 flex flex-col justify-between" data-mode="boss">
             <div>
-              <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-rose-500 to-red-400 text-white flex items-center justify-center shadow-lg mb-4">
-                ${GAME_ICONS.monster()}
+              <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-3xl bg-gradient-to-tr from-rose-500 to-red-400 text-white flex items-center justify-center shadow-lg mb-4">
+                ${GAME_ICONS.monster("w-10 h-10 sm:w-12 sm:h-12")}
               </div>
-              <h3 class="text-lg font-black text-gray-900 group-hover:text-rose-600 transition-colors">难字歼灭战</h3>
+              <h3 class="text-xl font-black text-gray-900 group-hover:text-rose-600 transition-colors">难字歼灭战</h3>
               <p class="text-xs text-gray-500 mt-1.5 leading-relaxed font-semibold">
                 针对艾宾浩斯遗忘曲线薄弱生字，挑战 Boss 怪兽！
               </p>
             </div>
-            <button class="mt-4 bg-gradient-to-r from-rose-500 to-red-500 text-white text-xs font-black py-2.5 rounded-full shadow-md active:scale-95 transition-transform flex items-center justify-center gap-1.5">
+            <button class="mt-4 bg-gradient-to-r from-rose-500 to-red-500 text-white text-xs sm:text-sm font-black py-3 rounded-full shadow-md active:scale-95 transition-transform flex items-center justify-center gap-1.5 cursor-pointer">
               <span>进入挑战</span>
             </button>
           </div>
@@ -218,15 +218,15 @@ export class PlayModule extends BaseModule {
           <!-- 2. 汉字消消乐 -->
           <div class="mode-card group bg-white/95 backdrop-blur-md rounded-3xl p-6 shadow-xl border-4 border-amber-200 hover:border-amber-400 cursor-pointer transition-all duration-300 hover:scale-105 flex flex-col justify-between" data-mode="match">
             <div>
-              <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-amber-500 to-yellow-400 text-white flex items-center justify-center shadow-lg mb-4">
-                ${GAME_ICONS.gem()}
+              <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-3xl bg-gradient-to-tr from-amber-500 to-yellow-400 text-white flex items-center justify-center shadow-lg mb-4">
+                ${GAME_ICONS.gem("w-10 h-10 sm:w-12 sm:h-12")}
               </div>
-              <h3 class="text-lg font-black text-gray-900 group-hover:text-amber-600 transition-colors">汉字消消乐</h3>
+              <h3 class="text-xl font-black text-gray-900 group-hover:text-amber-600 transition-colors">汉字消消乐</h3>
               <p class="text-xs text-gray-500 mt-1.5 leading-relaxed font-semibold">
                 听音辨形，拼音与汉字 3D 翻转对对碰快速消除
               </p>
             </div>
-            <button class="mt-4 bg-gradient-to-r from-amber-500 to-yellow-500 text-white text-xs font-black py-2.5 rounded-full shadow-md active:scale-95 transition-transform flex items-center justify-center gap-1.5">
+            <button class="mt-4 bg-gradient-to-r from-amber-500 to-yellow-500 text-white text-xs sm:text-sm font-black py-3 rounded-full shadow-md active:scale-95 transition-transform flex items-center justify-center gap-1.5 cursor-pointer">
               <span>开始消除</span>
             </button>
           </div>
@@ -234,15 +234,15 @@ export class PlayModule extends BaseModule {
           <!-- 3. 双人竞技场 -->
           <div class="mode-card group bg-white/95 backdrop-blur-md rounded-3xl p-6 shadow-xl border-4 border-blue-200 hover:border-blue-400 cursor-pointer transition-all duration-300 hover:scale-105 flex flex-col justify-between" data-mode="pk">
             <div>
-              <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-blue-500 to-cyan-400 text-white flex items-center justify-center shadow-lg mb-4">
-                ${GAME_ICONS.pen()}
+              <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-3xl bg-gradient-to-tr from-blue-500 to-cyan-400 text-white flex items-center justify-center shadow-lg mb-4">
+                ${GAME_ICONS.swords("w-10 h-10 sm:w-12 sm:h-12")}
               </div>
-              <h3 class="text-lg font-black text-gray-900 group-hover:text-blue-600 transition-colors">双人竞技场</h3>
+              <h3 class="text-xl font-black text-gray-900 group-hover:text-blue-600 transition-colors">双人竞技场</h3>
               <p class="text-xs text-gray-500 mt-1.5 leading-relaxed font-semibold">
                 双人同屏/人机对战，听发音抢拍气球比拼手速！
               </p>
             </div>
-            <button class="mt-4 bg-gradient-to-r from-blue-500 to-cyan-500 text-white text-xs font-black py-2.5 rounded-full shadow-md active:scale-95 transition-transform flex items-center justify-center gap-1.5">
+            <button class="mt-4 bg-gradient-to-r from-blue-500 to-cyan-500 text-white text-xs sm:text-sm font-black py-3 rounded-full shadow-md active:scale-95 transition-transform flex items-center justify-center gap-1.5 cursor-pointer">
               <span>发起对决</span>
             </button>
           </div>
@@ -250,15 +250,15 @@ export class PlayModule extends BaseModule {
           <!-- 4. 成语国学馆 -->
           <div class="mode-card group bg-white/95 backdrop-blur-md rounded-3xl p-6 shadow-xl border-4 border-emerald-200 hover:border-emerald-400 cursor-pointer transition-all duration-300 hover:scale-105 flex flex-col justify-between" data-mode="idiom">
             <div>
-              <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-emerald-500 to-green-400 text-white flex items-center justify-center shadow-lg mb-4">
-                ${GAME_ICONS.book()}
+              <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-3xl bg-gradient-to-tr from-emerald-500 to-green-400 text-white flex items-center justify-center shadow-lg mb-4">
+                ${GAME_ICONS.scroll("w-10 h-10 sm:w-12 sm:h-12")}
               </div>
-              <h3 class="text-lg font-black text-gray-900 group-hover:text-emerald-600 transition-colors">成语国学馆</h3>
+              <h3 class="text-xl font-black text-gray-900 group-hover:text-emerald-600 transition-colors">成语国学馆</h3>
               <p class="text-xs text-gray-500 mt-1.5 leading-relaxed font-semibold">
-                50+ 经典成语趣味微课堂生动典故与互动小问答
+                80+ 经典成语趣味微课堂生动典故与互动小问答
               </p>
             </div>
-            <button class="mt-4 bg-gradient-to-r from-emerald-500 to-green-500 text-white text-xs font-black py-2.5 rounded-full shadow-md active:scale-95 transition-transform flex items-center justify-center gap-1.5">
+            <button class="mt-4 bg-gradient-to-r from-emerald-500 to-green-500 text-white text-xs sm:text-sm font-black py-3 rounded-full shadow-md active:scale-95 transition-transform flex items-center justify-center gap-1.5 cursor-pointer">
               <span>探索国学</span>
             </button>
           </div>

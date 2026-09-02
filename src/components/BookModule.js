@@ -229,8 +229,8 @@ export class BookModule extends BaseModule {
               isRead ? "border-amber-400 ring-2 ring-amber-300/40" : "border-amber-200/80 hover:border-orange-400"
             } transition-all duration-300 hover:-translate-y-1.5 hover:shadow-2xl cursor-pointer flex flex-col justify-between" data-book-id="${book.id}">
               
-              <!--  -->
-              <div class="relative w-full h-44 overflow-hidden bg-amber-100">
+              <!-- 绘本封面图 (16:10 黄金画册比例) -->
+              <div class="relative w-full aspect-[16/10] overflow-hidden bg-amber-100 rounded-t-3xl">
                 <img src="${book.coverImg}" alt="${book.title}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                 
                 <!--  -->

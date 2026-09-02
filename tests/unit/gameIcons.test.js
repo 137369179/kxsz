@@ -16,14 +16,16 @@ describe('GAME_ICONS 3D Image Icon Library', () => {
     expect(typeof GAME_ICONS.gem).toBe('function');
     expect(typeof GAME_ICONS.mic).toBe('function');
     expect(typeof GAME_ICONS.scroll).toBe('function');
+    expect(typeof GAME_ICONS.check).toBe('function');
+    expect(typeof GAME_ICONS.islandSpace).toBe('function');
   });
 
-  it('should render <img> tags with webp sources and never render <svg>', () => {
-    const keys = ['star', 'coin', 'trophy', 'chest', 'swords', 'bell', 'brush', 'compass', 'crown', 'gem', 'mic', 'scroll'];
+  it('should render <img> tags with raster image sources (webp/png/gif) and never render <svg>', () => {
+    const keys = ['star', 'coin', 'trophy', 'chest', 'swords', 'bell', 'brush', 'compass', 'crown', 'gem', 'mic', 'scroll', 'check', 'islandSpace'];
     for (const key of keys) {
       const html = GAME_ICONS[key]();
       expect(html).toContain('<img');
-      expect(html).toContain('.webp');
+      expect(/\.(webp|png|gif)/.test(html)).toBe(true);
       expect(html).not.toContain('<svg');
       expect(html).not.toContain('</svg>');
     }

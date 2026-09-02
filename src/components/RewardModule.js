@@ -220,15 +220,15 @@ export class RewardModule extends BaseModule {
 
     const shop = getShopData();
 
-    const previewCircle = (item, size = "w-16 h-16 text-3xl") => {
+    const previewCircle = (item, size = "w-14 h-14 sm:w-16 sm:h-16") => {
       const frameCls = item.type === "frame" ? item.frameClass : "";
       const inner =
         item.type === "avatar"
           ? item.icon
-            ? `<img src="${item.icon}" class="w-full h-full rounded-full object-cover" />`
-            : `<div class="w-10 h-10">${GAME_ICONS.cards()}</div>`
-          : `<span class="text-3xl"></span>`;
-      return `<div class="rounded-full bg-amber-50 flex items-center justify-center overflow-hidden ${size} ${frameCls}">${inner}</div>`;
+            ? `<img src="${item.icon}" class="w-full h-full rounded-full object-cover shrink-0" alt="${item.name}" />`
+            : `<div class="w-8 h-8">${GAME_ICONS.cards()}</div>`
+          : `<span class="text-2xl font-black text-amber-600">框</span>`;
+      return `<div class="rounded-full bg-amber-50 flex items-center justify-center overflow-hidden aspect-square shrink-0 ${size} ${frameCls}">${inner}</div>`;
     };
 
     const card = (item) => {
