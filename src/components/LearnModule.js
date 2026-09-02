@@ -584,10 +584,27 @@ export class LearnModule extends BaseModule {
                 听到声音啦，继续读！
               </div>
 
+              <!-- 实时语音识别转写文本 -->
+              <div id="record-interim-text" class="mt-2 text-xs font-black text-emerald-300 h-5 transition-opacity duration-300 opacity-0"></div>
+
               <!-- 动态状态提示文字 -->
               <div id="record-status" class="mt-2 text-xs font-black text-rose-200 tracking-wider">
                 点击开始录音
               </div>
+
+              <!-- 错误提示（权限拒绝等） -->
+              <div id="record-error-text" class="mt-2 text-xs font-black text-rose-300 hidden"></div>
+            </div>
+
+            <!-- 无 ASR 环境手动评分面板 (Safari / 不支持语音识别) -->
+            <div id="manual-rating-panel" class="hidden flex flex-col items-center justify-center w-full py-4 animate-fade-in">
+              <p class="text-xs text-sky-100 font-bold mb-3 leading-relaxed">当前浏览器不支持语音识别<br/>请给自己打分吧！</p>
+              <div id="manual-stars-row" class="flex items-center gap-3">
+                <button class="manual-star-btn text-4xl transition-transform hover:scale-110 active:scale-90 cursor-pointer" data-stars="1">⭐</button>
+                <button class="manual-star-btn text-5xl transition-transform hover:scale-110 active:scale-90 cursor-pointer" data-stars="2">⭐</button>
+                <button class="manual-star-btn text-4xl transition-transform hover:scale-110 active:scale-90 cursor-pointer" data-stars="3">⭐</button>
+              </div>
+              <p id="manual-rating-status" class="mt-2 text-xs font-black text-yellow-300 h-5"></p>
             </div>
 
             <!-- 评测结果展示区 (默认隐藏，打分后显现) -->
@@ -696,20 +713,28 @@ export class LearnModule extends BaseModule {
       });
     }
 
-    // 重新录制
+    // 重新录制 / 重新评分
     if (retryRecordBtn) {
       this._on(retryRecordBtn, "click", () => {
         soundAndFX.playPop();
         const resultBox = stage.querySelector("#read-result-box");
         const micZone = stage.querySelector("#mic-interaction-zone");
+        const manualPanel = stage.querySelector("#manual-rating-panel");
         const statusTxt = stage.querySelector("#record-status");
+        const asrSupported = pe && typeof pe.isSupported === "function" && pe.isSupported();
         if (resultBox) resultBox.classList.add("hidden");
-        if (micZone) micZone.classList.remove("hidden");
-        if (statusTxt) {
-          statusTxt.textContent = "点击开始录音";
-          statusTxt.className = "mt-2 text-xs font-black text-rose-200 tracking-wider";
+        if (asrSupported) {
+          if (micZone) micZone.classList.remove("hidden");
+          if (manualPanel) manualPanel.classList.add("hidden");
+          if (statusTxt) {
+            statusTxt.textContent = "点击开始录音";
+            statusTxt.className = "mt-2 text-xs font-black text-rose-200 tracking-wider";
+          }
+          this.executeRecordToggle(stage);
+        } else {
+          if (micZone) micZone.classList.add("hidden");
+          if (manualPanel) manualPanel.classList.remove("hidden");
         }
-        this.executeRecordToggle(stage);
       });
     }
 
@@ -726,6 +751,48 @@ export class LearnModule extends BaseModule {
         }, 500);
       });
     }
+
+    // ASR 可用性检测：不支持时展示手动三星评分面板
+    const pe = pronunciationEval || window.pronunciationEval;
+    const asrSupported = pe && typeof pe.isSupported === "function" && pe.isSupported();
+    const micZone = stage.querySelector("#mic-interaction-zone");
+    const manualPanel = stage.querySelector("#manual-rating-panel");
+    const panelTitle = stage.querySelector("#read-panel-title");
+
+    if (!asrSupported) {
+      if (micZone) micZone.classList.add("hidden");
+      if (manualPanel) manualPanel.classList.remove("hidden");
+      if (panelTitle) panelTitle.innerHTML = `<span>${window.GAME_ICONS ? window.GAME_ICONS.star("w-4 h-4 inline-block") : "⭐"} 手动发音自评</span>`;
+      this._bindManualRating(stage);
+    } else {
+      if (manualPanel) manualPanel.classList.add("hidden");
+    }
+  }
+
+  /**
+   * 绑定手动三星评分（Safari / 无 ASR 环境）
+   */
+  _bindManualRating(stage) {
+    const pe = pronunciationEval || window.pronunciationEval;
+    const starsRow = stage.querySelector("#manual-stars-row");
+    const status = stage.querySelector("#manual-rating-status");
+    if (!starsRow || !pe) return;
+
+    starsRow.querySelectorAll(".manual-star-btn").forEach((btn) => {
+      this._on(btn, "click", () => {
+        const stars = parseInt(btn.dataset.stars, 10);
+        soundAndFX.playPop();
+        starsRow.querySelectorAll(".manual-star-btn").forEach((b, idx) => {
+          b.classList.toggle("grayscale", idx + 1 > stars);
+          b.classList.toggle("opacity-50", idx + 1 > stars);
+        });
+        if (status) status.textContent = `${stars} 颗星！`;
+
+        const char = this.charData;
+        const res = pe.manualEvaluate({ text: char.char, stars });
+        this._timeout(() => this._showEvalResult(stage, res), 300);
+      });
+    });
   }
 
   /**
@@ -786,10 +853,34 @@ export class LearnModule extends BaseModule {
       statusTxt.className = "mt-2 text-xs font-black text-yellow-300 animate-pulse";
     }
 
+    let started = false;
     try {
-      await pe.startEvaluation({ text: char.char, mode: "char" });
+      const startRes = await pe.startEvaluation({
+        text: char.char,
+        mode: "char",
+        maxDurationMs: 3200,
+        silenceTimeoutMs: 2500,
+        onResult: ({ transcript, isFinal }) => {
+          const interim = stage.querySelector("#record-interim-text");
+          if (interim) {
+            interim.textContent = isFinal ? "" : `识别到：${transcript}`;
+            interim.classList.toggle("opacity-0", !transcript || isFinal);
+          }
+        }
+      });
+      started = startRes && startRes.ok;
+      if (!started) {
+        this._showRecordError(stage, startRes?.reason || "start_failed");
+        this._resetRecordUI(stage);
+        this._isRecordingTransition = false;
+        return;
+      }
     } catch (e) {
       console.warn("[LearnModule] startEvaluation error:", e);
+      this._showRecordError(stage, "exception");
+      this._resetRecordUI(stage);
+      this._isRecordingTransition = false;
+      return;
     }
     this._isRecordingTransition = false;
 
@@ -869,6 +960,53 @@ export class LearnModule extends BaseModule {
         } catch (e) {}
       }
     }, totalDuration);
+  }
+
+  /**
+   * 录音错误提示
+   */
+  _showRecordError(stage, reason) {
+    const errorTxt = stage.querySelector("#record-error-text");
+    const statusTxt = stage.querySelector("#record-status");
+    const messages = {
+      mic_permission_denied: "麦克风权限被拒绝，请在浏览器设置中允许访问麦克风",
+      asr_permission_denied: "语音识别权限被拒绝",
+      start_failed: "录音启动失败，请重试",
+      exception: "录音遇到异常，请重试",
+      already_running: "正在录音中，请勿重复点击",
+    };
+    const msg = messages[reason] || "录音遇到异常，请重试";
+    if (errorTxt) {
+      errorTxt.textContent = msg;
+      errorTxt.classList.remove("hidden");
+    }
+    if (statusTxt) {
+      statusTxt.textContent = "录音未启动";
+      statusTxt.className = "mt-2 text-xs font-black text-rose-200 tracking-wider";
+    }
+  }
+
+  /**
+   * 重置录音 UI 到初始态
+   */
+  _resetRecordUI(stage) {
+    const btnRecord = stage.querySelector("#btn-start-record");
+    const ripples = stage.querySelector("#mic-wave-ripples");
+    const volBars = stage.querySelector("#record-vol-bars");
+    const svgRing = stage.querySelector("#record-svg-ring");
+    const audioCue = stage.querySelector("#record-audio-cue");
+    const interim = stage.querySelector("#record-interim-text");
+    const errorTxt = stage.querySelector("#record-error-text");
+
+    if (btnRecord) {
+      btnRecord.className = "relative z-10 w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-gradient-to-tr from-rose-500 via-red-500 to-orange-400 shadow-[0_10px_30px_rgba(244,63,94,0.7)] flex items-center justify-center border-4 border-white active:scale-90 transition-all hover:scale-105 cursor-pointer";
+    }
+    ripples?.classList.add("hidden");
+    volBars?.classList.add("hidden");
+    svgRing?.classList.add("hidden");
+    audioCue?.classList.add("hidden");
+    interim?.classList.add("opacity-0");
+    errorTxt?.classList.add("hidden");
   }
 
   /**

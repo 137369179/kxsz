@@ -149,7 +149,7 @@ export class MapModule extends BaseModule {
             <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/30 pointer-events-none"></div>
 
             <!-- S型蜿蜒关卡节点序列 (3D浮岛与光路连线) -->
-            <div class="relative z-10 flex items-center gap-16 px-24">
+            <div class="relative z-10 flex items-center justify-center gap-12 px-12">
               ${displayChars
                 .map((charItem, index) => {
                   const record = progress.charRecords[charItem.id];
@@ -161,19 +161,22 @@ export class MapModule extends BaseModule {
                   const yOffset = Math.sin(index * 0.8) * 40;
 
                   return `
-                  <div class="relative flex flex-col items-center justify-center group level-node cursor-pointer transition-transform duration-300 hover:scale-125" style="transform: translateY(${yOffset}px)" data-char-id="${charItem.id}">
+                  <div class="relative flex flex-col items-center justify-center group level-node${isCurrent ? ' is-current' : ''} cursor-pointer transition-transform duration-300 hover:scale-125" style="transform: translateY(${yOffset}px)" data-char-id="${charItem.id}">
                     
                     <!-- 伴学主角凯茜小精灵站立在当前关卡上 (巨幅伴学导引，超高悬浮) -->
                     ${
                       isCurrent
                         ? `
-                      <div data-mascot-anchor="true" class="absolute z-30 flex flex-col items-center animate-bounce-cathy pointer-events-none" style="bottom: calc(100% + 20px); left: 50%; transform: translateX(-50%);">
-                        <!-- 对话气泡 -->
-                        <div class="bg-gradient-to-r from-orange-500 to-amber-500 text-white text-xs sm:text-sm font-black px-4 py-1.5 rounded-full shadow-2xl whitespace-nowrap mb-2 border-2 border-white animate-pulse flex items-center gap-1.5">
-                          <span class="flex items-center">${GAME_ICONS.sparkle('w-4 h-4')}</span>
-                          <span>凯茜：快来学“${charItem.char}”字！</span>
+                      <!-- 凯茜小精灵：外层容器负责波浪位置抵消，内层负责弹跳动画 (避免 transform 冲突) -->
+                      <div style="bottom: calc(100% + 20px); left: 50%; transform: translateX(-50%) translateY(${-yOffset}px);" class="absolute z-30 pointer-events-none">
+                        <div class="animate-bounce-cathy flex flex-col items-center">
+                          <!-- 对话气泡 -->
+                          <div class="bg-gradient-to-r from-orange-500 to-amber-500 text-white text-xs sm:text-sm font-black px-4 py-1.5 rounded-full shadow-2xl whitespace-nowrap mb-2 border-2 border-white animate-pulse flex items-center gap-1.5">
+                            <span class="flex items-center">${GAME_ICONS.sparkle('w-4 h-4')}</span>
+                            <span>凯茜：快来学"${charItem.char}"字！</span>
+                          </div>
+                          <img src="assets/images/cathy_mascot.webp" class="w-24 h-24 sm:w-28 sm:h-28 rounded-full border-4 border-white shadow-2xl object-cover ring-4 ring-orange-400/80 aspect-square shrink-0" alt="凯茜" onerror="this.src='assets/images/icon_star.webp'" />
                         </div>
-                        <img src="assets/images/cathy_mascot.webp" class="w-24 h-24 sm:w-28 sm:h-28 rounded-full border-4 border-white shadow-2xl object-cover ring-4 ring-orange-400/80 aspect-square shrink-0" alt="凯茜" onerror="this.src='assets/images/icon_star.webp'" />
                       </div>
                     `
                         : ""
@@ -337,12 +340,16 @@ export class MapModule extends BaseModule {
   }
 
   autoScrollToCurrent() {
-    const mascot = this.container.querySelector("[data-mascot-anchor]");
+    // 找到当前学习中的关卡节点
+    const currentNode = this.container.querySelector(".level-node.is-current");
     const viewport = this.container.querySelector("#map-scroll-viewport");
-    if (mascot && viewport) {
+    if (currentNode && viewport) {
       this._timeout(() => {
-        const offset = mascot.offsetLeft - viewport.clientWidth / 2;
-        viewport.scrollTo({ left: Math.max(0, offset), behavior: "smooth" });
+        // 计算当前节点相对于视口的偏移，使其居中
+        const nodeRect = currentNode.getBoundingClientRect();
+        const viewportRect = viewport.getBoundingClientRect();
+        const offset = nodeRect.left - viewportRect.left - (viewportRect.width / 2) + (nodeRect.width / 2);
+        viewport.scrollTo({ left: viewport.scrollLeft + offset, behavior: "smooth" });
       }, 300);
     }
   }

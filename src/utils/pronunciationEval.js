@@ -1,19 +1,19 @@
 /**
- *   (Pronunciation Assessment Engine)
+ * 发音评测引擎 (Pronunciation Assessment Engine)
  *
- *  Web Speech API (SpeechRecognition) + WebAudio 
- *  1. MediaRecorder/MediaStream 3s ~ 5s 
- *  2. ASR  window.SpeechRecognition (webkitSpeechRecognition)
- *  3.  G2P  vs    Needleman-Wunsch
- *  4. 
- *      PA  (Pronunciation Accuracy ) —  /  × 100
- *      SR  (Stress & Rhythm )    —  × 100
- *      CM  (Completeness )          — 1 - ( + )/ × 100
+ * Web Speech API (SpeechRecognition) + WebAudio 双通道：
+ * 1. MediaRecorder/MediaStream 录制 3s ~ 6s 音频
+ * 2. ASR：window.SpeechRecognition / window.webkitSpeechRecognition 实时转写
+ * 3. G2P 音素归一化 + Needleman-Wunsch 对齐
+ * 4. 三维评分：
+ *      PA (Pronunciation Accuracy) — 发音准确度
+ *      SR (Stress & Rhythm)        — 节奏完整度
+ *      CM (Completeness)           — 内容完整度
  *      TOTAL = PA * 0.55 + SR * 0.25 + CM * 0.20
- *  5.  { substitution|deletion|insertion|tone_error } + 
- *  6. IDLE  LISTENING  EVALUATING  RESULT / ERROR
+ * 5. 错误定位：{ substitution | deletion | insertion | tone_error }
+ * 6. 状态机：IDLE → LISTENING → EVALUATING → RESULT / ERROR
  *
- *  /  TTS
+ * 降级：无 SpeechRecognition 环境提供 manualEvaluate({text, stars}) 手动评分，保持同一结果形状。
  */
 
 import { soundAndFX } from "./soundEngine.js";
@@ -26,7 +26,7 @@ const STATES = Object.freeze({
 });
 
 // ============================================================
-// 1. 
+// 1. 拼音音素工具
 // ============================================================
 const PINYIN_INITIALS = ["zh", "ch", "sh", "b", "p", "m", "f", "d", "t", "n", "l", "g", "k", "h", "j", "q", "x", "r", "z", "c", "s", "y", "w"];
 
@@ -52,7 +52,7 @@ const SIMILAR_FINAL_MAP = new Map([
 ]);
 
 /**
- * 
+ * 分解拼音为 {initial, final, tone}
  */
 function decomposePinyin(pinyinStr, toneNum = 0) {
   let s = (pinyinStr || "").toLowerCase().replace(/ü/g, "v");
@@ -69,7 +69,7 @@ function decomposePinyin(pinyinStr, toneNum = 0) {
 }
 
 /**
- * / (0.0 ~ 1.0)
+ * 计算两个汉字在音素层面的相似度 (0.0 ~ 1.0)
  */
 function computeCharPhoneticSimilarity(charA, charB) {
   if (!charA || !charB) return 0;
@@ -94,23 +94,23 @@ function computeCharPhoneticSimilarity(charA, charB) {
   const pyA = decomposePinyin(infoA.strip, infoA.tone);
   const pyB = decomposePinyin(infoB.strip, infoB.tone);
 
-  // 1.  ()
+  // 1. 声韵完全相同，按声调差细分
   if (infoA.strip === infoB.strip) {
     const toneDiff = Math.abs(pyA.tone - pyB.tone);
-    if (toneDiff === 0) return 0.96; // 
-    if (toneDiff === 1) return 0.82; // 1 (12)
-    return 0.70;                     // 
+    if (toneDiff === 0) return 0.96; // 完美
+    if (toneDiff === 1) return 0.82; // 差 1 个声调（1↔2）
+    return 0.70;                     // 差多个声调
   }
 
-  // 2. 
+  // 2. 声母相同
   if (pyA.initial && pyA.initial === pyB.initial) {
     if (pyA.final === pyB.final) return 0.85;
     const simFinals = SIMILAR_FINAL_MAP.get(pyA.final) || [];
-    if (simFinals.includes(pyB.final)) return 0.65; //  an/ang
-    return 0.25; // 
+    if (simFinals.includes(pyB.final)) return 0.65; // 前后鼻音等
+    return 0.25; // 韵母不同
   }
 
-  // 3.  ( z/zh, l/n, f/h)
+  // 3. 声母相似 (z/zh, l/n, f/h 等)
   const simInits = SIMILAR_INITIAL_MAP.get(pyA.initial) || [];
   if (simInits.includes(pyB.initial)) {
     if (pyA.final === pyB.final) return 0.72;
@@ -119,12 +119,12 @@ function computeCharPhoneticSimilarity(charA, charB) {
     return 0.15;
   }
 
-  // 4.  (“”“”)
+  // 4. 声韵均不相似
   return 0.0;
 }
 
 // ============================================================
-// 2.  Needleman-Wunsch 
+// 2. Needleman-Wunsch 音素对齐
 // ============================================================
 function needlemanWunschPhonetic(refChars, hypChars) {
   const n = refChars.length, m = hypChars.length;
@@ -178,7 +178,7 @@ function needlemanWunschPhonetic(refChars, hypChars) {
 }
 
 // ============================================================
-// 3.  (RhythmAnalyzer)
+// 3. 节奏分析器 (RhythmAnalyzer)
 // ============================================================
 class RhythmAnalyzer {
   constructor(audioCtx) {
@@ -244,15 +244,31 @@ class RhythmAnalyzer {
 }
 
 // ============================================================
-// 4. 
+// 4. 评测引擎
 // ============================================================
 export class PronunciationAssessmentEngine {
   constructor() {
     this.state = STATES.IDLE;
     this._transcripts = [];
+    this._finalTranscripts = [];
     this._activeRecogText = "";
     this._recordedAudioUrl = null;
     this._lastResult = null;
+    this._activeStream = null;
+    this._activeMediaRecorder = null;
+    this._activeRecog = null;
+    this._activeAnalyser = null;
+    this._activeFreqData = null;
+    this._activeRhythm = null;
+    this._audioChunks = [];
+    this._currentEvalTarget = "";
+    this._currentEvalOpts = {};
+    this._evalStartTime = 0;
+    this._maxDurationTimer = null;
+    this._silenceTimer = null;
+    this._lastSpeechTime = 0;
+    this._stopping = false;
+    this._manualMode = false;
   }
 
   _setState(newState) {
@@ -266,47 +282,145 @@ export class PronunciationAssessmentEngine {
   }
 
   /**
-   * 
+   * 当前环境是否支持浏览器语音识别。
+   */
+  isSupported() {
+    return !!this._ensureRecognition();
+  }
+
+  /**
+   * 获取当前麦克风实时音量（0~255 频域均值）。
+   */
+  getLiveVolume() {
+    if (!this._activeAnalyser || !this._activeFreqData) return 0;
+    try {
+      this._activeAnalyser.getByteFrequencyData(this._activeFreqData);
+      let sum = 0;
+      for (let i = 0; i < this._activeFreqData.length; i++) sum += this._activeFreqData[i];
+      return sum / this._activeFreqData.length;
+    } catch {
+      return 0;
+    }
+  }
+
+  /**
+   * 清理计时器与媒体资源（幂等）。
+   */
+  _cleanupTimers() {
+    if (this._maxDurationTimer) {
+      clearTimeout(this._maxDurationTimer);
+      this._maxDurationTimer = null;
+    }
+    if (this._silenceTimer) {
+      clearTimeout(this._silenceTimer);
+      this._silenceTimer = null;
+    }
+  }
+
+  /**
+   * Safari / 无 ASR 环境的手动评分入口。
+   * 保持与 stopAndEvaluate 同一结果形状，便于 UI 复用。
+   */
+  manualEvaluate({ text = "", stars = 3 } = {}) {
+    const targetText = text || "";
+    const targetClean = targetText.replace(/[^\u4e00-\u9fa5]/g, "");
+    const clampedStars = Math.max(1, Math.min(3, stars || 1));
+    const score = clampedStars === 3 ? 100 : clampedStars === 2 ? 78 : 55;
+    const perCharReport = [...targetClean].map((ch) => ({
+      ref: ch,
+      hyp: ch,
+      similarity: 1.0,
+      score,
+      type: "match",
+    }));
+
+    const result = {
+      score,
+      totalScore: score,
+      stars: clampedStars,
+      target: targetText,
+      hypothesis: targetClean,
+      isCorrect: score >= 80,
+      perCharReport,
+      audioUrl: null,
+      audioBlob: null,
+      manual: true,
+    };
+    this._lastResult = result;
+    this._setState(STATES.RESULT);
+    eventBus.emit(EVENTS.AUDIO_EVAL_RESULT, result);
+    return result;
+  }
+
+  /**
+   * 开始一次发音评测录音。
+   * @param {Object} opts
+   * @param {string} opts.text            期望朗读的文本
+   * @param {string} [opts.mode="char"]   char/word/sentence
+   * @param {number} [opts.maxDurationMs=6000]  最大录音时长，到时间自动停止
+   * @param {number} [opts.silenceTimeoutMs=4000]  无语音自动停止（从最近一次有声开始计时）
+   * @param {Function} [opts.onResult]    中间/最终结果回调：({ transcript, isFinal }) => void
    */
   async startEvaluation(opts = {}) {
+    if (this.state === STATES.LISTENING || this.state === STATES.EVALUATING) {
+      return { ok: false, reason: "already_running" };
+    }
+
     const targetText = opts.text || "";
     if (!targetText) throw new Error("targetText is required");
+
+    this._cleanupTimers();
+    this._stopping = false;
+    this._manualMode = false;
     this._currentEvalTarget = targetText;
     this._currentEvalOpts = opts;
     this._audioChunks = [];
     this._recordedAudioUrl = null;
     this._transcripts = [];
+    this._finalTranscripts = [];
     this._activeRecogText = "";
+    this._lastResult = null;
     this._setState(STATES.LISTENING);
 
     soundAndFX.init();
     const ctx = soundAndFX.audioCtx;
     const recogClass = this._ensureRecognition();
     this._evalStartTime = performance.now();
+    this._lastSpeechTime = performance.now();
 
-    // 1.  ()
+    const onResultCb = typeof opts.onResult === "function" ? opts.onResult : null;
+    const maxDurationMs = Math.max(2000, opts.maxDurationMs || 6000);
+    const silenceTimeoutMs = Math.max(1000, opts.silenceTimeoutMs || 4000);
+
+    // 1. 获取麦克风 (降级允许无 stream)
     try {
       if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
         this._activeStream = await navigator.mediaDevices.getUserMedia({
           audio: {
             echoCancellation: true,
             noiseSuppression: true,
-            autoGainControl: true
+            autoGainControl: true,
           },
-          video: false
+          video: false,
         });
       }
     } catch (e) {
       console.warn("[PronunciationEval] getUserMedia fallback:", e);
       this._activeStream = null;
+      if (e.name === "NotAllowedError" || e.name === "PermissionDeniedError") {
+        this._setState(STATES.ERROR);
+        eventBus.emit(EVENTS.AUDIO_EVAL_ERROR, { reason: "mic_permission_denied", error: e.message });
+        return { ok: false, reason: "mic_permission_denied" };
+      }
     }
 
-    // 2.  Web Audio AnalyserNode ()
+    // 2. Web Audio AnalyserNode + RhythmAnalyzer（能量检测）
     if (this._activeStream && ctx) {
       try {
         const source = ctx.createMediaStreamSource(this._activeStream);
         const analyser = ctx.createAnalyser();
         analyser.fftSize = 64;
+        source.connect(analyser);
         this._activeAnalyser = analyser;
         this._activeFreqData = new Uint8Array(analyser.frequencyBinCount);
 
@@ -318,7 +432,7 @@ export class PronunciationAssessmentEngine {
       }
     }
 
-    // 3.  MediaRecorder  Blob
+    // 3. MediaRecorder 录制 Blob（供回放）
     if (this._activeStream && typeof MediaRecorder !== "undefined") {
       try {
         const mime = MediaRecorder.isTypeSupported("audio/webm;codecs=opus") ? "audio/webm;codecs=opus"
@@ -337,7 +451,14 @@ export class PronunciationAssessmentEngine {
       }
     }
 
-    // 4.  SpeechRecognition ()
+    // 4. 最大录音时长自动停止
+    this._maxDurationTimer = setTimeout(() => {
+      if (this.state === STATES.LISTENING && !this._stopping) {
+        this.stopAndEvaluate().catch(() => {});
+      }
+    }, maxDurationMs);
+
+    // 5. SpeechRecognition 实时转写
     if (recogClass) {
       try {
         this._activeRecog = new recogClass();
@@ -347,20 +468,41 @@ export class PronunciationAssessmentEngine {
         this._activeRecog.maxAlternatives = 5;
 
         this._activeRecog.onresult = (ev) => {
+          const lastIdx = ev.results.length - 1;
           for (let i = ev.resultIndex || 0; i < ev.results.length; i++) {
             const res = ev.results[i];
-            for (let j = 0; j < res.length; j++) {
-              const text = res[j]?.transcript?.trim();
-              if (text && !this._transcripts.includes(text)) {
-                this._transcripts.push(text);
+            const top = res[0];
+            const text = top?.transcript?.trim();
+            if (!text) continue;
+
+            if (res.isFinal) {
+              if (!this._finalTranscripts.includes(text)) {
+                this._finalTranscripts.push(text);
+              }
+              this._lastSpeechTime = performance.now();
+              if (onResultCb) {
+                try { onResultCb({ transcript: text, isFinal: true }); } catch {}
+              }
+            } else {
+              this._activeRecogText = text;
+              if (i === lastIdx && onResultCb) {
+                try { onResultCb({ transcript: text, isFinal: false }); } catch {}
               }
             }
-            if (res[0]?.transcript) {
-              this._activeRecogText = res[0].transcript.trim();
-            }
+          }
+
+          // 检测到声音时刷新静音超时
+          this._resetSilenceTimer(silenceTimeoutMs);
+        };
+
+        this._activeRecog.onerror = (ev) => {
+          const err = ev?.error || "";
+          console.warn("[PronunciationEval] SpeechRecognition error:", err);
+          if (err === "not-allowed" || err === "service-not-allowed") {
+            this._setState(STATES.ERROR);
+            eventBus.emit(EVENTS.AUDIO_EVAL_ERROR, { reason: "asr_permission_denied", error: err });
           }
         };
-        this._activeRecog.onerror = () => {};
         this._activeRecog.onend = () => {};
         this._activeRecog.start();
       } catch (e) {
@@ -368,17 +510,44 @@ export class PronunciationAssessmentEngine {
       }
     }
 
+    // 6. 静音超时（无论 ASR 是否可用，都靠麦克风能量兜底）
+    this._resetSilenceTimer(silenceTimeoutMs);
+
     return { ok: true };
   }
 
+  _resetSilenceTimer(silenceTimeoutMs) {
+    if (this._silenceTimer) clearTimeout(this._silenceTimer);
+    this._silenceTimer = setTimeout(() => {
+      if (this.state === STATES.LISTENING && !this._stopping) {
+        this.stopAndEvaluate().catch(() => {});
+      }
+    }, silenceTimeoutMs);
+  }
+
   /**
-   * 
+   * 停止录音并计算评分。
    */
   async stopAndEvaluate() {
+    if (this._stopping) return this._lastResult;
+    this._stopping = true;
+    this._cleanupTimers();
+
+    if (this.state === STATES.RESULT && this._lastResult) {
+      this._stopping = false;
+      return this._lastResult;
+    }
+
+    if (this.state === STATES.ERROR) {
+      this._stopping = false;
+      return this._lastResult || { score: 0, stars: 0, isCorrect: false, error: true };
+    }
+
     if (this.state !== STATES.LISTENING) {
-      if (this.state === STATES.RESULT && this._lastResult) return this._lastResult;
+      this._stopping = false;
       return null;
     }
+
     this._setState(STATES.EVALUATING);
 
     const targetText = this._currentEvalTarget || "";
@@ -386,7 +555,7 @@ export class PronunciationAssessmentEngine {
     const stream = this._activeStream;
     const mr = this._activeMediaRecorder;
 
-    // 
+    // 停止 ASR
     if (this._activeRecog) {
       try {
         const recog = this._activeRecog;
@@ -401,7 +570,7 @@ export class PronunciationAssessmentEngine {
       try { rhythm.stop(); } catch {}
     }
 
-    //  MediaRecorder  Blob
+    // 停止 MediaRecorder 并生成 Blob
     let audioUrl = null;
     let audioBlob = null;
     if (mr && mr.state !== "inactive") {
@@ -420,7 +589,7 @@ export class PronunciationAssessmentEngine {
       } catch {}
     }
 
-    // 
+    // 释放麦克风轨道
     if (stream) {
       try { stream.getTracks().forEach(t => t.stop()); } catch {}
       this._activeStream = null;
@@ -428,12 +597,11 @@ export class PronunciationAssessmentEngine {
     this._activeAnalyser = null;
     this._activeFreqData = null;
 
-    // 5. 
+    // 5. 评分
     const targetClean = targetText.replace(/[^\u4e00-\u9fa5]/g, "");
     const isSingleChar = targetClean.length === 1;
 
-    // /
-    const allCandidateTexts = [...this._transcripts];
+    const allCandidateTexts = [...this._finalTranscripts];
     if (this._activeRecogText && !allCandidateTexts.includes(this._activeRecogText)) {
       allCandidateTexts.unshift(this._activeRecogText);
     }
@@ -447,14 +615,13 @@ export class PronunciationAssessmentEngine {
     const maxRms = rhythm ? rhythm.maxRms : 0;
     const hadVoiceEnergy = maxRms > 0.015 || avgRms > 0.005;
 
-    // A.  (“”)
+    // A. 单字评测
     if (isSingleChar) {
       const targetChar = targetClean;
       let highestSimilarity = 0;
       let closestSpokenChar = "";
 
       if (allCandidateTexts.length > 0) {
-        // 
         const spokenChars = [...new Set(allCandidateTexts.join("").replace(/[^\u4e00-\u9fa5]/g, ""))];
         for (const spk of spokenChars) {
           const sim = computeCharPhoneticSimilarity(targetChar, spk);
@@ -470,15 +637,12 @@ export class PronunciationAssessmentEngine {
         bestHypothesis = closestSpokenChar || targetChar;
 
         if (highestSimilarity >= 0.85) {
-          // 
           bestScore = Math.min(100, Math.round(92 + highestSimilarity * 8));
           bestStars = 3;
         } else if (highestSimilarity >= 0.55) {
-          //  ()
           bestScore = Math.round(68 + (highestSimilarity - 0.55) / 0.3 * 16);
           bestStars = 2;
         } else if (closestSpokenChar) {
-          //  (“”“”) -> 
           bestScore = Math.max(10, Math.round(highestSimilarity * 40));
           bestStars = 0;
         } else {
@@ -486,19 +650,16 @@ export class PronunciationAssessmentEngine {
           bestStars = hadVoiceEnergy ? 3 : 0;
         }
       } else {
-        // ASR  / ()
+        // ASR 无结果，按麦克风能量兜底
         if (maxRms > 0.018 || avgRms > 0.006) {
-          // 
           bestScore = Math.min(98, Math.round(88 + Math.min(10, maxRms * 100)));
           bestStars = 3;
           bestHypothesis = targetChar;
         } else if (maxRms > 0.008) {
-          // 
           bestScore = Math.round(68 + maxRms * 800);
           bestStars = 2;
           bestHypothesis = targetChar;
         } else {
-          //  / 
           bestScore = 0;
           bestStars = 0;
           bestHypothesis = "";
@@ -512,7 +673,7 @@ export class PronunciationAssessmentEngine {
         score: bestScore
       }];
     }
-    // B.  (“”)
+    // B. 多字/词组/句子评测
     else {
       const refChars = [...targetClean];
       let bestPath = [];
@@ -562,11 +723,13 @@ export class PronunciationAssessmentEngine {
       perCharReport,
       audioUrl: audioUrl || this._recordedAudioUrl,
       audioBlob,
+      manual: false,
     };
     this._lastResult = result;
 
     eventBus.emit(EVENTS.AUDIO_EVAL_RESULT, result);
     this._setState(STATES.RESULT);
+    this._stopping = false;
     return result;
   }
 
@@ -620,4 +783,3 @@ if (typeof window !== "undefined") {
   window.pronunciationEval = pronunciationEval;
 }
 export default pronunciationEval;
-
