@@ -8,6 +8,7 @@
 输出：src/data/characters.js
 """
 import json
+import math
 import os
 import re
 import sys
@@ -647,6 +648,322 @@ EVOLUTION_DESC = {
 }
 
 
+# ---------------------------------------------------------------------------
+# 笔顺几何管线：hanzi-writer medians(1024 网格) → 渲染器 0-100 空间的三点笔画
+# 渲染端 (hanziEngine.renderStrokePath / drawGuideOrb) 只消费 start / corner / end
+# 三点并连直线，故必须把中轴折线简化为「起点—(拐点)—终点」。
+#
+# 标定方法：取字库中与人工精编版重叠的 86 字，统计中轴包围盒与精编包围盒，
+# 线性回归得到仿射参数（缩放 + 中心对齐），使自动生成的字形与人工版视觉一致。
+#   中轴 bbox x:[11.91, 89.45] y:[10.84, 85.30]  中心 (50.68, 48.07)
+#   精编 bbox x:[20.00, 82.00] y:[18.00, 88.00]  中心 (51.00, 53.00)
+# ---------------------------------------------------------------------------
+_GRID = 1024.0
+_Y_FLIP = 900.0
+_CALIB_X_SCALE = 0.80
+_CALIB_Y_SCALE = 0.94
+_CALIB_SRC_CX = 50.68
+_CALIB_SRC_CY = 48.07
+_CALIB_DST_CX = 51.0
+_CALIB_DST_CY = 53.0
+# 拐点判定：用「起点→候选点」与「候选点→终点」两条弦的夹角度量转向。
+# 不能用相邻微小线段的局部转角——中轴在拐角处是弧线采样，局部转角会严重
+# 低估（如「日」的横折局部仅 43.8°，实际整体转向 90°），导致折笔漏判。
+_CORNER_MIN_DEG = 50.0
+# 弦长下限：候选点离端点太近时弦方向不可靠，直接排除
+_CORNER_MIN_CHORD = 8.0
+# 钩判定：末段方向与主体差异 ≥92°。实测分布：真钩（月 113 / 小 102 / 刀 99）
+# 与竖段内收（目 84 / 田 12）存在清晰分界，92° 兼顾两者。
+_HOOK_MAX_LEN_RATIO = 0.30
+_HOOK_MIN_DEG = 92.0
+# 弯判定：转角介于折与直之间，视为缓弯
+_BEND_MAX_DEG = 62.0
+# 弧线判定：弦转角虽大但相邻微段最大转角低于该值时，是平滑弧线（如卧钩）
+# 而非折笔——折笔的转向集中在一个点，弧线的转向均匀分散。
+_ARC_MAX_LOCAL_DEG = 28.0
+# 竖 与 竖撇 的判别阈值（由 100 字人工标注集网格扫描标定，见 tools/tune_stroke.py）
+# 实测上限：几何推断笔画名的准确率约 77%（顺序无关口径），无法再显著提升——
+# 「竖」与「竖撇」在角度/偏移/曲率上本质重叠。
+_VERT_MAX_DEV = 0.30
+_VERT_MAX_CURV = 0.08
+# 点/捺 的分界长度（短者为点）
+_DOT_MAX_LEN = 26.0
+# 提：上扬且偏离水平超过该角度才判为提
+_TI_MIN_DEG = 18.0
+
+
+def _to_canvas(pt):
+    """1024 网格原始点 → 渲染器 0-100 空间（y 轴翻转 + 标定仿射）。
+
+    输出取整以压缩体积（1490 字内联笔顺下可省约 25%）；渲染时坐标再乘
+    canvas 尺寸，0.5 单位的取整误差对应不足 1% 的像素偏差，可忽略。"""
+    x = (pt[0] / _GRID) * 100.0
+    y = ((_Y_FLIP - pt[1]) / _GRID) * 100.0
+    x = (x - _CALIB_SRC_CX) * _CALIB_X_SCALE + _CALIB_DST_CX
+    y = (y - _CALIB_SRC_CY) * _CALIB_Y_SCALE + _CALIB_DST_CY
+    return (
+        int(round(max(2.0, min(98.0, x)))),
+        int(round(max(2.0, min(98.0, y)))),
+    )
+
+
+def _seg_len(a, b):
+    return ((b[0] - a[0]) ** 2 + (b[1] - a[1]) ** 2) ** 0.5
+
+
+def _turn_deg(p0, p1, p2):
+    """p0→p1→p2 的转角（度），0 表示共线同向"""
+    v1 = (p1[0] - p0[0], p1[1] - p0[1])
+    v2 = (p2[0] - p1[0], p2[1] - p1[1])
+    n1 = (v1[0] ** 2 + v1[1] ** 2) ** 0.5
+    n2 = (v2[0] ** 2 + v2[1] ** 2) ** 0.5
+    if n1 < 1e-6 or n2 < 1e-6:
+        return 0.0
+    cosv = (v1[0] * v2[0] + v1[1] * v2[1]) / (n1 * n2)
+    cosv = max(-1.0, min(1.0, cosv))
+    return math.degrees(math.acos(cosv))
+
+
+def _metrics(a, b, pts):
+    """点列 pts 上 a→b 的段度量（未标定坐标）：dx, dy, length, dev, curv"""
+    dx = pts[b][0] - pts[a][0]
+    dy = pts[b][1] - pts[a][1]
+    length = _seg_len(pts[a], pts[b])
+    s = abs(dx) + abs(dy)
+    dev = abs(dx) / s if s > 1e-6 else 0.0
+    sub = pts[a:b + 1]
+    curv = (_polyline_len(sub) / (length or 1e-6)) - 1.0 if len(sub) > 2 else 0.0
+    return dx, dy, length, dev, curv
+
+
+def _key_index(raw_pts, can_pts):
+    """返回归约后的关键点下标 (start_i, corner_i|None, end_i)。
+
+    候选拐点的转向由两条弦的夹角度量：pts[0]→pts[i] 与 pts[i]→pts[-1]。
+    相比相邻微段的局部转角，弦向量不受弧线采样密度影响，能正确识别折笔，
+    同时对直笔的采样抖动不敏感（直笔各候选点弦夹角均接近 0）。
+
+    折点优先规则：横折钩/竖弯钩这类「横/竖→折→钩」三段的笔画，弦夹角
+    最大的点往往落在钩上（「月」的横折钩：折点 103°，钩点 130°），选中
+    它会把「横折钩」误拆成「横段 + 撇段」。笔顺中折点必然先于钩点出现，
+    故在转角达标（≥_CORNER_MIN_DEG）的候选中，优先采用「首段方向为
+    横/竖」的最靠前点；无此类候选时再退化取全局最大转角。"""
+    n = len(can_pts)
+    if n <= 2:
+        return 0, None, n - 1
+    cands = []
+    max_local = 0.0
+    for i in range(1, n - 1):
+        if _seg_len(can_pts[0], can_pts[i]) < _CORNER_MIN_CHORD:
+            continue
+        if _seg_len(can_pts[i], can_pts[-1]) < _CORNER_MIN_CHORD:
+            continue
+        t = _turn_deg(can_pts[0], can_pts[i], can_pts[-1])
+        if t < _CORNER_MIN_DEG:
+            continue
+        # 相邻微段最大转角：折笔的转向集中在一点（接近整体转向），
+        # 平滑弧线（如卧钩）的转向均匀分散在多点，局部转角显著偏小。
+        local = max(
+            _turn_deg(can_pts[j - 1], can_pts[j], can_pts[j + 1])
+            for j in range(max(1, i - 2), min(n - 1, i + 3))
+        )
+        max_local = max(max_local, local)
+        m = _metrics(0, i, raw_pts)
+        base = _dir_name(m[0], m[1], m[2], m[3], m[4], allow_dot=False)
+        cands.append((t, i, base))
+    if not cands or max_local < _ARC_MAX_LOCAL_DEG:
+        return 0, None, n - 1
+    for _, i, base in cands:
+        if base in ("横", "竖"):
+            return 0, i, n - 1
+    _, best_i, _ = max(cands, key=lambda c: c[0])
+    return 0, best_i, n - 1
+
+
+def _dir_name(dx, dy, length, dev=0.0, curv=0.0, allow_dot=True, vert_lenient=False):
+    """单段方向 → 基本笔画名。
+
+    必须在**未标定**的原始屏幕坐标上判定：校准仿射对 x/y 的缩放系数不同
+    （0.80 / 0.94），会把所有方向朝垂直方向扭转约 17%，引入系统性偏差。
+
+    竖 与 竖撇在角度上重叠（「月」首笔约 97°，既像竖又像撇），故额外引入
+    两个判别量：
+      dev  水平偏移比 = |dx| / (|dx|+|dy|)   —— 竖≈0，撇明显左偏
+      curv 弯曲度     = 折线长/弦长 - 1       —— 竖直，撇带弧
+    屏幕坐标 y 向下为正。"""
+    ang = math.degrees(math.atan2(dy, dx))  # 0=向右, 90=向下, 180=向左
+    a = abs(ang)
+    if a <= 30:
+        # 上扬的短横实为提（如「虫」末笔）
+        if dy < 0 and a > _TI_MIN_DEG:
+            return "提"
+        return "横"
+    if 30 < a < 60:
+        if dy > 0:
+            return "点" if (allow_dot and length < _DOT_MAX_LEN) else "捺"
+        return "提"
+    if 60 <= a <= 120:
+        if dy > 0:
+            # 复合笔画（横折/竖折等）的竖段就是竖直的，曲率会被钩/折段污染，
+            # 用 vert_lenient 跳过 dev/curv 判别（竖撇判别只用于独立撇笔）
+            if vert_lenient:
+                return "竖"
+            return "竖" if (dev < _VERT_MAX_DEV and curv < _VERT_MAX_CURV) else "撇"
+        return "提"
+    # 120°~180°：向左
+    return "撇" if dy > 0 else "提"
+
+
+def _polyline_len(pts):
+    return sum(_seg_len(pts[i], pts[i + 1]) for i in range(len(pts) - 1))
+
+
+def _name_of(raw_pts, can_pts, si, ci, ei):
+    """在未标定的原始屏幕坐标上推断笔画名（标定会扭曲角度，不可用于判定）"""
+
+    def metrics(a, b):
+        dx = raw_pts[b][0] - raw_pts[a][0]
+        dy = raw_pts[b][1] - raw_pts[a][1]
+        length = _seg_len(raw_pts[a], raw_pts[b])
+        s = abs(dx) + abs(dy)
+        dev = abs(dx) / s if s > 1e-6 else 0.0
+        sub = raw_pts[a:b + 1]
+        curv = (_polyline_len(sub) / (length or 1e-6)) - 1.0 if len(sub) > 2 else 0.0
+        return dx, dy, length, dev, curv
+
+    def detect_hook():
+        """检测末段钩：末尾短段 + 急转（基于原始点列末尾，绕过弦法拐点选择）。
+
+        钩必然位于点列末尾——末两段弦长占比 <30% 且方向与主体差异 ≥62°。
+        主体方向必须从**拐点**（而非起点）起算：对横折类，起点→末端的
+        整体弦方向被横段拖向水平，会把「田」横折竖段仅 10° 的内收误判成钩
+        （实测整体弦 39.6° vs 末端 104.5° → diff 64.9° 误触发）。"""
+        n = len(raw_pts)
+        if n - si < 3:
+            return False
+        end_len = _seg_len(raw_pts[ei - 2], raw_pts[ei])
+        total_len = _seg_len(raw_pts[si], raw_pts[ei])
+        if end_len >= _HOOK_MAX_LEN_RATIO * total_len:
+            return False
+        body = math.degrees(
+            math.atan2(
+                raw_pts[ei - 2][1] - raw_pts[ci][1],
+                raw_pts[ei - 2][0] - raw_pts[ci][0],
+            )
+        )
+        last = math.degrees(
+            math.atan2(
+                raw_pts[ei][1] - raw_pts[ei - 2][1],
+                raw_pts[ei][0] - raw_pts[ei - 2][0],
+            )
+        )
+        diff = abs(last - body) % 360.0
+        if diff > 180.0:
+            diff = 360.0 - diff
+        return diff >= _HOOK_MIN_DEG
+
+    if ci is None:
+        m = metrics(si, ei)
+        return _dir_name(m[0], m[1], m[2], m[3], m[4], allow_dot=True)
+
+    turn = _turn_deg(can_pts[si], can_pts[ci], can_pts[ei])
+    hook = detect_hook()
+
+    m1 = metrics(si, ci)
+    m2 = metrics(ci, ei)
+    # 复合笔画的分段一律不判「点」（点必须是独立短笔），避免脏名扩散
+    base = _dir_name(m1[0], m1[1], m1[2], m1[3], m1[4], allow_dot=False)
+    tail = _dir_name(m2[0], m2[1], m2[2], m2[3], m2[4], allow_dot=False, vert_lenient=True)
+
+    # 钩：基于原始点列末段独立检测（弦法拐点常落在折点而非钩点）
+    if hook:
+        return {"竖": "竖钩", "横": "横折钩", "撇": "撇钩"}.get(base, base + "钩")
+    # 缓弯：转角不足，退化为基本名（不臆造「X弯」）
+    if turn < _BEND_MAX_DEG:
+        return "竖弯" if base == "竖" else base
+    if base == tail:
+        return base
+    combo = {
+        ("横", "竖"): "横折",
+        ("横", "撇"): "横撇",
+        ("横", "捺"): "横折",
+        ("横", "提"): "横折提",
+        ("竖", "横"): "竖折",
+        ("竖", "捺"): "竖折",
+        ("竖", "提"): "竖提",
+        ("撇", "横"): "撇折",
+        ("撇", "捺"): "撇折",
+        ("捺", "横"): "撇折",
+    }
+    return combo.get((base, tail), base + "折")
+
+
+def build_strokes(medians):
+    """hanzi-writer medians → 渲染器 strokes 数组
+
+    维护两条并行点列：raw（未标定，供笔画名判定）与 can（标定后，供输出）。
+    两者同步去重，保证下标一一对应。"""
+    out = []
+    for i, m in enumerate(medians):
+        if len(m) < 2:
+            continue
+        pairs = []
+        for p in m:
+            raw = (p[0] / _GRID * 100.0, (_Y_FLIP - p[1]) / _GRID * 100.0)
+            can = _to_canvas(p)
+            if pairs and _seg_len(pairs[-1][1], can) <= 0.8:
+                continue
+            pairs.append((raw, can))
+        if len(pairs) < 2:
+            pairs = [
+                (
+                    (m[0][0] / _GRID * 100.0, (_Y_FLIP - m[0][1]) / _GRID * 100.0),
+                    _to_canvas(m[0]),
+                ),
+                (
+                    (m[-1][0] / _GRID * 100.0, (_Y_FLIP - m[-1][1]) / _GRID * 100.0),
+                    _to_canvas(m[-1]),
+                ),
+            ]
+        raw_pts = [r for r, _ in pairs]
+        can_pts = [c for _, c in pairs]
+
+        si, ci, ei = _key_index(raw_pts, can_pts)
+        name = _name_of(raw_pts, can_pts, si, ci, ei)
+
+        # path 字段全项目无消费方（渲染只用 start/corner/end），不写入以压缩体积
+        rec = {
+            "name": name,
+            "order": i + 1,
+            "start": {"x": can_pts[si][0], "y": can_pts[si][1]},
+            "end": {"x": can_pts[ei][0], "y": can_pts[ei][1]},
+        }
+        if ci is not None:
+            rec["corner"] = {"x": can_pts[ci][0], "y": can_pts[ci][1]}
+        out.append(rec)
+    return out
+
+
+# 人工精编版字库（并行产出的 100 字 premium 内容），用于合并保留。
+# 注意：src/data/characters.js 是 JS 对象字面量（键名无引号），并非合法 JSON，
+# 直接 json.loads 会抛错并被 except 静默吞掉导致精编内容丢失。
+# 故统一以 tools/content/seed_premium.json 作为规范种子源（由 node 导出生成）。
+SEED_PATH = os.path.join(CONTENT_DIR, "seed_premium.json")
+
+
+def load_seed():
+    """读取人工精编记录（保留其定制故事 / 游戏配置 / 手调笔顺）"""
+    if not os.path.exists(SEED_PATH):
+        print(f"  ⚠ 未找到精编种子 {SEED_PATH}，将全部自动生成")
+        return {}
+    try:
+        data = json.load(open(SEED_PATH, encoding="utf-8"))
+    except Exception as exc:  # noqa: BLE001
+        print(f"  ⚠ 精编种子解析失败（{exc}），将全部自动生成")
+        return {}
+    return {d["char"]: d for d in data if d.get("char") and d.get("strokes")}
+
+
 def build():
     rows = parse_content()
     auto_rows = load_auto()
@@ -665,6 +982,15 @@ def build():
             rows.append(r)
             added_list += 1
     print(f"语义内容条目: {len(rows)} (自动扩字 {added_auto}，字池扩字 {added_list})")
+
+    # 人工精编版 100 字优先置顶：既是最高频基础字（教学顺序正确），
+    # 也保留其定制演变故事 / 游戏配置 / 手调笔顺，避免被自动生成覆盖。
+    seed_map = load_seed()
+    if seed_map:
+        seed_rows = [r for r in rows if r["char"] in seed_map]
+        rest_rows = [r for r in rows if r["char"] not in seed_map]
+        rows = seed_rows + rest_rows
+        print(f"人工精编字置顶: {len(seed_rows)} 字")
 
     # 字库上限：默认不设限（全字池）；如需对齐《洪恩识字》1300 字课程口径，
     # 用环境变量 MAX_CHARS=1300 重跑即可只保留核心课程
@@ -738,7 +1064,6 @@ def build():
         return picks[:want]
 
     records = []
-    stroke_map = {}  # char -> {strokes, medians}，单独写成懒加载文件
     missing = 0
     for idx, (row, sd) in enumerate(zip(rows, stroke_data)):
         if sd is None:
@@ -797,13 +1122,14 @@ def build():
 
         confuse_with_pinyin = ", ".join(f"{c}({py_tone(c)})" for c in confusing)
 
-        # 真实笔顺（Make Me a Hanzi 派生数据）单独存入懒加载文件
-        stroke_map[row["char"]] = {"strokes": sd["strokes"], "medians": sd["medians"]}
-
         records.append(
             {
                 "id": f"char_{idx + 1:03d}",
                 "char": row["char"],
+                # 甲骨文 / 金文字形：人工精编版用「太玄经符号」作象形占位，
+                # 自动扩字无可靠字形来源，留空由渲染层回退处理。
+                "oracleGlyph": "",
+                "bronzeGlyph": "",
                 "pinyin": py_tone(row["char"]),
                 "pinyinTone": tone_number(row["char"]),
                 "radical": row["radical"],
@@ -832,6 +1158,7 @@ def build():
                 },
                 "words": words,
                 "sentence": sentence,
+                "strokes": build_strokes(sd["medians"]),
                 "confusingChars": confusing,
                 "confusingHint": confuse_with_pinyin,
                 "gameConfig": {
@@ -844,39 +1171,60 @@ def build():
             }
         )
 
+        # 人工精编版：保留其定制内容，仅重排进度字段（id/阶段/单元/关卡）
+        rec = records[-1]
+        sd_row = seed_map.get(row["char"])
+        if sd_row:
+            for k in (
+                "oracleGlyph", "bronzeGlyph", "words", "sentence",
+                "strokes", "confusingChars", "gameConfig",
+            ):
+                if sd_row.get(k):
+                    rec[k] = sd_row[k]
+            # evolution 逐字段合并：部分精编条目缺 story / oracleDesc 等字段，
+            # 整块覆盖会把空值写回、丢掉模板生成的故事。改为「精编非空优先，
+            # 缺失项由本文件的故事模板兜底」。
+            seed_ev = sd_row.get("evolution") or {}
+            if seed_ev:
+                ev = dict(rec["evolution"])
+                for k, v in seed_ev.items():
+                    if v:
+                        ev[k] = v
+                rec["evolution"] = ev
+            rec["strokeCount"] = len(rec["strokes"])
+            # 精编版带 path 字段，统一剥离（渲染层不消费，纯属体积负担）
+            for st in rec["strokes"]:
+                st.pop("path", None)
+            # 人工标注的笔画名可直接用于语音播报
+            rec["strokeNamesVerified"] = True
+        else:
+            # 几何推断的笔画名准确率约 77%，不可用于语音播报（会念错给孩子）。
+            # 渲染与书写判定只依赖 start/corner/end 几何，该字段不影响练习正确性；
+            # 语音侧改播「第 N 笔」，保证零错误发音。
+            rec["strokeNamesVerified"] = False
+
+
     print(f"成功生成: {len(records)} 字，失败: {missing}")
 
-    # ---- 拆分输出：元数据（首屏加载） + 笔顺数据（写环节按需懒加载）----
-    STROKE_PATH = os.path.join(ROOT, "src", "data", "hanzi_strokes.js")
-    with open(STROKE_PATH, "w", encoding="utf-8") as f:
-        f.write(
-            "/**\n"
-            " * 凯茜识字 - 真实笔顺数据（Make Me a Hanzi 派生, CC BY 4.0）\n"
-            " * 由 tools/build_characters.py 生成，仅在「写」环节由 strokeLoader 按需动态加载。\n"
-            " */\n\n"
-        )
-        f.write(
-            "export const HANZI_STROKES = "
-            + json.dumps(stroke_map, ensure_ascii=False, separators=(",", ":"))
-            + ";\n"
-        )
-    print(f"已写出笔顺数据: {STROKE_PATH} ({os.path.getsize(STROKE_PATH) / 1024:.1f} KB)")
-
     header = """/**
- * 凯茜识字 (Cathy Literacy) - 阶梯字库核心数据库（仅元数据，笔顺见 hanzi_strokes.js）
+ * 凯茜识字 (Cathy Literacy) - 阶梯字库核心数据库
  * ------------------------------------------------------------
  * 数据来源：
- *  · 笔顺 strokes/medians —— hanzi-writer-data (Make Me a Hanzi 衍生, CC BY 4.0)，
- *    1024x1024 坐标系，笔画轮廓与中线采样点存于同目录 hanzi_strokes.js，按需懒加载。
+ *  · strokes（笔顺）—— hanzi-writer-data (Make Me a Hanzi 衍生, CC BY 4.0)，
+ *    由 1024x1024 网格中轴 medians 归约为「起点-拐点-终点」三点，
+ *    再经标定仿射映射到渲染器 0-100 空间，随字库内联（无需额外请求）。
  *  · 拼音与声调 —— pypinyin 自动生成；部首 —— cnradical 自动取。
  *  · 象形演变故事 / 词组 / 造句 / 形近字 —— 教学编撰 / 字形模板生成。
+ *  · 前 100 字为人工精编版（定制演变故事、游戏配置与手调笔顺），优先级最高。
  * 本文件由 tools/build_characters.py 生成，请勿手工编辑。
  */
 
 """
 
+    # 紧凑输出：本文件为生成产物（勿手工编辑），无需缩进可读性；
+    # 1490 字内联笔顺后体积敏感，去掉缩进与多余空格可显著减小首屏传输量。
     body = "export const CHARACTER_DATABASE = " + json.dumps(
-        records, ensure_ascii=False, indent=2
+        records, ensure_ascii=False, separators=(",", ":")
     ) + ";\n"
 
     # 根据实际生成数据动态计算三阶段范围
