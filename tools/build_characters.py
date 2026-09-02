@@ -1206,6 +1206,34 @@ def build():
 
     print(f"成功生成: {len(records)} 字，失败: {missing}")
 
+    # ------------------------------------------------------------------
+    # 写前完整性校验（防止环境编码问题 / 脏数据覆盖健康字库）
+    # 曾发生：并行环境的编码异常把全部中文吞成空串，1490 条记录 char 全为
+    # ""、1489 条重复，几乎覆盖健康字库。任何一项不通过即中止，绝不写文件。
+    # ------------------------------------------------------------------
+    errors = []
+    if not records:
+        errors.append("记录为空")
+    chars = [r["char"] for r in records]
+    empty_chars = sum(1 for c in chars if not c or not c.strip())
+    if empty_chars:
+        errors.append(f"存在空 char 记录 {empty_chars} 条")
+    if len(set(chars)) != len(chars):
+        dup = sorted({c for c in chars if chars.count(c) > 1})
+        errors.append(f"重复 char {len(dup)} 个: {''.join(dup[:20])}")
+    if any(not r.get("strokes") for r in records):
+        errors.append("存在无笔顺记录")
+    if any(not r.get("sentence") for r in records):
+        errors.append("存在无造句记录")
+    if any(not r.get("evolution") or not r["evolution"].get("story") for r in records):
+        errors.append("存在无演变故事记录")
+    if errors:
+        print("✗✗ 写前校验失败，已中止写文件（保留现有健康字库）：")
+        for e in errors:
+            print(f"  - {e}")
+        return
+    print(f"✓ 写前校验通过（{len(records)} 字无重复 / 无空字 / 内容完整）")
+
     header = """/**
  * 凯茜识字 (Cathy Literacy) - 阶梯字库核心数据库
  * ------------------------------------------------------------
