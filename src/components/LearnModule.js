@@ -24,6 +24,7 @@ import { mascotProgress } from "../utils/mascotProgress.js";
 import { openEtymologyQuiz } from "../utils/etymologyQuiz.js";
 import { buildEtymologyCard } from "../utils/etymologyEngine.js";
 import { chantChar, CHANT_MODES } from "../utils/chantEngine.js";
+import { forChar as mmForChar, SCENES as MM_SCENES } from "../utils/multimodalEngine.js";
 import { voiceGuide } from "../utils/voiceGuide.js";
 import { getCognitiveStageData } from "../utils/cognitiveStage.js";
 
@@ -310,11 +311,18 @@ export class LearnModule extends BaseModule {
 
                 ${(() => {
             const _etym = buildEtymologyCard(char);
+            // E19: 多模态编排器 — 动态决定 reveal-box 显示哪些块
+            const _mm = mmForChar(char, MM_SCENES.LEARN);
+            const _showTimeline = !!_mm.modalities.visual_timeline;
+            const _showChant = !!_mm.modalities.auditory_chant;
+            const _showConfuse = !!_mm.modalities.semantic_confuse && _etym.confusing.hasConfusables;
+            const _showEmoji = !!_mm.modalities.visual_emoji;
             return `
         <div id="evolution-reveal-box" class="absolute inset-0 bg-black/88 backdrop-blur-md rounded-3xl p-4 sm:p-6 flex flex-col items-center justify-center text-white hidden animate-scale-up z-30 overflow-auto">
           <span class="bg-orange-500 text-white font-black text-xs px-4 py-1 rounded-full mb-2 shadow flex-shrink-0">字源 4 阶段演变！</span>
 
-          <!-- 4 阶段 timeline -->
+          <!-- E19: 4 阶段 timeline — 由 multimodalEngine 编排 -->
+          ${_showTimeline ? `
           <div class="flex items-center gap-2 sm:gap-3 my-2 flex-wrap justify-center">
             ${_etym.stages.map((s, i) => `
               <div class="flex flex-col items-center flex-shrink-0">
@@ -328,20 +336,25 @@ export class LearnModule extends BaseModule {
               </div>
             `).join('')}
           </div>
+          ` : ''}
 
-          <!-- 口诀 + 易错提示 -->
+          <!-- E19: 口诀 + 易错提示 — 由 multimodalEngine 编排 -->
+          ${(_showChant || _showConfuse) ? `
           <div class="flex gap-2 sm:gap-3 mt-2 w-full max-w-3xl flex-wrap justify-center flex-shrink-0">
+            ${_showChant ? `
             <button id="btn-chant" class="bg-amber-100 text-amber-950 font-black text-xs sm:text-sm px-3 sm:px-5 py-2 rounded-full shadow-md border-2 border-amber-300 active:scale-95 transition-transform flex items-center gap-1.5 cursor-pointer">
               ${GAME_ICONS.speaker("w-3.5 h-3.5")}
               <span>口诀：${_etym.mnemonic.chant}</span>
             </button>
-            ${_etym.confusing.hasConfusables ? `
+            ` : ''}
+            ${_showConfuse ? `
               <div class="bg-rose-100/90 text-rose-800 text-xs font-bold px-3 py-1.5 rounded-full shadow-md border-2 border-rose-300 flex items-center gap-1.5">
                 <span>⚠️ 别搞混：</span>
                 ${_etym.confusing.pairs.map(p => `<span class="font-black text-rose-950">${p.other}${p.otherPinyin?'('+p.otherPinyin+')':''}</span>`).join(' ')}
               </div>
             ` : ''}
           </div>
+          ` : ''}
 
           <!-- 操作按钮 -->
           <div class="flex items-center gap-3 mt-3 flex-shrink-0">

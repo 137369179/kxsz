@@ -7,6 +7,7 @@ import { MapModule } from "./components/MapModule.js";
 import { soundAndFX } from "./utils/soundEngine.js";
 import { neuralVoice } from "./utils/neuralVoice.js";
 import { CHARACTER_DATABASE } from "./data/characters.js";
+import { ensureDetails } from "./utils/charDetailLoader.js";
 import { EVENTS, eventBus } from "./utils/eventBus.js";
 import { storageManager } from "./utils/storageManager.js";
 import { eyeCareManager } from "./utils/eyeCareManager.js";
@@ -163,6 +164,7 @@ class CathyAppManager extends BaseModule {
     const loader = MODULE_LOADERS[key];
     if (!loader) return null;
     try {
+      await ensureDetails();
       let cls = this._moduleClasses.get(key);
       if (!cls) {
         cls = await loader();
@@ -225,6 +227,14 @@ class CathyAppManager extends BaseModule {
 
     // 
     this._removeLoader();
+
+    // 后台预取字库详情层（空闲期加载，不阻塞首屏；进入学习/字卡时已就绪）
+    const prefetchDetails = () => ensureDetails().catch(() => {});
+    if (typeof requestIdleCallback === "function") {
+      requestIdleCallback(prefetchDetails, { timeout: 2000 });
+    } else {
+      setTimeout(prefetchDetails, 1500);
+    }
 
     //  (Eye Protection / Time Limit System)
     this._initAntiAddiction();
@@ -539,7 +549,8 @@ class CathyAppManager extends BaseModule {
     }
   }
 
-  startLearnFlow(charData) {
+  async startLearnFlow(charData) {
+    await ensureDetails();
     this.currentMode = "learn";
     if (this.learnModule) {
       this.learnModule.destroy();
