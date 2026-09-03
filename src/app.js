@@ -8,7 +8,7 @@ import { soundAndFX } from "./utils/soundEngine.js";
 import { neuralVoice } from "./utils/neuralVoice.js";
 import { CHARACTER_DATABASE } from "./data/characters.js";
 import { ensureDetails } from "./utils/charDetailLoader.js";
-import { EVENTS, eventBus } from "./utils/eventBus.js";
+import { eventBus } from "./utils/eventBus.js";
 import { storageManager } from "./utils/storageManager.js";
 import { eyeCareManager } from "./utils/eyeCareManager.js";
 

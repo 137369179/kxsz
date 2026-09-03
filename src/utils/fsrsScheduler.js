@@ -197,13 +197,17 @@ export function initFSRSRecord(charId) {
 }
 
 /**
- * 将旧版 record 转换为 FSRS state（迁移用）
+ * 确保 record 有 _fsrsState（迁移用）
+ * - 若已有 _fsrsState，直接返回 record
+ * - 若无，迁移旧字段到新的 _fsrsState 结构，并保留旧字段以兼容旧代码
  * @param {object} record 旧版 charRecords 条目
- * @returns {object} FSRS state
+ * @returns {object} 带有 _fsrsState 的 record
  */
-export function migrateToFSRS(record) {
+export function ensureFSRSState(record) {
   if (!record) return record;
+  // 已有 FSRS 状态，无需迁移
   if (record._fsrsState) return record;
+  
   const intervalMs = record.interval || Math.max(0, (record.nextReviewDate || Date.now()) - Date.now());
   const stability = intervalToStability(intervalMs);
   const prevState = record.reviewCount > 0 ? FSRSState.REVIEW : FSRSState.LEARNING;
@@ -223,6 +227,9 @@ export function migrateToFSRS(record) {
     },
   };
 }
+
+/** @deprecated 兼容旧接口，请使用 ensureFSRSState */
+export const migrateToFSRS = ensureFSRSState;
 
 /**
  * 判断本次复习是否为同日复习（Intra-day review）
@@ -456,7 +463,7 @@ export function scheduleLearningStep(fsrsState, passed) {
  * @returns {object} 更新后的 record（同时更新 _fsrsState 和旧字段）
  */
 export function fsrsCompleteCharacter(charRecord, starsEarned = 3) {
-  const state = migrateToFSRS(charRecord)._fsrsState || initFSRSRecord(charRecord.charId);
+  const state = ensureFSRSState(charRecord)._fsrsState || initFSRSRecord(charRecord.charId);
   // 新字学完，进入 REVIEW，rating = GOOD（有星星说明掌握得不错）
   const rating = starsEarned >= 2 ? FSRGRating.GOOD : FSRGRating.HARD;
   const result = scheduleFSRS(state, rating);
@@ -494,7 +501,7 @@ export function fsrsCompleteCharacter(charRecord, starsEarned = 3) {
  * @returns {object} 更新后的 record
  */
 export function fsrsCompleteReview(charRecord, isCorrect) {
-  const state = migrateToFSRS(charRecord)._fsrsState || initFSRSRecord(charRecord.charId);
+  const state = ensureFSRSState(charRecord)._fsrsState || initFSRSRecord(charRecord.charId);
   const rating = isCorrectToRating(isCorrect);
   const result = scheduleFSRS(state, rating);
 

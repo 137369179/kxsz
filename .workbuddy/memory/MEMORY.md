@@ -10,15 +10,17 @@
   - 手工精编（9 字段）：`0数字_*.txt`（01-04，保留高质量故事/词组/形近字）
   - 自动扩字（4 字段 `字|类型|部首|emoji|词组`）：`auto*.txt`
   - 纯字池（每行一字）：`auto*.chars.txt` —— `load_auto_list()` 读取，自动取部首/配图/定机制
-- 产物：`src/data/characters.js`（**仅元数据**，~1.84 MB）+ `src/data/hanzi_strokes.js`（**真实笔顺，懒加载**，~3.2 MB）
+- 产物：`src/data/characters.js`（**索引层**，~336KB，仅地图/关卡必需字段）+ `src/data/characterDetails.js`（**详情层**，~2.88MB，strokes/evolution/words/meanings/gameConfig 等，懒加载）
+- 拆分工具：`tools/split_characters.mjs`（生成索引层 + 详情层）；`tools/build_characters.py` 仍负责生字
 - 部首来源：`cnradical`（`Radical(RunOption.Radical).trans_ch(ch)`，已装 venv）
 - 笔顺来源：hanzi-writer-data CDN `cdn.jsdelivr.net/npm/hanzi-writer-data@2.0.1/<char>.json`，本地缓存 `tools/cache/<codepoint>.json`
 - 上限：`MAX_CHARS=1300`（超出保留精编、裁字池尾部）
 
 ## 首屏瘦身约定（不要回退）
-- 笔顺数据 **不**进 characters.js；写环节经 `src/utils/strokeLoader.js` 的 `loadStrokes(char)` 动态 import。
-- 改 `hanziEngine` 构造需传第 5 参 `strokeData`；或走 `HanziEngine.create(canvas, charData, cb)` 异步工厂。
-- `LearnModule.stepWrite()` 已是 async executor，构造引擎前先 `await loadStrokes(char.char)`。
+- 笔顺/详情字段 **不**进 characters.js（索引层）；经 `src/utils/charDetailLoader.js` 的 `ensureDetails()` 动态 import characterDetails.js，`Object.assign` 回 CHARACTER_DATABASE 同引用（12 消费方 API 零改动）。
+- 旧 `strokeLoader.js` 与 `hanzi_strokes.js` 已废弃删除；旧按-stage 拆分 `characters/{index,stage1,stage2,stage3}.js` 也已删除（零引用）。
+- 组件路由懒加载：app.js 顶层仅静态 import MapModule，其余 10 组件 `() => import(...)` 动态加载。
+- 构建发布：`npm run build` → Vite → `dist/`（首屏 JS 4.31MB→459KB / gzip 82KB）。源码直出 src/app.js 仅开发/探针用。
 
 ## 服务与验证
 - 本地预览：`node http-server -p 8848 --cors`（或 python 版易崩，勿用）

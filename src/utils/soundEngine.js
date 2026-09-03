@@ -24,10 +24,12 @@ import { GAME_ICONS } from "./gameIcons.js";
 import { rewardThrottle } from "./rewardThrottle.js";
 
 // ============================================================
-// 0. 
+// 常量定义（消除魔法数字）
 // ============================================================
+const COIN_FLY_THROTTLE_MS = 800;      // 金币飞行节流（毫秒）
+const EST_CHAR_MS_MIN = 160;           // 最小预估字符时长（毫秒）
 
-/**  */
+/** 语音队列项 */
 class SpeechQueueItem {
   constructor({ kind, priority, text, opts = {}, utteranceFactory, onEnd = null }) {
     this.kind = kind;                         // tutor | eval | char | word | sentence
@@ -605,7 +607,8 @@ class CathyAudioEngine {
       this.synth.speak(utter);
 
       //  ( onboundary)
-      const estCharMs = Math.max(160, Math.round(280 / (utter.rate || 1)));
+      // 最小预估字符时长 160ms
+      const estCharMs = Math.max(EST_CHAR_MS_MIN, Math.round(280 / (utter.rate || 1)));
       let idx = 0;
       const total = chars.length * estCharMs;
       queueItem._progressTimer = setInterval(() => {
@@ -1452,9 +1455,9 @@ class CathyAudioEngine {
   triggerCoinFly(container, startX = null, startY = null, count = 3) {
     if (typeof window === "undefined" || !document.body) return;
 
-    // 调研报告 §4 建议B：节流与视觉降噪，800ms 窗口内防止音画多重叠加过载
+    // 调研报告 §4 建议B：节流与视觉降噪，COIN_FLY_THROTTLE_MS 窗口内防止音画多重叠加过载
     const now = Date.now();
-    if (this._lastCoinFlyTime && now - this._lastCoinFlyTime < 800) {
+    if (this._lastCoinFlyTime && now - this._lastCoinFlyTime < COIN_FLY_THROTTLE_MS) {
       this.playCoinClink();
       return;
     }

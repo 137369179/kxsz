@@ -13,7 +13,7 @@ import { HanziEngine } from "../utils/hanziEngine.js";
 import { PrewriteEngine } from "../utils/prewriteEngine.js";
 import { soundAndFX } from "../utils/soundEngine.js";
 import { ebbinghausManager } from "../utils/ebbinghaus.js";
-import { BaseModule } from "../utils/BaseModule.js";
+import { BaseModule, escapeHtml } from "../utils/BaseModule.js";
 import { EVENTS } from "../utils/eventBus.js";
 import { GAME_ICONS } from "../utils/gameIcons.js";
 import { pronunciationEval } from "../utils/pronunciationEval.js";
@@ -27,6 +27,13 @@ import { chantChar, CHANT_MODES } from "../utils/chantEngine.js";
 import { forChar as mmForChar, SCENES as MM_SCENES } from "../utils/multimodalEngine.js";
 import { voiceGuide } from "../utils/voiceGuide.js";
 import { getCognitiveStageData } from "../utils/cognitiveStage.js";
+
+// ============================================================
+// 常量定义（消除魔法数字）
+// ============================================================
+const RECORD_MAX_DURATION_MS = 3200;    // 录音最大时长（毫秒）
+const RECORD_SILENCE_TIMEOUT_MS = 2500; // 静音超时（毫秒）
+const HAZARD_PEEK_DURATION_MS = 2500;   // 象形动画 peek 展示时长
 
 export class LearnModule extends BaseModule {
   constructor(container, charData, onFinishCallback, onBackToMapCallback) {
@@ -70,6 +77,18 @@ export class LearnModule extends BaseModule {
     return storageManager.getItem(`learn_progress_${this.charData.id}`);
   }
 
+  /**
+   * Promise 风格的延时辅助函数（用于 async/await 动画序列）
+   * @param {number} ms 毫秒
+   * @returns {Promise}
+   */
+  _wait(ms) {
+    return new Promise(resolve => {
+      const id = setTimeout(resolve, ms);
+      this._addCleanup(() => clearTimeout(id));
+    });
+  }
+
   markStepComplete(stepIdx) {
     if (!this.completedSteps.includes(stepIdx)) {
       this.completedSteps.push(stepIdx);
@@ -108,7 +127,8 @@ export class LearnModule extends BaseModule {
       this._countTimer = null;
     }
     const pe = pronunciationEval || (typeof window !== "undefined" ? window.pronunciationEval : null);
-    if (pe && pe.state === "listening") {
+    // P0 内存泄漏修复：stopAndEvaluate 已完整清理 MediaRecorder、流轨道、AnalyserNode 等资源
+    if (pe && (pe.state === "listening" || pe.state === "evaluating")) {
       try { pe.stopAndEvaluate(); } catch {}
     }
     if (typeof document !== "undefined") {
@@ -168,7 +188,7 @@ export class LearnModule extends BaseModule {
           <div class="flex items-center gap-2.5">
             <div class="flex items-center gap-2 bg-gradient-to-r from-orange-500 via-amber-500 to-yellow-400 text-white font-black text-xs sm:text-sm px-4 py-2 rounded-full border-2 border-white shadow-xl">
               <span class="text-white/90">正在学:</span>
-              <span class="text-xl sm:text-2xl text-yellow-100 font-serif leading-none drop-shadow">${this.charData.char}</span>
+              <span class="text-xl sm:text-2xl text-yellow-100 font-serif leading-none drop-shadow">${escapeHtml(this.charData.char)}</span>
             </div>
             <button id="btn-learn-sound" class="w-10 h-10 sm:w-11 sm:h-11 bg-black/40 backdrop-blur-md rounded-full text-white flex items-center justify-center hover:bg-black/60 transition-transform active:scale-90 border-2 border-white/40 shadow-lg cursor-pointer" title="声音开关">
               ${__lnSpeakerIcon}
@@ -259,7 +279,8 @@ export class LearnModule extends BaseModule {
       this._countTimer = null;
     }
     const pe = pronunciationEval || (typeof window !== "undefined" ? window.pronunciationEval : null);
-    if (pe && pe.state === "listening") {
+    // P0 内存泄漏修复：stopAndEvaluate 已完整清理 MediaRecorder、流轨道、AnalyserNode 等资源
+    if (pe && (pe.state === "listening" || pe.state === "evaluating")) {
       try { pe.stopAndEvaluate(); } catch {}
     }
 
@@ -551,20 +572,24 @@ export class LearnModule extends BaseModule {
 
     const jellyBtn = stage.querySelector("#btn-jelly-char");
     if (jellyBtn) {
-      this._on(jellyBtn, "click", () => {
+      this._on(jellyBtn, "click", async () => {
         soundAndFX.playJellyBoing();
         soundAndFX.speakPriority(`${char.char}，${char.pinyin}`, { kind: "char", priority: 1 });
         soundAndFX.triggerConfetti(this.container);
         jellyBtn.classList.remove("animate-bounce-cathy");
+        
+        // 阶段 1：挤压动画
         jellyBtn.classList.add("scale-x-125", "scale-y-75");
-        this._timeout(() => {
-          jellyBtn.classList.remove("scale-x-125", "scale-y-75");
-          jellyBtn.classList.add("scale-x-85", "scale-y-115");
-          this._timeout(() => {
-            jellyBtn.classList.remove("scale-x-85", "scale-y-115");
-            jellyBtn.classList.add("animate-bounce-cathy");
-          }, 150);
-        }, 120);
+        await this._wait(120);
+        
+        // 阶段 2：拉伸动画
+        jellyBtn.classList.remove("scale-x-125", "scale-y-75");
+        jellyBtn.classList.add("scale-x-85", "scale-y-115");
+        await this._wait(150);
+        
+        // 阶段 3：弹跳恢复
+        jellyBtn.classList.remove("scale-x-85", "scale-y-115");
+        jellyBtn.classList.add("animate-bounce-cathy");
       });
     }
 
@@ -986,8 +1011,8 @@ export class LearnModule extends BaseModule {
       const startRes = await pe.startEvaluation({
         text: char.char,
         mode: "char",
-        maxDurationMs: 3200,
-        silenceTimeoutMs: 2500,
+        maxDurationMs: RECORD_MAX_DURATION_MS,
+        silenceTimeoutMs: RECORD_SILENCE_TIMEOUT_MS,
         onResult: ({ transcript, isFinal }) => {
           const interim = stage.querySelector("#record-interim-text");
           if (interim) {
@@ -1012,8 +1037,8 @@ export class LearnModule extends BaseModule {
     }
     this._isRecordingTransition = false;
 
-    // 麦克风已成功接入，正式开始 3.2 秒倒计时与实时声学动态频谱
-    const totalDuration = 3200;
+    // 麦克风已成功接入，正式开始录音倒计时与实时声学动态频谱
+    const totalDuration = RECORD_MAX_DURATION_MS;
     const startTime = performance.now();
     let countdown = 3;
     if (statusTxt) {
@@ -1984,7 +2009,7 @@ export class LearnModule extends BaseModule {
         soundAndFX.playPop();
         soundAndFX.speakPriority(`小精灵给你提示一眼，看清楚笔顺马上写哦！`, { kind: "sentence", emotion: "gentle" });
         if (this.hanziEngine) {
-          this.hanziEngine.peekGuide(2500);
+          this.hanziEngine.peekGuide(HAZARD_PEEK_DURATION_MS);
         }
       });
     }

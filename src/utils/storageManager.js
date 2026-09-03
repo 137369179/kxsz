@@ -144,7 +144,8 @@ export class StorageManager {
         p: progress
       };
       const jsonStr = JSON.stringify(payload);
-      const encoded = btoa(encodeURIComponent(jsonStr));
+      // 安全修复：btoa 仅支持 Latin-1，使用 unescape/encodeURIComponent 处理 Unicode 字符
+      const encoded = btoa(unescape(encodeURIComponent(jsonStr)));
       return `CATHY_SYNC_V1:${encoded}`;
     } catch (e) {
       console.error("生成换机迁移码失败", e);
@@ -163,7 +164,8 @@ export class StorageManager {
       let progressObj = null;
       if (trimmed.startsWith("CATHY_SYNC_V1:")) {
         const rawBase64 = trimmed.slice("CATHY_SYNC_V1:".length);
-        const decodedJson = decodeURIComponent(atob(rawBase64));
+        // 安全修复：使用 decodeURIComponent/unescape 正确处理 Unicode 字符
+        const decodedJson = decodeURIComponent(escape(atob(rawBase64)));
         const payload = JSON.parse(decodedJson);
         progressObj = payload.p || payload;
       } else if (trimmed.startsWith("{")) {

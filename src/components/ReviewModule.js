@@ -15,6 +15,23 @@ import { EVENTS } from "../utils/eventBus.js";
 import { GAME_ICONS } from "../utils/gameIcons.js";
 import { printWorksheet } from "../utils/worksheetGenerator.js";
 import { getSessionConfig } from "../utils/sessionPlanner.js";
+// P4 引擎接入：B8 原子卡 + B3 FSRS 调度 + B19 多模态编排
+import {
+  buildAtomicCardsForChar,
+  expandCharsToAtomicQueue,
+  recordAtomicAnswer,
+  isCardMastered,
+  ATOMIC_CARD_TYPES,
+} from "../utils/flashcardEngine.js";
+import {
+  scheduleFSRS,
+  initFSRSRecord,
+  migrateToFSRS,
+  FSRGRating,
+  isIntradayReview,
+  fsrsPredict,
+} from "../utils/fsrsScheduler.js";
+import { forChar as mmForChar, SCENES as MM_SCENES } from "../utils/multimodalEngine.js";
 
 function shuffle(arr) {
   const a = [...arr];
@@ -60,6 +77,28 @@ export class ReviewModule extends BaseModule {
     this.queue = allIds
       .map((id) => CHARACTER_DATABASE.find((c) => c.id === id))
       .filter(Boolean);
+
+    // P4 B8: 跳过 flashcardEngine 判定所有原子卡已掌握的字
+    // P4 B3: 用 FSRS predict 排序 — 先复习弱字，强字排后
+    const records = ebbinghausManager.progress.charRecords || {};
+    this.queue = this.queue
+      .filter((c) => {
+        const rec = records[c.id];
+        if (!rec) return true;  // 未记录过的字保留
+        // 所有 5 张原子卡都已掌握 → 这个字暂时跳过
+        const allMastered = Object.values(ATOMIC_CARD_TYPES).every((t) =>
+          isCardMastered(rec, t)
+        );
+        return !allMastered;
+      })
+      .sort((a, b) => {
+        const recA = records[a.id];
+        const recB = records[b.id];
+        const predA = fsrsPredict(recA?._fsrsState || recA);
+        const predB = fsrsPredict(recB?._fsrsState || recB);
+        // retention 低的排前面（先复习遗忘风险高的字）
+        return (predA.retention ?? 1) - (predB.retention ?? 1);
+      });
 
     // 若无到期复习字，抽取已学字或基础字进行巩固
     if (this.queue.length === 0) {
@@ -173,6 +212,13 @@ export class ReviewModule extends BaseModule {
     const charData = this.queue[this.currentIndex];
     const progress = this.currentIndex + 1;
 
+    // P4 B19: 多模态编排器 — 为当前复习字生成模态包
+    const __mm = mmForChar(charData, MM_SCENES.REVIEW);
+    const __emoji    = __mm.modalities.visual_emoji?.emoji;
+    const __radical  = __mm.modalities.semantic_radical?.radical;
+    const __confuses = __mm.modalities.semantic_confuse?.confusables || [];
+    const __chant    = __mm.modalities.auditory_chant?.chant;
+
     this.container.innerHTML = `
       <div class="relative w-full h-full min-h-[640px] flex flex-col select-none overflow-hidden bg-gradient-to-b from-indigo-950 via-purple-950 to-slate-950 text-white animate-fade-in">
         
@@ -199,6 +245,14 @@ export class ReviewModule extends BaseModule {
             </div>
           </div>
         </header>
+
+        <!-- P4 B19: 多模态预览条 — 由 multimodalEngine 编排 -->
+        <div class="relative z-20 w-full px-4 py-1.5 flex items-center gap-2 flex-wrap justify-center bg-black/30 backdrop-blur-sm border-b border-white/10 text-xs font-bold">
+          ${__emoji ? `<span class="bg-white/15 text-white px-2 py-0.5 rounded-full border border-white/20">${__emoji} 形象</span>` : ''}
+          ${__radical ? `<span class="bg-amber-500/25 text-amber-200 px-2 py-0.5 rounded-full border border-amber-400/40">部首 ${__radical}</span>` : ''}
+          ${__confuses.length ? `<span class="bg-rose-500/25 text-rose-200 px-2 py-0.5 rounded-full border border-rose-400/40">⚠ 别搞混 ${__confuses.slice(0, 3).join(' ')}</span>` : ''}
+          ${__chant ? `<span class="bg-emerald-500/25 text-emerald-200 px-2 py-0.5 rounded-full border border-emerald-400/40">口诀：${__chant}</span>` : ''}
+        </div>
 
         <main id="drill-container" class="relative z-10 flex-1 w-full flex items-center justify-center p-4 sm:p-6">
         </main>
@@ -228,6 +282,39 @@ export class ReviewModule extends BaseModule {
       // 完成单个字的强化训练
       const perfect = (this.drillEngine.bestCombo || 0) >= 2;
       const charId = charData.id;
+      const records = ebbinghausManager.progress.charRecords;
+      let charRec = records[charId];
+
+      // P4 B3: ensure FSRS state exists (lazy migrate)
+      if (charRec && !charRec._fsrsState) {
+        charRec._fsrsState = migrateToFSRS(charRec);
+      } else if (!charRec) {
+        charRec = records[charId] = initFSRSRecord(charId);
+      }
+
+      // P4 B3: 决定 FSRS rating
+      // perfect → GOOD/EASY，非 perfect → HARD/AGAIN
+      let rating;
+      if (perfect) {
+        rating = (this.drillEngine.bestCombo || 0) >= 4 ? FSRGRating.EASY : FSRGRating.GOOD;
+      } else if ((this.consecutiveMistakes[charId] || 0) >= 2) {
+        rating = FSRGRating.AGAIN;
+      } else {
+        rating = FSRGRating.HARD;
+      }
+
+      // P4 B3: 执行 FSRS 调度
+      const prevStability = charRec._fsrsState.stability;
+      charRec._fsrsState = scheduleFSRS(charRec._fsrsState, rating);
+
+      // P4 B8: flashcardEngine 原子卡答题记录
+      // 整字 perfect → 所有原子卡记 correct，否则记 incorrect
+      for (const cardType of Object.values(ATOMIC_CARD_TYPES)) {
+        recordAtomicAnswer(charRec, cardType, perfect);
+      }
+
+      // 持久化（ebbinghausManager 会写 localStorage）
+      ebbinghausManager.saveProgress?.();
 
       if (perfect) {
         this.correctCount++;
@@ -293,7 +380,7 @@ export class ReviewModule extends BaseModule {
     ].join(';');
     banner.innerHTML = [
       GAME_ICONS.star('w-5 h-5', false),
-      `<span>「${charData.char}」需要加强巳固！已加入本轮末尾重练</span>`,
+      `<span>「${escapeHtml(charData.char)}」需要加强巳固！已加入本轮末尾重练</span>`,
     ].join('');
     document.body.appendChild(banner);
     setTimeout(() => { banner.remove(); }, 3200);
@@ -338,10 +425,10 @@ export class ReviewModule extends BaseModule {
                 ${forgottenSet.has(c.id)
                   ? 'bg-red-500/30 border-2 border-red-400'
                   : 'bg-white/20 border-2 border-yellow-300/50'}
-                hover:bg-white/30 flex flex-col items-center justify-center cursor-pointer active:scale-90 transition-transform font-serif shadow" data-char="${c.char}">
-                <span class="text-xl font-black text-white leading-none">${c.char}</span>
+                hover:bg-white/30 flex flex-col items-center justify-center cursor-pointer active:scale-90 transition-transform font-serif shadow" data-char="${escapeHtml(c.char)}">
+                <span class="text-xl font-black text-white leading-none">${escapeHtml(c.char)}</span>
                 <span class="text-[9px] ${forgottenSet.has(c.id) ? 'text-red-300' : 'text-yellow-300'} font-sans mt-0.5">
-                  ${forgottenSet.has(c.id) ? '加强' : c.pinyin}
+                  ${forgottenSet.has(c.id) ? '加强' : escapeHtml(c.pinyin)}
                 </span>
               </div>
             `).join("")}

@@ -1,15 +1,29 @@
 /**
- * 
+ * 基础 Module 类 — 所有业务模块的基类
  *
- *  Module  container
- * - this.container : 
- * - this._cleanups  : 
- * - this._on / _onWindow / _onDocument : 
- * - this._interval / this._timeout : destroy 
- * - this._busOn / this._busEmit : 
- * - this.destroy() : 
+ * 职责：生命周期管理、事件绑定、资源清理
+ * - this.container : DOM 容器
+ * - this._cleanups  : 生命周期清理队列
+ * - this._on / _onWindow / _onDocument : 事件绑定
+ * - this._interval / this._timeout : 定时器（自动清理）
+ * - this._busOn / this._busEmit : 事件总线
+ * - this.destroy() : 清理所有资源
  */
 import { eventBus, EVENTS } from "./eventBus.js";
+
+/**
+ * HTML 转义 — 防止 XSS 注入
+ * 将 < > & " ' 等特殊字符转义为 HTML 实体
+ */
+export function escapeHtml(str) {
+  if (str == null) return "";
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
 
 export class BaseModule {
   constructor(container) {
@@ -122,6 +136,38 @@ export class BaseModule {
     const cleanup = () => clearTimeout(id);
     this._addCleanup(cleanup);
     return id;
+  }
+
+  /**
+   * 返回大地图（统一返回按钮行为）
+   * @param {Object} options 配置选项
+   * @param {boolean} options.playSound 是否播放 pop 音效，默认 true
+   * @param {string} options.target 目标模式，默认 "map"
+   * @param {Function} options.beforeEmit 切换前回调，可用于清理模块特有资源
+   */
+  navigateToMap(options = {}) {
+    const { playSound = true, target = "map", beforeEmit } = options;
+    // 动态导入 soundAndFX 避免循环依赖
+    if (playSound && typeof window !== "undefined" && window.soundAndFX?.playPop) {
+      window.soundAndFX.playPop();
+    }
+    if (typeof beforeEmit === "function") {
+      beforeEmit();
+    }
+    this._busEmit(EVENTS.SWITCH_MODE, { mode: target });
+  }
+
+  /**
+   * 通用返回按钮绑定（配合 HTML 中的 data-back-to 属性使用）
+   * @param {string|Element} btn 返回按钮选择器或元素
+   * @param {Object} options 配置选项
+   */
+  bindBackButton(btn, options = {}) {
+    const { playSound = true, target = "map", beforeEmit } = options;
+    if (!btn) return;
+    this._on(btn, "click", () => {
+      this.navigateToMap({ playSound, target, beforeEmit });
+    });
   }
 
   /**
