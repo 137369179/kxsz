@@ -23,6 +23,7 @@ import { storageManager } from "../utils/storageManager.js";
 import { mascotProgress } from "../utils/mascotProgress.js";
 import { openEtymologyQuiz } from "../utils/etymologyQuiz.js";
 import { buildEtymologyCard } from "../utils/etymologyEngine.js";
+import { chantChar, CHANT_MODES } from "../utils/chantEngine.js";
 import { voiceGuide } from "../utils/voiceGuide.js";
 import { getCognitiveStageData } from "../utils/cognitiveStage.js";
 
@@ -378,15 +379,46 @@ export class LearnModule extends BaseModule {
       });
     }
 
-    // E12: 口诀朗读按钮
+    // E12+E16: 口诀节拍唱读（替代纯朗读）
+    let _chantHandle = null;  // 允许中途取消
     const chantBtn = stage.querySelector("#btn-chant");
     if (chantBtn) {
       this._on(chantBtn, "click", () => {
+        // 已在唱读 → 取消
+        if (_chantHandle) {
+          _chantHandle.cancel();
+          _chantHandle = null;
+          chantBtn.classList.remove("ring-4", "ring-yellow-300");
+          return;
+        }
+
         soundAndFX.playPop();
-        const card = buildEtymologyCard(char);
-        soundAndFX.speakPriority(card.mnemonic.chant, { kind: "sentence", emotion: "gentle" });
         chantBtn.classList.add("ring-4", "ring-yellow-300");
-        this._timeout(() => chantBtn.classList.remove("ring-4", "ring-yellow-300"), 600);
+
+        const { plan, handle } = chantChar(char, {
+          mode: CHANT_MODES.CHANT,
+          bpm: 110,
+          soundEngine: soundAndFX,
+          callbacks: {
+            onBeat(beat, text) {
+              // 目标字 ★ 给个视觉强调
+              if (text === char.char) {
+                chantBtn.classList.add("scale-110");
+              }
+            },
+            onComplete() {
+              chantBtn.classList.remove("ring-4", "ring-yellow-300", "scale-110");
+              _chantHandle = null;
+            },
+          },
+        });
+
+        _chantHandle = handle;
+        // 超时兜底：plan 总时长 + 500ms 后自动清理
+        this._timeout(() => {
+          chantBtn.classList.remove("ring-4", "ring-yellow-300", "scale-110");
+          _chantHandle = null;
+        }, plan.totalMs + 500);
       });
     }
 
