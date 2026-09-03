@@ -2,8 +2,8 @@
 const _ver = new URL(self.location.href).searchParams.get("v") || "2.9.1";
 const CACHE_NAME = `cathy-literacy-v${_ver.replace(/\./g, "-")}`; // 动态读取版本，避免硬编码（与 version.js 对齐）
 
-// 核心数据文件预缓存列表（install 阶段离线就绪）
-const CORE_ASSETS = [
+// 核心数据文件预缓存列表（源码直出模式默认；构建模式优先用 sw-manifest.json）
+const DEFAULT_CORE_ASSETS = [
   "./index.html",
   `./assets/css/prod.css?v=${_ver}`,
   `./src/app.js?v=${_ver}`,
@@ -93,11 +93,25 @@ const CORE_ASSETS = [
 // 静态资源走 Cache-First（离线秒开，支持 webp 图像格式）
 const STATIC_CACHEABLE = /\.(js|css|html|json|jpg|jpeg|png|gif|svg|webp|woff2?|ttf|ico)$/i;
 
+// 构建模式（dist/）优先用 tools/_gen_sw_manifest.mjs 生成的实际产物清单；
+// 源码直出模式无 sw-manifest.json，回退硬编码 DEFAULT_CORE_ASSETS。
+async function resolvePrecacheList() {
+  try {
+    const res = await fetch("./sw-manifest.json", { cache: "no-store" });
+    if (res.ok) {
+      const list = await res.json();
+      if (Array.isArray(list) && list.length) return list;
+    }
+  } catch (e) {}
+  return DEFAULT_CORE_ASSETS;
+}
+
 self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
+    caches.open(CACHE_NAME).then(async (cache) => {
+      const assets = await resolvePrecacheList();
       return Promise.allSettled(
-        CORE_ASSETS.map((asset) =>
+        assets.map((asset) =>
           fetch(asset)
             .then((res) => {
               if (res.ok) return cache.put(asset, res);

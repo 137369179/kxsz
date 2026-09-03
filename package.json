@@ -3,7 +3,7 @@
   "version": "2.8.0",
   "type": "module",
   "scripts": {
-    "build": "vite build && cp sw.js dist/sw.js",
+    "build": "vite build && cp sw.js dist/sw.js && cp -r assets/images dist/assets/ && node tools/_gen_sw_manifest.mjs",
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
