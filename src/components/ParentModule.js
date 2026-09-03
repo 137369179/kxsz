@@ -45,6 +45,16 @@ export class ParentModule extends BaseModule {
     this.mathNum1 = Math.floor(Math.random() * 6) + 4; // 4~9
     this.mathNum2 = Math.floor(Math.random() * 6) + 4; // 4~9
     this.mathAnswer = this.mathNum1 * this.mathNum2;
+    this.gateFailCount = 0; // 门禁连续失败计数（防儿童穷举试错）
+    this.gateLockUntil = 0; // 门禁锁定截止时间戳（ms），3 次失败后冷却
+  }
+
+  /** 重新生成门禁算术题（每次进入门禁出新题，防记住答案） */
+  _newQuestion() {
+    this.mathNum1 = Math.floor(Math.random() * 6) + 4;
+    this.mathNum2 = Math.floor(Math.random() * 6) + 4;
+    this.mathAnswer = this.mathNum1 * this.mathNum2;
+    this.gateFailCount = 0;
   }
 
   getChineseNumber(n) {
@@ -75,6 +85,11 @@ export class ParentModule extends BaseModule {
   // 1. 家长安全算术门禁
   // ----------------------------------------------------
   renderParentGate() {
+    // 每次进入门禁出新题 + 检查冷却锁
+    this._newQuestion();
+    const now = Date.now();
+    const locked = now < this.gateLockUntil;
+    const lockRemainSec = Math.max(1, Math.ceil((this.gateLockUntil - now) / 1000));
     const qText = `${this.getChineseNumber(this.mathNum1)} 乘 ${this.getChineseNumber(this.mathNum2)} 等于多少？`;
 
     this.container.innerHTML = `
@@ -95,9 +110,13 @@ export class ParentModule extends BaseModule {
             <span class="text-lg font-black text-amber-900">${qText}</span>
           </div>
 
-          <input id="gate-answer-input" type="number" placeholder="请输入数字答案" class="w-full text-center text-2xl font-black py-3 px-4 rounded-2xl border-2 border-amber-300 focus:outline-none focus:ring-4 focus:ring-orange-200 mb-4 bg-amber-50/50 text-amber-950" />
+          ${locked ? `<div class="w-full bg-rose-50 border-2 border-rose-300 rounded-2xl p-3 mb-4 text-center">
+            <span class="text-xs font-black text-rose-600">尝试次数过多，请找爸爸妈妈帮忙，约 ${lockRemainSec} 秒后可再试</span>
+          </div>` : ""}
 
-          <button id="btn-submit-gate" class="w-full btn-game-orange text-white font-black text-sm py-3.5 rounded-2xl shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2 cursor-pointer">
+          <input id="gate-answer-input" type="number" placeholder="请输入数字答案" ${locked ? "disabled" : ""} class="w-full text-center text-2xl font-black py-3 px-4 rounded-2xl border-2 border-amber-300 focus:outline-none focus:ring-4 focus:ring-orange-200 mb-4 bg-amber-50/50 text-amber-950 ${locked ? "opacity-50" : ""}" />
+
+          <button id="btn-submit-gate" class="w-full btn-game-orange text-white font-black text-sm py-3.5 rounded-2xl shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2 cursor-pointer ${locked ? "opacity-50 pointer-events-none" : ""}" ${locked ? "disabled" : ""}>
             <span>验证并进入家长中心</span>
           </button>
 
@@ -121,16 +140,27 @@ export class ParentModule extends BaseModule {
     }
 
     const checkAnswer = () => {
+      if (Date.now() < this.gateLockUntil) return; // 冷却中直接忽略
       const val = parseInt(input.value.trim(), 10);
       if (val === this.mathAnswer) {
         soundAndFX.playSuccessSound();
         this.isUnlocked = true;
+        this.gateFailCount = 0;
         this.render();
       } else {
+        this.gateFailCount++;
+        if (this.gateFailCount >= 3) {
+          // 连续 3 次错误：冷却 30s（防儿童穷举试错）
+          this.gateLockUntil = Date.now() + 30000;
+          this.gateFailCount = 0;
+          showGameToast(this.container, "尝试次数过多，请找爸爸妈妈帮忙，30 秒后再试！", "error");
+          this.renderParentGate();
+          return;
+        }
         soundAndFX.playSoftError();
         input.classList.add("animate-shake");
         this._timeout(() => input.classList.remove("animate-shake"), 500);
-        showGameToast(this.container, "验证错误，请计算正确乘积后输入！", "error");
+        showGameToast(this.container, `验证错误（还可尝试 ${3 - this.gateFailCount} 次），请计算正确乘积后输入！`, "error");
         input.value = "";
       }
     };
@@ -177,7 +207,8 @@ export class ParentModule extends BaseModule {
               { key: "family", label: "亲子互动房", icon: (cls) => GAME_ICONS.swords(cls) },
               { key: "trophies", label: "荣誉勋章墙", icon: (cls) => GAME_ICONS.trophy(cls) },
               { key: "print", label: "字帖打印", icon: (cls) => GAME_ICONS.print(cls) },
-              { key: "settings", label: "督学设置", icon: (cls) => GAME_ICONS.gear(cls) }
+              { key: "settings", label: "督学设置", icon: (cls) => GAME_ICONS.gear(cls) },
+              { key: "privacy", label: "隐私与数据", icon: (cls) => GAME_ICONS.shieldLock(cls) }
             ]
               .map(
                 (tab) => `
@@ -655,6 +686,48 @@ export class ParentModule extends BaseModule {
       `;
     }
 
+    if (this.currentTab === "privacy") {
+      const profileId = storageManager.getActiveProfileId?.() || "child_1";
+      return `
+        <div class="space-y-5">
+          <div class="bg-white/95 rounded-3xl p-6 shadow-xl border-2 border-sky-200">
+            <h2 class="text-base font-black text-amber-950 mb-2 flex items-center gap-2">
+              <span class="flex items-center">${GAME_ICONS.shieldLock("w-5 h-5")}</span>
+              <span>隐私与数据安全</span>
+            </h2>
+            <div class="bg-sky-50 border-2 border-sky-200 rounded-2xl p-4 text-xs font-semibold text-sky-900 leading-relaxed">
+              凯茜识字<b>完全离线运行</b>：孩子的全部学习数据（进度/打卡/星币/勋章）仅保存在<b>本设备的浏览器本地存储</b>中，
+              应用内无任何账号注册、无云端上传、无广告与第三方统计 SDK。发音评测的跟读录音仅在评测瞬间使用，不落盘、不上传。
+              语音朗读由本机语音服务（127.0.0.1 本地端口）生成，数据不离开设备。
+            </div>
+          </div>
+
+          <div class="bg-white/95 rounded-3xl p-6 shadow-xl border-2 border-amber-200">
+            <h2 class="text-base font-black text-amber-950 mb-3 flex items-center gap-2">
+              <span class="flex items-center">${GAME_ICONS.gear("w-5 h-5")}</span>
+              <span>本设备存储的数据</span>
+            </h2>
+            <ul class="text-xs text-gray-600 font-semibold space-y-1.5 list-disc pl-5 leading-relaxed">
+              <li>学习进度主存档（${profileId}）：已学汉字 / 艾宾浩斯复习调度 / 星币与勋章 / 打卡日历</li>
+              <li>绘本阅读进度（cathy_book_progress_v2）与家长语音模板（家长中心录制，本机 IndexedDB）</li>
+              <li>偏好设置：专注模式 / 护眼间隔 / 描红容差 / 今日目标</li>
+            </ul>
+          </div>
+
+          <div class="bg-white/95 rounded-3xl p-6 shadow-xl border-2 border-emerald-200 flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
+            <div class="text-xs text-gray-600 font-semibold leading-relaxed">
+              <span class="text-emerald-800 font-black block mb-1">换设备或想留档？</span>
+              导出当前进度为 JSON 文件保存；如需重新开始可一键清除全部学习数据（需二次确认）。
+            </div>
+            <div class="flex items-center gap-3 flex-wrap shrink-0">
+              <button id="btn-export-data" class="bg-emerald-500 hover:bg-emerald-400 text-white font-black text-xs px-5 py-2.5 rounded-full shadow-md active:scale-95 cursor-pointer">导出进度备份 (JSON)</button>
+              <button id="btn-wipe-data" class="bg-rose-500 hover:bg-rose-400 text-white font-black text-xs px-5 py-2.5 rounded-full shadow-md active:scale-95 cursor-pointer">清除全部学习数据</button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
     return "";
   }
 
@@ -771,6 +844,55 @@ export class ParentModule extends BaseModule {
         soundAndFX.playPop();
         this.isUnlocked = false;
         this.render();
+      });
+    }
+
+    // 隐私与数据：导出进度备份
+    const exportBtn = mainEl.querySelector("#btn-export-data");
+    if (exportBtn) {
+      this._on(exportBtn, "click", () => {
+        try {
+          const data = {};
+          for (let i = 0; i < localStorage.length; i++) {
+            const k = localStorage.key(i);
+            if (k && /cathy/i.test(k)) data[k] = localStorage.getItem(k);
+          }
+          const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = `cathy-backup-${new Date().toISOString().slice(0, 10)}.json`;
+          a.click();
+          setTimeout(() => URL.revokeObjectURL(url), 2000);
+          soundAndFX.playSuccessSound();
+          showGameToast(this.container, "进度备份已导出！", "success");
+        } catch (e) {
+          console.warn("[ParentModule] 导出失败:", e);
+          showGameToast(this.container, "导出失败，请重试", "error");
+        }
+      });
+    }
+
+    // 隐私与数据：清除全部学习数据（二次确认）
+    const wipeBtn = mainEl.querySelector("#btn-wipe-data");
+    if (wipeBtn) {
+      this._on(wipeBtn, "click", () => {
+        if (typeof confirm === "function" && !confirm("确定要清除全部学习数据吗？此操作不可恢复，建议先导出备份！")) return;
+        try {
+          storageManager.clearAllCathyKeys();
+          // 补全：删除全部 cathy 前缀 key（专注模式偏好/动态档案等）
+          const rm = [];
+          for (let i = 0; i < localStorage.length; i++) {
+            const k = localStorage.key(i);
+            if (k && /cathy/i.test(k)) rm.push(k);
+          }
+          rm.forEach((k) => { try { localStorage.removeItem(k); } catch {} });
+        } catch (e) {
+          console.warn("[ParentModule] 清除失败:", e);
+        }
+        soundAndFX.playSuccessSound();
+        showGameToast(this.container, "学习数据已清除，正在刷新…", "success");
+        setTimeout(() => { try { location.reload(); } catch {} }, 1200);
       });
     }
 
