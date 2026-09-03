@@ -22,6 +22,7 @@ import { createPlayGame } from "../utils/playGames/index.js";
 import { storageManager } from "../utils/storageManager.js";
 import { mascotProgress } from "../utils/mascotProgress.js";
 import { openEtymologyQuiz } from "../utils/etymologyQuiz.js";
+import { buildEtymologyCard } from "../utils/etymologyEngine.js";
 import { voiceGuide } from "../utils/voiceGuide.js";
 
 export class LearnModule extends BaseModule {
@@ -305,41 +306,53 @@ export class LearnModule extends BaseModule {
         
         <div id="play-interactive-stage" class="relative z-10 w-full flex-1 flex flex-col items-center justify-center"></div>
 
-        <div id="evolution-reveal-box" class="absolute inset-0 bg-black/85 backdrop-blur-md rounded-3xl p-8 flex flex-col items-center justify-center text-white hidden animate-scale-up z-30">
-          <span class="bg-orange-500 text-white font-black text-xs px-4 py-1 rounded-full mb-3 shadow">象形 3 阶段蜕变完成！</span>
-          
-          <div class="flex items-center gap-6 my-4">
-            <div class="flex flex-col items-center">
-              <span class="text-xs text-yellow-300 font-bold mb-1">1. 甲骨文</span>
-              <div class="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl bg-amber-100 text-amber-950 flex items-center justify-center text-5xl sm:text-6xl font-black shadow-inner border-2 border-amber-300">
-                ${char.oracleGlyph || char.char}
+                ${(() => {
+            const _etym = buildEtymologyCard(char);
+            return `
+        <div id="evolution-reveal-box" class="absolute inset-0 bg-black/88 backdrop-blur-md rounded-3xl p-4 sm:p-6 flex flex-col items-center justify-center text-white hidden animate-scale-up z-30 overflow-auto">
+          <span class="bg-orange-500 text-white font-black text-xs px-4 py-1 rounded-full mb-2 shadow flex-shrink-0">字源 4 阶段演变！</span>
+
+          <!-- 4 阶段 timeline -->
+          <div class="flex items-center gap-2 sm:gap-3 my-2 flex-wrap justify-center">
+            ${_etym.stages.map((s, i) => `
+              <div class="flex flex-col items-center flex-shrink-0">
+                <span class="text-[10px] sm:text-xs text-yellow-300 font-bold mb-0.5">${s.label}</span>
+                <span class="text-[9px] text-white/50 mb-1">${s.age}</span>
+                <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-xl text-amber-950 flex items-center justify-center text-3xl sm:text-4xl font-black shadow-inner border-2"
+                     style="background:${s.key==='modern'?'linear-gradient(135deg,#fbbf24,#f97316)':'#fef3c7'};border-color:${s.color};${s.key==='modern'?'color:white;border-color:white;border-width:3px;':''}">
+                  ${s.glyph}
+                </div>
+                ${i < _etym.stages.length - 1 ? '<span class="text-orange-400 font-black text-xl mt-1 hidden sm:block">→</span>' : ''}
               </div>
-            </div>
-            <span class="text-2xl text-orange-400 font-black">-&gt;</span>
-            <div class="flex flex-col items-center">
-              <span class="text-xs text-yellow-300 font-bold mb-1">2. 小篆</span>
-              <div class="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl bg-amber-200 text-amber-950 flex items-center justify-center text-5xl sm:text-6xl font-black shadow-inner border-2 border-amber-400">
-                ${char.bronzeGlyph || char.char}
-              </div>
-            </div>
-            <span class="text-2xl text-orange-400 font-black">-&gt;</span>
-            <div class="flex flex-col items-center">
-              <span class="text-xs text-yellow-300 font-bold mb-1">3. 楷体规范字</span>
-              <div class="w-32 h-32 sm:w-36 sm:h-36 rounded-3xl bg-gradient-to-tr from-yellow-400 to-orange-500 text-white flex items-center justify-center text-7xl sm:text-8xl font-black shadow-2xl border-4 border-white animate-pulse">
-                ${char.char}
-              </div>
-            </div>
+            `).join('')}
           </div>
 
-          <div class="flex items-center gap-4 mt-4">
-            <button id="btn-open-morph-play" class="bg-gradient-to-r from-amber-400 to-orange-500 text-white font-black text-sm px-6 py-3 rounded-full shadow-2xl border-2 border-white active:scale-95 transition-transform flex items-center gap-2 cursor-pointer">
-              <span class="flex items-center">${GAME_ICONS.sparkle("w-4 h-4")}</span> 查看动效微剧场
+          <!-- 口诀 + 易错提示 -->
+          <div class="flex gap-2 sm:gap-3 mt-2 w-full max-w-3xl flex-wrap justify-center flex-shrink-0">
+            <button id="btn-chant" class="bg-amber-100 text-amber-950 font-black text-xs sm:text-sm px-3 sm:px-5 py-2 rounded-full shadow-md border-2 border-amber-300 active:scale-95 transition-transform flex items-center gap-1.5 cursor-pointer">
+              ${GAME_ICONS.speaker("w-3.5 h-3.5")}
+              <span>口诀：${_etym.mnemonic.chant}</span>
             </button>
-            <button id="btn-next-to-rec" class="bg-gradient-to-r from-emerald-400 to-emerald-600 text-white font-black text-sm px-8 py-3 rounded-full shadow-2xl border-2 border-white active:scale-95 transition-transform flex items-center gap-2 cursor-pointer">
-              <span class="flex items-center">${GAME_ICONS.sparkle("w-4 h-4")}</span> 去认字大剧场
+            ${_etym.confusing.hasConfusables ? `
+              <div class="bg-rose-100/90 text-rose-800 text-xs font-bold px-3 py-1.5 rounded-full shadow-md border-2 border-rose-300 flex items-center gap-1.5">
+                <span>⚠️ 别搞混：</span>
+                ${_etym.confusing.pairs.map(p => `<span class="font-black text-rose-950">${p.other}${p.otherPinyin?'('+p.otherPinyin+')':''}</span>`).join(' ')}
+              </div>
+            ` : ''}
+          </div>
+
+          <!-- 操作按钮 -->
+          <div class="flex items-center gap-3 mt-3 flex-shrink-0">
+            <button id="btn-open-morph-play" class="bg-gradient-to-r from-amber-400 to-orange-500 text-white font-black text-xs sm:text-sm px-4 sm:px-6 py-2.5 sm:py-3 rounded-full shadow-2xl border-2 border-white active:scale-95 transition-transform flex items-center gap-2 cursor-pointer">
+              ${GAME_ICONS.sparkle("w-4 h-4")} 动效微剧场
+            </button>
+            <button id="btn-next-to-rec" class="bg-gradient-to-r from-emerald-400 to-emerald-600 text-white font-black text-xs sm:text-sm px-6 sm:px-8 py-2.5 sm:py-3 rounded-full shadow-2xl border-2 border-white active:scale-95 transition-transform flex items-center gap-2 cursor-pointer">
+              ${GAME_ICONS.sparkle("w-4 h-4")} 去认字
             </button>
           </div>
         </div>
+            `;
+          })()}
 
       </div>
     `;
@@ -361,6 +374,18 @@ export class LearnModule extends BaseModule {
       this._on(morphBtn, "click", () => {
         soundAndFX.playPop();
         openMorphTheater(char);
+      });
+    }
+
+    // E12: 口诀朗读按钮
+    const chantBtn = stage.querySelector("#btn-chant");
+    if (chantBtn) {
+      this._on(chantBtn, "click", () => {
+        soundAndFX.playPop();
+        const card = buildEtymologyCard(char);
+        soundAndFX.speakPriority(card.mnemonic.chant, { kind: "sentence", emotion: "gentle" });
+        chantBtn.classList.add("ring-4", "ring-yellow-300");
+        this._timeout(() => chantBtn.classList.remove("ring-4", "ring-yellow-300"), 600);
       });
     }
 
