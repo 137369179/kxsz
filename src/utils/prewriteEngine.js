@@ -110,6 +110,23 @@ const SHAPE_HINTS = {
   spiral: "从里向外慢慢绕，像小蜗牛的壳！"
 };
 
+/**
+ * Letter School 步骤3「运笔动作演示」专属语音解说
+ * 调研报告 §5.2：动作演示步骤在手写教学中效果提升 25%
+ * 每种形状对应一句童趣运笔口令（配合光球动画同步朗读）
+ */
+const STROKE_GESTURE_CUES = {
+  line_horizontal: "从左边出发，手指轻轻向右滑，像小火车走平路！",
+  line_vertical:   "从上面出发，手指慢慢往下滑，像小雨滴落下来！",
+  line_diagonal_down: "从左上角出发，斜斜地往右下滑，像从滑梯上溜下来！",
+  line_diagonal_up:   "从右下角出发，斜斜地往左上爬，像小蚂蚁爬山坡！",
+  line_wave:       "手指跟着光球，一上一下画波浪，像大海的小波纹！",
+  circle:          "从顶部出发，顺时针画一个大圆圈，转一圈回到起点！",
+  square:          "先往右，再往下，再往左，最后往上，画一个方方的框！",
+  triangle:        "从顶点出发，先往右下，再往左，最后斜着回到顶点！",
+  spiral:          "从中心出发，慢慢往外绕，像小蜗牛壳一圈一圈展开！"
+};
+
 // ------------------------------------------------------------------
 // PrewriteEngine
 // ------------------------------------------------------------------
@@ -376,8 +393,11 @@ export class PrewriteEngine {
     }
   }
 
-  /** 自动演示动画：发光光球沿目标路径滑动 */
-  _startDemoAnimation() {
+  /** 自动演示动画：发光光球沿目标路径滑动（单次预演，结束后自动进入用户描摹）
+   * Letter School 步骤3「运笔动作演示」实现
+   * @param {Function} [onDemoEnd]  预演结束后的回调（可选）
+   */
+  _startDemoAnimation(onDemoEnd) {
     if (this.demoTimer) cancelAnimationFrame(this.demoTimer);
     if (this.currentShapeIdx >= this.shapes.length) return;
     this.demoPhase = true;
@@ -387,12 +407,29 @@ export class PrewriteEngine {
     if (!target || target.length < 2) { this.demoPhase = false; return; }
 
     let step = 0;
-    const speed = 0.015; // 每秒推进 1.5%
+    // 单次预演速度：约 1.8 秒走完全程（每帧 @ 60fps 推进 1/108）
+    const speed = 1 / 108;
 
     const animate = () => {
       if (this.isDestroyed || !this.demoPhase) return;
       step += speed;
-      if (step >= 1) step = 0; // 循环
+
+      if (step >= 1) {
+        // 预演结束：定格在终点，短暂停留后切入用户描摹
+        const last = target[target.length - 1];
+        this.demoPos = { x: last.x, y: last.y };
+        this._guideProgress = 1;
+        this.render();
+        this.demoPhase = false;
+        this.demoTimer = null;
+        // 播报「现在轮到你了」
+        soundAndFX.speakPriority?.(
+          '好了！现在换你来画，跟着虚线试试看！',
+          { kind: 'sentence', emotion: 'gentle' }
+        );
+        if (typeof onDemoEnd === 'function') onDemoEnd();
+        return;
+      }
 
       // 沿路径插值
       const totalSegs = target.length - 1;
@@ -422,25 +459,39 @@ export class PrewriteEngine {
   }
 
   /**
-   * T5: Letter School 运笔演示 (简笔画动作展示 + 语音解说)
+   * Letter School 步骤3「运笔动作演示」正式入口
+   * 调研报告 §5.2：先播运笔解说语音，再启动单次预演动画
+   * 预演结束后自动提示儿童开始描摹（切换到用户描摹阶段）
+   * @param {string} [shapeName]  形状名（默认取当前形状）
    */
-  async animateStrokeGesture(shapeName = this.getCurrentShapeName()) {
-    this._startDemoAnimation();
-    const hint = this._getGestureHint(shapeName);
-    if (hint && typeof window !== "undefined" && window.soundAndFX?.speakPriority) {
-      window.soundAndFX.speakPriority(hint, { kind: "sentence", emotion: "gentle" });
+  animateStrokeGesture(shapeName) {
+    const key = this.shapes[this.currentShapeIdx];
+    // 先播运笔专属语音解说（步骤3核心）
+    const cue = STROKE_GESTURE_CUES[key];
+    if (cue) {
+      soundAndFX.speakPriority?.(cue, { kind: 'sentence', emotion: 'gentle' });
     }
+    // 短暂延迟后启动单次预演动画（让语音先开口）
+    setTimeout(() => {
+      if (!this.isDestroyed) {
+        this._startDemoAnimation();
+      }
+    }, 400);
   }
 
   _getGestureHint(shapeName) {
     const hints = {
-      "竖直线": "从上往下直直画，像小雨滴落下来～",
-      "水平线": "从左往右轻轻滑，像小汽车在开～",
-      "右斜线": "从左上往右下斜斜滑，像滑滑梯～",
-      "同心圆": "圆溜溜转一圈，画个大皮球～",
-      "折线": "先往右再往下折，像个小山折角～"
+      line_horizontal: '从左向右轻轻滑动，像画一条小河',
+      line_vertical:   '从上往下直直画，像小雨滴落下来',
+      line_diagonal_down: '从左上往右下斜斜滑，像滑滑梯',
+      circle:          '顺时针转一圈，画个大皮球',
+      square:          '先往右再往下折，像个小山折角',
+      triangle:        '三条边画出小山峰',
+      line_wave:       '一上一下画波浪，像大海的小波纹',
+      line_diagonal_up: '从右下往左上爬，像爬山坡',
+      spiral:          '从中心往外绕，像小蜗牛壳',
     };
-    return hints[shapeName] || `跟着光球画一画${shapeName}吧！`;
+    return hints[shapeName] || ('跟着光球画一画' + (shapeName || '形状') + '吧！');
   }
 
   _finishAll() {
@@ -622,7 +673,8 @@ export class PrewriteEngine {
     ctx.fillStyle = "#E64A19";
     ctx.font = "bold 11px sans-serif";
     ctx.textAlign = "left";
-    ctx.fillText("✏️ 用三根手指", bx + 8, by + 18);
+    // 零 Emoji 红线：使用纯文字替代铅笔 emoji
+    ctx.fillText("[笔] 用三根手指", bx + 8, by + 18);
     ctx.fillText("轻轻握住笔哦～", bx + 8, by + 34);
 
     ctx.restore();
