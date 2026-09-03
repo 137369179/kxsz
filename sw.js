@@ -35,6 +35,7 @@ const CORE_ASSETS = [
   "./src/utils/parentVoice.js",
   "./src/utils/playSceneEngine.js",
   "./src/data/characters.js",
+  "./src/data/characterDetails.js",
   "./src/data/books.js",
   "./src/data/idioms.js",
   "./src/data/shop.js",

@@ -29,6 +29,7 @@ except Exception:  # noqa: BLE001
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CACHE_DIR = os.path.join(ROOT, "tools", "cache")
 OUT_PATH = os.path.join(ROOT, "src", "data", "characters.js")
+DETAILS_PATH = os.path.join(ROOT, "src", "data", "characterDetails.js")
 CDN = "https://cdn.jsdelivr.net/npm/hanzi-writer-data@2.0.1/{}.json"
 
 # ---------------------------------------------------------------------------
@@ -1331,24 +1332,50 @@ def build():
     print(f"✓ 写前校验通过（{len(records)} 字无重复 / 无空字 / 内容完整）")
 
     header = """/**
- * 凯茜识字 (Cathy Literacy) - 阶梯字库核心数据库
+ * 凯茜识字 (Cathy Literacy) - 阶梯字库核心数据库【索引层】
  * ------------------------------------------------------------
- * 数据来源：
- *  · strokes（笔顺）—— hanzi-writer-data (Make Me a Hanzi 衍生, CC BY 4.0)，
- *    由 1024x1024 网格中轴 medians 归约为「起点-拐点-终点」三点，
- *    再经标定仿射映射到渲染器 0-100 空间，随字库内联（无需额外请求）。
- *  · 拼音与声调 —— pypinyin 自动生成；部首 —— cnradical 自动取。
- *  · 象形演变故事 / 词组 / 造句 / 形近字 —— 教学编撰 / 字形模板生成。
- *  · 前 100 字为人工精编版（定制演变故事、游戏配置与手调笔顺），优先级最高。
+ * 本文件仅含地图/关卡/列表渲染必需的轻量索引字段（首屏瘦身）。
+ * 详情字段（strokes/evolution/gameConfig/meanings/words/sentence 等）
+ * 见 characterDetails.js，经 src/utils/charDetailLoader.js 的 ensureDetails()
+ * 按需动态 import 后 Object.assign 回对应字对象，保持消费方 API 兼容。
  * 本文件由 tools/build_characters.py 生成，请勿手工编辑。
  */
 
 """
 
-    # 紧凑输出：本文件为生成产物（勿手工编辑），无需缩进可读性；
-    # 1490 字内联笔顺后体积敏感，去掉缩进与多余空格可显著减小首屏传输量。
+    # 紧凑输出：生成产物（勿手工编辑），去掉缩进与多余空格以减小首屏传输量。
+    # 索引字段（首屏必需，轻量）与详情字段（按需懒加载，重量）分层拆分。
+    INDEX_FIELDS = [
+        "id", "char", "pinyin", "pinyinTone", "radical", "strokeCount",
+        "stage", "themeIsland", "unitIndex", "levelIndex", "charType",
+        "mechanism", "interaction",
+    ]
+
+    index_records = []
+    details_map = {}
+    for r in records:
+        idx = {k: r[k] for k in INDEX_FIELDS if k in r}
+        det = {k: v for k, v in r.items() if k not in INDEX_FIELDS}
+        index_records.append(idx)
+        details_map[r["id"]] = det
+
     body = "export const CHARACTER_DATABASE = " + json.dumps(
-        records, ensure_ascii=False, separators=(",", ":")
+        index_records, ensure_ascii=False, separators=(",", ":")
+    ) + ";\n"
+
+    details_header = """/**
+ * 凯茜识字 (Cathy Literacy) - 阶梯字库核心数据库【详情层】（懒加载）
+ * ------------------------------------------------------------
+ * 含笔顺(strokes)/象形演变(evolution)/游戏配置(gameConfig)/释义(meanings)/
+ * 词组(words)/造句(sentence)/形近字(confusingChars) 等重量级字段。
+ * 由 src/utils/charDetailLoader.js 的 ensureDetails() 按需动态 import。
+ * 本文件由 tools/build_characters.py 生成，请勿手工编辑。
+ */
+
+"""
+
+    details_body = "export const CHARACTER_DETAILS = " + json.dumps(
+        details_map, ensure_ascii=False, separators=(",", ":")
     ) + ";\n"
 
     # 根据实际生成数据动态计算三阶段范围
@@ -1395,8 +1422,13 @@ export const STAGES_METADATA = [
     with open(OUT_PATH, "w", encoding="utf-8") as f:
         f.write(header + body + stages)
 
+    with open(DETAILS_PATH, "w", encoding="utf-8") as f:
+        f.write(details_header + details_body)
+
     print(f"已写出: {OUT_PATH}")
     print(f"文件大小: {os.path.getsize(OUT_PATH) / 1024:.1f} KB")
+    print(f"已写出: {DETAILS_PATH}")
+    print(f"文件大小: {os.path.getsize(DETAILS_PATH) / 1024:.1f} KB")
 
 
 if __name__ == "__main__":
