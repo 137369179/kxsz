@@ -24,7 +24,6 @@ import {
   ATOMIC_CARD_TYPES,
 } from "../utils/flashcardEngine.js";
 import {
-  scheduleFSRS,
   initFSRSRecord,
   migrateToFSRS,
   FSRGRating,
@@ -289,11 +288,19 @@ export class ReviewModule extends BaseModule {
       if (charRec && !charRec._fsrsState) {
         charRec._fsrsState = migrateToFSRS(charRec);
       } else if (!charRec) {
-        charRec = records[charId] = initFSRSRecord(charId);
+        charRec = records[charId] = {
+          charId,
+          learnedAt: Date.now(),
+          reviewCount: 0,
+          correctStreak: 0,
+          masteryRate: 60,
+          nextReviewDate: Date.now(),
+          isDifficult: false,
+          ...initFSRSRecord(charId),
+        };
       }
 
-      // P4 B3: 决定 FSRS rating
-      // perfect → GOOD/EASY，非 perfect → HARD/AGAIN
+      // P4 B3: 决定 FSRS rating（perfect → GOOD/EASY，否则 HARD/AGAIN）
       let rating;
       if (perfect) {
         rating = (this.drillEngine.bestCombo || 0) >= 4 ? FSRGRating.EASY : FSRGRating.GOOD;
@@ -303,29 +310,20 @@ export class ReviewModule extends BaseModule {
         rating = FSRGRating.HARD;
       }
 
-      // P4 B3: 执行 FSRS 调度
-      const prevStability = charRec._fsrsState.stability;
-      charRec._fsrsState = scheduleFSRS(charRec._fsrsState, rating);
-
-      // P4 B8: flashcardEngine 原子卡答题记录
-      // 整字 perfect → 所有原子卡记 correct，否则记 incorrect
+      // 单路径：只通过 completeReview 调度一次，避免 scheduleFSRS + completeReview 双写覆盖
       for (const cardType of Object.values(ATOMIC_CARD_TYPES)) {
         recordAtomicAnswer(charRec, cardType, perfect);
       }
 
-      // 持久化（ebbinghausManager 会写 localStorage）
-      ebbinghausManager.save();
-
       if (perfect) {
         this.correctCount++;
-        this.consecutiveMistakes[charId] = 0;  // 重置连错计数
-        ebbinghausManager.completeReview(charId, true);
+        this.consecutiveMistakes[charId] = 0;
+        ebbinghausManager.completeReview(charId, rating);
         ebbinghausManager.addCoins(5);
       } else {
         this.wrongCount++;
-        // 连续失误计数 +1
         this.consecutiveMistakes[charId] = (this.consecutiveMistakes[charId] || 0) + 1;
-        ebbinghausManager.completeReview(charId, false);
+        ebbinghausManager.completeReview(charId, rating);
         ebbinghausManager.addCoins(1);
 
         // SM-18 遗忘警报：连续错 2 次及以上触发

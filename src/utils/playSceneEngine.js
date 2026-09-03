@@ -4,6 +4,7 @@
  */
 
 import { soundAndFX } from "./soundEngine.js";
+import { ebbinghausManager } from "./ebbinghaus.js";
 
 //  3A  Keyframes
 if (typeof document !== "undefined" && !document.getElementById("cathy-game-feel-styles")) {
@@ -99,11 +100,11 @@ export class PlaySceneEngine {
 
   // --- Game Feel Utilities ---
   shakeScreen() {
-    // P0-9 安全防护：6 岁以下禁用 + 450ms cooldown
+    // P0-9：6 岁以下禁用 + reduce-motion + 450ms cooldown（用真实 ebbinghausManager，勿依赖未赋值的 window.__EBH__）
     try {
-      const age = typeof window !== "undefined" && window.__EBH__ ? window.__EBH__.getAge?.() ?? 6 : 6;
+      const age = typeof ebbinghausManager.getAge === "function" ? ebbinghausManager.getAge() : 6;
       if (age < 6) return;
-      // reduce-motion 跳过
+      if (ebbinghausManager.progress?.settings?.focusMode) return;
       if (typeof matchMedia === "function" && matchMedia("(prefers-reduced-motion: reduce)").matches) return;
       const t = Date.now();
       if (this._lastShakeAt && t - this._lastShakeAt < 450) return;

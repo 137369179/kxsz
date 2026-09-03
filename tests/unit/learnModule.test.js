@@ -8,6 +8,7 @@ import { soundAndFX } from "../../src/utils/soundEngine.js";
 import { CHARACTER_DATABASE } from "../../src/data/characters.js";
 import { ensureDetails } from "../../src/utils/charDetailLoader.js";
 import { clearLearnProgress } from "../../src/utils/learnProgressStore.js";
+import { ebbinghausManager } from "../../src/utils/ebbinghaus.js";
 
 await ensureDetails();
 
@@ -26,6 +27,9 @@ describe("LearnModule (六步闭环识字学习)", () => {
 
   beforeEach(() => {
     clearLearnProgress(mockChar.id);
+    // 强制 7+ 岁全 8 步，避免默认 age=6 跳过「读/写」导致旧断言失真
+    ebbinghausManager.progress.profile = { ...(ebbinghausManager.progress.profile || {}), age: 7 };
+    ebbinghausManager.progress.settings.stepSequenceOverride = null;
     container = createMockElement("div", "learn-container");
     vi.spyOn(soundAndFX, "stopSpeaking").mockImplementation(() => {});
     vi.spyOn(soundAndFX, "playPop").mockImplementation(() => {});
@@ -41,6 +45,16 @@ describe("LearnModule (六步闭环识字学习)", () => {
     expect(learn.charData.char).toBe(mockChar.char);
     expect(learn.onFinish).toBe(onFinish);
     expect(learn.onBackToMap).toBe(onBack);
+  });
+
+  it("should use age-adaptive sequence for age 5-6 (skip 读/写)", () => {
+    ebbinghausManager.progress.profile.age = 5;
+    const learn = new LearnModule(container, mockChar, vi.fn(), vi.fn());
+    expect(learn.stepSequence).toEqual([1, 2, 4, 5, 6, 8]);
+    learn.nextStep();
+    expect(learn.currentStep).toBe(2);
+    learn.nextStep();
+    expect(learn.currentStep).toBe(4);
   });
 
   it("should advance step on nextStep() call", () => {
@@ -59,7 +73,7 @@ describe("LearnModule (六步闭环识字学习)", () => {
       learn.render();
 
       expect(container.innerHTML).toContain("返回大地图");
-      // B1/B6 铁律：8 步闭环（玩/认/读/练/控笔/描红/独立写/测）
+      // B1/B6：7+ 岁 8 步闭环（玩/认/读/练/控笔/描红/独立写/测）
       expect(container.innerHTML).toContain("玩");
       expect(container.innerHTML).toContain("认");
       expect(container.innerHTML).toContain("读");

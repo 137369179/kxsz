@@ -10,6 +10,7 @@ import { ebbinghausManager } from "./ebbinghaus.js";
 import { soundAndFX } from "./soundEngine.js";
 import { rewardEngine } from "./rewardEngine.js";
 import { GAME_ICONS } from "./gameIcons.js";
+import { showParentGate } from "./parentGate.js";
 
 class EyeCareManager {
   constructor() {
@@ -177,21 +178,19 @@ class EyeCareManager {
     }
 
     if (parentOverrideBtn) {
-      parentOverrideBtn.addEventListener("click", () => {
-        if (typeof window === "undefined" || typeof window.prompt !== "function") {
-          closeRestModal(false);
-          return;
-        }
-        // 简单家长算术确认
-        const a = Math.floor(Math.random() * 8) + 2;
-        const b = Math.floor(Math.random() * 8) + 2;
-        const ans = window.prompt(`【家长验证】请输入 ${a} + ${b} = ? 的计算结果：`);
-        if (ans && parseInt(ans.trim(), 10) === a + b) {
+      parentOverrideBtn.addEventListener("click", async () => {
+        // P0-2：替换 window.prompt，用项目内 Modal + 升级门禁难度（乘法）
+        const passed = await showParentGate({
+          title: "护眼操跳过验证",
+          level: "medium",
+          confirmText: "继续学习",
+          cancelText: "乖乖做操"
+        });
+        if (passed) {
           soundAndFX.playPop();
           closeRestModal(false);
-        } else if (ans !== null) {
-          if (typeof alert === "function") alert("计算错误，继续休息做操吧！");
         }
+        // 失败时什么都不做，弹窗自己关了
       });
     }
   }

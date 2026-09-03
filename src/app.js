@@ -11,6 +11,8 @@ import { ensureDetails } from "./utils/charDetailLoader.js";
 import { eventBus, EVENTS } from "./utils/eventBus.js";
 import { storageManager } from "./utils/storageManager.js";
 import { eyeCareManager } from "./utils/eyeCareManager.js";
+import { ebbinghausManager } from "./utils/ebbinghaus.js";
+import { showParentGate, showToast } from "./utils/parentGate.js";
 
 import { BaseModule } from "./utils/BaseModule.js";
 
@@ -116,6 +118,7 @@ class CathyAppManager extends BaseModule {
     this._moduleClasses = new Map();
     this._moduleInstances = new Map([["map", this.mapModule]]);
     this.learnModule = null;
+    this._studySession = null;
 
     this.init();
   }
@@ -513,19 +516,65 @@ class CathyAppManager extends BaseModule {
     });
   }
 
+  /** P0-4：结束当前学习会话计时 */
+  _endStudySession() {
+    if (!this._studySession) return;
+    try { this._studySession.stop(); } catch {}
+    this._studySession = null;
+    try { eventBus.emit(EVENTS.STUDY_SESSION_END, {}); } catch {}
+  }
+
+  /** P0-4：开启学习会话计时（学习/复习） */
+  _beginStudySession() {
+    this._endStudySession();
+    this._studySession = ebbinghausManager.createStudySession();
+    try { eventBus.emit(EVENTS.STUDY_SESSION_START, {}); } catch {}
+  }
+
+  /**
+   * P0-4：达到每日上限时弹家长门禁，通过则延长 30 分钟
+   * @returns {Promise<boolean>}
+   */
+  async _ensureDailyLimitAllowsStudy() {
+    const check = ebbinghausManager.checkDailyLimit();
+    if (!check.reached) return true;
+    try {
+      eventBus.emit(EVENTS.DAILY_LIMIT_REACHED, check);
+    } catch {}
+    const passed = await showParentGate({
+      title: "今日学习时长已满",
+      level: "medium",
+      confirmText: "延长 30 分钟",
+      cancelText: "明天再学",
+    });
+    if (!passed) {
+      showToast(`今日已学 ${check.current}/${check.limit} 分钟，先休息吧`, { variant: "warn" });
+      return false;
+    }
+    if (!ebbinghausManager.overrideDailyLimit(30)) {
+      showToast("今日延长次数已用完，明天再来吧", { variant: "warn" });
+      return false;
+    }
+    showToast("已延长 30 分钟学习时间", { variant: "info" });
+    return true;
+  }
+
   /**  ——  */
   async switchMode(modeName) {
+    const prev = this.currentMode;
     this.currentMode = modeName;
 
-    // 
+    // 离开学习/复习：结算会话时长
+    if ((prev === "learn" || prev === "review") && modeName !== "learn" && modeName !== "review") {
+      this._endStudySession();
+    }
+
     if (this.learnModule && modeName !== "learn") {
       this.learnModule.destroy();
       this.learnModule = null;
     }
 
-    // 
     try {
-      // 非 map/learn 模式：先确保目标模块已按需加载并实例化
       if (modeName !== "map" && modeName !== "learn") {
         const inst = await this._ensureModule(modeName);
         if (!inst) throw new Error(`模块 "${modeName}" 加载失败`);
@@ -548,6 +597,14 @@ class CathyAppManager extends BaseModule {
       if (modeName === "play" || modeName === "arcade") {
         this.playModule.currentMode = null;
       }
+      if (modeName === "review") {
+        if (!(await this._ensureDailyLimitAllowsStudy())) {
+          this.currentMode = "map";
+          this.mapModule.render();
+          return;
+        }
+        this._beginStudySession();
+      }
       const targetModule = this._moduleMap[modeName] || this.mapModule;
       targetModule.render();
     } catch (err) {
@@ -558,17 +615,18 @@ class CathyAppManager extends BaseModule {
   }
 
   async startLearnFlow(charData) {
-    // 防御性检查：确保 charData 有效
     if (!charData || !charData.id || !charData.char) {
       console.error("[App] startLearnFlow: 无效的 charData", charData);
-      if (typeof showGameToast === "function") {
-        showGameToast(this.container, "学习数据异常，请重试", "error");
-      }
+      showToast("学习数据异常，请重试", { variant: "error" });
       return;
     }
-    
+
+    if (!(await this._ensureDailyLimitAllowsStudy())) {
+      await this.switchMode("map");
+      return;
+    }
+
     await ensureDetails();
-    // LearnModule 为按需加载模块，动态 import 后缓存其类
     let LearnModuleCls = this._moduleClasses.get("learn");
     if (!LearnModuleCls) {
       const mod = await import("./components/LearnModule.js");
@@ -579,15 +637,14 @@ class CathyAppManager extends BaseModule {
     if (this.learnModule) {
       this.learnModule.destroy();
     }
+    this._beginStudySession();
     this.learnModule = new LearnModuleCls(
       this.container,
       charData,
       () => {
-        // 
         this.transitionToMode("map");
       },
       () => {
-        // 
         this.transitionToMode("map");
       }
     );

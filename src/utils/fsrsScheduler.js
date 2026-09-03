@@ -497,12 +497,20 @@ export function fsrsCompleteCharacter(charRecord, starsEarned = 3) {
 /**
  * E2 核心：替换 completeReview 中的固定间隔表
  * @param {object} charRecord 当前汉字记录
- * @param {boolean} isCorrect 这次复习是否正确
+ * @param {boolean|number} isCorrectOrRating 是否正确，或显式 FSRGRating（0-3）
  * @returns {object} 更新后的 record
  */
-export function fsrsCompleteReview(charRecord, isCorrect) {
+export function fsrsCompleteReview(charRecord, isCorrectOrRating = true) {
   const state = ensureFSRSState(charRecord)._fsrsState || initFSRSRecord(charRecord.charId);
-  const rating = isCorrectToRating(isCorrect);
+  let rating;
+  let isCorrect;
+  if (typeof isCorrectOrRating === "number" && isCorrectOrRating >= FSRGRating.AGAIN && isCorrectOrRating <= FSRGRating.EASY) {
+    rating = isCorrectOrRating;
+    isCorrect = rating !== FSRGRating.AGAIN;
+  } else {
+    isCorrect = !!isCorrectOrRating;
+    rating = isCorrectToRating(isCorrect);
+  }
   const result = scheduleFSRS(state, rating);
 
   // 复习错误 → correctStreak 必须归零（buildResult 公式 reps-lapses 在 AGAIN 场景算错）

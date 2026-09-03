@@ -19,6 +19,7 @@ import { drawQRCode } from "../utils/qrCode.js";
 import { storageManager } from "../utils/storageManager.js";
 import { rewardEngine } from "../utils/rewardEngine.js";
 import { buildFullReport } from "../utils/reportEngine.js";
+import { showConfirm, generateParentChallenge } from "../utils/parentGate.js";
 
 const TROPHY_LIST = [
   { id: "first_char", name: "识字小萌新", desc: "学会第 1 个汉字", req: "1 个字", icon: "star" },
@@ -51,9 +52,10 @@ export class ParentModule extends BaseModule {
 
   /** 重新生成门禁算术题（每次进入门禁出新题，防记住答案） */
   _newQuestion() {
-    this.mathNum1 = Math.floor(Math.random() * 6) + 4;
-    this.mathNum2 = Math.floor(Math.random() * 6) + 4;
-    this.mathAnswer = this.mathNum1 * this.mathNum2;
+    const ch = generateParentChallenge("medium");
+    this.mathNum1 = ch.a;
+    this.mathNum2 = ch.b;
+    this.mathAnswer = ch.answer;
     this.gateFailCount = 0;
   }
 
@@ -880,14 +882,20 @@ export class ParentModule extends BaseModule {
       });
     }
 
-    // 隐私与数据：清除全部学习数据（二次确认）
+    // 隐私与数据：清除全部学习数据（二次确认，项目内 Modal）
     const wipeBtn = mainEl.querySelector("#btn-wipe-data");
     if (wipeBtn) {
-      this._on(wipeBtn, "click", () => {
-        if (typeof confirm === "function" && !confirm("确定要清除全部学习数据吗？此操作不可恢复，建议先导出备份！")) return;
+      this._on(wipeBtn, "click", async () => {
+        const ok = await showConfirm({
+          title: "清除全部学习数据",
+          message: "此操作不可恢复，建议先导出备份！",
+          variant: "danger",
+          okText: "确认清除",
+          cancelText: "取消",
+        });
+        if (!ok) return;
         try {
           storageManager.clearAllCathyKeys();
-          // 补全：删除全部 cathy 前缀 key（专注模式偏好/动态档案等）
           const rm = [];
           for (let i = 0; i < localStorage.length; i++) {
             const k = localStorage.key(i);

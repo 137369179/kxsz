@@ -42,17 +42,11 @@ export class LearnModule extends BaseModule {
     this.onFinish = onFinishCallback;
     this.onBackToMap = onBackToMapCallback;
 
-    // P0-7 B1/B6 铁律：年龄自适应步骤序列（不再硬编码 8 步）
-    // 3-4 岁 → [1,2,4,8]  5-6 岁 → [1,2,4,5,6,8]  7+ 岁 → [1-8] 全流程
-    let override = null;
-    try {
-      if (window.__EBH__?.progress?.settings?.stepSequenceOverride) {
-        override = window.__EBH__.progress.settings.stepSequenceOverride;
-      }
-    } catch { /* noop */ }
-    this.stepSequence = (window.ebbinghausManager && typeof window.ebbinghausManager.getStepSequence === "function")
-      ? window.ebbinghausManager.getStepSequence({ override })
-      : [1, 2, 3, 4, 5, 6, 7, 8]; // fallback
+    // P0-7 B1/B6：年龄自适应步骤序列（使用已导入的 ebbinghausManager，勿依赖未赋值的 window 钩子）
+    const override = ebbinghausManager.progress?.settings?.stepSequenceOverride ?? null;
+    this.stepSequence = typeof ebbinghausManager.getStepSequence === "function"
+      ? ebbinghausManager.getStepSequence({ override })
+      : [1, 2, 3, 4, 5, 6, 7, 8];
     this.currentStep = this.stepSequence[0] || 1;
 
     this.completedSteps = [];

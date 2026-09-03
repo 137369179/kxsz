@@ -309,31 +309,43 @@ export class EbbinghausManager {
    * 返回 { stop: () => void } — 调用 stop() 时自动 addStudyMinutes 累加
    */
   createStudySession() {
-    const startMs = Date.now();
-    let suspendedAt = null;
-    let totalVisibleMs = 0;
+    let accumulatedVisibleMs = 0;
+    let segmentStart = Date.now();
     let stopped = false;
 
     const onVisChange = () => {
+      if (typeof document === "undefined") return;
       if (document.hidden) {
-        suspendedAt = Date.now();
-      } else if (suspendedAt) {
-        totalVisibleMs += (suspendedAt - startMs);
-        suspendedAt = null;
+        if (segmentStart != null) {
+          accumulatedVisibleMs += Date.now() - segmentStart;
+          segmentStart = null;
+        }
+      } else if (segmentStart == null) {
+        segmentStart = Date.now();
       }
     };
 
-    document.addEventListener("visibilitychange", onVisChange);
-    if (this._studySessionCleanups) this._studySessionCleanups.push(() => document.removeEventListener("visibilitychange", onVisChange));
+    if (typeof document !== "undefined") {
+      document.addEventListener("visibilitychange", onVisChange);
+      if (this._studySessionCleanups) {
+        this._studySessionCleanups.push(() => document.removeEventListener("visibilitychange", onVisChange));
+      }
+    }
 
     return {
       stop: () => {
-        if (stopped) return;
+        if (stopped) return 0;
         stopped = true;
-        document.removeEventListener("visibilitychange", onVisChange);
-        const finalMs = suspendedAt ? (suspendedAt - startMs) : (Date.now() - startMs);
-        const minutes = Math.max(1, Math.floor(finalMs / 60000)); // 至少 1 分钟
-        this.addStudyMinutes(minutes);
+        if (typeof document !== "undefined") {
+          document.removeEventListener("visibilitychange", onVisChange);
+        }
+        if (segmentStart != null) {
+          accumulatedVisibleMs += Date.now() - segmentStart;
+          segmentStart = null;
+        }
+        // 诚实累计：不足 1 分钟不计；不再强制 +1 分钟虚增
+        const minutes = Math.floor(accumulatedVisibleMs / 60000);
+        if (minutes > 0) this.addStudyMinutes(minutes);
         return minutes;
       }
     };
@@ -510,8 +522,8 @@ export class EbbinghausManager {
     return updated;
   }
 
-  // 完成一次复习（E2: 委托 FSRS 调度）
-  completeReview(charId, isCorrect = true) {
+  // 完成一次复习（E2: 委托 FSRS 调度；可传 boolean 或显式 FSRGRating）
+  completeReview(charId, isCorrectOrRating = true) {
     const record = this.progress.charRecords[charId] || {
       charId,
       learnedAt: Date.now(),
@@ -521,7 +533,7 @@ export class EbbinghausManager {
       nextReviewDate: Date.now() + 86400000,
       isDifficult: false
     };
-    const updated = fsrsCompleteReview(record, isCorrect);
+    const updated = fsrsCompleteReview(record, isCorrectOrRating);
     this.progress.charRecords[charId] = updated;
     this.save();
     return updated;
