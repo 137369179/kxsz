@@ -120,7 +120,7 @@ export class ParentModule extends BaseModule {
             <span>验证并进入家长中心</span>
           </button>
 
-          <button id="btn-cancel-gate" class="mt-4 text-xs font-bold text-gray-500 hover:text-amber-800 transition-colors cursor-pointer py-1 px-3">
+          <button id="btn-cancel-gate" class="min-touch mt-4 text-xs font-bold text-gray-500 hover:text-amber-800 transition-colors cursor-pointer py-1 px-3">
             取消，返回大地图
           </button>
         </div>
@@ -212,7 +212,7 @@ export class ParentModule extends BaseModule {
             ]
               .map(
                 (tab) => `
-              <button class="parent-tab-btn px-3.5 py-1.5 rounded-full text-xs font-black transition-all active:scale-95 flex items-center gap-1.5 ${
+              <button class="parent-tab-btn min-touch-sm px-3.5 py-1.5 rounded-full text-xs font-black transition-all active:scale-95 flex items-center gap-1.5 ${
                 this.currentTab === tab.key
                   ? "bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-md"
                   : "text-amber-900 hover:bg-amber-100"
@@ -255,6 +255,13 @@ export class ParentModule extends BaseModule {
       const maxCount = Math.max(5, ...history.map(h => h.count));
 
       return `
+        <!-- 过程性反馈：引导家长关注过程而非全勤/分数（自我决定理论：胜任感来自尝试与坚持） -->
+        <div class="bg-gradient-to-r from-emerald-50 to-teal-50 border-2 border-emerald-200 rounded-2xl px-4 py-3 mb-5 flex items-center gap-3">
+          <span class="flex items-center text-emerald-600 shrink-0">${GAME_ICONS.sparkle("w-5 h-5")}</span>
+          <p class="text-xs font-bold text-emerald-900 leading-relaxed">
+            今日已学 <span class="text-emerald-700 text-sm">${progress.todayLearnedCount || 0}</span> 字 · 每天 5 分钟的专注陪伴，比 30 天全勤打卡更有价值——记得和孩子一起朗读、鼓励每一次尝试。
+          </p>
+        </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-6">
           <div class="bg-white/95 rounded-3xl p-6 shadow-xl border-2 border-orange-200 text-center">
             <span class="text-xs sm:text-sm text-gray-500 font-bold">已掌握总字数</span>

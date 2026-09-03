@@ -82,6 +82,20 @@
       -ms-overflow-style: none;
       scrollbar-width: none;
     }
+    /* 儿童触控基线（3-6 岁精细动作发育期，Apple HIG 44pt / 儿童产品 48px+）：
+       核心操作按钮用 .min-touch(48px)；紧凑标签栏用 .min-touch-sm(40px)；
+       布局受限的小按钮用 .touch-expand（伪元素扩大命中区，不改变视觉布局） */
+    .min-touch { min-height: 48px; }
+    .min-touch-sm { min-height: 40px; }
+    .touch-expand { position: relative; }
+    .touch-expand::before {
+      content: "";
+      position: absolute;
+      inset: -10px;
+      z-index: 1;
+    }
+    /* 相邻可点元素最小间距，防误触相邻项 */
+    .h-touch-row > * + * { margin-left: 8px; }
   </style>
 </head>
 <body class="bg-slate-950 text-amber-950 overflow-hidden select-none m-0 p-0 w-screen h-screen flex items-center justify-center">
