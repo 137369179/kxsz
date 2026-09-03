@@ -18,6 +18,8 @@ import { BaseModule, escapeHtml } from "../utils/BaseModule.js";
 import { GAME_ICONS } from "../utils/gameIcons.js";
 import { EVENTS } from "../utils/eventBus.js";
 import { RADICAL_FAMILIES } from "../data/radicalFamilies.js";
+// P4 B19: 游乐场多模态编排
+import { forChar as mmForChar, SCENES as MM_SCENES } from "../utils/multimodalEngine.js";
 
 // ------------------------------------------------------------
 // 游乐场玩法增强专属动画样式（3D翻牌 / 飘字 / 倒计时环 / 狂暴 / 连胜）
@@ -2747,15 +2749,25 @@ export class PlayModule extends BaseModule {
           </div>
 
           <div class="grid grid-cols-2 gap-6 sm:gap-10 w-full max-w-lg mb-6">
-            ${cards.map((ch) => `
-              <button class="spotter-char-card group relative h-52 sm:h-64 bg-gradient-to-tr from-amber-400 via-orange-400 to-yellow-300 border-4 border-white shadow-[0_12px_36px_rgba(245,158,11,0.5)] hover:shadow-[0_16px_48px_rgba(245,158,11,0.8)] rounded-3xl flex flex-col items-center justify-center cursor-pointer transition-all duration-300 hover:scale-105 active:scale-95 text-white" data-char="${ch}">
-                <span class="text-8xl sm:text-9xl font-black font-serif drop-shadow-md group-hover:scale-110 transition-transform">${ch}</span>
-                <span class="absolute bottom-3 text-xs font-black text-amber-950 bg-white/90 px-4 py-1 rounded-full shadow border border-amber-200 flex items-center gap-1">
-                  ${GAME_ICONS.sparkle("w-3.5 h-3.5")}
+            ${cards.map((ch) => {
+              // P4 B19: 查表 + 多模态编排 → 显示小字标签
+              const _charData = CHARACTER_DATABASE.find((c) => c.char === ch);
+              const _mm = _charData ? mmForChar(_charData, MM_SCENES.PLAY) : null;
+              const _py = escapeHtml(_mm?.modalities?.auditory_pinyin?.data || _charData?.pinyin || "");
+              const _rd = escapeHtml(_mm?.modalities?.semantic_radical?.data || _charData?.radical || "");
+              const _hint = escapeHtml(_mm?.modalities?.motor_hint_mechanism?.data || _charData?.mechanism || "");
+              return `
+              <button class="spotter-char-card group relative h-52 sm:h-64 bg-gradient-to-tr from-amber-400 via-orange-400 to-yellow-300 border-4 border-white shadow-[0_12px_36px_rgba(245,158,11,0.5)] hover:shadow-[0_16px_48px_rgba(245,158,11,0.8)] rounded-3xl flex flex-col items-center justify-center cursor-pointer transition-all duration-300 hover:scale-105 active:scale-95 text-white" data-char="${escapeHtml(ch)}">
+                <span class="text-8xl sm:text-9xl font-black font-serif drop-shadow-md group-hover:scale-110 transition-transform">${escapeHtml(ch)}</span>
+                ${_py ? `<span class="mt-1 text-xs font-black text-amber-950/85 bg-white/70 px-2 py-0.5 rounded-full">${_py}</span>` : ""}
+                ${_rd ? `<span class="text-[10px] font-bold text-amber-900/70 bg-white/50 px-1.5 rounded-full">部首 ${_rd}</span>` : ""}
+                <span class="absolute bottom-2 text-[10px] font-black text-amber-950 bg-white/85 px-3 py-0.5 rounded-full shadow border border-amber-200 flex items-center gap-1">
+                  ${GAME_ICONS.sparkle("w-3 h-3")}
                   <span>选这个字</span>
                 </span>
               </button>
-            `).join("")}
+              `;
+            }).join("")}
           </div>
 
           <div class="flex items-center gap-3">
