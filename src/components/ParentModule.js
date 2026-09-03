@@ -50,6 +50,16 @@ export class ParentModule extends BaseModule {
     return map[n] || n;
   }
 
+  destroy() {
+    if (typeof document !== "undefined") {
+      document.getElementById("parent-poster-modal-overlay")?.remove();
+      document.getElementById("parent-sync-export-overlay")?.remove();
+      document.getElementById("parent-sync-import-overlay")?.remove();
+      document.getElementById("cathy-print-iframe")?.remove();
+    }
+    super.destroy();
+  }
+
   render() {
     this.destroy();
     if (!this.isUnlocked) {
@@ -208,7 +218,6 @@ export class ParentModule extends BaseModule {
       const maxCount = Math.max(5, ...history.map(h => h.count));
 
       return `
-        // 1. 学习罗盘概览卡片 (大数字大卡片)
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-6">
           <div class="bg-white/95 rounded-3xl p-6 shadow-xl border-2 border-orange-200 text-center">
             <span class="text-xs sm:text-sm text-gray-500 font-bold">已掌握总字数</span>
@@ -238,7 +247,6 @@ export class ParentModule extends BaseModule {
           </div>
         </div>
 
-        // 7日学习柱状图与海报生成入口
         <div class="bg-white/95 rounded-3xl p-6 shadow-xl border-2 border-amber-200 mb-6">
           <div class="flex items-center justify-between mb-4 flex-wrap gap-3">
             <div class="flex items-center gap-2">
@@ -281,7 +289,6 @@ export class ParentModule extends BaseModule {
 
     if (this.currentTab === "trophies") {
       return `
-        // 2. 12 勋章墙 (巨幅 3D 荣耀勋章)
         <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5">
           ${TROPHY_LIST.map((t, idx) => {
             const isUnlocked = idx < Math.max(3, Math.floor(charCount / 2));
@@ -324,7 +331,6 @@ export class ParentModule extends BaseModule {
       }
 
       return `
-        // 3. A4 田字格字帖打印工坊
         <div class="bg-white/95 rounded-3xl p-6 shadow-xl border-2 border-amber-200">
           <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 pb-3 border-b border-amber-100 gap-3">
             <div>
@@ -492,7 +498,6 @@ export class ParentModule extends BaseModule {
             </div>
           </div>
 
-          // 2. 亲子寻宝任务卡
           <div class="bg-white/95 rounded-3xl p-6 shadow-xl border-2 border-amber-200">
             <h2 class="text-base font-black text-amber-950 mb-4 flex items-center gap-2">
               <span class="flex items-center">${GAME_ICONS.compass("w-5 h-5")}</span>
@@ -527,7 +532,6 @@ export class ParentModule extends BaseModule {
 
     if (this.currentTab === "settings") {
       return `
-        // 4. 教学流程与防沉迷设置
         <div class="bg-white/95 rounded-3xl p-6 shadow-xl border-2 border-amber-200">
           <h2 class="text-base font-black text-amber-950 mb-4 flex items-center gap-2">
             <span class="flex items-center">${GAME_ICONS.parent()}</span>
@@ -584,7 +588,6 @@ export class ParentModule extends BaseModule {
           </div>
         </div>
 
-        // 5. 跨设备换机迁移与进度同步
         <div class="bg-white/95 rounded-3xl p-6 shadow-xl border-2 border-amber-200 mt-6">
           <h2 class="text-base font-black text-amber-950 mb-2 flex items-center gap-2">
             <span class="flex items-center">${GAME_ICONS.sparkle("w-5 h-5")}</span>
@@ -803,6 +806,7 @@ export class ParentModule extends BaseModule {
     const streak = p.attendance?.streakDays || 1;
 
     const overlay = document.createElement("div");
+    overlay.id = "parent-poster-modal-overlay";
     overlay.className = "fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex flex-col items-center justify-center p-4 animate-fade-in select-none";
     overlay.innerHTML = `
       <div class="relative max-w-sm sm:max-w-md w-full bg-white rounded-3xl p-4 shadow-2xl flex flex-col items-center max-h-[90vh] overflow-y-auto no-scrollbar">
@@ -899,16 +903,17 @@ export class ParentModule extends BaseModule {
     history.forEach((h, idx) => {
       const barX = 70 + idx * 68;
       const barH = (h.count / maxVal) * 110;
-      const barY = 670 - barH;
+      const safeBarH = Math.max(4, barH);
+      const safeBarY = 670 - safeBarH;
 
       ctx.fillStyle = "#f97316";
-      ctx.roundRect(barX, barY, 36, barH, 8);
+      ctx.roundRect(barX, safeBarY, 36, safeBarH, Math.min(8, Math.floor(safeBarH / 2)));
       ctx.fill();
 
       ctx.fillStyle = "#ea580c";
       ctx.font = "bold 14px sans-serif";
       ctx.textAlign = "center";
-      ctx.fillText(String(h.count), barX + 18, barY - 6);
+      ctx.fillText(String(h.count), barX + 18, safeBarY - 6);
 
       ctx.fillStyle = "#64748b";
       ctx.font = "bold 13px sans-serif";
@@ -937,12 +942,13 @@ export class ParentModule extends BaseModule {
     ctx.fillText(`生成时间: ${nowStr} · 凯茜识字`, 550, 895);
 
     // 绑定关闭、复制、分享与下载
-    overlay.querySelector("#btn-close-poster").addEventListener("click", () => overlay.remove());
+    this._on(overlay.querySelector("#btn-close-poster"), "click", () => overlay.remove());
 
     const copyBtn = overlay.querySelector("#btn-copy-poster");
     if (copyBtn) {
-      copyBtn.addEventListener("click", () => {
+      this._on(copyBtn, "click", () => {
         canvas.toBlob(async (blob) => {
+          if (!blob) return;
           if (navigator.clipboard && window.ClipboardItem) {
             try {
               await navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]);
@@ -960,9 +966,10 @@ export class ParentModule extends BaseModule {
 
     const shareBtn = overlay.querySelector("#btn-share-poster");
     if (shareBtn) {
-      shareBtn.addEventListener("click", () => {
+      this._on(shareBtn, "click", () => {
         if (navigator.share) {
           canvas.toBlob(async (blob) => {
+            if (!blob) return;
             try {
               const file = new File([blob], `凯茜识字_成长周报_${nowStr}.png`, { type: "image/png" });
               await navigator.share({
@@ -979,7 +986,7 @@ export class ParentModule extends BaseModule {
       });
     }
 
-    overlay.querySelector("#btn-download-poster").addEventListener("click", () => {
+    this._on(overlay.querySelector("#btn-download-poster"), "click", () => {
       const link = document.createElement("a");
       link.download = `凯茜识字_成长周报_${nowStr}.png`;
       link.href = canvas.toDataURL("image/png");
@@ -1000,6 +1007,7 @@ export class ParentModule extends BaseModule {
     }
 
     const overlay = document.createElement("div");
+    overlay.id = "parent-sync-export-overlay";
     overlay.className = "fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex flex-col items-center justify-center p-4 animate-fade-in select-none";
     overlay.innerHTML = `
       <div class="relative max-w-sm w-full bg-white rounded-3xl p-6 shadow-2xl flex flex-col items-center text-center">
@@ -1032,8 +1040,8 @@ export class ParentModule extends BaseModule {
     const canvas = overlay.querySelector("#sync-qr-canvas");
     drawQRCode(canvas, token, { size: 220, margin: 2, darkColor: "#78350f" });
 
-    overlay.querySelector("#btn-close-sync-qr").addEventListener("click", () => overlay.remove());
-    overlay.querySelector("#btn-copy-sync-token").addEventListener("click", async () => {
+    this._on(overlay.querySelector("#btn-close-sync-qr"), "click", () => overlay.remove());
+    this._on(overlay.querySelector("#btn-copy-sync-token"), "click", async () => {
       try {
         await navigator.clipboard.writeText(token);
         soundAndFX.playSuccessSound();
@@ -1049,6 +1057,7 @@ export class ParentModule extends BaseModule {
    */
   showImportSyncModal() {
     const overlay = document.createElement("div");
+    overlay.id = "parent-sync-import-overlay";
     overlay.className = "fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex flex-col items-center justify-center p-4 animate-fade-in select-none";
     overlay.innerHTML = `
       <div class="relative max-w-md w-full bg-white rounded-3xl p-6 shadow-2xl flex flex-col items-center text-center">
@@ -1078,11 +1087,11 @@ export class ParentModule extends BaseModule {
 
     const input = overlay.querySelector("#sync-token-input");
 
-    overlay.querySelector("#btn-close-import-sync").addEventListener("click", () => overlay.remove());
+    this._on(overlay.querySelector("#btn-close-import-sync"), "click", () => overlay.remove());
 
     const pasteBtn = overlay.querySelector("#btn-paste-sync-token");
     if (pasteBtn && input) {
-      pasteBtn.addEventListener("click", async () => {
+      this._on(pasteBtn, "click", async () => {
         try {
           const text = await navigator.clipboard.readText();
           if (text && text.trim().startsWith("CATHY_SYNC_V1:")) {
@@ -1097,7 +1106,7 @@ export class ParentModule extends BaseModule {
         }
       });
     }
-    overlay.querySelector("#btn-confirm-import-sync").addEventListener("click", () => {
+    this._on(overlay.querySelector("#btn-confirm-import-sync"), "click", () => {
       const input = overlay.querySelector("#sync-token-input");
       const val = input ? input.value.trim() : "";
       const res = storageManager.importSyncToken(val);

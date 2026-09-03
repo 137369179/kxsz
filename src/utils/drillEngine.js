@@ -22,12 +22,12 @@ import { GAME_ICONS } from "./gameIcons.js";
 const ROUNDS_PER_CHAR = 3;
 
 const TYPE_META = {
-  audio_choice: { iconSvg: (cls) => GAME_ICONS.speaker(cls), name: "", tip: "" },
-  image_choice: { iconSvg: (cls) => GAME_ICONS.cards(cls), name: "", tip: "" },
-  similar_pick: { iconSvg: (cls) => GAME_ICONS.gem(cls), name: "", tip: "" },
-  word_fill: { iconSvg: (cls) => GAME_ICONS.brush(cls), name: "", tip: "" },
-  sentence_fill: { iconSvg: (cls) => GAME_ICONS.scroll(cls), name: "", tip: "" },
-  balloon_pop: { iconSvg: (cls) => GAME_ICONS.monster(cls), name: "", tip: "" },
+  audio_choice: { iconSvg: (cls) => GAME_ICONS.speaker(cls), name: "听音辨字", tip: "听准发音，找出对应的神奇汉字" },
+  image_choice: { iconSvg: (cls) => GAME_ICONS.cards(cls), name: "看图识字", tip: "观察卡片图景，选出匹配的字" },
+  similar_pick: { iconSvg: (cls) => GAME_ICONS.gem(cls), name: "火眼金睛", tip: "形近字大挑战，找出正确的汉字" },
+  word_fill: { iconSvg: (cls) => GAME_ICONS.brush(cls), name: "词语填空", tip: "帮词语找回丢失的核心汉字" },
+  sentence_fill: { iconSvg: (cls) => GAME_ICONS.scroll(cls), name: "趣味造句", tip: "把汉字宝宝送回句子中" },
+  balloon_pop: { iconSvg: (cls) => GAME_ICONS.monster(cls), name: "戳破气球", tip: "瞄准目标字气球，快速戳破" },
 };
 
 /** Fisher-Yates */
@@ -53,12 +53,28 @@ export class DrillEngine {
     this.correctCount = 0;
     this.hitsInBalloonRound = 0;
     this.finished = false;
+    this._timeouts = [];
 
     // 
     this.typePool = this.buildTypePool();
     this.queue = shuffle(this.typePool).slice(0, ROUNDS_PER_CHAR);
 
     this.render();
+  }
+
+  _timeout(fn, ms) {
+    const id = setTimeout(() => {
+      const idx = this._timeouts.indexOf(id);
+      if (idx !== -1) this._timeouts.splice(idx, 1);
+      fn();
+    }, ms);
+    this._timeouts.push(id);
+    return id;
+  }
+
+  destroy() {
+    this._timeouts.forEach((id) => clearTimeout(id));
+    this._timeouts = [];
   }
 
   /**  */
@@ -113,7 +129,6 @@ export class DrillEngine {
     this.mount.innerHTML = `
       <div class="relative w-full max-w-4xl h-[480px] bg-gradient-to-b from-slate-950 via-indigo-950 to-slate-900 rounded-3xl overflow-hidden shadow-2xl border-4 border-amber-300 flex flex-col justify-between p-6 animate-fade-in select-none">
 
-        <!--  -->
         <div class="w-full flex items-center justify-between bg-black/60 px-6 py-2.5 rounded-full border border-white/30 text-white">
           <div class="flex items-center gap-2 text-xs font-black text-yellow-300">
             <span class="flex items-center">${meta.iconSvg("w-4 h-4")}</span>
@@ -127,12 +142,10 @@ export class DrillEngine {
           </div>
         </div>
 
-        <!--  -->
         <div class="w-full flex-1 flex flex-col items-center justify-center gap-5 my-3">
           ${promptHTML}
         </div>
 
-        <!--  -->
         <div id="drill-options" class="w-full flex items-center justify-center gap-5 flex-wrap">
           ${this.buildOptionsFor(type)}
         </div>
@@ -207,11 +220,12 @@ export class DrillEngine {
     // balloon_pop
     return `
       <div class="flex flex-col items-center gap-2">
-        <span class="bg-black/50 text-yellow-300 font-black text-lg px-6 py-2 rounded-full border border-amber-300">
-           ${c.char} 
-        </span>
+        <div class="bg-black/60 text-yellow-300 font-black text-base px-6 py-2 rounded-full border border-amber-300 shadow-md flex items-center gap-2">
+          <span>目标汉字：</span>
+          <span class="text-3xl text-orange-400 font-serif leading-none">${c.char}</span>
+        </div>
         <p class="text-white font-black text-sm">${meta.tip}</p>
-        <p class="text-[11px] text-cyan-200/80"> <b id="balloon-left" class="text-yellow-300 text-sm">3</b> </p>
+        <p class="text-xs text-cyan-200">还需击中：<b id="balloon-left" class="text-yellow-300 text-base font-black">3</b> 次</p>
       </div>
     `;
   }
@@ -248,13 +262,13 @@ export class DrillEngine {
   announce(type) {
     const c = this.char;
     const text = {
-      audio_choice: `“${c.char}”`,
-      image_choice: `“${c.char}”`,
-      similar_pick: `“${c.pinyin}”“${c.char}”`,
-      word_fill: `“${c.char}”`,
-      sentence_fill: `“${c.char}”`,
-      balloon_pop: `“${c.char}”`,
-    }[type] ?? c.char;
+      audio_choice: `请仔细听发音，选出对应的汉字“${c.char}”！`,
+      image_choice: `请观察卡片图景，选出汉字“${c.char}”！`,
+      similar_pick: `拼音读作“${c.pinyin}”，请找出正确的汉字“${c.char}”！`,
+      word_fill: `词语填空大挑战，请选出丢失的汉字“${c.char}”！`,
+      sentence_fill: `趣味造句，请为句子送回正确的汉字“${c.char}”！`,
+      balloon_pop: `戳破气球！连续击中3次带有“${c.char}”字的气球！`,
+    }[type] ?? `请找出汉字“${c.char}”！`;
     soundAndFX.speakPriority(text, { kind: "sentence", emotion: "gentle" });
   }
 
@@ -264,8 +278,9 @@ export class DrillEngine {
   bindRound(type) {
     const isBalloon = type === "balloon_pop";
     const needHits = 3;
+    let isRoundLocked = false;
 
-    // 
+    // 重听发音
     const replay = this.mount.querySelector("#btn-replay-audio");
     if (replay) {
       replay.addEventListener("click", () => {
@@ -276,6 +291,8 @@ export class DrillEngine {
 
     this.mount.querySelectorAll(".drill-opt").forEach((btn) => {
       btn.addEventListener("click", () => {
+        if (isRoundLocked) return;
+
         const selected = btn.dataset.char;
         const correct = selected === this.char.char;
 
@@ -284,23 +301,32 @@ export class DrillEngine {
           ebbinghausManager.markDifficult(this.char.id);
           this.combo = 0;
           btn.classList.add("animate-shake");
-          setTimeout(() => btn.classList.remove("animate-shake"), 420);
+          this._timeout(() => btn.classList.remove("animate-shake"), 420);
           return;
         }
 
-        // 
+        // 答对处理
         soundAndFX.playAttackHit();
 
         if (isBalloon) {
+          btn.style.pointerEvents = "none";
           this.hitsInBalloonRound++;
           const left = Math.max(0, needHits - this.hitsInBalloonRound);
           const leftEl = this.mount.querySelector("#balloon-left");
           if (leftEl) leftEl.textContent = left;
           btn.classList.add("scale-125", "opacity-0");
-          setTimeout(() => btn.classList.remove("opacity-0", "scale-125"), 600);
+          this._timeout(() => {
+            btn.classList.remove("opacity-0", "scale-125");
+            if (!isRoundLocked) btn.style.pointerEvents = "auto";
+          }, 600);
+
           if (this.hitsInBalloonRound < needHits) return;
+          isRoundLocked = true;
+          this.mount.querySelectorAll(".drill-opt").forEach((b) => { b.style.pointerEvents = "none"; });
           this.hitsInBalloonRound = 0;
         } else {
+          isRoundLocked = true;
+          this.mount.querySelectorAll(".drill-opt").forEach((b) => { b.style.pointerEvents = "none"; });
           btn.classList.add("ring-4", "ring-emerald-400", "bg-emerald-100");
         }
 
@@ -327,7 +353,7 @@ export class DrillEngine {
 
     soundAndFX.triggerConfetti(this.mount);
 
-    setTimeout(() => {
+    this._timeout(() => {
       this.roundIndex += 1;
       this.render();
     }, 720);
@@ -349,35 +375,35 @@ export class DrillEngine {
       <div class="relative w-full max-w-4xl h-[480px] bg-gradient-to-b from-slate-950 via-indigo-950 to-slate-900 rounded-3xl overflow-hidden shadow-2xl border-4 border-amber-300 flex flex-col items-center justify-center p-8 animate-fade-in text-center">
 
         <div class="mb-3 animate-bounce-slow flex items-center justify-center">
-          ${window.GAME_ICONS ? window.GAME_ICONS.trophy("w-20 h-20") : ""}
+          ${GAME_ICONS.trophy("w-20 h-20")}
         </div>
-        <h2 class="text-2xl font-black text-yellow-300 mb-2">
-          ${perfect ? "" : ""}
+        <h2 class="text-2xl sm:text-3xl font-black text-yellow-300 mb-2">
+          ${perfect ? "太棒啦！三连击大满贯！" : "挑战成功！顺利完成复习！"}
         </h2>
-        <p class="text-xs text-gray-300 mb-4 font-bold">
-          “<b class="text-amber-300 text-base">${c.char}</b>”
+        <p class="text-xs sm:text-sm text-gray-300 mb-4 font-bold">
+          你已经扎实巩固了汉字 “<b class="text-amber-300 text-lg font-serif">${c.char}</b>” 的多维认知！
         </p>
 
         <div class="flex items-center gap-4 mb-6">
           <div class="bg-black/50 border border-white/25 rounded-2xl px-5 py-3">
-            <div class="text-[10px] text-white/60 font-bold"></div>
+            <div class="text-[10px] text-white/60 font-bold">正确题数</div>
             <div class="text-2xl font-black text-emerald-300">${this.correctCount} / ${this.queue.length}</div>
           </div>
           <div class="bg-black/50 border border-white/25 rounded-2xl px-5 py-3">
-            <div class="text-[10px] text-white/60 font-bold"></div>
+            <div class="text-[10px] text-white/60 font-bold">最高连击</div>
             <div class="text-2xl font-black text-yellow-300">${this.bestCombo} Combo</div>
           </div>
           <div class="bg-black/50 border border-white/25 rounded-2xl px-5 py-3">
-            <div class="text-[10px] text-white/60 font-bold"></div>
+            <div class="text-[10px] text-white/60 font-bold">挑战项目</div>
             <div class="text-xs font-black text-cyan-300 mt-1">
               ${this.queue.map((t) => TYPE_META[t].name).join(" · ")}
             </div>
           </div>
         </div>
 
-        <button id="btn-goto-write-step" class="btn-game-orange text-white font-black text-base px-10 py-3.5 rounded-full shadow-2xl shimmer-badge flex items-center gap-2 cursor-pointer active:scale-95 transition-transform">
-          <span class="flex items-center">${window.GAME_ICONS ? window.GAME_ICONS.sparkle("w-5 h-5") : ""}</span> 
-          <span></span> 
+        <button id="btn-goto-write-step" class="btn-game-orange text-white font-black text-base px-10 py-3.5 rounded-full shadow-2xl shimmer-badge flex items-center gap-2 cursor-pointer active:scale-95 transition-transform hover:brightness-105">
+          <span class="flex items-center">${GAME_ICONS.sparkle("w-5 h-5")}</span> 
+          <span>继续下一关复习</span> 
         </button>
       </div>
     `;

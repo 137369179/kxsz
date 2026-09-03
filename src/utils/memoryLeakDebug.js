@@ -257,11 +257,28 @@ class AudioDebugPanel {
       const r = memoryLeakProbe.diffReport();
       this._setStatus(`heapΔ${r.heapSlopeMB}MB nodesΔ${r.nodeSlope} suspects${r.leakScanSuspects}`);
     };
-    // 
-    let startX = 0, startY = 0, startT = 0, startL = 0, dragging = false;
-    el.querySelector("[data-adp=head]").onmousedown = (e) => { dragging = true; startX = e.clientX; startY = e.clientY; const r = el.getBoundingClientRect(); startT = r.top; startL = r.left; };
-    window.addEventListener("mousemove", (e) => { if (dragging) { el.style.top = (startT + e.clientY - startY) + "px"; el.style.left = (startL + e.clientX - startX) + "px"; el.style.right = "auto"; el.style.bottom = "auto"; } });
-    window.addEventListener("mouseup", () => dragging = false);
+    // 拖拽逻辑 + 配套清理 (避免 window 监听器泄漏)
+    this._dragState = { dragging: false, startX: 0, startY: 0, startT: 0, startL: 0 };
+    const dragHead = el.querySelector("[data-adp=head]");
+    dragHead.onmousedown = (e) => {
+      this._dragState.dragging = true;
+      this._dragState.startX = e.clientX;
+      this._dragState.startY = e.clientY;
+      const r = el.getBoundingClientRect();
+      this._dragState.startT = r.top;
+      this._dragState.startL = r.left;
+    };
+    this._onPanelMouseMove = (e) => {
+      const ds = this._dragState;
+      if (!ds.dragging) return;
+      el.style.top = (ds.startT + e.clientY - ds.startY) + "px";
+      el.style.left = (ds.startL + e.clientX - ds.startX) + "px";
+      el.style.right = "auto";
+      el.style.bottom = "auto";
+    };
+    this._onPanelMouseUp = () => { this._dragState.dragging = false; };
+    window.addEventListener("mousemove", this._onPanelMouseMove);
+    window.addEventListener("mouseup", this._onPanelMouseUp);
 
     this._raf = requestAnimationFrame(() => this._loop());
     memoryLeakProbe.attach && (typeof window !== "undefined") && setTimeout(() => memoryLeakProbe.attach(window.__soundEngine || null), 0);
@@ -270,6 +287,16 @@ class AudioDebugPanel {
   unmount() {
     if (!this.mounted) return;
     cancelAnimationFrame(this._raf);
+    // 清理拖拽时挂载的 window 监听器，避免重复挂载时堆积
+    if (this._onPanelMouseMove) {
+      try { window.removeEventListener("mousemove", this._onPanelMouseMove); } catch {}
+      this._onPanelMouseMove = null;
+    }
+    if (this._onPanelMouseUp) {
+      try { window.removeEventListener("mouseup", this._onPanelMouseUp); } catch {}
+      this._onPanelMouseUp = null;
+    }
+    this._dragState = null;
     this._root && this._root.remove();
     this._root = null;
     this.mounted = false;
@@ -375,21 +402,13 @@ class AudioDebugPanel {
 
   _spark(arr, color) {
     if (!arr || !arr.length) return "";
-    const W = 390, H = 40, mn = Math.min(...arr), mx = Math.max(...arr) || 1;
-    const pts = arr.map((v, i) => `${(i / (arr.length - 1 || 1)) * W},${H - ((v - mn) / (mx - mn + 1e-9)) * H}`).join(" ");
-    return `<svg width="${W}" height="${H}" style="display:block;background:#0f1527;border-radius:4px;"><polyline points="${pts}" fill="none" stroke="${color}" stroke-width="1.2"/></svg>`;
+    const W = 390, H = 40;
+    return `<canvas width="${W}" height="${H}" data-spark="${arr.join(',')}" data-color="${color}" style="display:block;background:#0f1527;border-radius:4px;"></canvas>`;
   }
 
   _f0Canvas() {
     const W = 390, H = 110;
-    const tone = { 1: [55, 55], 2: [35, 55], 3: [21, 14, 51], 4: [51, 11] }; //  5 
-    const scale = (v) => H - 10 - ((v - 10) / 45) * (H - 20);
-    const lines = Object.entries(tone).map(([k, arr]) => {
-      const pts = arr.map((v, i) => `${(i / (arr.length - 1)) * W * 0.22 + (+k - 1) * (W / 4 + 4)},${scale(v)}`).join(" ");
-      return `<polyline points="${pts}" fill="none" stroke="${["#7cf0c2","#ffd166","#f7b267","#ff7a90"][k-1]}" stroke-width="2"/>
-        <text x="${(+k - 1) * (W / 4 + 4) + 6}" y="14" fill="#9aa7d6" font-size="10">T${k}</text>`;
-    }).join("");
-    return `<svg width="${W}" height="${H}" style="display:block;background:#0f1527;border-radius:4px;">${lines}</svg>`;
+    return `<canvas width="${W}" height="${H}" data-f0="1" style="display:block;background:#0f1527;border-radius:4px;"></canvas>`;
   }
 }
 

@@ -209,7 +209,8 @@ export class PlayFeedCreature {
             }, 600);
           }
 
-          const progress = Math.min(100, Math.round((this.fedCount / this.targetFeedCount) * 100));
+          const target = Math.max(1, this.targetFeedCount || 1);
+          const progress = Math.min(100, Math.round((this.fedCount / target) * 100));
           if (progressBar) progressBar.style.width = `${progress}%`;
 
           if (this.fedCount >= this.targetFeedCount && !this.isCompleted) {

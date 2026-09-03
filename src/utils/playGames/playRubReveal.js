@@ -138,7 +138,8 @@ export class PlayRubReveal {
       }
 
       this.rubbedPoints++;
-      const progress = Math.min(100, Math.round((this.rubbedPoints / this.targetRubCount) * 100));
+      const target = Math.max(1, this.targetRubCount || 1);
+      const progress = Math.min(100, Math.round((this.rubbedPoints / target) * 100));
       if (progressBar) progressBar.style.width = `${progress}%`;
 
       // 产生金色触控火花微粒
@@ -150,7 +151,9 @@ export class PlayRubReveal {
         spark.style.left = `${clientX - 7}px`;
         spark.style.top = `${clientY - 7}px`;
         document.body.appendChild(spark);
-        setTimeout(() => spark.remove(), 350);
+        this.timers.push(setTimeout(() => {
+          try { spark.remove(); } catch {}
+        }, 350));
       }
 
       if (this.rubbedPoints % 6 === 0) {

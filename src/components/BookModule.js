@@ -84,6 +84,15 @@ export class BookModule extends BaseModule {
       URL.revokeObjectURL(this.userRecordedUrl);
       this.userRecordedUrl = null;
     }
+    const pe = pronunciationEval || (typeof window !== "undefined" ? window.pronunciationEval : null);
+    if (pe && pe.state === "listening") {
+      try { pe.stopAndEvaluate(); } catch {}
+    }
+    if (typeof document !== "undefined") {
+      document.getElementById("char-popover-overlay")?.remove();
+      document.getElementById("book-catalog-drawer-overlay")?.remove();
+      document.getElementById("user-voice-modal-overlay")?.remove();
+    }
     this.karaokeSessionId++;
     this.isVoiceModalOpen = false;
     this.isCatalogOpen = false;
@@ -216,7 +225,6 @@ export class BookModule extends BaseModule {
                     <h3 class="text-base font-black text-amber-950 group-hover:text-orange-600 transition-colors">
                       ${book.title}
                     </h3>
-                    // 3 颗小星星
                     <div class="flex items-center gap-0.5">
                       <span class="flex items-center">${GAME_ICONS.star("w-4 h-4", !isRead)}</span>
                       <span class="flex items-center">${GAME_ICONS.star("w-4 h-4", !isRead)}</span>
@@ -622,8 +630,7 @@ export class BookModule extends BaseModule {
         }
       }
     };
-    window.addEventListener("keydown", keyHandler);
-    this._addCleanup(() => window.removeEventListener("keydown", keyHandler));
+    this._onWindow("keydown", keyHandler);
   }
 
   // ----------------------------------------------------
@@ -714,13 +721,13 @@ export class BookModule extends BaseModule {
       overlay.remove();
     };
 
-    closeBtn.addEventListener("click", closePopover);
-    overlay.addEventListener("click", (e) => {
+    this._on(closeBtn, "click", closePopover);
+    this._on(overlay, "click", (e) => {
       if (e.target === overlay) closePopover();
     });
 
     const speakBtn = overlay.querySelector("#btn-popover-speak");
-    speakBtn.addEventListener("click", () => {
+    this._on(speakBtn, "click", () => {
       soundAndFX.playPop();
       soundAndFX.speakPriority(charData.char, { kind: "char", priority: 1 });
     });
@@ -798,21 +805,20 @@ export class BookModule extends BaseModule {
       overlay.remove();
     };
 
-    overlay.querySelector("#btn-close-catalog").addEventListener("click", closeDrawer);
-    overlay.querySelector("#btn-catalog-back").addEventListener("click", closeDrawer);
-    overlay.addEventListener("click", (e) => {
+    this._on(overlay.querySelector("#btn-close-catalog"), "click", closeDrawer);
+    this._on(overlay.querySelector("#btn-catalog-back"), "click", closeDrawer);
+    this._on(overlay, "click", (e) => {
       if (e.target === overlay) closeDrawer();
     });
 
-    overlay.querySelectorAll(".catalog-page-card").forEach((card) => {
-      card.addEventListener("click", () => {
-        const targetIdx = parseInt(card.dataset.pageIndex, 10);
-        soundAndFX.playPop();
-        this.currentPageIndex = targetIdx;
-        this._saveProgress();
-        closeDrawer();
-        this.render();
-      });
+    this._onDom(overlay.querySelectorAll(".catalog-page-card"), "click", (e) => {
+      const card = e.currentTarget;
+      const targetIdx = parseInt(card.dataset.pageIndex, 10);
+      soundAndFX.playPop();
+      this.currentPageIndex = targetIdx;
+      this._saveProgress();
+      closeDrawer();
+      this.render();
     });
   }
 
@@ -885,32 +891,35 @@ export class BookModule extends BaseModule {
     const playbackBtnText = overlay.querySelector("#playback-btn-text");
 
     // 角色选择
-    overlay.querySelectorAll(".role-select-btn").forEach((btn) => {
-      btn.addEventListener("click", () => {
-        soundAndFX.playPop();
-        selectedRole = btn.dataset.role;
-        overlay.querySelectorAll(".role-select-btn").forEach((b) => {
-          b.classList.remove("bg-orange-500", "text-white", "shadow");
-          b.classList.add("text-amber-900");
-        });
-        btn.classList.add("bg-orange-500", "text-white", "shadow");
-        btn.classList.remove("text-amber-900");
-
-        const roleName = selectedRole === "kid" ? "宝贝" : selectedRole === "parent" ? "家长" : "亲子合读";
-        statusText.textContent = `已切换为【${roleName}】模式，点击麦克风开始！`;
+    this._onDom(overlay.querySelectorAll(".role-select-btn"), "click", (e) => {
+      const btn = e.currentTarget;
+      soundAndFX.playPop();
+      selectedRole = btn.dataset.role;
+      overlay.querySelectorAll(".role-select-btn").forEach((b) => {
+        b.classList.remove("bg-orange-500", "text-white", "shadow");
+        b.classList.add("text-amber-900");
       });
+      btn.classList.add("bg-orange-500", "text-white", "shadow");
+      btn.classList.remove("text-amber-900");
+
+      const roleName = selectedRole === "kid" ? "宝贝" : selectedRole === "parent" ? "家长" : "亲子合读";
+      statusText.textContent = `已切换为【${roleName}】模式，点击麦克风开始！`;
     });
 
     let isRecording = false;
 
     const closeModal = () => {
       this.isVoiceModalOpen = false;
+      const pe = pronunciationEval || (typeof window !== "undefined" ? window.pronunciationEval : null);
+      if (pe && pe.state === "listening") {
+        try { pe.stopAndEvaluate(); } catch {}
+      }
       overlay.remove();
     };
 
-    closeBtn.addEventListener("click", closeModal);
+    this._on(closeBtn, "click", closeModal);
 
-    startRecordBtn.addEventListener("click", async () => {
+    this._on(startRecordBtn, "click", async () => {
       if (isRecording) return;
       isRecording = true;
       soundAndFX.playFamilyRecordChime(true);
@@ -961,7 +970,7 @@ export class BookModule extends BaseModule {
       }
     });
 
-    playbackBtn.addEventListener("click", () => {
+    this._on(playbackBtn, "click", () => {
       soundAndFX.playPop();
       soundAndFX.speakPriority(page.text, { kind: "sentence", emotion: "gentle" });
     });
@@ -1123,7 +1132,6 @@ export class BookModule extends BaseModule {
             凯茜识字分级阅读 · 顺利掌握全书精髓与核心生字
           </p>
 
-          // 3 颗金色大星星
           <div class="flex items-center gap-2 mb-6">
             <span class="flex items-center transform hover:scale-125 transition-transform">${GAME_ICONS.star("w-8 h-8", false)}</span>
             <span class="flex items-center transform hover:scale-125 transition-transform scale-125">${GAME_ICONS.star("w-8 h-8", false)}</span>

@@ -20,6 +20,7 @@
 
 import { EVENTS, eventBus } from "./eventBus.js";
 import { neuralVoice } from "./neuralVoice.js";
+import { GAME_ICONS } from "./gameIcons.js";
 
 // ============================================================
 // 0. 
@@ -422,7 +423,7 @@ class CathyAudioEngine {
 
   /**  (AudioContext Resiliency) */
   _setupVisibilityRecovery() {
-    if (typeof document === "undefined" || this._visibilityBound) return;
+    if (typeof document === "undefined" || typeof document.addEventListener !== "function" || this._visibilityBound) return;
     this._visibilityBound = true;
     const resumeAudio = () => {
       if (this.audioCtx && this.audioCtx.state === "suspended") {
@@ -432,22 +433,35 @@ class CathyAudioEngine {
     document.addEventListener("visibilitychange", () => {
       if (document.visibilityState === "visible") resumeAudio();
     });
-    window.addEventListener("focus", resumeAudio);
-    window.addEventListener("pageshow", resumeAudio);
+    if (typeof window !== "undefined" && typeof window.addEventListener === "function") {
+      window.addEventListener("focus", resumeAudio);
+      window.addEventListener("pageshow", resumeAudio);
+
+      // 一次性用户手势解锁 Web Audio API（iOS / Safari / Chrome 标配）
+      const unlockGesture = () => {
+        resumeAudio();
+        window.removeEventListener("pointerdown", unlockGesture, true);
+        window.removeEventListener("touchstart", unlockGesture, true);
+        window.removeEventListener("keydown", unlockGesture, true);
+      };
+      window.addEventListener("pointerdown", unlockGesture, true);
+      window.addEventListener("touchstart", unlockGesture, true);
+      window.addEventListener("keydown", unlockGesture, true);
+    }
   }
 
   // /
   initVisibilityListener() {
-    if (typeof document === "undefined") return;
+    if (typeof document === "undefined" || typeof document.addEventListener !== "function") return;
     document.addEventListener("visibilitychange", () => {
       if (document.hidden) {
         if (this.audioCtx && this.audioCtx.state === "running") {
-          this.audioCtx.suspend();
+          this.audioCtx.suspend().catch(() => {});
         }
         if (this.synth) this.synth.pause();
       } else {
         if (this.audioCtx && this.audioCtx.state === "suspended") {
-          this.audioCtx.resume();
+          this.audioCtx.resume().catch(() => {});
         }
         if (this.synth) this.synth.resume();
       }
@@ -500,12 +514,19 @@ class CathyAudioEngine {
     // ----  () ----
     const startProgress = (durationMs) => {
       const chars = [...text];
+      if (chars.length === 0) return;
       const total = Math.max(1, durationMs);
-      const per = total / chars.length;
+      const per = Math.max(10, total / chars.length);
       let idx = 0;
       queueItem._progressTimer = setInterval(() => {
         idx += 1;
-        if (idx >= chars.length) { clearInterval(queueItem._progressTimer); return; }
+        if (idx >= chars.length) {
+          if (queueItem._progressTimer) {
+            clearInterval(queueItem._progressTimer);
+            queueItem._progressTimer = null;
+          }
+          return;
+        }
         eventBus.emit(EVENTS.AUDIO_SPEAK_PROGRESS, {
           char_index: idx,
           char: chars[idx],
@@ -657,25 +678,32 @@ class CathyAudioEngine {
             activeHandle = lh;
             return await lh.onEndPromise;
           } else {
-            // / ( 150ms  neural  neural TTS)
+            // 长句 / 导语（优先 150ms 竞速判定 neural 缓存，未命中优雅降级）
             try {
-              const dest = this._voiceGainForKind(kind);
-              const timeoutPromise = new Promise((resolve) => setTimeout(() => resolve(null), 150));
-              const neuralPromise = neuralVoice.play({
-                text,
-                ctx: this.audioCtx,
-                dest,
-                emotion: opts.emotion || "neutral",
-                pitchOffset: pitchBias,
-                rateMul,
-                volume: 1,
-              });
-              const h = await Promise.race([neuralPromise, timeoutPromise]);
-              if (h) {
-                if (cancelledEarly) { h.cancel(); return { interrupted: true }; }
-                activeHandle = h;
-                startProgress(h.durationMs);
-                return await h.onEndPromise;
+              if (neuralVoice.available !== false) {
+                const dest = this._voiceGainForKind(kind);
+                const abortController = typeof AbortController !== "undefined" ? new AbortController() : null;
+                const timeoutPromise = new Promise((resolve) => setTimeout(() => {
+                  if (abortController) abortController.abort();
+                  resolve(null);
+                }, 150));
+                const neuralPromise = neuralVoice.play({
+                  text,
+                  ctx: this.audioCtx,
+                  dest,
+                  emotion: opts.emotion || "neutral",
+                  pitchOffset: pitchBias,
+                  rateMul,
+                  volume: 1,
+                  signal: abortController ? abortController.signal : null,
+                });
+                const h = await Promise.race([neuralPromise, timeoutPromise]);
+                if (h) {
+                  if (cancelledEarly) { h.cancel(); return { interrupted: true }; }
+                  activeHandle = h;
+                  startProgress(h.durationMs);
+                  return await h.onEndPromise;
+                }
               }
             } catch (e) {
               // 
@@ -693,16 +721,16 @@ class CathyAudioEngine {
       return {
         cancel: () => {
           cancelledEarly = true;
-          clearInterval(queueItem._progressTimer);
+          if (queueItem?._progressTimer) clearInterval(queueItem._progressTimer);
           if (activeHandle) { try { activeHandle.cancel(); } catch {} }
           ensureDuckPopped();
         },
         onEndPromise: onEndPromise.then((r) => {
-          clearInterval(queueItem._progressTimer);
+          if (queueItem?._progressTimer) clearInterval(queueItem._progressTimer);
           ensureDuckPopped();
           return r;
         }).catch((err) => {
-          clearInterval(queueItem._progressTimer);
+          if (queueItem?._progressTimer) clearInterval(queueItem._progressTimer);
           ensureDuckPopped();
           console.warn("[PSQ] onEndPromise cleanup error:", err);
           return { interrupted: false };
@@ -767,6 +795,17 @@ class CathyAudioEngine {
   // ----------------------------------------------------
   duckBGM() { this.duckStack.push("tutor_duck"); }
   restoreBGM() { this.duckStack.pop("tutor_duck"); }
+
+  /** 立即停止并清空所有当前及排队的语音播放 */
+  stopSpeaking() {
+    this.speechQueue.cancelAll();
+    try {
+      if (typeof window !== "undefined" && window.speechSynthesis) {
+        window.speechSynthesis.cancel();
+      }
+    } catch {}
+  }
+
 
   // ----------------------------------------------------
   // 1.5 
@@ -1082,6 +1121,17 @@ class CathyAudioEngine {
     this._tone({ type: "sine", from: 600, to: 1200, dur: 0.08, vol: 0.25 });
   }
 
+  // 谁 (Whoosh/Swoosh)
+  playWhoosh() {
+    this._tone({ type: "sine", from: 240, to: 880, dur: 0.15, vol: 0.22 });
+  }
+
+  // 节奏节拍 / 敲击 (Chant hit)
+  playChantHit() {
+    this._tone({ type: "triangle", from: 720, to: 240, dur: 0.09, vol: 0.28 });
+  }
+
+
   // 3. /
   playSunRise() {
     const chord = [261.63, 329.63, 392.0, 523.25, 659.25, 783.99];
@@ -1138,6 +1188,10 @@ class CathyAudioEngine {
   playSuccessSound() {
     this._tone({ type: "sine", from: 523.25, dur: 0.12, vol: 0.28 });
     this._tone({ type: "sine", from: 783.99, dur: 0.22, vol: 0.26, delay: 0.1 });
+  }
+
+  playSuccess() {
+    return this.playSuccessSound();
   }
 
   // 11.  ()
@@ -1271,13 +1325,16 @@ class CathyAudioEngine {
 
   // 18.  (Canvas Confetti)
   triggerConfetti(container) {
+    if (typeof document === "undefined" || !container || typeof container.appendChild !== "function") return;
     const canvas = document.createElement("canvas");
+    if (!canvas || typeof canvas.getContext !== "function") return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
     canvas.className = "fixed inset-0 pointer-events-none z-50 w-full h-full";
     container.appendChild(canvas);
 
-    const ctx = canvas.getContext("2d");
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+    canvas.width = (typeof window !== "undefined" && window.innerWidth) || 800;
+    canvas.height = (typeof window !== "undefined" && window.innerHeight) || 600;
 
     const particles = [];
     const colors = ["#FF5722", "#FFC107", "#4CAF50", "#00BCD4", "#E91E63", "#9C27B0", "#FFEB3B"];
@@ -1387,8 +1444,28 @@ class CathyAudioEngine {
   // ----------------------------------------------------
   triggerCoinFly(container, startX = null, startY = null, count = 7) {
     if (typeof window === "undefined" || !document.body) return;
-    const sx = (startX !== null && startX !== undefined) ? startX : window.innerWidth / 2;
-    const sy = (startY !== null && startY !== undefined) ? startY : window.innerHeight / 2;
+
+    // 支持 triggerCoinFly(finishBtn, 5) 形式重载
+    if (typeof startX === "number" && startY === null) {
+      count = startX;
+      startX = null;
+    }
+
+    let sx = (startX !== null && startX !== undefined) ? startX : null;
+    let sy = (startY !== null && startY !== undefined) ? startY : null;
+
+    if ((sx === null || sy === null) && container && typeof container.getBoundingClientRect === "function") {
+      try {
+        const rect = container.getBoundingClientRect();
+        if (rect && rect.width > 0 && rect.height > 0) {
+          sx = rect.left + rect.width / 2;
+          sy = rect.top + rect.height / 2;
+        }
+      } catch {}
+    }
+
+    if (sx === null || sx === undefined) sx = window.innerWidth / 2;
+    if (sy === null || sy === undefined) sy = window.innerHeight / 2;
     this.playCoinClink();
 
     for (let i = 0; i < count; i++) {
@@ -1398,14 +1475,17 @@ class CathyAudioEngine {
       coin.style.top = `${sy}px`;
       coin.style.width = "32px";
       coin.style.height = "32px";
-      coin.innerHTML = window.GAME_ICONS ? window.GAME_ICONS.coin("w-full h-full drop-shadow-[0_0_8px_rgba(251,191,36,0.9)]") : '<div class="w-full h-full rounded-full bg-gradient-to-tr from-yellow-300 via-amber-400 to-orange-500 border-2 border-white shadow-xl"></div>';
+      coin.innerHTML = (window.GAME_ICONS || GAME_ICONS)
+        ? (window.GAME_ICONS || GAME_ICONS).coin("w-full h-full drop-shadow-[0_0_8px_rgba(251,191,36,0.9)]")
+        : '<div class="w-full h-full rounded-full bg-gradient-to-tr from-yellow-300 via-amber-400 to-orange-500 border-2 border-white shadow-xl"></div>';
       document.body.appendChild(coin);
 
       const burstX = (Math.random() - 0.5) * 200;
       const burstY = -90 - Math.random() * 100;
       const rot = Math.random() * 720 - 360;
 
-      requestAnimationFrame(() => {
+      const raf = (typeof requestAnimationFrame !== "undefined" ? requestAnimationFrame : (typeof window !== "undefined" && window.requestAnimationFrame) ? window.requestAnimationFrame : (cb) => setTimeout(cb, 16));
+      raf(() => {
         coin.style.transform = `translate(${burstX}px, ${burstY}px) scale(1.3) rotate(${rot}deg)`;
 
         setTimeout(() => {
@@ -1417,7 +1497,7 @@ class CathyAudioEngine {
 
           setTimeout(() => {
             this.playCoinClink();
-            coin.remove();
+            try { coin.remove(); } catch {}
           }, 650);
         }, 220 + i * 45);
       });

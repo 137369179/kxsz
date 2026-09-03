@@ -16,6 +16,13 @@ export class BaseModule {
     this.container = container;
     this._cleanups = [];
     this.bus = eventBus;
+    // E7: 专注模式 — 订阅文档级切换
+    this._focusCleanup = eventBus.on(EVENTS.FOCUS_MODE_CHANGED, ({ enabled }) => {
+      if (typeof document !== "undefined") {
+        document.body.classList.toggle("focus-mode", enabled);
+      }
+    });
+    this._addCleanup(() => eventBus.off(EVENTS.FOCUS_MODE_CHANGED, this._focusCleanup));
   }
 
   /** destroy  */
@@ -29,6 +36,32 @@ export class BaseModule {
     el.addEventListener(evt, fn, opts);
     this._addCleanup(() => el.removeEventListener(evt, fn, opts));
   }
+
+  /**
+   * 通用 DOM 监听器绑定与全生命周期回收支持:
+   * - 支持单个 DOM 元素 (Element / EventTarget)
+   * - 支持字符串选择器 (在 this.container 范围内通过 querySelectorAll 查找并绑定)
+   * - 支持 NodeList 或 Element 数组批量绑定
+   * 绑定的所有监听器自动进入 this._cleanups，在 destroy() 时一键清理
+   */
+  _onDom(target, evt, fn, opts) {
+    if (!target || !evt || typeof fn !== "function") return;
+
+    if (typeof target === "string") {
+      if (!this.container) return;
+      const elements = this.container.querySelectorAll(target);
+      elements.forEach(el => this._on(el, evt, fn, opts));
+      return;
+    }
+
+    if (Array.isArray(target) || (typeof NodeList !== "undefined" && target instanceof NodeList) || (typeof target.forEach === "function" && typeof target.length === "number")) {
+      Array.from(target).forEach(el => el && this._on(el, evt, fn, opts));
+      return;
+    }
+
+    this._on(target, evt, fn, opts);
+  }
+
 
   /**  window  */
   _onWindow(evt, fn, opts) {

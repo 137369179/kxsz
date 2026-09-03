@@ -308,7 +308,9 @@ const POLYPHONE_RULES = [
   { char: "过",
     default: { pinyinStrip: "guo", toneNum: 4, label: "guò" },
     rules: [
-      { match: (ctx) => ctx.prevChar && isVLike(ctx.prevChar) && (!ctx.nextChar || !/[^一-龥]/.test(ctx.nextChar) && !isVLike(ctx.nextChar) === false), result: { pinyinStrip: "guo", toneNum: 0, label: "guo" } },
+      // 轻声判定: 当作助词「了/的/着」用法时 → 轻声 guo。
+      // 典型语境：动词 + 过 (走过、看过、去过)，即前后都是动词/名词但没有可强化读音时标轻声。
+      { match: (ctx) => ctx.prevChar && isVLike(ctx.prevChar) && (!ctx.nextChar || isVLike(ctx.nextChar)), result: { pinyinStrip: "guo", toneNum: 0, label: "guo" } },
     ]},
   // 发: fā vs fà (hair)
   { char: "发",
@@ -606,6 +608,8 @@ export class HanziG2P {
    * @returns {Array<{char, pinyinStrip, toneNum, pinyinMarked, originalTone, sandhi?, isNeutral, isPolyphone, isPunct?}>}
    */
   convert(text, opts = {}) {
+    if (!text && text !== 0) return [];
+    if (typeof text !== "string") text = String(text);
     if (!text) return [];
     const chars = [...text];
     const tokens = [];

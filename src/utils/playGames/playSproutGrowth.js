@@ -113,10 +113,11 @@ export class PlaySproutGrowth {
       can.style.transform = "rotate(-30deg) scale(1.15)";
       if (drops) drops.style.opacity = "1";
 
-      setTimeout(() => {
+      this.timers.push(setTimeout(() => {
+        if (this.isDestroyed) return;
         can.style.transform = "rotate(0deg) scale(1)";
         if (drops) drops.style.opacity = "0";
-      }, 450);
+      }, 450));
 
       // 植物逐级长大与称号演进
       if (plant) {
@@ -129,7 +130,8 @@ export class PlaySproutGrowth {
         stageText.textContent = stageNames[Math.min(stageNames.length - 1, this.waterCount - 1)] || "茁壮成长";
       }
 
-      const progress = Math.min(100, Math.round((this.waterCount / this.targetWaterCount) * 100));
+      const target = Math.max(1, this.targetWaterCount || 1);
+      const progress = Math.min(100, Math.round((this.waterCount / target) * 100));
       if (progressBar) progressBar.style.width = `${progress}%`;
 
       if (this.waterCount >= this.targetWaterCount && !this.isCompleted) {

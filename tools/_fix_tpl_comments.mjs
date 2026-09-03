@@ -13,7 +13,8 @@ function collectQuasis(node, out) {
   if (!node || typeof node !== "object") return;
   if (node.type === "TemplateLiteral") {
     for (const q of node.quasis) {
-      if (/\/\/\s*[\u4e00-\u9fa5]/.test(q.value.raw)) out.push(q);
+      // 检测任意 // 注释（不限语言），URL 的 // 前面是 : 不会命中「行首/空白 + //」
+      if (/^[ \t]*\/\/[^\n]*/m.test(q.value.raw) || /[ \t]+\/\/[^\n]*$/m.test(q.value.raw)) out.push(q);
     }
   }
   for (const k of Object.keys(node)) {
@@ -24,9 +25,14 @@ function collectQuasis(node, out) {
   }
 }
 
-// 删除「整行仅空白+//注释」的行（含其行尾换行）
+// 删除「整行仅空白+//注释」的行 与「行尾 HTML 后跟 //注释」；排除 URL（// 前是冒号）
 function cleanQuasi(raw) {
-  return raw.replace(/^[ \t]*\/\/[^\n]*\n/gm, "");
+  let s = raw;
+  // 1. 整行 // 注释（含行尾换行）
+  s = s.replace(/^[ \t]*\/\/[^\n]*\n/gm, "");
+  // 2. 行尾 // 注释（HTML 标签后空格 + //xxx），保留行首内容
+  s = s.replace(/(\S)[ \t]+\/\/[^\n]*$/gm, "$1");
+  return s;
 }
 
 const files = execSync('find src -name "*.js"').toString().trim().split("\n").filter(Boolean);
@@ -49,7 +55,7 @@ for (const f of files) {
     const raw = q.value.raw;
     const cleaned = cleanQuasi(raw);
     if (cleaned !== raw) {
-      removed += (raw.match(/\/\/\s*[\u4e00-\u9fa5]/g) || []).length;
+      removed += (raw.match(/\/\/[^\n]*/g) || []).length;
       src = src.slice(0, q.start) + cleaned + src.slice(q.end);
     }
   }

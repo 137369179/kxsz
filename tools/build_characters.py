@@ -1109,8 +1109,13 @@ def build():
             # 手工造句未含本字（8 处）：追加读音小贴士，恢复 sentence_fill 题型资格
             sentence = f"{sentence}「{row['char']}」读作「{char_pinyin}」哦！"
 
-        # gameConfig：正确项 + 形近干扰项（已剔除自身）
-        options = [row["char"]] + confusing[:3]
+        # gameConfig：正确项 + 形近干扰项（强制剔除自身并去重，防止射击游戏出现重复气球）
+        options = [row["char"]]
+        for c in confusing:
+            if c != row["char"] and c not in options:
+                options.append(c)
+            if len(options) >= 4:
+                break
         # 干扰项不足时用字库内其他字补齐
         if len(options) < 4:
             for other in rows:

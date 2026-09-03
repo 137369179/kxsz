@@ -81,4 +81,20 @@ describe('StorageManager', () => {
     const importedProgress = sm.getJSON('CATHY_LITERACY_USER_PROGRESS_V1')
     expect(importedProgress.coins).toBe(88)
   })
+
+  it('should export and import compact sync token across devices', () => {
+    sm.putJSON('CATHY_LITERACY_USER_PROGRESS_V1', { coins: 168, charRecords: { char_001: { masteryRate: 90 } } })
+    const token = sm.exportSyncToken()
+    expect(token).toMatch(/^CATHY_SYNC_V1:/)
+
+    // Reset storage and import token
+    Object.keys(mockStorage).forEach(k => delete mockStorage[k])
+    const res = sm.importSyncToken(token)
+    expect(res.ok).toBe(true)
+    expect(res.coins).toBe(168)
+    expect(res.charCount).toBe(1)
+
+    const imported = sm.getJSON('CATHY_LITERACY_USER_PROGRESS_V1')
+    expect(imported.coins).toBe(168)
+  })
 })

@@ -1,5 +1,5 @@
 // 版本号单一来源：注册 URL ?v= 由 index.html 从 version.js 注入
-const _ver = new URL(self.location.href).searchParams.get("v") || "2.7.7";
+const _ver = new URL(self.location.href).searchParams.get("v") || "2.9.1";
 const CACHE_NAME = `cathy-literacy-v${_ver.replace(/\./g, "-")}`; // 动态读取版本，避免硬编码（与 version.js 对齐）
 
 // 核心数据文件预缓存列表（install 阶段离线就绪）
@@ -23,6 +23,14 @@ const CORE_ASSETS = [
   "./src/utils/bgmAndChant.js",
   "./src/utils/dspChain.js",
   "./src/utils/g2p.js",
+  "./src/utils/morphEngine.js",
+  "./src/utils/qrCode.js",
+  "./src/utils/playGames/index.js",
+  "./src/utils/playGames/playRubReveal.js",
+  "./src/utils/playGames/playFeedCreature.js",
+  "./src/utils/playGames/playSlingshot.js",
+  "./src/utils/playGames/playSproutGrowth.js",
+  "./src/utils/playGames/playMagneticFusion.js",
   "./src/utils/audioSafety.js",
   "./src/utils/parentVoice.js",
   "./src/utils/playSceneEngine.js",
@@ -66,7 +74,19 @@ const CORE_ASSETS = [
   "./assets/images/icon_parent.webp",
   "./assets/images/icon_scroll.webp",
   "./assets/images/icon_sparkle.webp",
-  "./assets/images/icon_swords.webp"
+  "./assets/images/icon_swords.webp",
+  "./assets/images/icon_hand.webp",
+  "./assets/images/icon_print.webp",
+  "./assets/images/icon_shield_lock.webp",
+  "./assets/images/avatar_fairy.webp",
+  "./assets/images/avatar_hero.webp",
+  "./assets/images/avatar_unicorn.webp",
+  "./assets/images/avatar_panda.webp",
+  "./assets/images/cover_cat_fishing.webp",
+  "./assets/images/cover_midautumn.webp",
+  "./assets/images/cover_space_rocket.webp",
+  "./assets/images/cover_dinosaur.webp",
+  "./assets/images/cover_dragonboat.webp"
 ];
 
 // 静态资源走 Cache-First（离线秒开，支持 webp 图像格式）
@@ -74,7 +94,17 @@ const STATIC_CACHEABLE = /\.(js|css|html|json|jpg|jpeg|png|gif|svg|webp|woff2?|t
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(CORE_ASSETS))
+    caches.open(CACHE_NAME).then((cache) => {
+      return Promise.allSettled(
+        CORE_ASSETS.map((asset) =>
+          fetch(asset)
+            .then((res) => {
+              if (res.ok) return cache.put(asset, res);
+            })
+            .catch(() => {})
+        )
+      );
+    })
   );
   self.skipWaiting();
 });

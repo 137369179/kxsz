@@ -536,10 +536,17 @@ export function printWorksheet(chars, title, options = {}) {
   iframe.style.border = "none";
   document.body.appendChild(iframe);
 
-  const doc = iframe.contentWindow.document;
-  doc.open();
-  doc.write(html);
-  doc.close();
+  try {
+    const win = iframe.contentWindow;
+    if (!win) return;
+    const doc = win.document;
+    if (!doc) return;
+    doc.open();
+    doc.write(html);
+    doc.close();
+  } catch (e) {
+    console.warn("Print worksheet iframe error:", e);
+  }
 }
 
 /**

@@ -59,6 +59,7 @@ export class MapModule extends BaseModule {
   render() {
     this.destroy();
     const progress = ebbinghausManager.progress;
+    const targetDaily = Math.max(1, progress.settings?.dailyCharTarget || 5);
     const allChars = CHARACTER_DATABASE;
 
     // 智能定位当前正在学的主题岛屿（若用户未手动切换过岛屿）
@@ -208,7 +209,6 @@ export class MapModule extends BaseModule {
                         : ""
                     }
 
-                    // 3D 浮岛石台 / 汉字字卡底座 (字形放大1倍超大呈现)
                     <div class="relative w-36 h-36 sm:w-40 sm:h-40 rounded-3xl flex flex-col items-center justify-center font-black shadow-2xl transition-all duration-300 ${
                       isCompleted
                         ? "bg-gradient-to-b from-amber-300 via-yellow-400 to-amber-600 border-4 border-yellow-100 text-amber-950 ring-8 ring-amber-300/40"
@@ -247,7 +247,6 @@ export class MapModule extends BaseModule {
                   </div>
                 </div>
 
-                // 2. 汉字魔法积木屋
                 <div class="map-landmark-btn group relative w-48 h-56 rounded-3xl bg-gradient-to-b from-emerald-400 via-teal-500 to-emerald-800 border-4 border-white shadow-2xl p-5 flex flex-col items-center justify-between cursor-pointer hover:scale-110 active:scale-95 transition-all text-white shrink-0" data-mode="family" title="点击进入字族积木屋">
                   <span class="text-[11px] font-black bg-white/20 px-3 py-1 rounded-full border border-white/30">构字工坊</span>
                   <div class="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center shadow-inner group-hover:rotate-6 transition-transform">
@@ -259,7 +258,6 @@ export class MapModule extends BaseModule {
                   </div>
                 </div>
 
-                // 3. 伴学小树屋
                 <div class="map-landmark-btn group relative w-48 h-56 rounded-3xl bg-gradient-to-b from-amber-400 via-orange-500 to-amber-700 border-4 border-white shadow-2xl p-5 flex flex-col items-center justify-between cursor-pointer hover:scale-110 active:scale-95 transition-all text-white shrink-0" data-mode="treehouse" title="点击进入伴学小树屋">
                   <span class="text-[11px] font-black bg-white/20 px-3 py-1 rounded-full border border-white/30">养成家园</span>
                   <div class="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center shadow-inner group-hover:rotate-6 transition-transform">
@@ -278,7 +276,6 @@ export class MapModule extends BaseModule {
 
         </div>
 
-        // 3. 右下角直达最新待学字金色罗盘
         <button id="btn-quick-target-char" class="absolute bottom-6 right-6 z-30 bg-gradient-to-r from-orange-500 via-amber-500 to-yellow-400 text-white font-black text-sm px-6 py-3.5 rounded-full shadow-[0_10px_25px_rgba(255,107,0,0.6)] border-4 border-white active:scale-95 transition-all flex items-center gap-2 animate-bounce-slow cursor-pointer">
           <span class="flex items-center">${GAME_ICONS.compass('w-5 h-5')}</span>
           <span>直达最新生字</span>
@@ -298,10 +295,10 @@ export class MapModule extends BaseModule {
           <div class="bg-black/60 backdrop-blur-md rounded-2xl px-4 py-2.5 border border-white/20 shadow-xl">
             <div class="flex items-center justify-between mb-1.5">
               <span class="text-[10px] font-black text-amber-300">今日目标</span>
-              <span class="text-[10px] text-white/60">${Math.min(progress.todayLearnedCount || 0, 5)} / 5 个字</span>
+              <span class="text-[10px] text-white/60">${Math.min(progress.todayLearnedCount || 0, targetDaily)} / ${targetDaily} 个字</span>
             </div>
             <div class="w-36 h-2 bg-white/20 rounded-full overflow-hidden">
-              <div class="h-full bg-gradient-to-r from-amber-400 to-orange-500 rounded-full transition-all duration-700" style="width:${Math.min(((progress.todayLearnedCount || 0) / 5) * 100, 100)}%"></div>
+              <div class="h-full bg-gradient-to-r from-amber-400 to-orange-500 rounded-full transition-all duration-700" style="width:${Math.min(((progress.todayLearnedCount || 0) / targetDaily) * 100, 100)}%"></div>
             </div>
           </div>
 
@@ -314,11 +311,9 @@ export class MapModule extends BaseModule {
           </div>
         </div>
 
-        // 5. 世界全景大地图画卷 Modal
         <div id="world-overview-modal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-xl flex flex-col items-center justify-center p-6 select-none animate-fade-in ${this.showWorldOverview ? "" : "hidden"}">
           <div class="relative w-full max-w-5xl bg-gradient-to-b from-slate-900 via-indigo-950 to-slate-950 rounded-3xl border-4 border-amber-300/80 shadow-[0_25px_60px_rgba(0,0,0,0.8)] overflow-hidden flex flex-col">
             
-            // Modal 顶部栏
             <div class="flex items-center justify-between px-8 py-4 bg-gradient-to-r from-amber-900/60 to-purple-900/60 border-b border-white/20">
               <div class="flex items-center gap-3">
                 <span class="flex items-center">${GAME_ICONS.compass('w-7 h-7')}</span>
@@ -332,7 +327,6 @@ export class MapModule extends BaseModule {
               </button>
             </div>
 
-            // Modal 中部：全景地图画卷与岛屿传送卡片
             <div class="relative p-6 flex flex-col items-center">
               <div class="relative w-full h-80 rounded-2xl overflow-hidden border-2 border-amber-300/40 shadow-inner mb-6">
                 <img src="assets/images/cathy_world_map.webp" class="w-full h-full object-cover" alt="世界全景图" />

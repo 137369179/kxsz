@@ -55,12 +55,13 @@ export class PlaySceneEngine {
     this.render();
   }
 
-  /** 获取并缓存元素矩形，100ms 内复用缓存结果 */
+  /** 获取并缓存元素矩形，100ms 内复用缓存结果（仅在元素未失效时复用） */
   _getRect(el) {
+    if (!el || typeof el.getBoundingClientRect !== "function") return null;
     const now = performance.now();
     const cached = this._rectCache.get(el);
     if (cached && now - cached.time < 100) return cached.rect;
-    const rect = this._getRect(el);
+    const rect = el.getBoundingClientRect();
     this._rectCache.set(el, { rect, time: now });
     return rect;
   }
@@ -260,14 +261,12 @@ export class PlaySceneEngine {
   renderEducationalFire() {
     this.mount.innerHTML = `
       <div class="relative w-full h-full bg-slate-900 overflow-hidden select-none touch-none flex flex-col items-center justify-center">
-        // Ambient Embers
         <div class="absolute inset-0 pointer-events-none">
           <div class="ember absolute left-[20%] bottom-[30%] w-2 h-2 bg-orange-400 rounded-full" style="animation-delay: 0s"></div>
           <div class="ember absolute left-[50%] bottom-[20%] w-3 h-3 bg-red-400 rounded-full" style="animation-delay: 1.2s"></div>
           <div class="ember absolute left-[80%] bottom-[40%] w-2 h-2 bg-yellow-400 rounded-full" style="animation-delay: 0.5s"></div>
           <div class="ember absolute left-[35%] bottom-[10%] w-1.5 h-1.5 bg-orange-300 rounded-full" style="animation-delay: 2.1s"></div>
         </div>
-        // Ambient Embers
         <div class="absolute inset-0 pointer-events-none">
           <div class="ember absolute left-[20%] bottom-[30%] w-2 h-2 bg-orange-400 rounded-full" style="animation-delay: 0s"></div>
           <div class="ember absolute left-[50%] bottom-[20%] w-3 h-3 bg-red-400 rounded-full" style="animation-delay: 1.2s"></div>
@@ -606,7 +605,7 @@ export class PlaySceneEngine {
 
         <div class="relative flex items-center justify-center mt-10">
           <div id="real-sun" class="absolute w-40 h-40 bg-gradient-to-tr from-yellow-300 to-orange-500 rounded-full shadow-[0_0_100px_rgba(255,200,0,0)] opacity-0 scale-50 transition-all duration-1000 z-10 flex flex-col items-center justify-center">
-            <div class="w-24 h-2 bg-orange-200/80 rounded-full shadow-inner"></div> // “”
+            <div class="w-24 h-2 bg-orange-200/80 rounded-full shadow-inner"></div>
           </div>
 
           <div id="stone-shell" class="relative w-48 h-48 bg-slate-700 rounded-[40%] shadow-[inset_-10px_-10px_20px_rgba(0,0,0,0.5),0_20px_30px_rgba(0,0,0,0.8)] border-4 border-slate-600 cursor-pointer flex items-center justify-center z-20 transition-transform active:scale-95">
@@ -674,12 +673,10 @@ export class PlaySceneEngine {
   renderEducationalMoon() {
     this.mount.innerHTML = `
       <div class="relative w-full h-full bg-gradient-to-b from-indigo-950 via-purple-900 to-indigo-900 overflow-hidden select-none touch-none flex flex-col items-center">
-        // Ambient Clouds
         <div class="absolute inset-0 pointer-events-none opacity-20">
            <div class="absolute top-10 left-[-20%] w-64 h-20 bg-white rounded-full blur-2xl animate-[floatRight_20s_linear_infinite]"></div>
            <div class="absolute top-40 left-[-50%] w-80 h-24 bg-white rounded-full blur-3xl animate-[floatRight_35s_linear_infinite]" style="animation-delay: -10s"></div>
         </div>
-        // Ambient Clouds
         <div class="absolute inset-0 pointer-events-none opacity-20">
            <div class="absolute top-10 left-[-20%] w-64 h-20 bg-white rounded-full blur-2xl animate-[floatRight_20s_linear_infinite]"></div>
            <div class="absolute top-40 left-[-50%] w-80 h-24 bg-white rounded-full blur-3xl animate-[floatRight_35s_linear_infinite]" style="animation-delay: -10s"></div>
@@ -688,13 +685,10 @@ export class PlaySceneEngine {
             2 
         </div>
 
-        // 
         <div id="star-1" class="absolute top-0 w-8 h-8 text-2xl filter drop-shadow-[0_0_10px_rgba(253,224,71,1)] z-10 transition-transform"></div>
         <div id="star-2" class="absolute -top-20 w-8 h-8 text-2xl filter drop-shadow-[0_0_10px_rgba(253,224,71,1)] z-10 transition-transform"></div>
 
-        // ( + )
         <div id="moon-boat" class="absolute bottom-20 w-32 h-32 bg-transparent border-[12px] border-yellow-200 border-t-transparent border-r-transparent rounded-bl-full shadow-[-10px_10px_20px_rgba(253,224,71,0.4)] flex flex-col items-center justify-center gap-2 cursor-ew-resize z-20">
-           // ()
            <div id="moon-stroke-1" class="w-12 h-3 bg-yellow-300 rounded-full opacity-0 shadow-[0_0_10px_rgba(253,224,71,1)] transition-all duration-300 transform -translate-x-4"></div>
            <div id="moon-stroke-2" class="w-12 h-3 bg-yellow-300 rounded-full opacity-0 shadow-[0_0_10px_rgba(253,224,71,1)] transition-all duration-300 transform -translate-x-2"></div>
         </div>
@@ -806,26 +800,21 @@ export class PlaySceneEngine {
            
         </div>
 
-        // ()“”
         <div id="water-splat" class="absolute top-32 flex flex-col items-center opacity-0 scale-50 transition-all duration-700 z-10 filter drop-shadow-[0_5px_5px_rgba(59,130,246,0.5)]">
-           // 
            <div class="w-8 h-40 bg-blue-500 rounded-full relative">
               <div class="absolute bottom-0 -left-4 w-6 h-10 bg-blue-500 rounded-full -rotate-45"></div>
            </div>
-           // 
            <div class="absolute top-10 -left-16 w-16 h-6 bg-blue-400 rounded-full rotate-45"></div>
            <div class="absolute top-16 -left-16 w-12 h-6 bg-blue-400 rounded-full -rotate-[60deg]"></div>
-           // 
            <div class="absolute top-10 -right-16 w-16 h-6 bg-blue-400 rounded-full -rotate-45"></div>
            <div class="absolute top-20 -right-20 w-16 h-6 bg-blue-400 rounded-full rotate-45"></div>
         </div>
 
-        // 
         <div class="absolute bottom-20 flex flex-col items-center z-30">
           <div id="slingshot-band" class="absolute top-10 w-2 h-0 bg-white/50 rounded-full shadow-inner origin-top"></div>
           
           <div id="water-balloon" class="water-wobble w-24 h-24 bg-gradient-to-br from-blue-300 to-blue-500 shadow-[inset_-10px_-10px_20px_rgba(0,0,0,0.2),0_10px_30px_rgba(37,99,235,0.6)] border-4 border-blue-200 cursor-s-resize flex items-center justify-center text-4xl overflow-hidden relative">
-             <div class="absolute top-2 left-4 w-6 h-4 bg-white/40 rounded-full rotate-45"></div> // 
+             <div class="absolute top-2 left-4 w-6 h-4 bg-white/40 rounded-full rotate-45"></div>
           </div>
         </div>
       </div>

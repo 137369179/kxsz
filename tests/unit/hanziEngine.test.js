@@ -22,7 +22,7 @@ describe('HanziEngine Module', () => {
   it('should have expected prototype methods', async () => {
     const mod = await import('../../src/utils/hanziEngine.js')
     const proto = mod.HanziEngine.prototype
-    const methods = ['destroy', 'initCanvasSize', 'bindEvents', 'getPointerPos', 'onPointerDown', 'onPointerMove', 'onPointerUp', 'triggerError']
+    const methods = ['destroy', 'initCanvasSize', 'bindEvents', 'getPointerPos', 'onPointerDown', 'onPointerMove', 'onPointerUp', 'triggerError', 'demoAllStrokes', 'stopDemo']
     for (const method of methods) {
       expect(typeof proto[method]).toBe('function', `HanziEngine should have ${method} method`)
     }

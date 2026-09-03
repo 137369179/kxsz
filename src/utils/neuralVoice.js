@@ -58,8 +58,16 @@ class NeuralVoiceEngine {
     this.base = (typeof location !== "undefined" && location.protocol === "https:")
       ? "https://127.0.0.1:8766" : "http://127.0.0.1:8766";
     this.voice = "zh-CN-XiaoxiaoNeural"; // 默认音色: 晓晓·明亮少女 (MOS 盲测冠军 4.10)
-    this.available = null; // null=
+    let storedUnavailable = false;
+    try {
+      if (typeof sessionStorage !== "undefined") {
+        storedUnavailable = sessionStorage.getItem("cathy_neural_unavailable") === "1";
+      }
+    } catch {}
+    this.available = storedUnavailable ? false : null; // false=不可用/熔断中, null=待探测, true=可用
     this._probing = null;
+    this._consecutiveErrors = 0;
+    this._cooldownTimer = null;
     this._mem = new Map(); // key -> {buffer, lastUsed}
     this._memMax = 160;
     this._fetching = new Map(); // key -> Promise<AudioBuffer>
@@ -67,8 +75,26 @@ class NeuralVoiceEngine {
     this.stats = { plays: 0, cacheHits: 0, netFetch: 0, fallbacks: 0 };
     this.dspEnabled = true;
     this.jitterEnabled = true;
-    //  + (voice-server /tts-batch)
+    // 子句并行合成 + Web Audio 无缝级联 (voice-server /tts-batch)
     this.batchEnabled = true;
+  }
+
+  /** 记录失败并判定是否触发熔断保护 */
+  _recordFailure() {
+    this._consecutiveErrors = (this._consecutiveErrors || 0) + 1;
+    if (this._consecutiveErrors >= 2) {
+      this.available = false;
+      if (this._cooldownTimer) clearTimeout(this._cooldownTimer);
+      this._cooldownTimer = setTimeout(() => {
+        this.available = null; // 冷却 60 秒后允许重新探测
+        this._consecutiveErrors = 0;
+      }, 60000);
+    }
+  }
+
+  /** 记录成功并清零连续错误计数 */
+  _recordSuccess() {
+    this._consecutiveErrors = 0;
   }
 
   // ---------- 健康探测与可用性检查 ----------
@@ -79,15 +105,52 @@ class NeuralVoiceEngine {
     this._probing = new Promise((resolve) => {
       try {
         const ctl = typeof AbortController !== "undefined" ? new AbortController() : null;
-        const t = setTimeout(() => { ctl && ctl.abort(); this.available = false; resolve(false); }, timeoutMs);
+        const t = setTimeout(() => {
+          ctl && ctl.abort();
+          this.available = false;
+          resolve(false);
+        }, timeoutMs);
+
         fetch(this.base + "/health", { signal: ctl ? ctl.signal : undefined, mode: "cors" })
-          .then((r) => { clearTimeout(t); this.available = r.ok; resolve(r.ok); })
-          .catch(() => { clearTimeout(t); this.available = false; resolve(false); })
+          .then((r) => {
+            if (!r.ok) throw new Error("health-status-" + r.status);
+            return r.json();
+          })
+          .then((data) => {
+            clearTimeout(t);
+            // 严格验证是正版 voice-server 响应，而非本地其他占用 8766 端口的代理/网关
+            const isValid = !!(data && data.ok === true && data.defaultVoice);
+            this.available = isValid;
+            try {
+              if (typeof sessionStorage !== "undefined") {
+                if (isValid) sessionStorage.removeItem("cathy_neural_unavailable");
+                else sessionStorage.setItem("cathy_neural_unavailable", "1");
+              }
+            } catch {}
+            if (isValid) this._recordSuccess();
+            else this._recordFailure();
+            resolve(isValid);
+          })
+          .catch(() => {
+            clearTimeout(t);
+            this.available = false;
+            try {
+              if (typeof sessionStorage !== "undefined") {
+                sessionStorage.setItem("cathy_neural_unavailable", "1");
+              }
+            } catch {}
+            resolve(false);
+          })
           .finally(() => {
             this._probing = null;
           });
       } catch (e) {
         this.available = false;
+        try {
+          if (typeof sessionStorage !== "undefined") {
+            sessionStorage.setItem("cathy_neural_unavailable", "1");
+          }
+        } catch {}
         this._probing = null;
         resolve(false);
       }
@@ -101,7 +164,7 @@ class NeuralVoiceEngine {
 
   _decode(ctx, arrayBuf) {
     return new Promise((resolve, reject) => {
-      // Chrome 87 :  promise,  callback 
+      // Chrome 87 现代环境支持 promise, 旧版走 callback
       let p;
       try { p = ctx.decodeAudioData(arrayBuf, undefined, undefined); } catch (e) { p = null; }
       if (p && typeof p.then === "function") {
@@ -112,8 +175,8 @@ class NeuralVoiceEngine {
     });
   }
 
-  /**  AudioBuffer ( LRU  HTTP  decodeAudioData) */
-  async getBuffer(ctx, text, rate, pitch, voice) {
+  /** 获取单句 AudioBuffer (带 LRU 内存缓存、HTTP 代理获取与 decodeAudioData) */
+  async getBuffer(ctx, text, rate, pitch, voice, signal) {
     const key = this._key(text, rate, pitch, voice);
     const hit = this._mem.get(key);
     if (hit) {
@@ -132,11 +195,21 @@ class NeuralVoiceEngine {
       const url = `${this.base}/tts?text=${encodeURIComponent(text)}` +
         `&voice=${encodeURIComponent(voice || this.voice)}` +
         `&rate=${encodeURIComponent(rate)}&pitch=${encodeURIComponent(pitch)}`;
-      const res = await fetch(url);
-      if (!res.ok) throw new Error(`tts-http-${res.status}`);
+      let res;
+      try {
+        res = await fetch(url, { signal });
+      } catch (err) {
+        this._recordFailure();
+        throw err;
+      }
+      if (!res.ok) {
+        this._recordFailure();
+        throw new Error(`tts-http-${res.status}`);
+      }
+      this._recordSuccess();
       const ab = await res.arrayBuffer();
       const buf = await this._decode(ctx, ab);
-      // LRU 
+      // LRU 淘汰
       this._mem.set(key, { buffer: buf, lastUsed: Date.now() });
       if (this._mem.size > this._memMax) {
         const oldest = [...this._mem.entries()].sort((a, b) => a[1].lastUsed - b[1].lastUsed)[0];
@@ -210,18 +283,24 @@ class NeuralVoiceEngine {
    * @returns {{cancel:Function, onEndPromise:Promise<{interrupted:boolean}>, durationMs:number}}
    *          / null ( speechSynthesis)
    */
-  async play({ text, ctx, dest, emotion, pitchOffset, rateMul, volume = 1, onEnd }) {
+  async play({ text, ctx, dest, emotion, pitchOffset, rateMul, volume = 1, onEnd, signal }) {
     if (!ctx || !dest) return null;
-    // (>12 )  ,  ≈ max()  sum()
-    if (this.batchEnabled && [...text].length > 12) {
-      const h = await this.playSentence({ text, ctx, dest, emotion, pitchOffset, rateMul, volume, onEnd });
-      if (h) return h;
+    const ok = await this.probe();
+    if (!ok) {
+      this.stats.fallbacks++;
+      return null;
     }
-    return this._playSingle({ text, ctx, dest, emotion, pitchOffset, rateMul, volume, onEnd });
+    // (>12 字符) 走长句批处理分片并行合成，首片就绪即可开始无缝流式播放
+    if (this.batchEnabled && [...text].length > 12) {
+      const h = await this.playSentence({ text, ctx, dest, emotion, pitchOffset, rateMul, volume, onEnd, signal });
+      if (h) return h;
+      if (this.available === false) return null; // 若已熔断，不发起二次单次请求
+    }
+    return this._playSingle({ text, ctx, dest, emotion, pitchOffset, rateMul, volume, onEnd, signal });
   }
 
-  /**  () */
-  async _playSingle({ text, ctx, dest, emotion, pitchOffset, rateMul, volume = 1, onEnd }) {
+  /** 播放单句音频 (带 Web Audio 润色与抖动) */
+  async _playSingle({ text, ctx, dest, emotion, pitchOffset, rateMul, volume = 1, onEnd, signal }) {
     if (!ctx || !dest) return null;
     const ok = await this.probe();
     if (!ok) { this.stats.fallbacks++; return null; }
@@ -229,11 +308,12 @@ class NeuralVoiceEngine {
     const pros = emotionToProsody(emotion, pitchOffset, rateMul);
     let buffer;
     try {
-      buffer = await this.getBuffer(ctx, text, pros.rate, pros.pitch);
+      buffer = await this.getBuffer(ctx, text, pros.rate, pros.pitch, undefined, signal);
     } catch (e) {
       this.stats.fallbacks++;
       return null;
     }
+    if (!buffer || (signal && signal.aborted)) return null;
 
     const src = ctx.createBufferSource();
     src.buffer = buffer;
@@ -283,13 +363,22 @@ class NeuralVoiceEngine {
     };
   }
 
-  /**  (, ) */
+  /** 批量预热常用字词表（自动分批，防止 URL 过长触发 HTTP 431） */
   warmup(items) {
-    if (typeof fetch !== "function") return;
+    if (this.available === false) return;
+    if (typeof fetch !== "function" || !Array.isArray(items) || items.length === 0) return;
     this.probe().then((ok) => {
       if (!ok) return;
-      fetch(this.base + "/warmup?items=" + encodeURIComponent(items.join("|")))
-        .catch(() => {});
+      const list = [...new Set(items)].filter(Boolean);
+      const CHUNK_SIZE = 25; // 每批 25 个词条，URL < 600 字节，远低于 Node 8KB 阈值
+      for (let i = 0; i < list.length; i += CHUNK_SIZE) {
+        const chunk = list.slice(i, i + CHUNK_SIZE);
+        const delay = Math.floor(i / CHUNK_SIZE) * 80;
+        setTimeout(() => {
+          fetch(`${this.base}/warmup?items=${encodeURIComponent(chunk.join("|"))}`)
+            .catch(() => {});
+        }, delay);
+      }
     }).catch(() => {});
   }
 
@@ -324,26 +413,34 @@ class NeuralVoiceEngine {
    *
    * @returns  play()  handle;  null ( _playSingle/TTS)
    */
-  async playSentence({ text, ctx, dest, emotion, pitchOffset, rateMul, volume = 1, onEnd }) {
+  async playSentence({ text, ctx, dest, emotion, pitchOffset, rateMul, volume = 1, onEnd, signal }) {
     if (!ctx || !dest) return null;
     const ok = await this.probe();
     if (!ok) { this.stats.fallbacks++; return null; }
 
     const pros = emotionToProsody(emotion, pitchOffset, rateMul);
 
-    // 1)  ( + , )
+    // 1) 获取分片合成结果 (带缓存 + 并发去重，服务端完成)
     let data;
     try {
       const url = `${this.base}/tts-batch?text=${encodeURIComponent(text)}` +
         `&voice=${encodeURIComponent(this.voice)}` +
         `&rate=${encodeURIComponent(pros.rate)}&pitch=${encodeURIComponent(pros.pitch)}`;
-      const res = await fetch(url);
-      if (!res.ok) throw new Error(`batch-http-${res.status}`);
+      const res = await fetch(url, { signal });
+      if (!res.ok) {
+        this._recordFailure();
+        throw new Error(`batch-http-${res.status}`);
+      }
       data = await res.json();
-      if (!data || !data.ok || !Array.isArray(data.parts)) throw new Error("batch-bad-payload");
+      if (!data || !data.ok || !Array.isArray(data.parts)) {
+        this._recordFailure();
+        throw new Error("batch-bad-payload");
+      }
+      this._recordSuccess();
     } catch (e) {
-      return null; //  _playSingle ()
+      return null; // 降级为 _playSingle 或 本地系统 TTS
     }
+    if (signal && signal.aborted) return null;
 
     // 2)  decode  ( LRU)
     const buffers = [];

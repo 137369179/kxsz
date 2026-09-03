@@ -8,7 +8,7 @@ export const STORYBOOKS_DATABASE = [
     "id": "book_theme_midautumn",
     "level": 1,
     "title": "中秋月圆吃月饼",
-    "coverImg": "assets/images/cathy_storybook_cover.webp",
+    "coverImg": "assets/images/cover_midautumn.webp",
     "stage": 1,
     "theme": "中华传统节日",
     "targetChars": [
@@ -23,7 +23,7 @@ export const STORYBOOKS_DATABASE = [
       {
         "pageNumber": 1,
         "text": "八月十五月儿圆，天上的月亮像金盘",
-        "image": "assets/images/cathy_storybook_cover.webp",
+        "image": "assets/images/cover_midautumn.webp",
         "interactions": [
           {
             "x": "75%",
@@ -123,7 +123,7 @@ export const STORYBOOKS_DATABASE = [
       {
         "pageNumber": 2,
         "text": "一家人坐在院子里，开开心心吃甜月饼",
-        "image": "assets/images/cathy_storybook_cover.webp",
+        "image": "assets/images/cover_midautumn.webp",
         "interactions": [
           {
             "x": "50%",
@@ -226,7 +226,7 @@ export const STORYBOOKS_DATABASE = [
       {
         "pageNumber": 3,
         "text": "大月亮照在大地上，祝大家团团圆圆",
-        "image": "assets/images/cathy_storybook_cover.webp",
+        "image": "assets/images/cover_midautumn.webp",
         "interactions": [
           {
             "x": "35%",
@@ -340,7 +340,7 @@ export const STORYBOOKS_DATABASE = [
     "id": "book_theme_dragonboat",
     "level": 2,
     "title": "端午赛龙舟",
-    "coverImg": "assets/images/cathy_storybook_cover.webp",
+    "coverImg": "assets/images/cover_dragonboat.webp",
     "stage": 2,
     "theme": "中华传统节日",
     "targetChars": [
@@ -355,7 +355,7 @@ export const STORYBOOKS_DATABASE = [
       {
         "pageNumber": 1,
         "text": "五月五过端午，江水清清水流长",
-        "image": "assets/images/cathy_storybook_cover.webp",
+        "image": "assets/images/cover_dragonboat.webp",
         "interactions": [
           {
             "x": "45%",
@@ -443,7 +443,7 @@ export const STORYBOOKS_DATABASE = [
       {
         "pageNumber": 2,
         "text": "大龙舟两头翘，许多人在水上划得快",
-        "image": "assets/images/cathy_storybook_cover.webp",
+        "image": "assets/images/cover_dragonboat.webp",
         "interactions": [
           {
             "x": "60%",
@@ -544,7 +544,7 @@ export const STORYBOOKS_DATABASE = [
       {
         "pageNumber": 3,
         "text": "咚咚咚擂大鼓，龙舟冲过终点夺第一",
-        "image": "assets/images/cathy_storybook_cover.webp",
+        "image": "assets/images/cover_dragonboat.webp",
         "interactions": [
           {
             "x": "30%",
@@ -653,7 +653,7 @@ export const STORYBOOKS_DATABASE = [
     "id": "book_theme_space_rocket",
     "level": 3,
     "title": "小小宇航员上太空",
-    "coverImg": "assets/images/cathy_storybook_cover.webp",
+    "coverImg": "assets/images/cover_space_rocket.webp",
     "stage": 3,
     "theme": "太空与科学探索",
     "targetChars": [
@@ -668,7 +668,7 @@ export const STORYBOOKS_DATABASE = [
       {
         "pageNumber": 1,
         "text": "三二一点火！金色火箭飞上了蓝蓝的天空",
-        "image": "assets/images/cathy_storybook_cover.webp",
+        "image": "assets/images/cover_space_rocket.webp",
         "interactions": [
           {
             "x": "50%",
@@ -779,7 +779,7 @@ export const STORYBOOKS_DATABASE = [
       {
         "pageNumber": 2,
         "text": "太空里真奇妙，一颗颗星星在眨眼睛",
-        "image": "assets/images/cathy_storybook_cover.webp",
+        "image": "assets/images/cover_space_rocket.webp",
         "interactions": [
           {
             "x": "70%",
@@ -878,7 +878,7 @@ export const STORYBOOKS_DATABASE = [
       {
         "pageNumber": 3,
         "text": "宇航员在太空中自由飞翔，向地球挥挥手",
-        "image": "assets/images/cathy_storybook_cover.webp",
+        "image": "assets/images/cover_space_rocket.webp",
         "interactions": [
           {
             "x": "40%",
@@ -998,7 +998,7 @@ export const STORYBOOKS_DATABASE = [
     "id": "book_theme_dinosaur",
     "level": 2,
     "title": "神秘的恐龙世界",
-    "coverImg": "assets/images/cathy_storybook_cover.webp",
+    "coverImg": "assets/images/cover_dinosaur.webp",
     "stage": 2,
     "theme": "太空与科学探索",
     "targetChars": [
@@ -1013,7 +1013,7 @@ export const STORYBOOKS_DATABASE = [
       {
         "pageNumber": 1,
         "text": "高高的大山下，有一片绿绿的古老森林",
-        "image": "assets/images/cathy_storybook_cover.webp",
+        "image": "assets/images/cover_dinosaur.webp",
         "interactions": [
           {
             "x": "65%",
@@ -1117,7 +1117,7 @@ export const STORYBOOKS_DATABASE = [
       {
         "pageNumber": 2,
         "text": "大恐龙在草地上慢慢走，吃着青青的小草",
-        "image": "assets/images/cathy_storybook_cover.webp",
+        "image": "assets/images/cover_dinosaur.webp",
         "interactions": [
           {
             "x": "50%",
@@ -1227,7 +1227,7 @@ export const STORYBOOKS_DATABASE = [
       {
         "pageNumber": 3,
         "text": "恐龙蛋破壳了，可爱的小恐龙走出来啦",
-        "image": "assets/images/cathy_storybook_cover.webp",
+        "image": "assets/images/cover_dinosaur.webp",
         "interactions": [
           {
             "x": "40%",
@@ -1957,7 +1957,7 @@ export const STORYBOOKS_DATABASE = [
     "id": "book_001",
     "level": 1,
     "title": "小猫钓鱼",
-    "coverImg": "assets/images/cathy_storybook_cover.webp",
+    "coverImg": "assets/images/cover_cat_fishing.webp",
     "stage": 1,
     "theme": "奇幻森林岛",
     "targetChars": [
@@ -1972,7 +1972,7 @@ export const STORYBOOKS_DATABASE = [
       {
         "pageNumber": 1,
         "text": "红红的日头升起来了，照在绿绿的大山上",
-        "image": "assets/images/cathy_storybook_cover.webp",
+        "image": "assets/images/cover_cat_fishing.webp",
         "interactions": [
           {
             "x": "75%",
@@ -2092,7 +2092,7 @@ export const STORYBOOKS_DATABASE = [
       {
         "pageNumber": 2,
         "text": "清清的河水哗啦啦，水里有快活的小鱼",
-        "image": "assets/images/cathy_storybook_cover.webp",
+        "image": "assets/images/cover_cat_fishing.webp",
         "interactions": [
           {
             "x": "48%",
@@ -2200,7 +2200,7 @@ export const STORYBOOKS_DATABASE = [
       {
         "pageNumber": 3,
         "text": "夜晚月亮出来了，小猫高高兴兴走在回家路上",
-        "image": "assets/images/cathy_storybook_cover.webp",
+        "image": "assets/images/cover_cat_fishing.webp",
         "interactions": [
           {
             "x": "78%",

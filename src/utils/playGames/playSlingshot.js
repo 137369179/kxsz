@@ -170,7 +170,9 @@ export class PlaySlingshot {
       }
     };
 
-    setTimeout(() => drawBands(ammo), 100);
+    this.timers.push(setTimeout(() => {
+      if (!this.isDestroyed) drawBands(ammo);
+    }, 100));
 
     const onStart = (e) => {
       if (this.isCompleted) return;

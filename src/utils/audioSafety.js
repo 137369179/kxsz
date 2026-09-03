@@ -290,9 +290,9 @@ export class AudioSafetyAndPersistence {
     const appliedAfterHP = soundAndFX.masterVolume <= 0.65;
     soundAndFX.masterVolume = oldVol;
     this.headphonesActive = false;
-    // 清除 PIN（测试重置）
+    // 清除 PIN（测试重置）—— 使用 storageManager.removeItem 干净清理，不污染实例方法
     storageManager.removeItem(LS_PIN_KEY);
-    this.lockParentalLock = () => true; // reset
+    this.setParentalLock("1234", ["master", "voice"]); // 重新锁定，保留原始方法不被覆盖
 
     const allPass = persistOk && locked && guardReject && wrongPINsuccess === false && unlockRight && guardAllow && appliedAfterHP;
     return {

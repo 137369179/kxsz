@@ -17,8 +17,8 @@ import { storageManager } from "../utils/storageManager.js";
 export class TreehouseModule extends BaseModule {
   constructor(container) {
     super(container);
-    this.treeWaterCount = storageManager.getItem("cathy_tree_water_count", 0);
-    this.cathyHunger = storageManager.getItem("cathy_hunger_val", 80);
+    this.treeWaterCount = Number.parseInt(storageManager.getItem("cathy_tree_water_count", "0"), 10) || 0;
+    this.cathyHunger = Number.parseInt(storageManager.getItem("cathy_hunger_val", "80"), 10) || 80;
   }
 
   getTreeStage(learnedCount) {
@@ -130,13 +130,11 @@ export class TreehouseModule extends BaseModule {
               <span>浇水培育 (5金币)</span>
             </button>
 
-            // 2. 喂食凯茜
             <button id="btn-feed-cathy" class="bg-gradient-to-r from-teal-500 to-emerald-600 text-white text-xs sm:text-sm font-black px-6 py-3.5 rounded-2xl shadow-md active:scale-95 flex items-center gap-2 cursor-pointer flex-1 justify-center">
               <span class="flex items-center">${GAME_ICONS.coin("w-4 h-4")}</span>
               <span>给凯茜点心</span>
             </button>
 
-            // 3. 听凯茜讲汉字谜语
             <button id="btn-cathy-riddle" class="bg-emerald-100 hover:bg-emerald-200 text-emerald-950 text-xs sm:text-sm font-black px-5 py-3.5 rounded-2xl shadow-md active:scale-95 flex items-center gap-1.5 cursor-pointer">
               <span class="flex items-center">${GAME_ICONS.speaker("w-4 h-4")}</span>
               <span>听字谜</span>

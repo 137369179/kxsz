@@ -50,7 +50,8 @@ export class EbbinghausManager {
         eyeProtectionMinutes: 20,
         audioLanguage: "mandarin",
         soundEnabled: true,
-        strokeTolerance: "standard"  // "strict" | "standard" | "kid" — 书写容差（HanziEngine 读取）
+        strokeTolerance: "standard",  // "strict" | "standard" | "kid"
+        focusMode: false            // E7: 专注模式（减弱动画 + 简化音效）
       },
       shop: {
         owned: ["av_cathy", "av_fairy", "av_hero", "frame_none"],
@@ -179,6 +180,17 @@ export class EbbinghausManager {
   /** 仅 <5 岁时强制跳过描红（B1 铁律硬约束） */
   isWriteBlockedByAge() {
     return this.getWritingStage() === "prewrite_only";
+  }
+
+  // E7: 专注模式
+  isFocusModeEnabled() {
+    return !!this.progress.settings.focusMode;
+  }
+
+  setFocusMode(enabled) {
+    this.progress.settings.focusMode = !!enabled;
+    this.save();
+    eventBus.emit(EVENTS.FOCUS_MODE_CHANGED, { enabled: this.progress.settings.focusMode });
   }
 
   // ------------------------------------------------------------

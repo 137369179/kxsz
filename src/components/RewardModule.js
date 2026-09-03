@@ -13,6 +13,7 @@ import { BaseModule } from "../utils/BaseModule.js";
 import { mountGameShell, showGameToast } from "./SharedShell.js";
 import { getStickers, getMedals, getCalendar, getNewMedalIds, getShopData } from "../utils/rewardEngine.js";
 import { GAME_ICONS } from "../utils/gameIcons.js";
+import { storageManager } from "../utils/storageManager.js";
 
 const WEEKDAY_LABELS = ["日", "一", "二", "三", "四", "五", "六"];
 const TIER_STYLE = {
@@ -29,6 +30,9 @@ export class RewardModule extends BaseModule {
     const now = new Date();
     this.calYear = now.getFullYear();
     this.calMonth = now.getMonth(); // 0-based
+    this.scrapbookStickers = storageManager.getJSON("cathy_scrapbook_stickers_v1", []);
+    this.scrapbookBg = storageManager.getItem("cathy_scrapbook_bg_v1", "assets/images/cathy_island_forest.webp");
+    this._scrapbookSaved = false;
   }
 
   render() {
@@ -45,7 +49,6 @@ export class RewardModule extends BaseModule {
     contentEl.innerHTML = `
       <div class="w-full h-full overflow-y-auto no-scrollbar bg-gradient-to-b from-indigo-950 via-purple-950 to-slate-950 text-white select-none">
 
-        // 
         <div class="relative mx-5 mt-20 rounded-3xl overflow-hidden border-4 border-amber-300/70 shadow-[0_18px_40px_rgba(0,0,0,0.55)]">
           <img src="assets/images/cathy_island_life.webp" alt="" class="absolute inset-0 w-full h-full object-cover opacity-40 pointer-events-none" />
           <div class="relative z-10 flex items-center justify-between gap-4 bg-gradient-to-r from-amber-950/80 via-amber-900/60 to-transparent px-6 py-5">
@@ -73,7 +76,6 @@ export class RewardModule extends BaseModule {
           </div>
         </div>
 
-        // 
         <div class="mx-5 mt-4 grid grid-cols-4 gap-2 bg-black/40 backdrop-blur-md p-1.5 rounded-2xl border border-white/15">
           ${[
             { key: "stickers", label: "贴纸墙", iconSvg: (cls) => GAME_ICONS.cards(cls) },
@@ -88,7 +90,6 @@ export class RewardModule extends BaseModule {
           `).join("")}
         </div>
 
-        // 
         <div id="reward-panel" class="mx-5 my-5 pb-10"></div>
       </div>
     `;
@@ -209,60 +210,67 @@ export class RewardModule extends BaseModule {
       // 绑定手帐画板交互
       const exitBtn = panel.querySelector("#btn-exit-scrapbook");
       if (exitBtn) {
-        exitBtn.addEventListener("click", () => {
+        this._on(exitBtn, "click", () => {
           soundAndFX.playPop();
           this.isScrapbookMode = false;
           this._renderStickerWall(panel);
         });
       }
 
-      panel.querySelectorAll(".bg-choice-btn").forEach((btn) => {
-        btn.addEventListener("click", () => {
-          soundAndFX.playPop();
-          this.scrapbookBg = btn.dataset.bg;
-          this._renderStickerWall(panel);
-        });
+      this._onDom(panel.querySelectorAll(".bg-choice-btn"), "click", (e) => {
+        const btn = e.currentTarget;
+        soundAndFX.playPop();
+        this.scrapbookBg = btn.dataset.bg;
+        storageManager.setItem("cathy_scrapbook_bg_v1", this.scrapbookBg);
+        this._renderStickerWall(panel);
       });
 
-      panel.querySelectorAll(".tray-sticker-btn").forEach((btn) => {
-        btn.addEventListener("click", () => {
-          const char = btn.dataset.char;
-          const pinyin = btn.dataset.pinyin;
-          const x = `${Math.floor(Math.random() * 70) + 15}%`;
-          const y = `${Math.floor(Math.random() * 60) + 20}%`;
-          this.scrapbookStickers.push({ char, pinyin, x, y });
-          soundAndFX.playPop();
-          soundAndFX.speakPriority(char, { kind: "char", priority: 1 });
-          this._renderStickerWall(panel);
-        });
+      this._onDom(panel.querySelectorAll(".tray-sticker-btn"), "click", (e) => {
+        const btn = e.currentTarget;
+        const char = btn.dataset.char;
+        const pinyin = btn.dataset.pinyin;
+        const x = `${Math.floor(Math.random() * 70) + 15}%`;
+        const y = `${Math.floor(Math.random() * 60) + 20}%`;
+        this.scrapbookStickers.push({ char, pinyin, x, y });
+        storageManager.putJSON("cathy_scrapbook_stickers_v1", this.scrapbookStickers);
+        soundAndFX.playPop();
+        soundAndFX.speakPriority(char, { kind: "char", priority: 1 });
+        this._renderStickerWall(panel);
       });
 
-      panel.querySelectorAll(".canvas-placed-sticker").forEach((stEl) => {
-        stEl.addEventListener("click", (e) => {
-          e.stopPropagation();
-          const char = stEl.dataset.char;
-          const pinyin = stEl.dataset.pinyin;
-          soundAndFX.speakPriority(`${char}，${pinyin}`, { kind: "char", priority: 1 });
-          soundAndFX.playStarPopCombo();
-        });
+      this._onDom(panel.querySelectorAll(".canvas-placed-sticker"), "click", (e) => {
+        e.stopPropagation();
+        const stEl = e.currentTarget;
+        const char = stEl.dataset.char;
+        const pinyin = stEl.dataset.pinyin;
+        soundAndFX.speakPriority(`${char}，${pinyin}`, { kind: "char", priority: 1 });
+        soundAndFX.playStarPopCombo();
       });
 
       const clearBtn = panel.querySelector("#btn-clear-scrapbook");
       if (clearBtn) {
-        clearBtn.addEventListener("click", () => {
+        this._on(clearBtn, "click", () => {
           soundAndFX.playPop();
           this.scrapbookStickers = [];
+          storageManager.putJSON("cathy_scrapbook_stickers_v1", []);
           this._renderStickerWall(panel);
         });
       }
 
       const saveBtn = panel.querySelector("#btn-save-scrapbook");
       if (saveBtn) {
-        saveBtn.addEventListener("click", () => {
+        this._on(saveBtn, "click", () => {
           soundAndFX.playCrownFanfare();
           soundAndFX.triggerConfetti(this.container);
-          rewardEngine.addCoins(30);
-          showGameToast(this.container, "专属贴纸手帐作品已保存！奖励 +30 星币！", "success");
+          storageManager.putJSON("cathy_scrapbook_stickers_v1", this.scrapbookStickers);
+          storageManager.setItem("cathy_scrapbook_bg_v1", this.scrapbookBg);
+          if (!this._scrapbookSaved) {
+            this._scrapbookSaved = true;
+            rewardEngine.addCoins(30);
+            showGameToast(this.container, "专属贴纸手帐作品已保存！首次保存奖励 +30 星币！", "success");
+          } else {
+            showGameToast(this.container, "贴纸手帐作品已保存更新！", "success");
+          }
         });
       }
 
@@ -330,21 +338,19 @@ export class RewardModule extends BaseModule {
 
     const openScrapbookBtn = panel.querySelector("#btn-open-scrapbook");
     if (openScrapbookBtn) {
-      openScrapbookBtn.addEventListener("click", () => {
+      this._on(openScrapbookBtn, "click", () => {
         soundAndFX.playPop();
         this.isScrapbookMode = true;
         this._renderStickerWall(panel);
       });
     }
 
-    panel.querySelectorAll(".sticker-cell").forEach((cell) => {
-      cell.addEventListener("click", () => {
-        const char = cell.querySelector("span.text-lg")?.textContent;
-        if (char) {
-          soundAndFX.playPop();
-          soundAndFX.speakPriority(char, { kind: "char", priority: 1 });
-        }
-      });
+    this._onDom(panel.querySelectorAll(".sticker-cell"), "click", (e) => {
+      const char = e.currentTarget.querySelector("span.text-lg")?.textContent;
+      if (char) {
+        soundAndFX.playPop();
+        soundAndFX.speakPriority(char, { kind: "char", priority: 1 });
+      }
     });
   }
 
@@ -521,19 +527,16 @@ export class RewardModule extends BaseModule {
           </div>
         </div>
 
-        // 
         <div class="flex items-center justify-between mb-3">
           <button data-cal-nav="-1" class="cal-nav-btn w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 border border-white/15 font-black">‹</button>
           <h2 class="font-black text-amber-200 text-sm">${monthLabel} ·  ${cal.monthActive} 天</h2>
           <button data-cal-nav="1" class="cal-nav-btn w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 border border-white/15 font-black">›</button>
         </div>
 
-        // 
         <div class="grid grid-cols-7 gap-1.5 mb-1.5 text-center">
           ${WEEKDAY_LABELS.map((w) => `<div class="text-[10px] font-black text-white/40 py-1">${w}</div>`).join("")}
         </div>
 
-        // 
         <div class="grid grid-cols-7 gap-1.5">
           ${cal.weeks.flat().map((cell) => {
             if (!cell.key) return '<div></div>';

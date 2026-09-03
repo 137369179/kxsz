@@ -281,7 +281,6 @@ export class CardModule extends BaseModule {
             : ""
         }
 
-        // 3D 翻转卡片弹窗详情 (若选中)
         ${this.selectedCard ? this.renderCardDetailModal() : ""}
 
       </div>
@@ -670,11 +669,11 @@ export class CardModule extends BaseModule {
       isPlaying = false;
     };
 
-    closeBtn.addEventListener("click", () => {
+    this._on(closeBtn, "click", () => {
       cancelCurrentAnim = true;
       overlay.remove();
     });
-    replayBtn.addEventListener("click", () => {
+    this._on(replayBtn, "click", () => {
       cancelCurrentAnim = true;
       setTimeout(playDemo, 100);
     });
@@ -694,7 +693,6 @@ export class CardModule extends BaseModule {
             ${GAME_ICONS.back("w-6 h-6")}
           </button>
 
-          // 3D 翻转卡片容器 (巨幕 3D 字卡)
           <div id="flip-card" class="relative w-full h-[460px] sm:h-[480px] cursor-pointer preserve-3d transition-transform duration-500 ease-out ${this.isCardFlipped ? 'rotate-y-180' : ''}">
             
             <div class="absolute inset-0 bg-gradient-to-b from-amber-50 to-orange-50 rounded-3xl shadow-2xl border-4 border-amber-300 p-8 flex flex-col justify-between backface-hidden ${this.isCardFlipped ? 'pointer-events-none' : ''}">
@@ -922,7 +920,7 @@ export class CardModule extends BaseModule {
       // 绑定交互
       const closeBtn = overlay.querySelector("#btn-close-slideshow");
       if (closeBtn) {
-        closeBtn.addEventListener("click", () => {
+        this._on(closeBtn, "click", () => {
           if (autoPlayTimer) clearInterval(autoPlayTimer);
           soundAndFX.playPop();
           overlay.remove();
@@ -938,12 +936,12 @@ export class CardModule extends BaseModule {
           cardBox.classList.toggle("rotate-y-180", isFlipped);
         }
       };
-      if (cardBox) cardBox.addEventListener("click", toggleFlip);
-      if (flipBtn) flipBtn.addEventListener("click", (e) => { e.stopPropagation(); toggleFlip(); });
+      if (cardBox) this._on(cardBox, "click", toggleFlip);
+      if (flipBtn) this._on(flipBtn, "click", (e) => { e.stopPropagation(); toggleFlip(); });
 
       const prevBtn = overlay.querySelector("#btn-slideshow-prev");
       if (prevBtn) {
-        prevBtn.addEventListener("click", (e) => {
+        this._on(prevBtn, "click", (e) => {
           e.stopPropagation();
           if (currentIndex > 0) {
             currentIndex--;
@@ -956,7 +954,7 @@ export class CardModule extends BaseModule {
 
       const nextBtn = overlay.querySelector("#btn-slideshow-next");
       if (nextBtn) {
-        nextBtn.addEventListener("click", (e) => {
+        this._on(nextBtn, "click", (e) => {
           e.stopPropagation();
           if (currentIndex < chars.length - 1) {
             currentIndex++;
@@ -969,7 +967,7 @@ export class CardModule extends BaseModule {
 
       const speakBtn = overlay.querySelector("#btn-slideshow-speak");
       if (speakBtn) {
-        speakBtn.addEventListener("click", (e) => {
+        this._on(speakBtn, "click", (e) => {
           e.stopPropagation();
           soundAndFX.playPop();
           soundAndFX.speakPriority(`${c.char}，${c.pinyin}`, { kind: "char", priority: 1 });
@@ -978,7 +976,7 @@ export class CardModule extends BaseModule {
 
       const diffBtn = overlay.querySelector("#btn-slideshow-diff");
       if (diffBtn) {
-        diffBtn.addEventListener("click", (e) => {
+        this._on(diffBtn, "click", (e) => {
           e.stopPropagation();
           const curDiff = ebbinghausManager.isDifficultChar(c.id);
           if (curDiff) {
@@ -991,18 +989,16 @@ export class CardModule extends BaseModule {
         });
       }
 
-      overlay.querySelectorAll(".slideshow-word-btn").forEach((btn) => {
-        btn.addEventListener("click", (e) => {
-          e.stopPropagation();
-          const word = btn.dataset.word;
-          soundAndFX.playPop();
-          soundAndFX.speakPriority(word, { kind: "word", priority: 1 });
-        });
+      this._onDom(overlay.querySelectorAll(".slideshow-word-btn"), "click", (e) => {
+        e.stopPropagation();
+        const word = e.currentTarget.dataset.word;
+        soundAndFX.playPop();
+        soundAndFX.speakPriority(word, { kind: "word", priority: 1 });
       });
 
       const autoPlayBtn = overlay.querySelector("#btn-toggle-autoplay");
       if (autoPlayBtn) {
-        autoPlayBtn.addEventListener("click", (e) => {
+        this._on(autoPlayBtn, "click", (e) => {
           e.stopPropagation();
           isAutoPlaying = !isAutoPlaying;
           soundAndFX.playPop();

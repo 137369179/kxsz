@@ -463,7 +463,7 @@ export class PinyinModule extends BaseModule {
         }
       };
 
-      setTimeout(() => drawTrack(this.currentTone), 60);
+      this._timeout(() => drawTrack(this.currentTone), 60);
 
       const triggerCoasterBtn = mainEl.querySelector("#btn-trigger-coaster");
       if (triggerCoasterBtn) {
@@ -513,7 +513,7 @@ export class PinyinModule extends BaseModule {
             } else {
               soundAndFX.playSuccess();
               soundAndFX.triggerConfetti(mainEl);
-              setTimeout(() => drawTrack(this.currentTone), 400);
+              this._timeout(() => drawTrack(this.currentTone), 400);
             }
           };
 
@@ -547,7 +547,7 @@ export class PinyinModule extends BaseModule {
           plusSign.classList.add("scale-150", "text-amber-500");
         }
 
-        setTimeout(() => {
+        this._timeout(() => {
           soundAndFX.playSuccess();
           soundAndFX.triggerConfetti(mainEl);
           if (resultBox) {

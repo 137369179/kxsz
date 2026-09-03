@@ -366,7 +366,28 @@ const server = http.createServer(async (req, res) => {
 
   if (route === "/warmup") {
     const voice = u.searchParams.get("voice") || DEFAULT_VOICE;
-    const items = u.searchParams.get("items")
+    let items = [];
+    if (req.method === "POST") {
+      let body = "";
+      req.on("data", chunk => { body += chunk; });
+      req.on("end", () => {
+        try {
+          const parsed = JSON.parse(body || "{}");
+          items = Array.isArray(parsed.items) ? parsed.items : [];
+        } catch {
+          items = body.split("|").filter(Boolean);
+        }
+        json(res, 202, { started: true, count: items.length, voice });
+        if (items.length > 0) {
+          warmup(voice, items).then((r) =>
+            console.log(`[warmup] ok=${r.ok} fail=${r.fail} / ${r.total}`)
+          );
+        }
+      });
+      return;
+    }
+
+    items = u.searchParams.get("items")
       ? decodeURIComponent(u.searchParams.get("items")).split("|").filter(Boolean)
       : defaultWarmupList();
     // 后台执行, 立即返回

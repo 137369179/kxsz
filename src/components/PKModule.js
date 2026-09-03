@@ -54,9 +54,7 @@ export class PKModule extends BaseModule {
           <span>返回地图</span>
         </button>
 
-        // Header: Health Bars
         <div class="relative z-10 w-full p-6 flex items-center justify-between pl-36">
-           // Player
            <div class="flex items-center gap-3 sm:gap-4">
               <div class="w-14 h-14 sm:w-16 sm:h-16 aspect-square rounded-full bg-slate-200 border-4 border-emerald-400 shadow-[0_0_20px_rgba(52,211,153,0.6)] flex items-center justify-center overflow-hidden shrink-0">
                  <img src="${playerAvatarSrc}" class="w-full h-full object-cover rounded-full" alt="player" onerror="this.src='assets/images/cathy_mascot.webp'" />
@@ -74,7 +72,6 @@ export class PKModule extends BaseModule {
               <span>VS</span>
            </div>
 
-           // Boss
            <div class="flex items-center gap-3 sm:gap-4 flex-row-reverse">
               <div class="w-14 h-14 sm:w-16 sm:h-16 aspect-square rounded-full bg-slate-800 border-4 border-rose-500 shadow-[0_0_20px_rgba(244,63,94,0.6)] flex items-center justify-center overflow-hidden shrink-0">
                  <img src="assets/images/cathy_boss_monster.webp" class="w-full h-full object-cover rounded-full" alt="boss" onerror="this.src='assets/images/icon_chest.webp'" />
@@ -88,15 +85,12 @@ export class PKModule extends BaseModule {
            </div>
         </div>
 
-        // Arena Stage
         <div class="relative flex-1 flex flex-col items-center justify-center z-10">
-           // Battle Area
            <div class="absolute inset-0 flex items-center justify-between px-20">
               <div id="pk-player-sprite" class="w-40 h-40 bg-white/10 backdrop-blur-sm border-2 border-emerald-400/50 rounded-3xl animate-bounce-slow flex items-center justify-center shadow-[0_20px_40px_rgba(0,0,0,0.3)] overflow-hidden p-3">
                  <img src="${playerAvatarSrc}" class="w-full h-full object-cover rounded-2xl" alt="player" onerror="this.src='assets/images/cathy_mascot.webp'" />
               </div>
               
-              // Projectile container
               <div id="pk-projectile-layer" class="absolute inset-0 pointer-events-none"></div>
 
               <div id="pk-boss-sprite" class="w-48 h-48 bg-black/40 backdrop-blur-md border-2 border-rose-500/50 rounded-3xl animate-bounce-slow flex items-center justify-center shadow-[0_20px_40px_rgba(0,0,0,0.5)] overflow-hidden p-3" style="animation-delay: 0.5s">
@@ -104,16 +98,13 @@ export class PKModule extends BaseModule {
               </div>
            </div>
 
-           // Question UI
            <div class="z-20 flex flex-col items-center mt-20">
               <div class="bg-black/60 backdrop-blur-lg border-2 border-amber-300/50 rounded-full px-10 py-3 mb-8 shadow-2xl flex items-center gap-4 cursor-pointer active:scale-95 transition-transform" id="pk-btn-listen">
                  <div class="w-8 h-8">${GAME_ICONS.speaker("w-full h-full")}</div>
                  <span class="text-2xl font-black text-yellow-300 tracking-widest">听音选字</span>
               </div>
 
-              // Options
               <div class="grid grid-cols-2 gap-6" id="pk-options-grid">
-                 // Generated dynamically
               </div>
            </div>
         </div>
@@ -209,12 +200,13 @@ export class PKModule extends BaseModule {
     this._timeout(() => this.nextRound(), 1000);
   }
 
-  updateHpUI() {
-     const pBar = this.container.querySelector("#pk-player-hp");
-     const bBar = this.container.querySelector("#pk-boss-hp");
-     if (pBar) pBar.style.width = (this.playerHp / this.maxHp) * 100 + "%";
-     if (bBar) bBar.style.width = (this.bossHp / this.maxHp) * 100 + "%";
-  }
+   updateHpUI() {
+      const pBar = this.container.querySelector("#pk-player-hp");
+      const bBar = this.container.querySelector("#pk-boss-hp");
+      const maxHp = Math.max(1, this.maxHp || 100);
+      if (pBar) pBar.style.width = Math.min(100, Math.max(0, (this.playerHp / maxHp) * 100)) + "%";
+      if (bBar) bBar.style.width = Math.min(100, Math.max(0, (this.bossHp / maxHp) * 100)) + "%";
+   }
 
   playAttackAnimation(attacker) {
      return new Promise(resolve => {
@@ -224,46 +216,32 @@ export class PKModule extends BaseModule {
         const proj = document.createElement("div");
         proj.className = "absolute top-1/2 -translate-y-1/2 w-12 h-12 rounded-full shadow-[0_0_30px_rgba(255,255,255,1)] flex items-center justify-center text-3xl z-50";
         
-        if (attacker === "player") {
-           proj.innerHTML = GAME_ICONS.swords ? GAME_ICONS.swords("w-full h-full") : "";
-           proj.classList.add("bg-amber-400", "left-40");
-           layer.appendChild(proj);
-           
-           // Animate to right
-           const anim = proj.animate([
-              { left: '160px', transform: 'translateY(-50%) scale(1)' },
-              { left: 'calc(100% - 240px)', transform: 'translateY(-50%) scale(2)' }
-           ], { duration: 400, easing: 'ease-in' });
-           
-           anim.onfinish = () => {
-              proj.remove();
-              const boss = this.container.querySelector("#pk-boss-sprite");
-              if (boss) {
-                boss.classList.add("animate-shake", "brightness-150", "bg-rose-500/50");
-                this._timeout(() => boss.classList.remove("animate-shake", "brightness-150", "bg-rose-500/50"), 400);
-              }
-              resolve();
-           };
+        const isPlayer = attacker === "player";
+        proj.innerHTML = isPlayer
+          ? (GAME_ICONS.swords ? GAME_ICONS.swords("w-full h-full") : "")
+          : (GAME_ICONS.monster ? GAME_ICONS.monster("w-full h-full") : "");
+        proj.classList.add(isPlayer ? "bg-amber-400" : "bg-rose-500", isPlayer ? "left-40" : "right-48");
+        layer.appendChild(proj);
+
+        const onDone = () => {
+           try { proj.remove(); } catch {}
+           if (this.isDestroyed) return resolve();
+           const target = this.container.querySelector(isPlayer ? "#pk-boss-sprite" : "#pk-player-sprite");
+           if (target) {
+              target.classList.add("animate-shake", "brightness-150", "bg-rose-500/50");
+              this._timeout(() => target.classList.remove("animate-shake", "brightness-150", "bg-rose-500/50"), 400);
+           }
+           resolve();
+        };
+
+        if (typeof proj.animate === "function") {
+           const keyframes = isPlayer
+              ? [{ left: '160px', transform: 'translateY(-50%) scale(1)' }, { left: 'calc(100% - 240px)', transform: 'translateY(-50%) scale(2)' }]
+              : [{ right: '192px', transform: 'translateY(-50%) scale(1)' }, { right: 'calc(100% - 200px)', transform: 'translateY(-50%) scale(2)' }];
+           const anim = proj.animate(keyframes, { duration: 400, easing: 'ease-in' });
+           anim.onfinish = onDone;
         } else {
-           proj.innerHTML = GAME_ICONS.monster ? GAME_ICONS.monster("w-full h-full") : "";
-           proj.classList.add("bg-rose-500", "right-48");
-           layer.appendChild(proj);
-           
-           // Animate to left
-           const anim = proj.animate([
-              { right: '192px', transform: 'translateY(-50%) scale(1)' },
-              { right: 'calc(100% - 200px)', transform: 'translateY(-50%) scale(2)' }
-           ], { duration: 400, easing: 'ease-in' });
-           
-           anim.onfinish = () => {
-              proj.remove();
-              const player = this.container.querySelector("#pk-player-sprite");
-              if (player) {
-                player.classList.add("animate-shake", "brightness-150", "bg-rose-500/50");
-                this._timeout(() => player.classList.remove("animate-shake", "brightness-150", "bg-rose-500/50"), 400);
-              }
-              resolve();
-           };
+           this._timeout(onDone, 400);
         }
      });
   }

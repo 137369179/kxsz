@@ -18,9 +18,14 @@ export class StorageManager {
     return typeof localStorage !== "undefined";
   }
 
-  getItem(key) {
-    if (!this.isAvailable()) return null;
-    try { return localStorage.getItem(key); } catch { return null; }
+  getItem(key, fallback = null) {
+    if (!this.isAvailable()) return fallback;
+    try {
+      const val = localStorage.getItem(key);
+      return val !== null ? val : fallback;
+    } catch {
+      return fallback;
+    }
   }
 
   setItem(key, value) {
@@ -48,12 +53,18 @@ export class StorageManager {
     try { localStorage.removeItem(key); } catch {}
   }
 
-  /**  */
+  /** 清除所有凯茜识字相关的存储键 */
   clearAllCathyKeys() {
     const KEYS = [
       "CATHY_LITERACY_USER_PROGRESS_V1",
       "cathy_audio_v1",
       "cathy_audio_pin_v1",
+      "cathy_book_progress_v2",
+      "cathy_tree_water_count",
+      "cathy_hunger_val",
+      "CATHY_ACTIVE_PROFILE_ID",
+      "cathy_scrapbook_stickers_v1",
+      "cathy_scrapbook_bg_v1",
     ];
     KEYS.forEach((k) => this.removeItem(k));
   }
@@ -117,6 +128,65 @@ export class StorageManager {
     }
   }
 
+  /**
+   * 生成跨设备极简换机迁移码 (Base64 紧凑编码)
+   */
+  exportSyncToken() {
+    try {
+      const activeId = this.getActiveProfileId();
+      const progressKey = `CATHY_LITERACY_PROGRESS_${activeId}`;
+      const defaultKey = "CATHY_LITERACY_USER_PROGRESS_V1";
+      const progress = this.getJSON(progressKey) || this.getJSON(defaultKey) || {};
+      
+      const payload = {
+        v: 1,
+        t: Date.now(),
+        p: progress
+      };
+      const jsonStr = JSON.stringify(payload);
+      const encoded = btoa(encodeURIComponent(jsonStr));
+      return `CATHY_SYNC_V1:${encoded}`;
+    } catch (e) {
+      console.error("生成换机迁移码失败", e);
+      return null;
+    }
+  }
+
+  /**
+   * 解析并导入跨设备换机迁移码
+   * @param {string} tokenStr 迁移码或完整 JSON
+   */
+  importSyncToken(tokenStr) {
+    if (!tokenStr || typeof tokenStr !== "string") return { ok: false, msg: "迁移码为空" };
+    const trimmed = tokenStr.trim();
+    try {
+      let progressObj = null;
+      if (trimmed.startsWith("CATHY_SYNC_V1:")) {
+        const rawBase64 = trimmed.slice("CATHY_SYNC_V1:".length);
+        const decodedJson = decodeURIComponent(atob(rawBase64));
+        const payload = JSON.parse(decodedJson);
+        progressObj = payload.p || payload;
+      } else if (trimmed.startsWith("{")) {
+        const data = JSON.parse(trimmed);
+        progressObj = data.progress || data;
+      }
+
+      if (!progressObj || typeof progressObj !== "object") {
+        return { ok: false, msg: "无效的换机数据格式" };
+      }
+
+      const activeId = this.getActiveProfileId();
+      this.putJSON(`CATHY_LITERACY_PROGRESS_${activeId}`, progressObj);
+      this.putJSON("CATHY_LITERACY_USER_PROGRESS_V1", progressObj);
+
+      const charCount = Object.keys(progressObj.charRecords || {}).length;
+      const coins = progressObj.coins || 0;
+      return { ok: true, charCount, coins };
+    } catch (e) {
+      console.error("解析换机迁移码失败", e);
+      return { ok: false, msg: "换机码解析失败，请检查是否完整复制" };
+    }
+  }
 }
 
 

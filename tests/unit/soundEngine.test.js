@@ -64,5 +64,8 @@ describe('SoundEngine Core', () => {
     expect(typeof mod.soundAndFX.playStarPopCombo).toBe('function')
     expect(typeof mod.soundAndFX.playParentCheer).toBe('function')
     expect(typeof mod.soundAndFX.playFamilyRecordChime).toBe('function')
+    expect(typeof mod.soundAndFX.playWhoosh).toBe('function')
+    expect(typeof mod.soundAndFX.playChantHit).toBe('function')
+    expect(typeof mod.soundAndFX.stopSpeaking).toBe('function')
   })
 })

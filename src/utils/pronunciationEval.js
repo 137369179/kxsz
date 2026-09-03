@@ -213,6 +213,10 @@ class RhythmAnalyzer {
 
   stop() {
     this._stop = true;
+    if (this._rafId && typeof cancelAnimationFrame === "function") {
+      cancelAnimationFrame(this._rafId);
+      this._rafId = null;
+    }
   }
 
   _loop() {
@@ -223,7 +227,7 @@ class RhythmAnalyzer {
       for (let i = 0; i < this.timeBuf.length; i++) {
         sum += this.timeBuf[i] * this.timeBuf[i];
       }
-      const rms = Math.sqrt(sum / this.timeBuf.length);
+      const rms = this.timeBuf.length ? Math.sqrt(sum / this.timeBuf.length) : 0;
       this.totalRmsSum += rms;
       this.sampleCount++;
       if (rms > this.maxRms) this.maxRms = rms;
@@ -235,7 +239,9 @@ class RhythmAnalyzer {
         else if (rms > last.rms) { last.rms = rms; last.t = t; }
       }
     } catch {}
-    requestAnimationFrame(() => this._loop());
+    if (!this._stop && typeof requestAnimationFrame === "function") {
+      this._rafId = requestAnimationFrame(() => this._loop());
+    }
   }
 
   getAvgRms() {
@@ -297,7 +303,7 @@ export class PronunciationAssessmentEngine {
       this._activeAnalyser.getByteFrequencyData(this._activeFreqData);
       let sum = 0;
       for (let i = 0; i < this._activeFreqData.length; i++) sum += this._activeFreqData[i];
-      return sum / this._activeFreqData.length;
+      return this._activeFreqData.length ? sum / this._activeFreqData.length : 0;
     } catch {
       return 0;
     }

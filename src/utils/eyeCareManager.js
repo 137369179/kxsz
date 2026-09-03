@@ -15,6 +15,7 @@ class EyeCareManager {
   constructor() {
     this.activeSeconds = 0;
     this.timerInterval = null;
+    this.restCountdownTimer = null;
     this.isRestModalOpen = false;
     this.onRestCompleteCallback = null;
   }
@@ -40,6 +41,14 @@ class EyeCareManager {
       clearInterval(this.timerInterval);
       this.timerInterval = null;
     }
+    if (this.restCountdownTimer) {
+      clearInterval(this.restCountdownTimer);
+      this.restCountdownTimer = null;
+    }
+    if (typeof document !== "undefined") {
+      document.getElementById("eye-care-rest-modal")?.remove();
+    }
+    this.isRestModalOpen = false;
   }
 
   reset() {
@@ -116,7 +125,7 @@ class EyeCareManager {
 
     soundAndFX.speakPriority("小朋友，小眼睛辛苦啦！跟着凯茜的小星星一起做眼球放松操吧！", { kind: "sentence", priority: 1 });
 
-    const countdownTimer = setInterval(() => {
+    this.restCountdownTimer = setInterval(() => {
       countdown--;
       if (timerEl) timerEl.textContent = Math.max(countdown, 0);
 
@@ -133,7 +142,10 @@ class EyeCareManager {
       }
 
       if (countdown <= 0) {
-        clearInterval(countdownTimer);
+        if (this.restCountdownTimer) {
+          clearInterval(this.restCountdownTimer);
+          this.restCountdownTimer = null;
+        }
         soundAndFX.playCrownFanfare();
         soundAndFX.triggerConfetti(overlay);
         if (stepTitle) stepTitle.textContent = "太棒啦！眼睛放松完成！";
@@ -143,7 +155,10 @@ class EyeCareManager {
     }, 1000);
 
     const closeRestModal = (reward = true) => {
-      clearInterval(countdownTimer);
+      if (this.restCountdownTimer) {
+        clearInterval(this.restCountdownTimer);
+        this.restCountdownTimer = null;
+      }
       this.isRestModalOpen = false;
       this.reset();
       overlay.remove();
@@ -163,6 +178,10 @@ class EyeCareManager {
 
     if (parentOverrideBtn) {
       parentOverrideBtn.addEventListener("click", () => {
+        if (typeof window === "undefined" || typeof window.prompt !== "function") {
+          closeRestModal(false);
+          return;
+        }
         // 简单家长算术确认
         const a = Math.floor(Math.random() * 8) + 2;
         const b = Math.floor(Math.random() * 8) + 2;
@@ -171,7 +190,7 @@ class EyeCareManager {
           soundAndFX.playPop();
           closeRestModal(false);
         } else if (ans !== null) {
-          alert("计算错误，继续休息做操吧！");
+          if (typeof alert === "function") alert("计算错误，继续休息做操吧！");
         }
       });
     }

@@ -242,7 +242,6 @@ export class PlayModule extends BaseModule {
             </button>
           </div>
 
-          // 2. 汉字消消乐
           <div class="mode-card group bg-white/95 backdrop-blur-md rounded-3xl p-6 shadow-xl border-4 border-amber-200 hover:border-amber-400 cursor-pointer transition-all duration-300 hover:scale-105 flex flex-col justify-between" data-mode="match">
             <div>
               <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-3xl bg-gradient-to-tr from-amber-500 to-yellow-400 text-white flex items-center justify-center shadow-lg mb-4">
@@ -258,7 +257,6 @@ export class PlayModule extends BaseModule {
             </button>
           </div>
 
-          // 3. 汉字拼拼乐 (部首魔法屋)
           <div class="mode-card group bg-white/95 backdrop-blur-md rounded-3xl p-6 shadow-xl border-4 border-purple-200 hover:border-purple-400 cursor-pointer transition-all duration-300 hover:scale-105 flex flex-col justify-between" data-mode="fusion">
             <div>
               <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-3xl bg-gradient-to-tr from-purple-500 to-indigo-500 text-white flex items-center justify-center shadow-lg mb-4">
@@ -274,7 +272,6 @@ export class PlayModule extends BaseModule {
             </button>
           </div>
 
-          // 4. 双人竞技场
           <div class="mode-card group bg-white/95 backdrop-blur-md rounded-3xl p-6 shadow-xl border-4 border-blue-200 hover:border-blue-400 cursor-pointer transition-all duration-300 hover:scale-105 flex flex-col justify-between" data-mode="pk">
             <div>
               <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-3xl bg-gradient-to-tr from-blue-500 to-cyan-400 text-white flex items-center justify-center shadow-lg mb-4">
@@ -290,7 +287,6 @@ export class PlayModule extends BaseModule {
             </button>
           </div>
 
-          // 5. 成语国学馆
           <div class="mode-card group bg-white/95 backdrop-blur-md rounded-3xl p-6 shadow-xl border-4 border-emerald-200 hover:border-emerald-400 cursor-pointer transition-all duration-300 hover:scale-105 flex flex-col justify-between" data-mode="idiom">
             <div>
               <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-3xl bg-gradient-to-tr from-emerald-500 to-green-400 text-white flex items-center justify-center shadow-lg mb-4">
@@ -306,7 +302,6 @@ export class PlayModule extends BaseModule {
             </button>
           </div>
 
-          // 6. 古诗国学馆
           <div class="mode-card group bg-white/95 backdrop-blur-md rounded-3xl p-6 shadow-xl border-4 border-amber-200 hover:border-amber-400 cursor-pointer transition-all duration-300 hover:scale-105 flex flex-col justify-between" data-mode="poem">
             <div>
               <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-3xl bg-gradient-to-tr from-amber-500 to-orange-400 text-white flex items-center justify-center shadow-lg mb-4">
@@ -322,7 +317,6 @@ export class PlayModule extends BaseModule {
             </button>
           </div>
 
-          // 7. 汉字魔法积木屋 (字族同偏旁拼插)
           <div class="mode-card group bg-white/95 backdrop-blur-md rounded-3xl p-6 shadow-xl border-4 border-emerald-200 hover:border-emerald-400 cursor-pointer transition-all duration-300 hover:scale-105 flex flex-col justify-between" data-mode="family">
             <div>
               <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-3xl bg-gradient-to-tr from-emerald-500 to-teal-400 text-white flex items-center justify-center shadow-lg mb-4">
@@ -338,7 +332,6 @@ export class PlayModule extends BaseModule {
             </button>
           </div>
 
-          // 8. 火眼金睛辨异同 (形近字混淆靶向强化)
           <div class="mode-card group bg-white/95 backdrop-blur-md rounded-3xl p-6 shadow-xl border-4 border-rose-200 hover:border-rose-400 cursor-pointer transition-all duration-300 hover:scale-105 flex flex-col justify-between" data-mode="spotter">
             <div>
               <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-3xl bg-gradient-to-tr from-rose-500 to-amber-500 text-white flex items-center justify-center shadow-lg mb-4">
@@ -468,7 +461,6 @@ export class PlayModule extends BaseModule {
               <div id="boss-hp-bar" class="bg-gradient-to-r from-red-600 via-rose-500 to-yellow-400 h-full rounded-full transition-all duration-500 shadow-[0_0_15px_rgba(244,63,94,0.8)]" style="width: ${bossHp}%"></div>
             </div>
 
-            // Boss 3D 动画巨兽
             <div id="boss-avatar" class="relative w-32 h-32 rounded-full bg-gradient-to-tr from-rose-600 via-red-500 to-orange-500 border-4 border-white shadow-[0_0_60px_rgba(244,63,94,0.8)] flex items-center justify-center mb-4 animate-bounce-slow transition-all">
               <span class="flex items-center text-white">${GAME_ICONS.monster("w-16 h-16")}</span>
               <div id="boss-lv" class="absolute -top-3 bg-red-600 text-white font-black text-[10px] px-3 py-0.5 rounded-full border border-white">
@@ -1774,7 +1766,6 @@ export class PlayModule extends BaseModule {
               ${chars.map(c => `<div class="w-14 h-14 rounded-xl bg-gradient-to-br from-yellow-300 to-amber-500 border-2 border-white shadow-lg flex items-center justify-center"><span class="text-2xl font-black text-amber-950">${c}</span></div>`).join("")}
             </div>
 
-            // 30s 倒计时环 + 爱心次数
             <div class="flex items-center gap-4 mb-5">
               <div class="relative w-16 h-16">
                 <canvas id="quiz-ring-canvas" width="64" height="64"></canvas>
@@ -1989,7 +1980,10 @@ export class PlayModule extends BaseModule {
     const learnedList = ebbinghausManager.progress.learnedPoems || [];
     const learnedCount = learnedList.length;
 
-    mainEl.innerHTML = `
+    const targetEl = mainEl || (this.container && this.container.querySelector && this.container.querySelector(".shell-content")) || this.container;
+    if (!targetEl) return;
+
+    targetEl.innerHTML = `
       <div class="relative w-full max-w-5xl mx-auto flex flex-col select-none animate-fade-in pb-8">
         
         <div class="flex items-center justify-between mb-6 flex-wrap gap-3">
@@ -2062,7 +2056,7 @@ export class PlayModule extends BaseModule {
     `;
 
     // 绑定返回
-    const backBtn = mainEl.querySelector("#btn-poem-hall-back");
+    const backBtn = targetEl.querySelector("#btn-poem-hall-back");
     if (backBtn) {
       this._on(backBtn, "click", () => {
         soundAndFX.playPop();
@@ -2072,7 +2066,7 @@ export class PlayModule extends BaseModule {
     }
 
     // 绑定进入诗歌详情
-    mainEl.querySelectorAll(".poem-card").forEach((card) => {
+    targetEl.querySelectorAll(".poem-card").forEach((card) => {
       this._on(card, "click", () => {
         const id = card.dataset.id;
         const poem = POEMS_DATABASE.find((p) => p.id === id);
@@ -2719,7 +2713,7 @@ export class PlayModule extends BaseModule {
 
       const q = questions[roundIndex];
       const cards = shuffle([q.a, q.b]);
-      const progressPct = Math.round((roundIndex / questions.length) * 100);
+      const progressPct = questions.length ? Math.round((roundIndex / questions.length) * 100) : 0;
 
       mainEl.innerHTML = `
         <div class="relative w-full max-w-3xl mx-auto flex flex-col items-center select-none animate-fade-in pb-8">

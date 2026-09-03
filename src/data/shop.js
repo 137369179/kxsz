@@ -7,12 +7,12 @@
  */
 
 export const SHOP_AVATARS = [
-  { id: "av_cathy",   type: "avatar", name: "凯茜",     icon: "assets/images/cathy_mascot.webp",        value: "assets/images/cathy_mascot.webp",        price: 0 },
-  { id: "av_fairy",   type: "avatar", name: "森林仙子", icon: "assets/images/cathy_island_forest.webp", value: "assets/images/cathy_island_forest.webp", price: 0 },
-  { id: "av_hero",    type: "avatar", name: "冒险勇士", icon: "assets/images/cathy_island_life.webp",   value: "assets/images/cathy_island_life.webp",   price: 0 },
-  { id: "av_unicorn", type: "avatar", name: "幻彩之星", icon: "assets/images/cathy_trophy_gold.webp",   value: "assets/images/cathy_trophy_gold.webp",   price: 200 },
-  { id: "av_panda",   type: "avatar", name: "星空先锋", icon: "assets/images/cathy_island_space.webp",  value: "assets/images/cathy_island_space.webp",  price: 260 },
-  { id: "av_dragon",  type: "avatar", name: "喷火霸王", icon: "assets/images/cathy_boss_monster.webp",  value: "assets/images/cathy_boss_monster.webp",  price: 500 }
+  { id: "av_cathy",   type: "avatar", name: "凯茜",     icon: "assets/images/cathy_mascot.webp",   value: "assets/images/cathy_mascot.webp",   price: 0 },
+  { id: "av_fairy",   type: "avatar", name: "森林仙子", icon: "assets/images/avatar_fairy.webp",  value: "assets/images/avatar_fairy.webp",  price: 0 },
+  { id: "av_hero",    type: "avatar", name: "冒险勇士", icon: "assets/images/avatar_hero.webp",   value: "assets/images/avatar_hero.webp",   price: 0 },
+  { id: "av_unicorn", type: "avatar", name: "幻彩之星", icon: "assets/images/avatar_unicorn.webp",value: "assets/images/avatar_unicorn.webp",price: 200 },
+  { id: "av_panda",   type: "avatar", name: "星空先锋", icon: "assets/images/avatar_panda.webp",  value: "assets/images/avatar_panda.webp",  price: 260 },
+  { id: "av_dragon",  type: "avatar", name: "喷火霸王", icon: "assets/images/cathy_boss_monster.webp", value: "assets/images/cathy_boss_monster.webp", price: 500 }
 ];
 
 export const SHOP_FRAMES = [

@@ -48,7 +48,7 @@ for (const f of jsFiles) {
 
 const domIssues = [];
 for (const f of jsFiles) {
-  if (isSelfTool(f)) continue;
+  if (isSelfTool(f) || f.includes("/tests/")) continue;
   const src = readFileSync(f, "utf8");
   for (const m of src.matchAll(/querySelector(?:All)?\(\s*["']#([a-zA-Z0-9_-]+)["']\s*\)/g)) {
     const id = m[1];

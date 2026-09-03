@@ -18,7 +18,7 @@
   <meta name="twitter:description" content="专业儿童汉字启蒙与分级阅读应用" />
   <meta name="twitter:image" content="assets/images/cathy_mascot.webp" />
   <!-- CSP：限制资源加载来源，防止 XSS，允许本地 AI 语音服务与本地开发连接 -->
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' blob:; connect-src 'self' http://127.0.0.1:8766 http://localhost:8766 ws://127.0.0.1:8766 ws://localhost:8766; worker-src 'self' blob:; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'none';">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' blob:; connect-src 'self' http://127.0.0.1:8766 http://localhost:8766 ws://127.0.0.1:8766 ws://localhost:8766; worker-src 'self' blob:; frame-src 'self' data: blob:; object-src 'none'; base-uri 'self'; form-action 'none';">
   <link rel="icon" type="image/jpeg" href="assets/images/cathy_mascot.webp" />
   <link rel="manifest" href="manifest.json" />
   <link rel="apple-touch-icon" href="assets/images/cathy_mascot.webp" />
@@ -70,7 +70,7 @@
     })();
   </script>
   <!-- 生产级预编译 CSS（替代 398KB Tailwind 运行时编译器） -->
-  <link rel="stylesheet" href="assets/css/prod.css?v=2.8.2" />
+  <link rel="stylesheet" href="assets/css/prod.css?v=2.9.5" />
   <style>
     /* 隐藏滚动条 */
     .no-scrollbar::-webkit-scrollbar {
@@ -111,7 +111,7 @@
 
   <!-- 核心逻辑脚本 (带版本防缓存) -->
   <!-- [版本同步] 版本号与 src/utils/version.js 的 APP_VERSION 保持一致，升级时同步修改 -->
-  <script type="module" src="src/app.js?v=2.8.2"></script>
+  <script type="module" src="src/app.js?v=2.9.5"></script>
 
   <!-- 统一版本号注入：从 version.js 读取 APP_VERSION 供运行时与 SW 注册使用 -->
   <script type="module">
@@ -125,7 +125,7 @@
   <script>
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", () => {
-        const v = window.__APP_VERSION || "2.7.3";
+        const v = window.__APP_VERSION || "2.9.1";
         navigator.serviceWorker.register("./sw.js?v=" + v).then((reg) => {
           reg.update();
         }).catch((err) => {
