@@ -617,6 +617,7 @@ export function _showEvalResult(stage, res) {
     // 依据真实评测得分分档美化呈现
     if (score >= 85) {
       // 满分/优秀 (3星)
+      this._readFailCount = 0;
       mascotProgress.onCorrectPronunciation();
       if (praiseTxt) {
         praiseTxt.innerHTML = `<span class="text-emerald-300 font-bold">发音超级标准！太厉害了！</span><br/><span class="text-white/80 text-[11px]">声母韵母饱满，获得 3 颗星与 5 金币！</span>`;
@@ -631,6 +632,7 @@ export function _showEvalResult(stage, res) {
       }
     } else if (score >= 60) {
       // 良好 (2星)
+      this._readFailCount = 0;
       mascotProgress.onCorrectPronunciation();
       if (praiseTxt) {
         praiseTxt.innerHTML = `<span class="text-amber-300 font-bold">读得很棒！声音再清晰一点就满分啦！</span><br/><span class="text-white/80 text-[11px]">获得 2 颗星，再练一次可拿满分哦！</span>`;
@@ -645,14 +647,29 @@ export function _showEvalResult(stage, res) {
     } else {
       // 不准 / 读错 (0~1星)
       mascotProgress.onWrongAttempt();
+      // 连续失败计数：用于 ≥2 次后的示范降级（避免撞墙式重复）
+      this._readFailCount = (this._readFailCount || 0) + 1;
       const heard = res.hypothesis || "未检测到清晰发音";
+      // 情境归因文案：低分归因于麦克风/音量等可控因素而非能力（班杜拉自我效能：保护幼儿胜任感）
       if (praiseTxt) {
-        praiseTxt.innerHTML = `<div class="bg-rose-950/60 border border-rose-400/40 rounded-xl px-3 py-1.5 mb-1"><span class="text-yellow-300 font-bold">识别到读音：“${heard}”</span></div><span class="text-rose-200 text-xs">没有读准哦，请点击【听示范】并大声朗读【${char.char}】！</span>`;
+        const gentle = this._readFailCount >= 2
+          ? `<div class="bg-sky-950/60 border border-sky-400/40 rounded-xl px-3 py-1.5 mb-1"><span class="text-sky-200 text-xs">已经试了 2 次啦，别着急——凯茜示范一遍，听清楚再跟读，你一定可以！</span></div>`
+          : "";
+        praiseTxt.innerHTML = `<div class="bg-rose-950/60 border border-rose-400/40 rounded-xl px-3 py-1.5 mb-1"><span class="text-yellow-300 font-bold">识别到读音：“${heard}”</span></div><span class="text-rose-200 text-xs">好像是麦克风没听清，点击【听示范】大声跟读「${char.char}」，一定可以的！</span>${gentle}`;
       }
       soundAndFX.playSoftError();
-      soundAndFX.speakPriority(`好像读成了“${heard}”啦，请跟我大声读“${char.char}”，再试一次吧！`, { kind: "sentence", emotion: "correction" });
+      soundAndFX.speakPriority(`没关系，请听老师读“${char.char}”，再试一次吧！`, { kind: "sentence", emotion: "gentle" });
+      // 连续 2 次低分：自动播放标准音示范（脚手架式降级，非无限重试）
+      if (this._readFailCount >= 2) {
+        setTimeout(() => {
+          try {
+            soundAndFX.speakPriority(`${char.char}，${char.pinyin}`, { kind: "char", priority: 1 });
+          } catch (e) {}
+        }, 700);
+      }
       if (retryBtn) {
         retryBtn.className = "bg-gradient-to-r from-amber-400 to-yellow-400 text-amber-950 text-xs font-black px-3.5 py-1.5 rounded-full shadow-lg border border-white active:scale-95 transition-all cursor-pointer ring-4 ring-yellow-400 animate-pulse";
+        retryBtn.textContent = this._readFailCount >= 2 ? "跟读示范后再试一次" : "再试一次";
       }
       if (finishBtn) {
         finishBtn.innerHTML = `<span>跳过此步 (0 金币)</span>`;
