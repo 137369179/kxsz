@@ -20,6 +20,17 @@ export class BaseModule {
     this._focusCleanup = eventBus.on(EVENTS.FOCUS_MODE_CHANGED, ({ enabled }) => {
       if (typeof document !== "undefined") {
         document.body.classList.toggle("focus-mode", enabled);
+        document.documentElement.classList.toggle("focus-mode", enabled);
+        document.body.dataset.focusMode = enabled ? "true" : "false";
+      }
+    });
+    // 初始化时同步当前状态
+    eventBus.once("app:init", () => {
+      const { ebbinghausManager } = window._modules || {};
+      const focusOn = ebbinghausManager?.isFocusModeEnabled?.();
+      if (focusOn) {
+        document.body.classList.add("focus-mode");
+        document.documentElement.classList.add("focus-mode");
       }
     });
     this._addCleanup(() => eventBus.off(EVENTS.FOCUS_MODE_CHANGED, this._focusCleanup));

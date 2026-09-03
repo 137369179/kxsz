@@ -34,6 +34,9 @@ export const EVENTS = Object.freeze({
   // 音频控制
   SOUND_TOGGLE_MUTE: "sound:toggle-mute",
 
+  // E7: 专注模式
+  FOCUS_MODE_CHANGED: "focus:mode-changed",
+
   // 音频总线状态
   AUDIO_BUS_STATE_CHANGE: "audio:bus-state-change",  // 音频总线状态变化
   AUDIO_BGM_CHANGED: "audio:bgm-changed",            // BGM 切换
