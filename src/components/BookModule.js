@@ -307,9 +307,9 @@ export class BookModule extends BaseModule {
         // PARTIAL 模式 → 强制开拼音
         if (readiness.status === READING_STATUS.PARTIAL) {
           this.showPinyin = true;
-          showGameToast(this.container, readiness.message, { duration: 2500, icon: "📖" });
+          showGameToast(this.container, readiness.message, { duration: 2500 });
         } else if (readiness.message) {
-          showGameToast(this.container, readiness.message, { duration: 1800, icon: "✨" });
+          showGameToast(this.container, readiness.message, { duration: 1800 });
         }
 
         soundAndFX.playSuccessSound();

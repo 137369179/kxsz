@@ -252,7 +252,7 @@ export function renderFamilyWorkshop() {
             ebbinghausManager.addCoins(15);
             ebbinghausManager.addStars(2);
             if (mnemonicBubble) {
-              mnemonicBubble.textContent = `\ud83c\udf89 \u5927\u5706\u6ee1\uff01\u3010${currentFamily.name}\u3011\u5168\u90e8\u6210\u5458\u96c6\u9f50\uff01\u5956\u52b1 15 \u661f\u5e01 + 2 \u9897\u661f\u661f\uff01`;
+              mnemonicBubble.textContent = `大圆满！【${currentFamily.name}】全部成员集齐！奖励 15 星币 + 2 颗星星！`;
               mnemonicBubble.className = "mt-4 bg-amber-100 border-2 border-amber-400 px-6 py-3 rounded-2xl shadow-xl text-xs sm:text-sm font-black text-amber-950 text-center max-w-md animate-bounce-slow";
             }
             soundAndFX.speakPriority(`\u592a\u68d2\u5566\uff01\u4f60\u5df2\u7ecf\u96c6\u9f50\u4e86${currentFamily.name}\u7684\u5168\u90e8\u6210\u5458\uff01`, { kind: "sentence", emotion: "excited" });

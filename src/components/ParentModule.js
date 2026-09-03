@@ -637,6 +637,18 @@ export class ParentModule extends BaseModule {
             </div>
 
             <div class="flex flex-col gap-2">
+              <label class="text-xs font-bold text-gray-700">每日学习总时长上限：</label>
+              <select id="select-daily-limit" class="bg-amber-50 border-2 border-amber-300 rounded-xl px-3 py-2 text-xs font-black text-amber-900 focus:outline-none">
+                <option value="auto" ${settings.dailyTimeLimitMinutes == null ? "selected" : ""}>按年龄自动 (3-5岁40分 / 6-11岁60分)</option>
+                <option value="30" ${settings.dailyTimeLimitMinutes === 30 ? "selected" : ""}>30 分钟 / 天</option>
+                <option value="40" ${settings.dailyTimeLimitMinutes === 40 ? "selected" : ""}>40 分钟 / 天</option>
+                <option value="60" ${settings.dailyTimeLimitMinutes === 60 ? "selected" : ""}>60 分钟 / 天</option>
+                <option value="90" ${settings.dailyTimeLimitMinutes === 90 ? "selected" : ""}>90 分钟 / 天</option>
+              </select>
+              <p class="text-[10px] text-gray-500 font-semibold">到达上限后需家长算术验证才能延长，每天最多延长 2 次。</p>
+            </div>
+
+            <div class="flex flex-col gap-2">
               <label class="text-xs font-bold text-gray-700">AI 描红容差模式：</label>
               <select id="select-stroke-tolerance" class="bg-amber-50 border-2 border-amber-300 rounded-xl px-3 py-2 text-xs font-black text-amber-900 focus:outline-none">
                 <option value="toddler" ${settings.strokeTolerance !== "strict" && settings.strokeTolerance !== "standard" ? "selected" : ""}>幼童宽容模式 (推荐 3~4 岁，防手抖)</option>
@@ -1049,12 +1061,15 @@ export class ParentModule extends BaseModule {
         // 添加输入验证，防止恶意或异常数据
         const dailyTarget = Math.min(5, Math.max(1, parseInt(mainEl.querySelector("#select-daily-target")?.value || "3", 10) || 3));
         const eyeTime = Math.min(30, Math.max(15, parseInt(mainEl.querySelector("#select-eye-time")?.value || "20", 10) || 20));
+        const dailyLimitRaw = mainEl.querySelector("#select-daily-limit")?.value || "auto";
         const tolerance = mainEl.querySelector("#select-stroke-tolerance")?.value || "toddler";
         const enablePlay = mainEl.querySelector("#check-enable-play")?.checked ?? true;
         const enableWrite = mainEl.querySelector("#check-enable-write")?.checked ?? true;
 
         ebbinghausManager.progress.settings.dailyCharTarget = dailyTarget;
         ebbinghausManager.progress.settings.eyeProtectionMinutes = eyeTime;
+        ebbinghausManager.progress.settings.dailyTimeLimitMinutes =
+          dailyLimitRaw === "auto" ? null : Math.min(180, Math.max(15, parseInt(dailyLimitRaw, 10) || 40));
         ebbinghausManager.progress.settings.strokeTolerance = tolerance;
         ebbinghausManager.progress.settings.enablePlayStep = enablePlay;
         ebbinghausManager.progress.settings.enableWriteStep = enableWrite;

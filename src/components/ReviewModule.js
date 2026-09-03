@@ -247,7 +247,7 @@ export class ReviewModule extends BaseModule {
 
         <!-- P4 B19: 多模态预览条 — 由 multimodalEngine 编排 -->
         <div class="relative z-20 w-full px-4 py-1.5 flex items-center gap-2 flex-wrap justify-center bg-black/30 backdrop-blur-sm border-b border-white/10 text-xs font-bold">
-          ${__emoji ? `<span class="bg-white/15 text-white px-2 py-0.5 rounded-full border border-white/20">${__emoji} 形象</span>` : ''}
+          ${__emoji ? `<span class="bg-white/15 text-white px-2 py-0.5 rounded-full border border-white/20">形象提示</span>` : ''}
           ${__radical ? `<span class="bg-amber-500/25 text-amber-200 px-2 py-0.5 rounded-full border border-amber-400/40">部首 ${__radical}</span>` : ''}
           ${__confuses.length ? `<span class="bg-rose-500/25 text-rose-200 px-2 py-0.5 rounded-full border border-rose-400/40">⚠ 别搞混 ${__confuses.slice(0, 3).join(' ')}</span>` : ''}
           ${__chant ? `<span class="bg-emerald-500/25 text-emerald-200 px-2 py-0.5 rounded-full border border-emerald-400/40">口诀：${__chant}</span>` : ''}
