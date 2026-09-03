@@ -128,6 +128,8 @@ export function showGameToast(container, message, tone = "info") {
     message = container;
     container = (typeof document !== "undefined" && (document.getElementById("game-app-viewport") || document.body)) || null;
   }
+  // 兼容误传 options 对象：{ duration, icon } → 忽略，视为 info
+  if (tone && typeof tone === "object") tone = "info";
   if (!container || typeof container.appendChild !== "function") {
     container = (typeof document !== "undefined" && (document.getElementById("game-app-viewport") || document.body)) || null;
   }
@@ -142,7 +144,13 @@ export function showGameToast(container, message, tone = "info") {
       : "bg-gradient-to-r from-blue-500 to-cyan-500 border-cyan-200 text-white";
 
   toast.className = `absolute top-24 left-1/2 -translate-x-1/2 z-50 ${toneClass} font-black text-sm px-8 py-3 rounded-full border-2 shadow-[0_10px_25px_rgba(0,0,0,0.5)] animate-scale-up pointer-events-none`;
-  toast.innerHTML = message;
+  const html = String(message ?? "");
+  // 仅当确认为受控 HTML（含标签）时用 innerHTML；纯文本走 textContent，防 XSS
+  if (/<[a-z][\s\S]*>/i.test(html)) {
+    toast.innerHTML = html;
+  } else {
+    toast.textContent = html;
+  }
   container.appendChild(toast);
 
   setTimeout(() => {
