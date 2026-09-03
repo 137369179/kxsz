@@ -21,6 +21,7 @@
 import { EVENTS, eventBus } from "./eventBus.js";
 import { neuralVoice } from "./neuralVoice.js";
 import { GAME_ICONS } from "./gameIcons.js";
+import { rewardThrottle } from "./rewardThrottle.js";
 
 // ============================================================
 // 0. 
@@ -1112,6 +1113,7 @@ class CathyAudioEngine {
 
   // 1. Q (Bloop / Boing)
   playJellyBoing() {
+    if (!rewardThrottle.allow("jelly")) return;
     this._tone({ type: "sine", from: 300, to: 750, dur: 0.08, vol: 0.3 });
     this._tone({ type: "sine", from: 450, to: 320, dur: 0.14, vol: 0.18, delay: 0.08 });
   }
@@ -1152,6 +1154,7 @@ class CathyAudioEngine {
 
   // 6.  (Duang)
   playStarEarned(starIndex = 1) {
+    if (!rewardThrottle.allow("star")) return;
     const freqs = [523.25, 659.25, 783.99];
     const targetFreq = freqs[Math.min(starIndex - 1, freqs.length - 1)];
     this._tone({ type: "triangle", from: targetFreq * 0.8, to: targetFreq * 1.5, dur: 0.5, vol: 0.35 });
@@ -1186,6 +1189,7 @@ class CathyAudioEngine {
 
   // 10.  ( C5G5)
   playSuccessSound() {
+    if (!rewardThrottle.allow("success")) return;
     this._tone({ type: "sine", from: 523.25, dur: 0.12, vol: 0.28 });
     this._tone({ type: "sine", from: 783.99, dur: 0.22, vol: 0.26, delay: 0.1 });
   }
@@ -1201,6 +1205,7 @@ class CathyAudioEngine {
 
   // 12.  ()
   playStarChime() {
+    if (!rewardThrottle.allow("star")) return;
     this._tone({ type: "sine", from: 1567.98, dur: 0.3, vol: 0.18 });
     this._tone({ type: "sine", from: 2093.0, dur: 0.4, vol: 0.12, delay: 0.06 });
   }
@@ -1261,6 +1266,7 @@ class CathyAudioEngine {
 
   // 16.5 连击高光大星芒 (Ascending Musical Star Burst)
   playStarPopCombo(combo = 1) {
+    if (!rewardThrottle.allow("star")) return;
     const baseFreq = 659.25 * Math.pow(1.1, Math.min(combo, 10)); // E5 起始
     const chord = [baseFreq, baseFreq * 1.25, baseFreq * 1.5, baseFreq * 2.0];
     chord.forEach((f, idx) => {
@@ -1325,6 +1331,7 @@ class CathyAudioEngine {
 
   // 18.  (Canvas Confetti)
   triggerConfetti(container) {
+    if (!rewardThrottle.allow("confetti")) return;
     if (typeof document === "undefined" || !container || typeof container.appendChild !== "function") return;
     const canvas = document.createElement("canvas");
     if (!canvas || typeof canvas.getContext !== "function") return;
