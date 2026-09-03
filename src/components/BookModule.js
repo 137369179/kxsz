@@ -18,7 +18,7 @@ import { CHARACTER_DATABASE } from "../data/characters.js";
 import { soundAndFX } from "../utils/soundEngine.js";
 import { ebbinghausManager } from "../utils/ebbinghaus.js";
 import { mountGameShell, showGameToast } from "./SharedShell.js";
-import { BaseModule } from "../utils/BaseModule.js";
+import { BaseModule, escapeHtml } from "../utils/BaseModule.js";
 import { GAME_ICONS } from "../utils/gameIcons.js";
 import { g2p } from "../utils/g2p.js";
 import { pronunciationEval } from "../utils/pronunciationEval.js";
@@ -58,7 +58,10 @@ export class BookModule extends BaseModule {
       if (raw) {
         this.progressMap = JSON.parse(raw);
       }
-    } catch {}
+    } catch (e) {
+      console.warn("[BookModule] 加载阅读进度失败:", e);
+      this.progressMap = {};
+    }
   }
 
   /** 保存阅读进度到 storageManager */
@@ -433,8 +436,8 @@ export class BookModule extends BaseModule {
                       isTarget
                         ? "text-orange-800 bg-amber-100/90 font-black shadow-sm border-2 border-amber-300"
                         : "text-amber-950"
-                    }" data-index="${idx}" data-char="${token.char}" data-target="${isTarget ? '1' : '0'}">
-                      ${token.char}
+                    }" data-index="${idx}" data-char="${escapeHtml(token.char)}" data-target="${isTarget ? '1' : '0'}">
+                      ${escapeHtml(token.char)}
                     </span>
                   </div>
                 `;
@@ -448,8 +451,8 @@ export class BookModule extends BaseModule {
                   <span>核心生字:</span>
                 </span>
                 ${(book.targetChars || []).map(c => `
-                  <button class="target-char-pill bg-amber-100 hover:bg-orange-500 hover:text-white text-orange-800 font-black text-xs px-2.5 py-1 rounded-xl border border-amber-300/80 shadow-sm transition-all active:scale-90 cursor-pointer flex items-center gap-1" data-char="${c}">
-                    <span>${c}</span>
+                  <button class="target-char-pill bg-amber-100 hover:bg-orange-500 hover:text-white text-orange-800 font-black text-xs px-2.5 py-1 rounded-xl border border-amber-300/80 shadow-sm transition-all active:scale-90 cursor-pointer flex items-center gap-1" data-char="${escapeHtml(c)}">
+                    <span>${escapeHtml(c)}</span>
                     <span class="text-[9px] bg-orange-400 text-white px-1 rounded-full pointer-events-none">速查</span>
                   </button>
                 `).join("")}
@@ -887,7 +890,7 @@ export class BookModule extends BaseModule {
         </div>
 
         <div class="w-full bg-white/90 p-4 rounded-2xl border-2 border-amber-200 shadow-inner mb-4">
-          <p class="text-lg font-black text-amber-950 leading-relaxed">${page.text}</p>
+          <p class="text-lg font-black text-amber-950 leading-relaxed">${escapeHtml(page.text)}</p>
         </div>
 
         <div class="relative w-24 h-24 mb-3 flex items-center justify-center">
@@ -953,7 +956,7 @@ export class BookModule extends BaseModule {
       const roleName = selectedRole === "kid" ? "宝贝" : selectedRole === "parent" ? "家长" : "亲子";
       statusText.textContent = `正在录制【${roleName}】的声音... 请大声朗读`;
       recordBtnLabel.textContent = "录音中";
-      
+
       startRecordBtn.classList.add("bg-rose-500", "animate-pulse");
       const glowBg = overlay.querySelector("#voice-glow-bg");
       if (glowBg) {
@@ -961,41 +964,36 @@ export class BookModule extends BaseModule {
         glowBg.classList.add("animate-pulse");
       }
 
-      try {
-        const result = await pronunciationEval.evaluate(page.text, {
-          mode: "sentence",
-          maxSeconds: 5
-        });
+      const pe = pronunciationEval || (typeof window !== "undefined" ? window.pronunciationEval : null);
+      let score = 98;
 
-        if (!this.isVoiceModalOpen) return;
-
-        soundAndFX.playParentCheer();
-        soundAndFX.triggerConfetti(this.container);
-        ebbinghausManager.addCoins(20);
-        ebbinghausManager.save();
-        statusText.innerHTML = `<span class="text-emerald-600 font-black text-sm">${roleName} 朗读得分：${result.score || 98} 分！获得 20 凯茜星币！</span>`;
-        recordBtnLabel.textContent = "重新录音";
-        startRecordBtn.classList.remove("bg-rose-500", "animate-pulse");
-        if (glowBg) {
-          glowBg.classList.replace("opacity-100", "opacity-0");
-          glowBg.classList.remove("animate-pulse");
+      if (pe && typeof pe.evaluate === "function") {
+        try {
+          const result = await pe.evaluate(page.text, { mode: "sentence", maxSeconds: 5 });
+          if (typeof result?.score === "number" && !isNaN(result.score)) {
+            score = result.score;
+          }
+        } catch (err) {
+          console.warn("[BookModule] 语音评测失败，使用默认分数:", err);
         }
-        if (playbackBtnText) playbackBtnText.textContent = `回放【${roleName}】的朗读声音`;
-        playbackBtn.classList.remove("hidden");
-        isRecording = false;
-      } catch (err) {
-        if (!this.isVoiceModalOpen) return;
-        soundAndFX.playParentCheer();
-        statusText.innerHTML = `<span class="text-emerald-600 font-black text-sm">太好听了！${roleName} 录制完成！</span>`;
-        recordBtnLabel.textContent = "再次录制";
-        startRecordBtn.classList.remove("bg-rose-500", "animate-pulse");
-        if (glowBg) {
-          glowBg.classList.replace("opacity-100", "opacity-0");
-          glowBg.classList.remove("animate-pulse");
-        }
-        playbackBtn.classList.remove("hidden");
-        isRecording = false;
       }
+
+      if (!this.isVoiceModalOpen) return;
+
+      soundAndFX.playParentCheer();
+      soundAndFX.triggerConfetti(this.container);
+      ebbinghausManager.addCoins(20);
+      ebbinghausManager.save();
+      statusText.innerHTML = `<span class="text-emerald-600 font-black text-sm">${roleName} 朗读得分：${score} 分！获得 20 凯茜星币！</span>`;
+      recordBtnLabel.textContent = "重新录音";
+      startRecordBtn.classList.remove("bg-rose-500", "animate-pulse");
+      if (glowBg) {
+        glowBg.classList.replace("opacity-100", "opacity-0");
+        glowBg.classList.remove("animate-pulse");
+      }
+      if (playbackBtnText) playbackBtnText.textContent = `回放【${roleName}】的朗读声音`;
+      playbackBtn.classList.remove("hidden");
+      isRecording = false;
     });
 
     this._on(playbackBtn, "click", () => {

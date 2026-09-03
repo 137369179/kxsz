@@ -103,7 +103,7 @@ describe("Bug Fix Regression Audits", () => {
       removeEventListener: () => {},
       appendChild: () => {},
       getBoundingClientRect: () => ({ left: 100, top: 200, width: 80, height: 40 }),
-      getContext: () => ({ clearRect: () => {}, beginPath: () => {}, moveTo: () => {}, lineTo: () => {}, stroke: () => {}, fill: () => {}, fillText: () => {}, setLineDash: () => {}, lineWidth: 1, strokeStyle: '#000', fillStyle: '#000', font: '12px sans-serif', save: () => {}, restore: () => {}, translate: () => {}, rotate: () => {}, arc: () => {}, closePath: () => {}, measureText: () => ({ width: 10 }) })
+      getContext: () => ({ clearRect: () => {}, beginPath: () => {}, moveTo: () => {}, lineTo: () => {}, stroke: () => {}, fill: () => {}, fillText: () => {}, strokeText: () => {}, setLineDash: () => {}, lineWidth: 1, strokeStyle: '#000', fillStyle: '#000', font: '12px sans-serif', save: () => {}, restore: () => {}, translate: () => {}, rotate: () => {}, arc: () => {}, closePath: () => {}, measureText: () => ({ width: 10 }) })
     };
   });
 

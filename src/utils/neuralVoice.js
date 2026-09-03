@@ -209,11 +209,11 @@ class NeuralVoiceEngine {
       this._recordSuccess();
       const ab = await res.arrayBuffer();
       const buf = await this._decode(ctx, ab);
-      // LRU 淘汰
+      // LRU 淘汰（Map 保持插入顺序，FIFO 淘汰最旧的）
       this._mem.set(key, { buffer: buf, lastUsed: Date.now() });
       if (this._mem.size > this._memMax) {
-        const oldest = [...this._mem.entries()].sort((a, b) => a[1].lastUsed - b[1].lastUsed)[0];
-        if (oldest) this._mem.delete(oldest[0]);
+        const firstKey = this._mem.keys().next().value;
+        if (firstKey) this._mem.delete(firstKey);
       }
       return buf;
     })();
@@ -454,8 +454,8 @@ class NeuralVoiceEngine {
         const buf = await this._decode(ctx, ab);
         this._mem.set(key, { buffer: buf, lastUsed: Date.now() });
         if (this._mem.size > this._memMax) {
-          const oldest = [...this._mem.entries()].sort((a, b) => a[1].lastUsed - b[1].lastUsed)[0];
-          if (oldest) this._mem.delete(oldest[0]);
+          const firstKey = this._mem.keys().next().value;
+          if (firstKey) this._mem.delete(firstKey);
         }
         buffers.push(buf);
       }

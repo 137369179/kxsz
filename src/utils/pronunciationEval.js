@@ -304,7 +304,8 @@ export class PronunciationAssessmentEngine {
       let sum = 0;
       for (let i = 0; i < this._activeFreqData.length; i++) sum += this._activeFreqData[i];
       return this._activeFreqData.length ? sum / this._activeFreqData.length : 0;
-    } catch {
+    } catch (e) {
+      console.warn("[PronunciationEval] getLiveVolume error:", e);
       return 0;
     }
   }

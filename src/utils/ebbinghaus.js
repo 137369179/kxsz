@@ -120,11 +120,15 @@ export class EbbinghausManager {
       // 旧存档补齐：用真实日期列表重算连胜（比历史字段可靠）
       merged.attendance.streakDays = this._calcStreak(merged.attendance.dates);
 
-      if (typeof merged.coins !== "number" || isNaN(merged.coins) || merged.coins < 0) {
+      if (typeof merged.coins !== "number" || isNaN(merged.coins) || merged.coins < 0 || !isFinite(merged.coins)) {
         merged.coins = defaultState.coins;
+      } else {
+        merged.coins = Math.min(Math.max(0, Math.floor(merged.coins)), 9999999);
       }
-      if (typeof merged.stars !== "number" || isNaN(merged.stars) || merged.stars < 0) {
+      if (typeof merged.stars !== "number" || isNaN(merged.stars) || merged.stars < 0 || !isFinite(merged.stars)) {
         merged.stars = defaultState.stars;
+      } else {
+        merged.stars = Math.min(Math.max(0, Math.floor(merged.stars)), 999999);
       }
 
       return merged;

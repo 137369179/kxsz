@@ -280,18 +280,26 @@ export class LearnModule extends BaseModule {
   }
 
   setStep(stepNum) {
-    this.markStepComplete(this.currentStep);
-    this.currentStep = stepNum;
-    this.saveProgress();
+    try {
+      this.markStepComplete(this.currentStep);
+      this.currentStep = stepNum;
+      this.saveProgress();
+    } catch (e) {
+      console.warn("[LearnModule] 保存进度失败:", e);
+    }
     this.render();
   }
 
   /** B1/B6 8 步闭环：推进到下一步（上限 8） */
   nextStep() {
     if (this.currentStep < 8) {
-      this.markStepComplete(this.currentStep);
-      this.currentStep++;
-      this.saveProgress();
+      try {
+        this.markStepComplete(this.currentStep);
+        this.currentStep++;
+        this.saveProgress();
+      } catch (e) {
+        console.warn("[LearnModule] 保存进度失败:", e);
+      }
       this.render();
     }
   }

@@ -464,7 +464,7 @@ class CathyAppManager extends BaseModule {
       soundAndFX.playPop();
     }
 
-    // 3 /
+    // 安全超时：防止动画卡死
     const FADE_TIMEOUT_MS = 3000;
     let _settled = false;
     const safetyTimeout = setTimeout(() => {
@@ -473,6 +473,8 @@ class CathyAppManager extends BaseModule {
       console.warn("[App] transition timeout — force resetting");
       overlay.remove();
       this.isTransitioning = false;
+      // 恢复到地图模式
+      this.currentMode = "map";
     }, FADE_TIMEOUT_MS);
 
     // Phase 1: Close curtain

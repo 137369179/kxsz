@@ -909,8 +909,9 @@ export class ParentModule extends BaseModule {
     const saveBtn = mainEl.querySelector("#btn-save-settings");
     if (saveBtn) {
       this._on(saveBtn, "click", () => {
-        const dailyTarget = parseInt(mainEl.querySelector("#select-daily-target")?.value || "3", 10);
-        const eyeTime = parseInt(mainEl.querySelector("#select-eye-time")?.value || "20", 10);
+        // 添加输入验证，防止恶意或异常数据
+        const dailyTarget = Math.min(5, Math.max(1, parseInt(mainEl.querySelector("#select-daily-target")?.value || "3", 10) || 3));
+        const eyeTime = Math.min(30, Math.max(15, parseInt(mainEl.querySelector("#select-eye-time")?.value || "20", 10) || 20));
         const tolerance = mainEl.querySelector("#select-stroke-tolerance")?.value || "toddler";
         const enablePlay = mainEl.querySelector("#check-enable-play")?.checked ?? true;
         const enableWrite = mainEl.querySelector("#check-enable-write")?.checked ?? true;
@@ -986,6 +987,16 @@ export class ParentModule extends BaseModule {
 
     const canvas = overlay.querySelector("#poster-canvas");
     const ctx = canvas.getContext("2d");
+
+    // HiDPI 支持：缩放 Canvas 以在 Retina 屏幕上获得清晰文字
+    const dpr = typeof window !== "undefined" ? (window.devicePixelRatio || 1) : 1;
+    if (dpr > 1) {
+      canvas.width = 600 * dpr;
+      canvas.height = 960 * dpr;
+      canvas.style.width = "600px";
+      canvas.style.height = "960px";
+      ctx.scale(dpr, dpr);
+    }
 
     // 1. 绘制背景暖橙渐变
     const bgGrad = ctx.createLinearGradient(0, 0, 0, 960);
@@ -1189,6 +1200,14 @@ export class ParentModule extends BaseModule {
     document.body.appendChild(overlay);
 
     const canvas = overlay.querySelector("#sync-qr-canvas");
+    // HiDPI 支持
+    const dpr = typeof window !== "undefined" ? (window.devicePixelRatio || 1) : 1;
+    if (dpr > 1) {
+      canvas.width = 220 * dpr;
+      canvas.height = 220 * dpr;
+      canvas.style.width = "220px";
+      canvas.style.height = "220px";
+    }
     drawQRCode(canvas, token, { size: 220, margin: 2, darkColor: "#78350f" });
 
     this._on(overlay.querySelector("#btn-close-sync-qr"), "click", () => overlay.remove());

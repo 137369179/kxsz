@@ -9,7 +9,7 @@
 import { CHARACTER_DATABASE } from "../data/characters.js";
 import { ebbinghausManager } from "../utils/ebbinghaus.js";
 import { soundAndFX } from "../utils/soundEngine.js";
-import { BaseModule } from "../utils/BaseModule.js";
+import { BaseModule, escapeHtml } from "../utils/BaseModule.js";
 import { DrillEngine } from "../utils/drillEngine.js";
 import { EVENTS } from "../utils/eventBus.js";
 import { GAME_ICONS } from "../utils/gameIcons.js";
@@ -314,7 +314,7 @@ export class ReviewModule extends BaseModule {
       }
 
       // 持久化（ebbinghausManager 会写 localStorage）
-      ebbinghausManager.saveProgress?.();
+      ebbinghausManager.save();
 
       if (perfect) {
         this.correctCount++;
@@ -387,6 +387,9 @@ export class ReviewModule extends BaseModule {
   }
 
   renderSummary() {
+    // 停止所有当前音频，防止音效重叠
+    soundAndFX.stopSpeaking?.();
+
     const __rvProgress = ebbinghausManager.progress;
     const __rvSpeakerIcon = soundAndFX.isMuted ? GAME_ICONS.speaker("w-5 h-5", true) : GAME_ICONS.speaker("w-5 h-5", false);
     const total = this.queue.length;

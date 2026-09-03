@@ -160,9 +160,17 @@ export class PKModule extends BaseModule {
 
   async handleAnswer(idx) {
     if (this.isAnimating) return;
+    if (idx < 0 || !this.targetChar) {
+      this.isAnimating = false;
+      return;
+    }
     this.isAnimating = true;
 
     const selected = this.options[idx];
+    if (!selected) {
+      this.isAnimating = false;
+      return;
+    }
     const isCorrect = selected.id === this.targetChar.id;
     const btns = this.container.querySelectorAll(".pk-option-btn");
     const targetBtn = btns[idx];
