@@ -211,7 +211,10 @@ class AudioDebugPanel {
   }
 
   mount(target = document.body) {
-    if (this.mounted) return;
+    // 防止重复挂载：若已挂载，先清理再重新挂载
+    if (this.mounted) {
+      this.unmount();
+    }
     this.mounted = true;
     const el = document.createElement("div");
     el.id = "audio-debug-panel";

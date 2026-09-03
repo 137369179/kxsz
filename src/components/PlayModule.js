@@ -14,7 +14,7 @@ import { POEMS_DATABASE } from "../data/poems.js";
 import { ebbinghausManager } from "../utils/ebbinghaus.js";
 import { soundAndFX } from "../utils/soundEngine.js";
 import { mountGameShell, showGameToast } from "./SharedShell.js";
-import { BaseModule } from "../utils/BaseModule.js";
+import { BaseModule, escapeHtml } from "../utils/BaseModule.js";
 import { GAME_ICONS } from "../utils/gameIcons.js";
 import { EVENTS } from "../utils/eventBus.js";
 import { RADICAL_FAMILIES } from "../data/radicalFamilies.js";
@@ -1009,8 +1009,8 @@ export class PlayModule extends BaseModule {
             
             <div class="mb-4 bg-purple-900/60 px-6 py-2 rounded-full border-2 border-purple-400/50 shadow-2xl flex items-center gap-3">
               <span class="text-xs font-bold text-purple-200">目标合成字：</span>
-              <span class="text-3xl font-black text-yellow-300 font-serif">${cur.target}</span>
-              <span class="text-xs font-bold text-purple-300">(${cur.pinyin})</span>
+              <span class="text-3xl font-black text-yellow-300 font-serif">${escapeHtml(cur.target)}</span>
+              <span class="text-xs font-bold text-purple-300">(${escapeHtml(cur.pinyin)})</span>
             </div>
 
             <div class="relative w-48 h-48 sm:w-56 sm:h-56 mb-4 flex flex-col items-center justify-center">
@@ -2431,14 +2431,14 @@ export class PlayModule extends BaseModule {
             <div class="relative my-6 flex flex-col items-center justify-center">
               
               <div id="family-stage-block" class="relative w-44 h-44 sm:w-52 sm:h-52 rounded-3xl bg-gradient-to-tr from-amber-200 via-amber-100 to-yellow-50 border-4 border-amber-400 shadow-[0_12px_36px_rgba(217,119,6,0.3)] flex flex-col items-center justify-center transition-all duration-500">
-                <span id="family-current-pinyin" class="text-xl sm:text-2xl font-black text-amber-700 mb-1">${currentFamily.pinyin}</span>
-                <span id="family-current-char" class="text-7xl sm:text-8xl font-black text-amber-950 font-serif drop-shadow-md">${currentFamily.rootChar}</span>
+                <span id="family-current-pinyin" class="text-xl sm:text-2xl font-black text-amber-700 mb-1">${escapeHtml(currentFamily.pinyin)}</span>
+                <span id="family-current-char" class="text-7xl sm:text-8xl font-black text-amber-950 font-serif drop-shadow-md">${escapeHtml(currentFamily.rootChar)}</span>
                 
                 <div id="family-sparkle-overlay" class="absolute inset-0 rounded-3xl pointer-events-none opacity-0 transition-opacity duration-300"></div>
               </div>
 
               <div id="family-mnemonic-bubble" class="mt-4 bg-emerald-50 border-2 border-emerald-300 px-5 py-2.5 rounded-2xl shadow-md text-xs sm:text-sm font-black text-emerald-950 text-center max-w-sm transition-all duration-300">
-                ${currentFamily.desc}
+                ${escapeHtml(currentFamily.desc)}
               </div>
 
             </div>
@@ -2580,12 +2580,12 @@ export class PlayModule extends BaseModule {
           targetCard.className = "family-member-card p-3 rounded-2xl border-2 transition-all flex items-center gap-3 bg-emerald-50/80 border-emerald-400 shadow-md animate-bounce-cathy cursor-pointer hover:scale-105";
           targetCard.innerHTML = `
             <div class="w-12 h-12 rounded-xl bg-white text-emerald-900 shadow flex flex-col items-center justify-center shrink-0 border border-emerald-200 font-serif">
-              <span class="text-xl font-black">${member.char}</span>
-              <span class="text-[9px] font-bold text-emerald-700">${member.pinyin}</span>
+              <span class="text-xl font-black">${escapeHtml(member.char)}</span>
+              <span class="text-[9px] font-bold text-emerald-700">${escapeHtml(member.pinyin)}</span>
             </div>
             <div class="flex flex-col flex-1 min-w-0">
-              <span class="text-xs font-black text-emerald-950 truncate">${member.word}</span>
-              <span class="text-[10px] text-gray-500 truncate">${member.radicalName}</span>
+              <span class="text-xs font-black text-emerald-950 truncate">${escapeHtml(member.word)}</span>
+              <span class="text-[10px] text-gray-500 truncate">${escapeHtml(member.radicalName)}</span>
             </div>
           `;
         }

@@ -44,6 +44,8 @@ export class AudioSafetyAndPersistence {
     };
     this._monitorTimer = null;
     this._deviceListenerBound = false;
+    // 保存监听器引用以便移除
+    this._boundDeviceListener = null;
   }
 
   // ---------------- 10.1  ----------------
@@ -162,10 +164,11 @@ export class AudioSafetyAndPersistence {
     if (this._deviceListenerBound) return;
     try {
       if (navigator.mediaDevices && typeof navigator.mediaDevices.addEventListener === "function") {
-        navigator.mediaDevices.addEventListener("devicechange", () => this._checkHeadphoneAndApply());
+        this._boundDeviceListener = () => this._checkHeadphoneAndApply();
+        navigator.mediaDevices.addEventListener("devicechange", this._boundDeviceListener);
         this._deviceListenerBound = true;
       }
-    } catch {}
+    } catch (e) { console.warn("[AudioSafety] devicechange listener error:", e); }
     // 500ms  (/)
     if (!this._monitorTimer) {
       this._monitorTimer = setInterval(() => this._healthTick(), 1000);
@@ -175,7 +178,18 @@ export class AudioSafetyAndPersistence {
   }
 
   stopDeviceMonitor() {
+    // 清理定时器
     if (this._monitorTimer) { clearInterval(this._monitorTimer); this._monitorTimer = null; }
+    // 清理设备变化监听器，防止内存泄漏
+    if (this._deviceListenerBound && this._boundDeviceListener) {
+      try {
+        if (navigator.mediaDevices) {
+          navigator.mediaDevices.removeEventListener("devicechange", this._boundDeviceListener);
+        }
+      } catch (e) { console.warn("[AudioSafety] removeEventListener error:", e); }
+      this._deviceListenerBound = false;
+      this._boundDeviceListener = null;
+    }
   }
 
   async _checkHeadphoneAndApply() {
