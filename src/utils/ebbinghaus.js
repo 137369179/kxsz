@@ -5,6 +5,7 @@
 import { eventBus, EVENTS } from "./eventBus.js";
 import { storageManager } from "./storageManager.js";
 import { findShopItem } from "../data/shop.js";
+import { fsrsCompleteCharacter, fsrsCompleteReview, fsrsGetDueIds } from "./fsrsScheduler.js";
 
 const STORAGE_KEY = "CATHY_LITERACY_USER_PROGRESS_V1";
 
@@ -21,7 +22,8 @@ export class EbbinghausManager {
   loadProgress() {
     let loaded = null;
     try {
-      const raw = storageManager.getItem(STORAGE_KEY);
+      const activeId = typeof storageManager.getActiveProfileId === "function" ? storageManager.getActiveProfileId() : null;
+      const raw = (activeId ? storageManager.getItem(`CATHY_LITERACY_PROGRESS_${activeId}`) : null) || storageManager.getItem(STORAGE_KEY);
       if (raw) loaded = JSON.parse(raw);
     } catch (e) {
       console.warn("读取本地进度失败，使用默认配置", e);
@@ -36,15 +38,19 @@ export class EbbinghausManager {
       currentLevelIndex: 1,
       profile: {
         name: "凯茜小勇士",
-        avatar: "assets/images/cathy_mascot.webp"
+        avatar: "assets/images/cathy_mascot.webp",
+        age: null,            // 实岁 3~10；null = 未设置，默认走 6 岁宽容模式
+        grade: null           // 幼儿园大班/一年级/... 可选
       },
       settings: {
         dailyCharTarget: 5,
         enablePlayStep: true,
         enableWriteStep: true,
+        enablePrewriteStep: true,    // 控笔训练总开关（家长可关）
         eyeProtectionMinutes: 20,
         audioLanguage: "mandarin",
-        soundEnabled: true
+        soundEnabled: true,
+        strokeTolerance: "standard"  // "strict" | "standard" | "kid" — 书写容差（HanziEngine 读取）
       },
       shop: {
         owned: ["av_cathy", "av_fairy", "av_hero", "frame_none"],
@@ -54,6 +60,12 @@ export class EbbinghausManager {
       attendance: { dates: [], streakDays: 0 },
       seenMedals: [], // 已在奖励城堡亮过相的勋章 id，避免重复弹解锁提示
       readBooks: [], // 已读绘本 id —— 绘本类勋章数据源
+      errorProfiles: {
+        confusedPairs: {},        // { targetChar: { wrongChar: count } }
+        reverseStrokeErrors: {},  // { charId: count }
+        pronunciationErrors: {},  // { charId: count }
+        updatedAt: 0
+      },
       charRecords: {
         char_001: {
           charId: "char_001",
@@ -95,7 +107,8 @@ export class EbbinghausManager {
           streakDays: (loaded.attendance && loaded.attendance.streakDays) || 0
         },
         seenMedals: Array.isArray(loaded.seenMedals) ? loaded.seenMedals : [],
-        readBooks: Array.isArray(loaded.readBooks) ? loaded.readBooks : []
+        readBooks: Array.isArray(loaded.readBooks) ? loaded.readBooks : [],
+        errorProfiles: loaded.errorProfiles || { ...defaultState.errorProfiles }
       };
       // Daily reset: new day → reset today's counters
       if (merged.lastActiveDate !== today) {
@@ -105,6 +118,14 @@ export class EbbinghausManager {
       }
       // 旧存档补齐：用真实日期列表重算连胜（比历史字段可靠）
       merged.attendance.streakDays = this._calcStreak(merged.attendance.dates);
+
+      if (typeof merged.coins !== "number" || isNaN(merged.coins) || merged.coins < 0) {
+        merged.coins = defaultState.coins;
+      }
+      if (typeof merged.stars !== "number" || isNaN(merged.stars) || merged.stars < 0) {
+        merged.stars = defaultState.stars;
+      }
+
       return merged;
     }
 
@@ -114,9 +135,50 @@ export class EbbinghausManager {
   save() {
     try {
       storageManager.putJSON(STORAGE_KEY, this.progress);
+      if (typeof storageManager.getActiveProfileId === "function") {
+        const activeId = storageManager.getActiveProfileId();
+        if (activeId) {
+          storageManager.putJSON(`CATHY_LITERACY_PROGRESS_${activeId}`, this.progress);
+        }
+      }
     } catch (e) {
       console.error("保存进度失败", e);
     }
+  }
+
+  // ------------------------------------------------------------
+  // B1 铁律：年龄适配 + 控笔开关便捷接口
+  // ------------------------------------------------------------
+
+  /** 返回实岁 (3~10)，未设置则回退到 6（宽容模式） */
+  getAge() {
+    const age = this.progress?.profile?.age;
+    const n = Number(age);
+    if (!Number.isFinite(n) || n <= 0) return 6;
+    return Math.max(3, Math.min(10, Math.round(n)));
+  }
+
+  /**
+   * B1/B6 铁律：根据年龄返回书写阶段
+   *  - "prewrite_only"  → <5 岁：只做控笔训练，禁止进描红
+   *  - "guided_trace"   → 5~6 岁：田字格 + 宽容容差，引导式描红
+   *  - "full_trace"     → >=7 岁：米字格 + 正常容差，完整描红
+   */
+  getWritingStage() {
+    const age = this.getAge();
+    if (age < 5) return "prewrite_only";
+    if (age < 7) return "guided_trace";
+    return "full_trace";
+  }
+
+  /** 控笔训练是否开启（家长可关） */
+  isPrewriteEnabled() {
+    return !!this.progress?.settings?.enablePrewriteStep;
+  }
+
+  /** 仅 <5 岁时强制跳过描红（B1 铁律硬约束） */
+  isWriteBlockedByAge() {
+    return this.getWritingStage() === "prewrite_only";
   }
 
   // ------------------------------------------------------------
@@ -174,15 +236,27 @@ export class EbbinghausManager {
   }
 
   addCoins(amount = 10) {
-    this.progress.coins = (this.progress.coins || 0) + amount;
+    const validAmount = Number(amount) || 0;
+    this.progress.coins = Math.max(0, Math.floor((this.progress.coins || 0) + validAmount));
     this.save();
     eventBus.emit(EVENTS.PROGRESS_CHANGED, { progress: this.progress });
     return this.progress.coins;
   }
 
+  /** 扣除金币数量 */
+  deductCoins(amount = 0) {
+    const validAmount = Math.max(0, Number(amount) || 0);
+    this.progress.coins = Math.max(0, Math.floor((this.progress.coins || 0) - validAmount));
+    this.save();
+    eventBus.emit(EVENTS.PROGRESS_CHANGED, { progress: this.progress });
+    return this.progress.coins;
+  }
+
+
   /** 增加星星数量 */
   addStars(amount = 1) {
-    this.progress.stars = (this.progress.stars || 0) + amount;
+    const validAmount = Number(amount) || 0;
+    this.progress.stars = Math.max(0, Math.floor((this.progress.stars || 0) + validAmount));
     this.save();
     eventBus.emit(EVENTS.PROGRESS_CHANGED, { progress: this.progress });
     return this.progress.stars;
@@ -191,20 +265,29 @@ export class EbbinghausManager {
   // 每日签到 — 计算连续天数、奖励星币
   doSignIn() {
     if (this.progress.todaySignedIn) return;
-    const today = new Date().toDateString();
+    // 使用 ISO 格式 (YYYY-MM-DD) 统一日期键，与 attendance.dates 保持一致，避免 toDateString 跨午夜或 locale 差异
+    const today = this._todayKey();
     const lastDate = this.progress.lastSignInDate;
-    const yesterday = new Date(Date.now() - 86400000).toDateString();
-    // Streak: only continues if signed in yesterday
+
+    // 计算昨天的 ISO key
+    const yesterdayDate = new Date();
+    yesterdayDate.setDate(yesterdayDate.getDate() - 1);
+    const yesterday = this._fmtKey(yesterdayDate);
+
+    // Streak: only continues if signed in yesterday (使用 ISO 键判定跨日一致)
     if (lastDate === yesterday) {
       this.progress.signInStreak = (this.progress.signInStreak || 0) + 1;
     } else if (lastDate !== today) {
+      this.progress.signInStreak = 1;
+    } else if (typeof this.progress.signInStreak !== "number") {
+      // 兼容老存档 (lastDate === today 但 signInStreak 未初始化)
       this.progress.signInStreak = 1;
     }
     this.progress.lastSignInDate = today;
     this.progress.todaySignedIn = true;
     this.markTodayActive(); // 签到同样点亮热力日历
     // Bonus: 5 base + streak bonus
-    const bonus = 5 + Math.min(this.progress.signInStreak - 1, 10);
+    const bonus = 5 + Math.min((this.progress.signInStreak || 1) - 1, 10);
     this.addCoins(bonus);
     this.save();
     eventBus.emit(EVENTS.PROGRESS_CHANGED, { progress: this.progress });
@@ -219,46 +302,41 @@ export class EbbinghausManager {
     const todayLabel = days[new Date().getDay()];
     const hist = this.progress.studyHistory || [];
     const dayEntry = hist.find(h => h.date === todayLabel);
-    if (dayEntry) dayEntry.count = this.progress.todayLearnedCount;
+    if (dayEntry) {
+      dayEntry.count = this.progress.todayLearnedCount;
+    } else {
+      hist.push({ date: todayLabel, count: this.progress.todayLearnedCount });
+      this.progress.studyHistory = hist;
+    }
     this.save();
     eventBus.emit(EVENTS.PROGRESS_CHANGED, { progress: this.progress });
   }
 
-  // 完成一个汉字的学习
+  // 完成一个汉字的学习（E2: 委托 FSRS 调度，旧兼容字段同步写入）
   completeCharacter(charId, starsEarned = 3) {
-    this.markTodayActive(); // 学字即打卡，点亮连胜日历
-    const now = Date.now();
+    this.markTodayActive();
     const existing = this.progress.charRecords[charId] || {
       charId,
-      learnedAt: now,
+      learnedAt: Date.now(),
       reviewCount: 0,
       correctStreak: 0,
       masteryRate: 75,
-      nextReviewDate: now + 86400000, // 次日复习
+      nextReviewDate: Date.now() + 86400000,
       isDifficult: false
     };
-
-    existing.reviewCount += 1;
-    existing.correctStreak += 1;
-    existing.masteryRate = Math.min(100, existing.masteryRate + 15);
-    // 艾宾浩斯间隔：1天 -> 2天 -> 4天 -> 7天 -> 15天
-    const intervals = [1, 2, 4, 7, 15, 30];
-    const days = intervals[Math.min(existing.reviewCount, intervals.length - 1)];
-    existing.nextReviewDate = now + days * 86400000;
-
-    this.progress.charRecords[charId] = existing;
+    // FSRS 调度（替换固定间隔表 [1,2,4,7,15,30]）
+    const updated = fsrsCompleteCharacter(existing, starsEarned);
+    this.progress.charRecords[charId] = updated;
     this.progress.coins = (this.progress.coins || 0) + 10;
     this.progress.stars = (this.progress.stars || 0) + starsEarned;
     this.progress.todayLearnedCount = (this.progress.todayLearnedCount || 0) + 1;
-
-    // 解锁下一关
-    this.progress.currentLevelIndex = Math.max(this.progress.currentLevelIndex, Object.keys(this.progress.charRecords).length + 1);
-
+    this.progress.currentLevelIndex = Math.min(1490, Math.max(this.progress.currentLevelIndex, Object.keys(this.progress.charRecords).length + 1));
     this.save();
     eventBus.emit(EVENTS.PROGRESS_CHANGED, { progress: this.progress });
-    return existing;
+    return updated;
   }
 
+  // 完成一次复习（E2: 委托 FSRS 调度）
   completeReview(charId, isCorrect = true) {
     const record = this.progress.charRecords[charId] || {
       charId,
@@ -269,24 +347,10 @@ export class EbbinghausManager {
       nextReviewDate: Date.now() + 86400000,
       isDifficult: false
     };
-
-    if (isCorrect) {
-      record.reviewCount += 1;
-      record.correctStreak += 1;
-      record.masteryRate = Math.min(100, record.masteryRate + 10);
-      record.isDifficult = false;
-      const intervals = [1, 2, 4, 7, 15, 30];
-      const days = intervals[Math.min(record.reviewCount, intervals.length - 1)];
-      record.nextReviewDate = Date.now() + days * 86400000;
-    } else {
-      record.correctStreak = 0;
-      record.masteryRate = Math.max(20, record.masteryRate - 20);
-      record.isDifficult = true;
-      record.nextReviewDate = Date.now() + 86400000; // 次日重新复习
-    }
-
-    this.progress.charRecords[charId] = record;
+    const updated = fsrsCompleteReview(record, isCorrect);
+    this.progress.charRecords[charId] = updated;
     this.save();
+    return updated;
   }
 
   isDifficultChar(charId) {
@@ -321,12 +385,66 @@ export class EbbinghausManager {
     this.addDifficultChar(charId);
   }
 
-  // 获取待复习汉字队列
+  /**
+   * 记录儿童在特定场景下的做错行为，用于形成错因画像与精准靶向训练
+   * @param {string} charId - 汉字ID
+   * @param {"similar_confuse"|"reverse_stroke"|"pronunciation"} mistakeType
+   * @param {{targetChar?: string, selectedChar?: string, strokeIndex?: number}} details
+   */
+  recordMistake(charId, mistakeType, details = {}) {
+    if (!this.progress.errorProfiles) {
+      this.progress.errorProfiles = {
+        confusedPairs: {},
+        reverseStrokeErrors: {},
+        pronunciationErrors: {},
+        updatedAt: Date.now()
+      };
+    }
+    const ep = this.progress.errorProfiles;
+    if (mistakeType === "similar_confuse" && details.selectedChar) {
+      const targetChar = details.targetChar || charId;
+      if (!ep.confusedPairs[targetChar]) ep.confusedPairs[targetChar] = {};
+      ep.confusedPairs[targetChar][details.selectedChar] = (ep.confusedPairs[targetChar][details.selectedChar] || 0) + 1;
+    } else if (mistakeType === "reverse_stroke") {
+      ep.reverseStrokeErrors[charId] = (ep.reverseStrokeErrors[charId] || 0) + 1;
+    } else if (mistakeType === "pronunciation") {
+      ep.pronunciationErrors[charId] = (ep.pronunciationErrors[charId] || 0) + 1;
+    }
+    ep.updatedAt = Date.now();
+
+    // 主记录：重置连续正确、标记困难、扣分
+    const r = this.progress.charRecords[charId];
+    if (r) {
+      r.correctStreak = 0;
+      r.isDifficult = true;
+      r.masteryRate = Math.max(0, (r.masteryRate || 50) - 15);
+    }
+
+    this.save();
+  }
+
+  /**
+   * 提取当前孩子混淆频率最高的形近字对，供“火眼金睛辨异同”微关卡靶向出题
+   */
+  getTopConfusedPair() {
+    const ep = this.progress.errorProfiles?.confusedPairs;
+    if (!ep || Object.keys(ep).length === 0) return null;
+    let best = null;
+    let maxCount = 0;
+    for (const [target, map] of Object.entries(ep)) {
+      for (const [confused, count] of Object.entries(map)) {
+        if (count > maxCount) {
+          maxCount = count;
+          best = { target, confused, count };
+        }
+      }
+    }
+    return best;
+  }
+
+  // 获取待复习汉字队列（E2: 优先读 FSRS due 字段）
   getDueReviewCharIds() {
-    const now = Date.now();
-    return Object.values(this.progress.charRecords || {})
-      .filter((r) => r.nextReviewDate <= now || r.isDifficult)
-      .map((r) => r.charId);
+    return fsrsGetDueIds(this.progress.charRecords);
   }
 
   // 获取难字列表
