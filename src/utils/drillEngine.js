@@ -18,6 +18,7 @@
 import { soundAndFX } from "./soundEngine.js";
 import { ebbinghausManager } from "./ebbinghaus.js";
 import { GAME_ICONS } from "./gameIcons.js";
+import { getQuestionWeights, computeAdaptiveProfile } from "./difficultyEngine.js";
 
 const ROUNDS_PER_CHAR = 3;
 
@@ -34,6 +35,8 @@ const TYPE_META = {
   stroke_trace: { iconSvg: (cls) => GAME_ICONS.pen(cls), name: "笔画描红", tip: "跟着虚线，描出汉字笔画" },
   // T7 新增：主动回忆（听音写字/选字）
   audio_to_text: { iconSvg: (cls) => GAME_ICONS.mic(cls), name: "听音写字", tip: "听准发音，找出对应的汉字" },
+  // T3 新增：字义选字
+  meaning_pick: { iconSvg: (cls) => GAME_ICONS.book(cls), name: "字义选字", tip: "根据字义描述，找出对应的汉字" },
 };
 
 /** Fisher-Yates */
@@ -117,6 +120,8 @@ export class DrillEngine {
     this.char = charData;
     this.onComplete = onCompleteCallback;
     this.allChars = options.allChars || [];
+    // E15: 自适应难度
+    this.difficultyLevel = options.difficultyLevel || "medium";
 
     this.roundIndex = 0;
     this.combo = 0;
@@ -153,17 +158,47 @@ export class DrillEngine {
    */
   buildTypePool() {
     const c = this.char;
-    const pool = ["audio_choice", "similar_pick", "balloon_pop"];
+    const basePool = ["audio_choice", "similar_pick", "balloon_pop"];
 
-    if ((c.words || []).some((w) => w.word.includes(c.char))) pool.push("word_fill");
-    if ((c.sentence || "").includes(c.char)) pool.push("sentence_fill");
-    // E4 新增题型
-    if ((c.sentence || "").includes(c.char)) pool.push("cloze_hint");
-    if (c.pinyin && c.pinyin.length > 1) pool.push("pinyin_spell");
-    if (c.char && c.char.length === 1) pool.push("stroke_trace");
-    // T7 新增题型
-    if (c.pinyin) pool.push("audio_to_text");
-    return pool;
+    if ((c.words || []).some((w) => w.word.includes(c.char))) basePool.push("word_fill");
+    if ((c.sentence || "").includes(c.char)) basePool.push("sentence_fill");
+    if ((c.sentence || "").includes(c.char)) basePool.push("cloze_hint");
+    if (c.pinyin && c.pinyin.length > 1) basePool.push("pinyin_spell");
+    if (c.char && c.char.length === 1) basePool.push("stroke_trace");
+    if (c.pinyin) basePool.push("audio_to_text");
+    if (c.meanings && c.meanings.primary) basePool.push("meaning_pick");
+
+    // E15: 根据自适应难度加权重复
+    return this._applyDifficultyWeights(basePool);
+  }
+
+  // E15: 题型 → 难度等级映射
+  _difficultyOf(type) {
+    // recognition → easy, production → hard
+    const easy = new Set(["audio_choice", "similar_pick", "balloon_pop", "stroke_trace", "audio_to_text"]);
+    const hard = new Set(["pinyin_spell", "word_fill", "sentence_fill", "cloze_hint", "meaning_pick"]);
+    if (easy.has(type)) return "easy";
+    if (hard.has(type)) return "hard";
+    return "medium";
+  }
+
+  // E15: 按难度等级加权重复题型
+  _applyDifficultyWeights(basePool) {
+    const level = this.difficultyLevel;
+    // 权重倍率: easy level 时 easy 题型多来几次, hard level 时 hard 多来几次
+    const MULT = {
+      easy:   { easy: 2, medium: 1, hard: 1 },
+      medium: { easy: 1, medium: 1, hard: 1 },
+      hard:   { easy: 1, medium: 1, hard: 2 },
+    };
+    const mult = MULT[level] || MULT.medium;
+    const weighted = [];
+    for (const t of basePool) {
+      const bucket = this._difficultyOf(t);
+      const count = mult[bucket] || 1;
+      for (let i = 0; i < count; i++) weighted.push(t);
+    }
+    return weighted;
   }
 
   /**
@@ -373,6 +408,24 @@ export class DrillEngine {
       `;
     }
 
+    // T3 meaning_pick: 字义选字
+    if (type === "meaning_pick") {
+      const meaningText = c.meanings?.primary || "字义解析";
+      const hintText = c.meanings?.radicalHint ? `（提示：${c.meanings.radicalHint}）` : "";
+      return `
+        <div class="flex flex-col items-center gap-3 text-center px-4">
+          <div class="w-16 h-16 rounded-full bg-gradient-to-tr from-amber-400 to-orange-500 border-2 border-white shadow-lg flex items-center justify-center text-white">
+            ${GAME_ICONS.book("w-8 h-8")}
+          </div>
+          <div class="text-xs font-black text-amber-300">根据字义找汉字</div>
+          <h3 class="text-xl sm:text-2xl font-black text-white bg-black/40 px-6 py-3 rounded-2xl border border-amber-300/40">
+            “${meaningText}”
+          </h3>
+          ${hintText ? `<p class="text-xs text-amber-200/90 font-medium">${hintText}</p>` : ""}
+        </div>
+      `;
+    }
+
     // balloon_pop
     return `
       <div class="flex flex-col items-center gap-2">
@@ -446,6 +499,7 @@ export class DrillEngine {
       cloze_hint: `句子填空！提示拼音是"${c.pinyin}"，请选出正确的汉字！`,
       pinyin_spell: "拼音拼读！仔细听发音，选出声母和韵母！",
       stroke_trace: `笔画描红！请在画布上描出汉字"${c.char}"！`,
+      meaning_pick: `字义选字！根据字义描述，请选出对应的汉字！`,
     };
     const msg = text[type] || `请找出汉字"${c.char}"！`;
     soundAndFX.speakPriority(msg, { kind: "sentence", emotion: "gentle" });
