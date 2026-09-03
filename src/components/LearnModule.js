@@ -27,13 +27,15 @@ export class LearnModule extends BaseModule {
     this.onFinish = onFinishCallback;
     this.onBackToMap = onBackToMapCallback;
 
-    // B1/B6 铁律：7 步闭环（含控笔训练）
-    // 1:玩  2:认  3:读  4:练  5:控笔  6:写  7:测
+    // B1/B6 铁律：8 步闭环（玩/认/读/练/控笔/描红/独立写/测）
+    // 1:玩  2:认  3:读  4:练  5:控笔  6:描红  7:写  8:测
     this.currentStep = 1;
     this.hanziEngine = null;
     this.prewriteEngine = null;
     this.activePlayGame = null;
     this._isRecordingTransition = false;
+    // P0-2 B9 铁律：存真实朗读评测分数，避免 completeCharacter 硬编码 3 星
+    this._evalStars = 3;
   }
 
   destroy() {
@@ -95,8 +97,9 @@ export class LearnModule extends BaseModule {
               { step: 3, name: "读", iconSvg: (cls) => GAME_ICONS.speaker(cls) },
               { step: 4, name: "练", iconSvg: (cls) => GAME_ICONS.arcade(cls) },
               { step: 5, name: "控笔", iconSvg: (cls) => GAME_ICONS.hand(cls) },
-              { step: 6, name: "写", iconSvg: (cls) => GAME_ICONS.brush(cls) },
-              { step: 7, name: "测", iconSvg: (cls) => GAME_ICONS.chest(cls) }
+              { step: 6, name: "描红", iconSvg: (cls) => GAME_ICONS.brush(cls) },
+              { step: 7, name: "写", iconSvg: (cls) => GAME_ICONS.pen(cls) },
+              { step: 8, name: "测", iconSvg: (cls) => GAME_ICONS.chest(cls) }
             ]
               .map(
                 (s) => `
@@ -111,7 +114,7 @@ export class LearnModule extends BaseModule {
                   ${s.step < this.currentStep ? `<span class="flex items-center">${GAME_ICONS.star("w-4 h-4", false)}</span>` : `<span class="flex items-center">${s.iconSvg("w-4 h-4")}</span>`}
                 </div>
                 <span class="text-xs sm:text-sm font-black ${s.step === this.currentStep ? "text-yellow-300 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]" : "text-white/70"}">${s.name}</span>
-                ${s.step < 6 ? `<div class="w-2.5 sm:w-4 h-1 rounded-full ${s.step < this.currentStep ? "bg-gradient-to-r from-emerald-400 to-teal-300 shadow-[0_0_8px_rgba(52,211,153,0.8)]" : "bg-white/20"}"></div>` : ""}
+                ${s.step < 8 ? `<div class="w-2 sm:w-3 h-1 rounded-full ${s.step < this.currentStep ? "bg-gradient-to-r from-emerald-400 to-teal-300 shadow-[0_0_8px_rgba(52,211,153,0.8)]" : "bg-white/20"}"></div>` : ""}
               </div>
             `
               )
@@ -151,9 +154,9 @@ export class LearnModule extends BaseModule {
     this.render();
   }
 
-  /** B1/B6 7 步闭环：推进到下一步（上限 7） */
+  /** B1/B6 8 步闭环：推进到下一步（上限 8） */
   nextStep() {
-    if (this.currentStep < 7) {
+    if (this.currentStep < 8) {
       this.currentStep++;
       this.render();
     }
@@ -229,9 +232,12 @@ export class LearnModule extends BaseModule {
         this.renderStepPrewrite(stage);
         break;
       case 6:
-        this.renderStepWrite(stage);
+        this.renderStepTrace(stage);
         break;
       case 7:
+        this.renderStepFreeWrite(stage);
+        break;
+      case 8:
         this.renderStepTestAndChest(stage);
         break;
     }
@@ -1046,6 +1052,8 @@ export class LearnModule extends BaseModule {
 
     const score = typeof res.totalScore === "number" ? res.totalScore : (typeof res.score === "number" ? res.score : 0);
     const stars = typeof res.stars === "number" ? res.stars : (score >= 85 ? 3 : (score >= 60 ? 2 : (score >= 35 ? 1 : 0)));
+    // P0-2: 存真实评测结果，让宝箱 → completeCharacter 不再硬编码 3
+    this._evalStars = stars;
 
     if (micZone) micZone.classList.add("hidden");
     if (resultBox) resultBox.classList.remove("hidden");
@@ -1291,10 +1299,10 @@ export class LearnModule extends BaseModule {
     const blockedByAge = ebbinghausManager.isWriteBlockedByAge();
 
     // B1 铁律：5 岁以下儿童，控笔是全部，不进入描红步骤
-    const nextStepAfterPrewrite = blockedByAge ? 7 : 6;
+    const nextStepAfterPrewrite = blockedByAge ? 8 : 6;
     const nextStepLabel = blockedByAge
       ? `${char.char}字就学到这里啦，去领取宝箱奖励！`
-      : `小手准备好了吗？去写“${char.char}”字！`;
+      : `小手准备好了吗？去描红“${char.char}”字！`;
 
     soundAndFX.speakPriority(
       stageLabel === "prewrite_only"
@@ -1370,8 +1378,8 @@ export class LearnModule extends BaseModule {
             </button>
 
             <button id="btn-finish-prewrite" class="w-full bg-gradient-to-r from-amber-400 to-orange-500 text-white font-black text-sm py-3 rounded-full shadow-lg border-2 border-white active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer opacity-40 pointer-events-none">
-              <span>${nextStepAfterPrewrite === 7 ? GAME_ICONS.chest("w-4 h-4") : GAME_ICONS.brush("w-4 h-4")}</span>
-              <span id="txt-prewrite-next">完成训练去${nextStepAfterPrewrite === 7 ? "领宝箱" : "写字"}</span>
+              <span>${nextStepAfterPrewrite === 8 ? GAME_ICONS.chest("w-4 h-4") : GAME_ICONS.brush("w-4 h-4")}</span>
+              <span id="txt-prewrite-next">完成训练去${nextStepAfterPrewrite === 8 ? "领宝箱" : "描红"}</span>
             </button>
           </div>
         </div>
@@ -1424,7 +1432,7 @@ export class LearnModule extends BaseModule {
           );
         } else {
           soundAndFX.speakPriority(
-            "小手活动好了！接下来去写写字吧～",
+            "小手活动好了！接下来去描红写字吧～",
             { kind: "sentence", emotion: "encouraging" }
           );
         }
@@ -1432,7 +1440,7 @@ export class LearnModule extends BaseModule {
         if (finishBtn) {
           finishBtn.classList.remove("opacity-40", "pointer-events-none");
           finishBtn.classList.add("animate-bounce-cathy");
-          if (nextStepAfterPrewrite === 7) {
+          if (nextStepAfterPrewrite === 8) {
             finishBtn.innerHTML = `<span>${GAME_ICONS.chest("w-5 h-5")}</span><span>领宝箱！</span>`;
           }
         }
@@ -1530,9 +1538,9 @@ export class LearnModule extends BaseModule {
   }
 
   // ----------------------------------------------------------------
-  // STEP 6: 写 (AI 魔法星光毛笔描红 + 倒笔画拦截) —— B6 年龄自适应
+  // STEP 6: 描红 (AI 魔法星光毛笔描红 + 倒笔画拦截) —— B6 年龄自适应
   // ----------------------------------------------------------------
-  renderStepWrite(stage) {
+  renderStepTrace(stage) {
     const char = this.charData;
     soundAndFX.speakPriority(`魔法毛笔描红！请从发光起点开始，按照笔顺书写“${char.char}”字！`, { kind: "sentence", priority: 1 });
 
@@ -1559,9 +1567,9 @@ export class LearnModule extends BaseModule {
         <div class="w-72 flex flex-col justify-between h-full bg-white/80 backdrop-blur-md rounded-3xl p-6 border-2 border-amber-200 shadow-xl text-center">
           <div>
             <span class="bg-amber-100 text-amber-800 text-xs font-black px-4 py-1 rounded-full mb-3 inline-block flex items-center justify-center gap-1">
-              ${GAME_ICONS.pen("w-3.5 h-3.5 inline-block")} 魔法星光笔描红
+              ${GAME_ICONS.brush("w-3.5 h-3.5 inline-block")} 阶段一 · 有轨描红
             </span>
-            <h3 class="text-lg font-black text-amber-950 mb-2">规范笔顺写好字</h3>
+            <h3 class="text-lg font-black text-amber-950 mb-2">规范笔顺描红</h3>
             <p class="text-xs text-gray-600 leading-relaxed font-semibold">
               ${GAME_ICONS.sparkle("w-4 h-4 inline-block")} 沿黄色魔法光球滑行，遇到倒笔画系统会自动提示并拦截哦！
             </p>
@@ -1584,8 +1592,8 @@ export class LearnModule extends BaseModule {
             </button>
 
             <button id="btn-finish-write-step" class="w-full bg-gradient-to-r from-orange-500 via-amber-500 to-yellow-400 text-white font-black text-base py-3.5 rounded-full shadow-[0_8px_25px_rgba(245,158,11,0.6)] border-2 border-white active:scale-95 transition-all flex items-center justify-center gap-2 hidden animate-bounce-slow cursor-pointer hover:brightness-105">
-              <span class="flex items-center">${GAME_ICONS.chest("w-5 h-5")}</span>
-              <span>书写满分！去开通关宝箱</span>
+              <span class="flex items-center">${GAME_ICONS.pen("w-5 h-5")}</span>
+              <span>描红达标！去独立书写</span>
             </button>
           </div>
         </div>
@@ -1629,10 +1637,8 @@ export class LearnModule extends BaseModule {
     const _ws = ebbinghausManager.getWritingStage();
     if (this.hanziEngine) {
       if (_ws === "guided_trace") {
-        // 5-6 岁：田字格（更简单的定位）
         this.hanziEngine.gridType = "tian";
       }
-      // >=7 岁或默认：米字格
     }
 
     if (toggleGridBtn && txtGridType) {
@@ -1676,8 +1682,155 @@ export class LearnModule extends BaseModule {
     }
   }
 
+  // 向下兼容别名
+  renderStepWrite(stage) {
+    return this.renderStepTrace(stage);
+  }
+
   // ----------------------------------------------------------------
-  // STEP 7: 测 & 华丽黄金宝箱结算 (Duang! Duang! Duang! 飞星)
+  // STEP 7: 独立写 (无底模脱轨回忆书写 + 骨架还原评分 + 印章奖励)
+  // 教育学依据：B1 认知先于执笔 + B6 独立书写 + B9 测试回忆而非识别
+  // ----------------------------------------------------------------
+  renderStepFreeWrite(stage) {
+    const char = this.charData;
+    soundAndFX.speakPriority(`小书法家挑战！拿掉虚线，凭记忆在米字格里写出漂亮的“${char.char}”字！`, { kind: "sentence", priority: 1 });
+
+    stage.innerHTML = `
+      <div class="relative w-full max-w-5xl h-[520px] sm:h-[560px] bg-gradient-to-b from-amber-50 via-yellow-50 to-orange-50 rounded-3xl overflow-hidden shadow-2xl border-4 border-amber-300 flex items-center justify-between p-8 animate-fade-in select-none">
+        
+        <div class="flex-1 flex flex-col items-center justify-center">
+          <div class="mb-3 flex items-center gap-2 bg-black/40 px-4 py-1.5 rounded-full border border-white/20 shadow-md">
+            <span class="text-xs font-black text-amber-300">笔画回忆:</span>
+            <div id="freewrite-stroke-beads" class="flex items-center gap-1.5 flex-wrap justify-center">
+              ${char.strokes.map((s, idx) => `
+                <span class="stroke-bead px-2.5 py-0.5 rounded-full text-[11px] font-black border transition-all ${idx === 0 ? 'bg-amber-400 text-amber-950 border-white shadow-md animate-pulse' : 'bg-white/15 text-white/60 border-white/20'}" data-idx="${idx}">
+                  ${idx + 1}.${s.name}
+                </span>
+              `).join("")}
+            </div>
+          </div>
+
+          <div class="relative w-[340px] h-[340px] sm:w-[380px] sm:h-[380px] rounded-3xl overflow-hidden shadow-2xl border-4 border-amber-400 bg-white">
+            <canvas id="hanzi-freewrite-canvas" class="w-full h-full cursor-crosshair"></canvas>
+          </div>
+        </div>
+
+        <div class="w-72 flex flex-col justify-between h-full bg-white/80 backdrop-blur-md rounded-3xl p-6 border-2 border-amber-200 shadow-xl text-center">
+          <div>
+            <span class="bg-amber-100 text-amber-800 text-xs font-black px-4 py-1 rounded-full mb-3 inline-block flex items-center justify-center gap-1">
+              ${GAME_ICONS.pen("w-3.5 h-3.5 inline-block")} 阶段二 · 独立书写
+            </span>
+            <h3 class="text-lg font-black text-amber-950 mb-2">小书法家挑战</h3>
+            <p class="text-xs text-gray-600 leading-relaxed font-semibold">
+              没有虚线跟着写啦！凭小脑瓜里的记忆，一笔一画写出漂亮的“${char.char}”字！
+            </p>
+          </div>
+
+          <div class="flex flex-col gap-2.5">
+            <button id="btn-peek-guide" class="w-full bg-amber-50 hover:bg-amber-100 text-amber-900 font-black text-xs py-2.5 rounded-full border border-amber-300 shadow-sm active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer">
+              <span class="flex items-center">${GAME_ICONS.sparkle("w-3.5 h-3.5")}</span>
+              <span>偷偷看一眼提示 (2秒)</span>
+            </button>
+
+            <button id="btn-toggle-grid-free" class="w-full bg-amber-50 hover:bg-amber-100 text-amber-900 font-black text-xs py-2 rounded-full border border-amber-300 shadow-sm active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer">
+              <span class="flex items-center">${GAME_ICONS.pen("w-3.5 h-3.5")}</span>
+              <span id="txt-grid-type-free">当前格线：米字格 (切田字格)</span>
+            </button>
+
+            <button id="btn-reset-freewrite" class="w-full bg-amber-100 hover:bg-amber-200 text-amber-900 font-black text-xs py-2.5 rounded-full shadow-sm active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer">
+              <span class="flex items-center">${GAME_ICONS.brush("w-4 h-4")}</span>
+              <span>重写这一字</span>
+            </button>
+
+            <button id="btn-finish-freewrite-step" class="w-full bg-gradient-to-r from-orange-500 via-amber-500 to-yellow-400 text-white font-black text-base py-3.5 rounded-full shadow-[0_8px_25px_rgba(245,158,11,0.6)] border-2 border-white active:scale-95 transition-all flex items-center justify-center gap-2 hidden animate-bounce-slow cursor-pointer hover:brightness-105">
+              <span class="flex items-center">${GAME_ICONS.chest("w-5 h-5")}</span>
+              <span>独立书写大成功！去领通关宝箱</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+    `;
+
+    const canvas = stage.querySelector("#hanzi-freewrite-canvas");
+    const peekBtn = stage.querySelector("#btn-peek-guide");
+    const resetBtn = stage.querySelector("#btn-reset-freewrite");
+    const toggleGridBtn = stage.querySelector("#btn-toggle-grid-free");
+    const txtGridType = stage.querySelector("#txt-grid-type-free");
+    const nextBtn = stage.querySelector("#btn-finish-freewrite-step");
+    const beads = stage.querySelectorAll(".stroke-bead");
+
+    const updateBeads = (currentIdx) => {
+      beads.forEach((b, i) => {
+        if (i < currentIdx) {
+          b.className = "stroke-bead px-2.5 py-0.5 rounded-full text-[11px] font-black border bg-emerald-500 text-white border-white shadow-md";
+        } else if (i === currentIdx) {
+          b.className = "stroke-bead px-2.5 py-0.5 rounded-full text-[11px] font-black border bg-amber-400 text-amber-950 border-white shadow-md animate-pulse";
+        } else {
+          b.className = "stroke-bead px-2.5 py-0.5 rounded-full text-[11px] font-black border bg-white/15 text-white/60 border-white/20";
+        }
+      });
+    };
+
+    this.hanziEngine = new HanziEngine(
+      canvas,
+      char,
+      () => {
+        soundAndFX.triggerConfetti(this.container);
+        soundAndFX.playVictoryFanfare();
+        ebbinghausManager.addCoins(3);
+        soundAndFX.speakPriority(`太厉害了！小书法家独立写出了“${char.char}”字！`, { kind: "sentence", emotion: "excited" });
+        if (nextBtn) nextBtn.classList.remove("hidden");
+      },
+      (strokeIdx) => {
+        updateBeads(strokeIdx + 1);
+      },
+      { freeWrite: true }
+    );
+
+    const _ws = ebbinghausManager.getWritingStage();
+    if (this.hanziEngine && _ws === "guided_trace") {
+      this.hanziEngine.gridType = "tian";
+    }
+
+    if (toggleGridBtn && txtGridType) {
+      this._on(toggleGridBtn, "click", () => {
+        soundAndFX.playPop();
+        const type = this.hanziEngine.toggleGridType();
+        txtGridType.textContent = type === "mi" ? "当前格线：米字格 (切田字格)" : "当前格线：田字格 (切米字格)";
+      });
+    }
+
+    if (peekBtn) {
+      this._on(peekBtn, "click", () => {
+        soundAndFX.playPop();
+        soundAndFX.speakPriority(`小精灵给你提示一眼，看清楚笔顺马上写哦！`, { kind: "sentence", emotion: "gentle" });
+        if (this.hanziEngine) {
+          this.hanziEngine.peekGuide(2500);
+        }
+      });
+    }
+
+    if (resetBtn) {
+      this._on(resetBtn, "click", () => {
+        soundAndFX.playPop();
+        if (this.hanziEngine) this.hanziEngine.reset();
+        updateBeads(0);
+        if (nextBtn) nextBtn.classList.add("hidden");
+      });
+    }
+
+    if (nextBtn) {
+      this._on(nextBtn, "click", () => {
+        soundAndFX.playPop();
+        this.currentStep = 8;
+        this.render();
+      });
+    }
+  }
+
+  // ----------------------------------------------------------------
+  // STEP 8: 测 & 华丽黄金宝箱结算 (Duang! Duang! Duang! 飞星)
   // ----------------------------------------------------------------
   renderStepTestAndChest(stage) {
     const char = this.charData;
@@ -1752,35 +1905,44 @@ export class LearnModule extends BaseModule {
         soundAndFX.triggerConfetti(this.container);
         soundAndFX.triggerCoinFly(this.container);
 
-        // Duang! Duang! Duang! 依次点亮三星
+        // P0-2 B9 铁律：用真实评测分数，不再硬编码 3 星
+        const earnedStars = Math.max(0, Math.min(3, this._evalStars ?? 3));
+
+        // Duang! Duang! Duang! 依次点亮（按真实评测分数）
         this._timeout(() => {
-          soundAndFX.playStarEarned(1);
-          if (star1) {
-            star1.innerHTML = `<span class="flex items-center">${GAME_ICONS.star("w-12 h-12", false)}</span>`;
-            star1.classList.add("bg-yellow-400", "scale-125", "shadow-[0_0_20px_rgba(255,235,59,1)]");
+          if (earnedStars >= 1) {
+            soundAndFX.playStarEarned(1);
+            if (star1) {
+              star1.innerHTML = `<span class="flex items-center">${GAME_ICONS.star("w-12 h-12", false)}</span>`;
+              star1.classList.add("bg-yellow-400", "scale-125", "shadow-[0_0_20px_rgba(255,235,59,1)]");
+            }
           }
         }, 200);
 
         this._timeout(() => {
-          soundAndFX.playStarEarned(2);
-          if (star2) {
-            star2.innerHTML = `<span class="flex items-center">${GAME_ICONS.star("w-14 h-14", false)}</span>`;
-            star2.classList.add("bg-yellow-400", "scale-125", "shadow-[0_0_20px_rgba(255,235,59,1)]");
+          if (earnedStars >= 2) {
+            soundAndFX.playStarEarned(2);
+            if (star2) {
+              star2.innerHTML = `<span class="flex items-center">${GAME_ICONS.star("w-14 h-14", false)}</span>`;
+              star2.classList.add("bg-yellow-400", "scale-125", "shadow-[0_0_20px_rgba(255,235,59,1)]");
+            }
           }
         }, 600);
 
         this._timeout(() => {
-          soundAndFX.playStarEarned(3);
-          if (star3) {
-            star3.innerHTML = `<span class="flex items-center">${GAME_ICONS.star("w-12 h-12", false)}</span>`;
-            star3.classList.add("bg-yellow-400", "scale-125", "shadow-[0_0_20px_rgba(255,235,59,1)]");
+          if (earnedStars >= 3) {
+            soundAndFX.playStarEarned(3);
+            if (star3) {
+              star3.innerHTML = `<span class="flex items-center">${GAME_ICONS.star("w-12 h-12", false)}</span>`;
+              star3.classList.add("bg-yellow-400", "scale-125", "shadow-[0_0_20px_rgba(255,235,59,1)]");
+            }
           }
         }, 1000);
 
         this._timeout(() => {
           if (rewardCard) rewardCard.classList.remove("hidden");
-          ebbinghausManager.completeCharacter(char.id, 3);
-          this._busEmit(EVENTS.LEARN_FINISH, { charId: char.id, stars: 3 });
+          ebbinghausManager.completeCharacter(char.id, earnedStars);
+          this._busEmit(EVENTS.LEARN_FINISH, { charId: char.id, stars: earnedStars });
         }, 1400);
       });
     }
