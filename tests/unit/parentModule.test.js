@@ -50,10 +50,17 @@ describe("ParentModule (T18 家长中心与 AI 伴学日志)", () => {
     expect(html).toContain("btn-speak-ai-log");
   });
 
-  it("严守工程红线：ParentModule.js 零 Unicode Emoji", () => {
-    const filePath = path.resolve(__dirname, "../../src/components/ParentModule.js");
-    const content = fs.readFileSync(filePath, "utf-8");
+  it("严守工程红线：ParentModule 与 parentHub 零 Unicode Emoji", () => {
+    const files = [
+      path.resolve(__dirname, "../../src/components/ParentModule.js"),
+      path.resolve(__dirname, "../../src/utils/parentHub/parentGateUI.js"),
+      path.resolve(__dirname, "../../src/utils/parentHub/parentPoster.js"),
+      path.resolve(__dirname, "../../src/utils/parentHub/parentSync.js")
+    ];
     const emojiRegex = /[\u{1F300}-\u{1F64F}\u{1F680}-\u{1F6FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F900}-\u{1F9FF}\u{1F1E0}-\u{1F1FF}]/u;
-    expect(emojiRegex.test(content)).toBe(false);
+    for (const filePath of files) {
+      const content = fs.readFileSync(filePath, "utf-8");
+      expect(emojiRegex.test(content), filePath).toBe(false);
+    }
   });
 });
