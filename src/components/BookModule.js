@@ -24,7 +24,7 @@ import { g2p } from "../utils/g2p.js";
 import { pronunciationEval } from "../utils/pronunciationEval.js";
 import { storageManager } from "../utils/storageManager.js";
 import { rewardEngine } from "../utils/rewardEngine.js";
-
+import { checkBookReadiness, READING_STATUS } from "../utils/readingGatekeeper.js";
 export class BookModule extends BaseModule {
   constructor(container) {
     super(container);
@@ -125,6 +125,7 @@ export class BookModule extends BaseModule {
     this._addCleanup(destroyShell);
 
     const readBooks = ebbinghausManager.progress.readBooks || [];
+    const charRecords = ebbinghausManager.progress.charRecords || {};
 
     // 过滤阶段
     const filteredBooks = STORYBOOKS_DATABASE.filter((b) => {
@@ -208,6 +209,13 @@ export class BookModule extends BaseModule {
                   第 ${book.level || 1} 阶
                 </div>
 
+                ${(() => {
+                  const r = checkBookReadiness(book, charRecords);
+                  if (r.status === READING_STATUS.READY || r.status === READING_STATUS.EMPTY) return "";
+                  const color = r.status === READING_STATUS.PARTIAL ? "bg-sky-500" : "bg-rose-500";
+                  return `<div class="absolute bottom-2.5 left-2.5 ${color} text-white text-[10px] font-black px-2 py-0.5 rounded-full shadow-md">${r.status === "blocked" ? "🔒" : "📚"}${r.stats.unknownCount}字</div>`;
+                })()}
+
                 ${
                   isRead
                     ? `
@@ -272,16 +280,35 @@ export class BookModule extends BaseModule {
       });
     });
 
-    // 书籍点击进入阅读
+    // 书籍点击进入阅读（E11: gatekeeper 拦截）
     mainEl.querySelectorAll(".book-card").forEach((card) => {
       this._on(card, "click", () => {
         const bookId = card.dataset.bookId;
         this.currentBook = STORYBOOKS_DATABASE.find((b) => b.id === bookId);
+        const charRecords = ebbinghausManager.progress.charRecords || {};
+        const readiness = checkBookReadiness(this.currentBook, charRecords);
+
+        if (readiness.status === READING_STATUS.BLOCKED) {
+          // B10: 超过一半没学 → 引导去学
+          soundAndFX.playErrorSound?.();
+          showGameToast(this.container, readiness.message, { duration: 2800, icon: "📚" });
+          return;
+        }
+
         this.currentPageIndex = this.progressMap[bookId] || 0;
         this.isQuizMode = false;
         this.isCertificateMode = false;
         this.quizAnswered = false;
         this.currentQuizStage = 1;
+
+        // PARTIAL 模式 → 强制开拼音
+        if (readiness.status === READING_STATUS.PARTIAL) {
+          this.showPinyin = true;
+          showGameToast(this.container, readiness.message, { duration: 2500, icon: "📖" });
+        } else if (readiness.message) {
+          showGameToast(this.container, readiness.message, { duration: 1800, icon: "✨" });
+        }
+
         soundAndFX.playSuccessSound();
         this.render();
       });
