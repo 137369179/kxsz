@@ -7,8 +7,16 @@ export default defineConfig({
     environment: 'node',
     include: ['tests/**/*.test.js'],
     setupFiles: ['tests/setup.js'],
-    // singleFork：所有测试同进程串行，共享模块缓存 —— 字库详情层(2.8MB)只 transform 一次
-    pool: 'forks',
-    poolOptions: { forks: { singleFork: true } },
+    // threads：每个测试文件独立 worker 线程
+    // 天然隔离 global document / window / localStorage 等全局对象
+    // 之前 singleFork:true 把所有测试塞进同一个进程 → 全局污染
+    pool: 'threads',
+    poolOptions: {
+      threads: {
+        singleThread: false,
+        maxThreads: 4,
+        minThreads: 1,
+      },
+    },
   },
 })
