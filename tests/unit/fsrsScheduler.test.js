@@ -16,7 +16,7 @@
  * ─────────────────────────────────────────────────────────────
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import {
   FSRSState,
   FSRGRating,
@@ -446,6 +446,15 @@ describe('stabilityToInterval / intervalToStability 互逆', () => {
 import { isIntradayReview } from '../../src/utils/fsrsScheduler.js';
 
 describe('isIntradayReview — 同日复习识别', () => {
+  beforeEach(() => {
+    // 固定时间到 2026-09-03 15:00:00（下午3点，远离午夜边界）
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-09-03T15:00:00.000Z'));
+  });
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
   it('null lastReview → false（从未复习过）', () => {
     expect(isIntradayReview(null)).toBe(false);
     expect(isIntradayReview(undefined)).toBe(false);

@@ -1449,8 +1449,16 @@ class CathyAudioEngine {
   // ----------------------------------------------------
   // 7.  ()
   // ----------------------------------------------------
-  triggerCoinFly(container, startX = null, startY = null, count = 7) {
+  triggerCoinFly(container, startX = null, startY = null, count = 3) {
     if (typeof window === "undefined" || !document.body) return;
+
+    // 调研报告 §4 建议B：节流与视觉降噪，800ms 窗口内防止音画多重叠加过载
+    const now = Date.now();
+    if (this._lastCoinFlyTime && now - this._lastCoinFlyTime < 800) {
+      this.playCoinClink();
+      return;
+    }
+    this._lastCoinFlyTime = now;
 
     // 支持 triggerCoinFly(finishBtn, 5) 形式重载
     if (typeof startX === "number" && startY === null) {
