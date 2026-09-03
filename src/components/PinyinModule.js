@@ -529,10 +529,7 @@ export class PinyinModule extends BaseModule {
     // 1. 返回大地图
     const backBtn = mainEl.querySelector("#btn-pinyin-back");
     if (backBtn) {
-      this._on(backBtn, "click", () => {
-        soundAndFX.playPop();
-        this._busEmit(EVENTS.SWITCH_MODE, { mode: "map" });
-      });
+      this.bindBackButton(backBtn);
     }
 
     // 2. 切换主玩法标签

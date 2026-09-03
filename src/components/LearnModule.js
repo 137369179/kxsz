@@ -231,13 +231,13 @@ export class LearnModule extends BaseModule {
   }
 
   bindHeaderEvents() {
+    // 使用 BaseModule 统一的返回按钮绑定
     const backBtn = this.container.querySelector("#btn-learn-back-map");
     if (backBtn) {
-      this._on(backBtn, "click", () => {
-        soundAndFX.playPop();
-        if (this.hanziEngine) this.hanziEngine.destroy();
-        if (this.onBackToMap) this.onBackToMap();
-        else this._busEmit(EVENTS.SWITCH_MODE, { mode: "map" });
+      this.bindBackButton(backBtn, {
+        beforeEmit: () => {
+          if (this.hanziEngine) this.hanziEngine.destroy();
+        }
       });
     }
 
