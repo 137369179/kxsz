@@ -20,6 +20,7 @@
  *   3. 跨引擎调度（etymologyEngine / chantEngine / difficultyEngine / reportEngine）
  */
 
+import { buildEtymologyCard } from "./etymologyEngine.js";
 import { buildPlan, CHANT_MODES } from "./chantEngine.js";
 
 // ──────────────────────────────────────────────────────────
@@ -288,7 +289,7 @@ export async function assembleEnhanced(charItem, scene, opts = {}) {
   const enhancers = [];
 
   // E12: etymologyEngine → 补充 VISUAL_TIMELINE / chant
-  enhancers.push(import("./etymologyEngine.js").then(({ buildEtymologyCard }) => {
+  enhancers.push(Promise.resolve().then(() => {
     if (base.modalities[MODALITIES.VISUAL_TIMELINE] || base.modalities[MODALITIES.AUDITORY_CHANT]) {
       const etym = buildEtymologyCard(charItem);
       base.modalities[MODALITIES.VISUAL_TIMELINE] = {

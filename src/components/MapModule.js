@@ -184,7 +184,7 @@ export class MapModule extends BaseModule {
                     const yOffset = Math.sin(index * 0.8) * 40;
 
                     return `
-                    <div class="relative flex flex-col items-center justify-center group level-node shrink-0${isCurrent ? " is-current" : ""} cursor-pointer transition-transform duration-300 hover:scale-125" style="transform: translateY(${yOffset}px)" data-char-id="${charItem.id}">
+                    <div class="relative flex flex-col items-center justify-center group level-node shrink-0${isCurrent ? " is-current" : ""} cursor-pointer transition-transform duration-300 hover:scale-125" style="transform: translateY(${yOffset}px); content-visibility: auto; contain-intrinsic-size: auto 208px;" data-char-id="${charItem.id}">
                       
                       ${
                         isCurrent
