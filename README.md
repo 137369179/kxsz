@@ -4,12 +4,15 @@
 
 ## 功能特性
 
-- **世界大地图** — 三大主题岛屿（森林/小镇/太空），7 大地标快捷入口
-- **五步学习流** — 玩→认→练→写→测，沉浸式汉字教学闭环
-- **分级绘本馆** — 20+ 绘本，支持 Karaoke 逐字跟读
-- **字卡字典** — 50+ 汉字，支持部首/阶段/搜索筛选
-- **游乐场** — 5 种游戏模式（Boss 战/消消乐/PK 竞技/成语馆）
-- **家长中心** — PIN 码保护，学习数据分析，设置管理
+- **世界大地图** — 三大主题岛屿（启蒙森林/生活小镇/星际探索），全量 1490 字阶梯进阶
+- **八步微课闭环** — 玩→认→读→练→控笔→描红→独立写→测，遵循 B1（认知先于执笔）与 B6（年龄分阶书写）
+- **FSRS-6 智能复习** — 21 参数认知间隔重复算法，优先调度到期字与高频混淆字对
+- **奇趣拼音乐园** — 63 个声母、韵母、整体认读音节图鉴、四声调过山车与拼读大碰撞
+- **分级绘本馆** — 20+ 绘本，支持 Karaoke 逐字跟读与亲子录音
+- **字卡字典** — 全量 1490 汉字，支持部首/阶段/拼音/搜索与字帖一键排版打印
+- **游乐场** — 5 种微游戏（Boss 战/消消乐/PK 竞技/成语接龙/部首家族）
+- **同音字特训** — 意符线索与情境挖空，突破目/木、石/十、在/再等常见易混难点
+- **家长中心** — 算术门禁、数据罗盘、AI 伴学诊断日志与 A4 规范字帖打印工坊
 - **PWA 离线支持** — 首次访问后完全离线可用
 
 ## 技术架构
@@ -17,28 +20,38 @@
 ```
 src/
 ├── app.js              # 主控制器（路由/生命周期/事件总线）
-├── components/         # 9 个功能模块
+├── components/         # 10 个核心业务模块
 │   ├── MapModule.js    # 世界大地图
-│   ├── LearnModule.js  # 五步学习流
-│   ├── BookModule.js   # 绘本馆
-│   ├── PlayModule.js   # 游乐场
-│   ├── CardModule.js   # 字卡库
-│   ├── ParentModule.js # 家长中心
-│   ├── RewardModule.js # 奖励城堡
-│   ├── ReviewModule.js # 复习中心
-│   └── PKModule.js     # PK 对战
-├── utils/              # 工具层
-│   ├── BaseModule.js   # 模块基类（生命周期管理）
-│   ├── EventBus.js     # 全局事件总线
-│   ├── soundEngine.js  # 六级音频总线引擎
-│   ├── neuralVoice.js  # 神经童声 TTS
-│   ├── ebbinghaus.js   # 艾宾浩斯复习调度
-│   ├── hanziEngine.js  # 笔顺描红引擎
-│   └── storageManager.js  # 统一存储层
-└── data/               # 静态数据
-    ├── characters.js   # 50 字字库（音/形/义/笔顺/游戏）
-    ├── books.js        # 绘本数据
-    └── idioms.js       # 成语数据
+│   ├── LearnModule.js  # 8 步微课学习流（支持断点续学）
+│   ├── BookModule.js   # 分级绘本馆
+│   ├── PlayModule.js   # 游戏游乐场
+│   ├── CardModule.js   # 1490 字卡字典
+│   ├── ParentModule.js # 家长中心与 AI 伴学日志
+│   ├── RewardModule.js # 奖励城堡与成长荣誉
+│   ├── ReviewModule.js # FSRS-6 智能复习中心
+│   ├── PKModule.js     # 初学者安全对战竞技场
+│   └── PinyinModule.js # 奇趣拼音乐园
+├── utils/              # 核心引擎与教育学工具层
+│   ├── fsrsScheduler.js   # FSRS-6 认知记忆调度器
+│   ├── ebbinghaus.js      # 艾宾浩斯复习调度管理器
+│   ├── hanziEngine.js     # 笔顺方向角容差验证与描红引擎
+│   ├── prewriteEngine.js  # 控笔训练与 Letter School 运笔演示
+│   ├── drillEngine.js     # 10 种题型闪卡与主动回忆练习引擎
+│   ├── soundEngine.js     # 六级音频总线引擎（零第三方依赖）
+│   ├── pronunciationEval.js # 麦克风多维度语音评测（写回真实成绩）
+│   ├── mascotProgress.js  # 凯茜内在动机与专属表情故事系统 (T13)
+│   ├── etymologyQuiz.js   # 象形字源与意符字理问答微交互 (T15)
+│   ├── voiceGuide.js      # 3-7 岁儿童全流程智能语音引导 (T16)
+│   ├── homophoneTrainer.js # 同音字辨析专项特训引擎 (T17)
+│   ├── BaseModule.js      # 模块基类（生命周期统一清理）
+│   ├── eventBus.js        # 全局事件总线
+│   └── storageManager.js  # 统一存储持久化层
+└── data/               # 核心字库与课程数据
+    ├── characters.js      # 全量 1490 字核心数据库
+    ├── charactersSchema.js # 字库数据标准与验证规范 (T3)
+    ├── pinyinList.js      # 63 拼音数据库
+    ├── books.js           # 分级绘本数据
+    └── idioms.js          # 成语故事数据
 ```
 
 ### 核心设计
