@@ -35,3 +35,6 @@ __pycache__/
 # Session memory (local)
 .workbuddy/memory/
 dist/
+
+# Vitest runtime temp config files
+vitest.config.js.timestamp-*.mjs

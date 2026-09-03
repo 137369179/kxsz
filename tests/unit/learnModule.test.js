@@ -6,6 +6,9 @@ setupTestDom();
 import { LearnModule } from "../../src/components/LearnModule.js";
 import { soundAndFX } from "../../src/utils/soundEngine.js";
 import { CHARACTER_DATABASE } from "../../src/data/characters.js";
+import { ensureDetails } from "../../src/utils/charDetailLoader.js";
+
+await ensureDetails();
 
 describe("LearnModule (六步闭环识字学习)", () => {
   let container;

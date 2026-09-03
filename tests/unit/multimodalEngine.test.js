@@ -7,6 +7,9 @@ import {
   forChar,
 } from '../../src/utils/multimodalEngine.js';
 import { CHARACTER_DATABASE } from '../../src/data/characters.js';
+import { ensureDetails } from '../../src/utils/charDetailLoader.js';
+
+await ensureDetails();
 
 // ──────────────────────────────────────────────────────────
 // E17 多模态融合
