@@ -17,6 +17,7 @@ import { GAME_ICONS } from "../utils/gameIcons.js";
 import { printWorksheet, getTodayWorksheetChars, getDifficultWorksheetChars } from "../utils/worksheetGenerator.js";
 import { drawQRCode } from "../utils/qrCode.js";
 import { storageManager } from "../utils/storageManager.js";
+import { rewardEngine } from "../utils/rewardEngine.js";
 
 const TROPHY_LIST = [
   { id: "first_char", name: "识字小萌新", desc: "学会第 1 个汉字", req: "1 个字", icon: "star" },

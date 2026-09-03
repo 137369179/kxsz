@@ -692,6 +692,85 @@ _DOT_MAX_LEN = 26.0
 _TI_MIN_DEG = 18.0
 
 
+def build_meanings(char, char_type, radical, story, words):
+    """P0-3: 从已有数据自动提炼字义（零外部词典依赖）。
+
+    输出字段：
+      primary     — 本义（一句话，从 story 提炼 / 按字形类别模板生成）
+      extended    — 延伸义（常用组词提示，优先 words[0]，退化到 char 自身）
+      radicalHint — 部首关联（RADICAL_MEANINGS 的 rad_tip，帮助形旁表义理解）
+      mnemonic    — 记忆口诀（从 story 压缩，30字以内）
+    """
+    # --- primary（本义）---
+    primary = ""
+    if story:
+        # 从叙事型 story 抓核心：
+        #   "代表XX" / "表示XX" / "就是XX" / "这就是X"
+        #   也尝试从结尾提取："就是'X'字" 之前的部分
+        for pat in (r"代表[，,]?([^，。！？]{1,20})",
+                    r"表示[，,]?([^，。！？]{1,20})",
+                    r"就是[，,]?([^，。！？]{1,20})",
+                    r"意思是[，,]?([^，。！？]{1,20})",
+                    r"这就是" + re.escape(char) + r"(.{1,10})",
+                    r"的由来"):
+            m = re.search(pat, story)
+            if m and m.group(1).strip("，。！？"):
+                primary = m.group(1).strip("，。！？")
+                break
+
+    if not primary:
+        # 从 story 里最后一个逗号后面取（通常是"就是'X'字"这类收尾）
+        if story:
+            tail = story.split("，")[-1].strip()
+            if 3 <= len(tail) <= 20 and char not in tail[:-2]:
+                primary = tail.replace("字的由来", "").strip()
+
+    if not primary:
+        # 按字形类别兜底模板
+        _TPL = {
+            "pictograph": f"古人画一个图画表示「{char}」",
+            "ideograph":  f"用符号表示「{char}」的意思",
+            "compound":   f"两个部件合起来表示「{char}」",
+            "phono":      f"形旁表义、声旁表音的形声字，表示「{char}」",
+        }
+        primary = _TPL.get(char_type, f"表示「{char}」这个意思")
+
+    # --- extended（延伸义）---
+    extended = ""
+    if words:
+        w0 = words[0].get("word", "") if isinstance(words[0], dict) else str(words[0])
+        if w0 and w0 != char:
+            extended = f"常见词语：{w0}"
+
+    # --- radicalHint（部首关联）---
+    rad_entry = RADICAL_MEANINGS.get(radical)
+    if rad_entry:
+        rad_name, rad_tip = rad_entry
+        radical_hint = f"{rad_name}，{rad_tip}"
+    else:
+        # 部首没在 RADICAL_MEANINGS 里时，用字符类型做 fallback
+        radical_hint = f"部首「{radical}」，是「{char}」的核心部件"
+
+    # --- mnemonic（记忆口诀）---
+    mnemonic = ""
+    if story:
+        # story 无句号时取第一个逗号前的子句（通常是"古人看到..."开头）
+        first_clause = story.split("，")[0]
+        # 去掉开头的"古人看到/观察/发现"等冗余动词
+        first_clause = re.sub(r"^(古人|人们|我们)看到[的]?", "", first_clause)
+        first_clause = re.sub(r"^(古人|人们|我们)(观察|发现|便根据)", "", first_clause)
+        first_clause = first_clause.strip()
+        if 4 <= len(first_clause) <= 30:
+            mnemonic = first_clause
+
+    return {
+        "primary": primary,
+        "extended": extended,
+        "radicalHint": radical_hint,
+        "mnemonic": mnemonic,
+    }
+
+
 def _to_canvas(pt):
     """1024 网格原始点 → 渲染器 0-100 空间（y 轴翻转 + 标定仿射）。
 
@@ -1153,7 +1232,7 @@ def build():
                         row["charType"], STORY_TEMPLATES["pictograph"]
                     ).format(
                         char=row["char"], emoji=row["emoji"],
-                        radical=row["radical"], pinyin=py_tone(row["char"]),
+                        radical=row["radical"], pinyin=char_pinyin,
                         rad_name=rad_name, rad_tip=rad_tip,
                     ),
                     "oracleDesc": desc4[0],
@@ -1161,6 +1240,18 @@ def build():
                     "sealDesc": desc4[2],
                     "modernDesc": desc4[3],
                 },
+                # P0-3 B3 铁律：自动生成字义（从已有数据提炼，零外部依赖）
+                "meanings": build_meanings(
+                    row["char"], row["charType"], row["radical"],
+                    row["story"] if row["story"] not in ("-", "") else STORY_TEMPLATES.get(
+                        row["charType"], STORY_TEMPLATES["pictograph"]
+                    ).format(
+                        char=row["char"], emoji=row["emoji"],
+                        radical=row["radical"], pinyin=char_pinyin,
+                        rad_name=rad_name, rad_tip=rad_tip,
+                    ),
+                    words,
+                ),
                 "words": words,
                 "sentence": sentence,
                 "strokes": build_strokes(sd["medians"]),

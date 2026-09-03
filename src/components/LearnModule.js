@@ -19,6 +19,7 @@ import { GAME_ICONS } from "../utils/gameIcons.js";
 import { pronunciationEval } from "../utils/pronunciationEval.js";
 import { openMorphTheater } from "../utils/morphEngine.js";
 import { createPlayGame } from "../utils/playGames/index.js";
+import { storageManager } from "../utils/storageManager.js";
 
 export class LearnModule extends BaseModule {
   constructor(container, charData, onFinishCallback, onBackToMapCallback) {
@@ -30,12 +31,48 @@ export class LearnModule extends BaseModule {
     // B1/B6 铁律：8 步闭环（玩/认/读/练/控笔/描红/独立写/测）
     // 1:玩  2:认  3:读  4:练  5:控笔  6:描红  7:写  8:测
     this.currentStep = 1;
+    this.completedSteps = [];
     this.hanziEngine = null;
     this.prewriteEngine = null;
     this.activePlayGame = null;
     this._isRecordingTransition = false;
     // P0-2 B9 铁律：存真实朗读评测分数，避免 completeCharacter 硬编码 3 星
     this._evalStars = 3;
+
+    // T8: 3 分钟微课断点续学
+    const saved = this.loadProgress();
+    if (saved && typeof saved.currentStep === "number" && saved.currentStep >= 1 && saved.currentStep <= 8) {
+      this.currentStep = saved.currentStep;
+      this.completedSteps = Array.isArray(saved.completedSteps) ? saved.completedSteps : [];
+    }
+  }
+
+  saveProgress() {
+    if (!this.charData?.id) return;
+    const saved = {
+      charId: this.charData.id,
+      completedSteps: this.completedSteps || [],
+      currentStep: this.currentStep,
+      lastUpdated: Date.now(),
+    };
+    storageManager.setItem(`learn_progress_${this.charData.id}`, saved);
+  }
+
+  loadProgress() {
+    if (!this.charData?.id) return null;
+    return storageManager.getItem(`learn_progress_${this.charData.id}`);
+  }
+
+  markStepComplete(stepIdx) {
+    if (!this.completedSteps.includes(stepIdx)) {
+      this.completedSteps.push(stepIdx);
+    }
+    this.saveProgress();
+  }
+
+  clearProgress() {
+    if (!this.charData?.id) return;
+    storageManager.removeItem(`learn_progress_${this.charData.id}`);
   }
 
   destroy() {
@@ -150,14 +187,18 @@ export class LearnModule extends BaseModule {
   }
 
   setStep(stepNum) {
+    this.markStepComplete(this.currentStep);
     this.currentStep = stepNum;
+    this.saveProgress();
     this.render();
   }
 
   /** B1/B6 8 步闭环：推进到下一步（上限 8） */
   nextStep() {
     if (this.currentStep < 8) {
+      this.markStepComplete(this.currentStep);
       this.currentStep++;
+      this.saveProgress();
       this.render();
     }
   }
@@ -1941,6 +1982,7 @@ export class LearnModule extends BaseModule {
 
         this._timeout(() => {
           if (rewardCard) rewardCard.classList.remove("hidden");
+          this.clearProgress();
           ebbinghausManager.completeCharacter(char.id, earnedStars);
           this._busEmit(EVENTS.LEARN_FINISH, { charId: char.id, stars: earnedStars });
         }, 1400);

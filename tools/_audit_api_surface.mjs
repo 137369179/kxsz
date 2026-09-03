@@ -128,7 +128,12 @@ for (const f of modified) {
       const method = m[1];
       if (builtins.has(method)) continue;
       let exists = false;
-      try { exists = method in val || (val && typeof val === "object" && Object.prototype.hasOwnProperty.call(val, method)) || (typeof val === "function" && method in val); } catch {}
+      try {
+        exists = method in val ||
+          (typeof val === "function" && val.prototype && method in val.prototype) ||
+          (val && typeof val === "object" && Object.prototype.hasOwnProperty.call(val, method)) ||
+          (typeof val === "function" && method in val);
+      } catch {}
       if (!exists) findings.push({ file: f, binding: imp.local, source: path.relative(root, imp.source), method });
     }
   }

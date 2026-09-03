@@ -410,6 +410,28 @@ export class PrewriteEngine {
     this.render();
   }
 
+  /**
+   * T5: Letter School 运笔演示 (简笔画动作展示 + 语音解说)
+   */
+  async animateStrokeGesture(shapeName = this.getCurrentShapeName()) {
+    this._startDemoAnimation();
+    const hint = this._getGestureHint(shapeName);
+    if (hint && typeof window !== "undefined" && window.soundAndFX?.speakPriority) {
+      window.soundAndFX.speakPriority(hint, { kind: "sentence", emotion: "gentle" });
+    }
+  }
+
+  _getGestureHint(shapeName) {
+    const hints = {
+      "竖直线": "从上往下直直画，像小雨滴落下来～",
+      "水平线": "从左往右轻轻滑，像小汽车在开～",
+      "右斜线": "从左上往右下斜斜滑，像滑滑梯～",
+      "同心圆": "圆溜溜转一圈，画个大皮球～",
+      "折线": "先往右再往下折，像个小山折角～"
+    };
+    return hints[shapeName] || `跟着光球画一画${shapeName}吧！`;
+  }
+
   _finishAll() {
     this.demoPhase = false;
     if (this.demoTimer) cancelAnimationFrame(this.demoTimer);

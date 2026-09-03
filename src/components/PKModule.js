@@ -26,13 +26,14 @@ export class PKModule extends BaseModule {
   render() {
     this.destroy();
     
-    // Pick characters from learned pool, fallback to all
+    // Pick characters from learned pool, fallback to beginner stage 1 pool
     const learned = Object.keys(ebbinghausManager.progress.charRecords || {});
     if (learned.length >= 4) {
       this.pool = CHARACTER_DATABASE.filter(c => learned.includes(c.id));
     } else {
-      this.pool = CHARACTER_DATABASE;
+      this.pool = CHARACTER_DATABASE.filter(c => (c.stage || 1) === 1).slice(0, 20);
     }
+    if (this.pool.length === 0) this.pool = CHARACTER_DATABASE.slice(0, 20);
 
     this.playerHp = this.maxHp;
     this.bossHp = this.maxHp;

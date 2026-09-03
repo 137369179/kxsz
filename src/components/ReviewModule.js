@@ -36,8 +36,20 @@ export class ReviewModule extends BaseModule {
   }
 
   initQueue() {
-    const dueIds = ebbinghausManager.getDueReviewCharIds().slice(0, 5);
-    this.queue = dueIds
+    const dueIds = ebbinghausManager.getDueReviewCharIds().slice(0, 3);
+    const errorProfile = ebbinghausManager.progress.errorProfiles || {};
+    const confusedPairs = errorProfile.confusedPairs || {};
+    const confusedIds = Object.entries(confusedPairs)
+      .sort((a, b) => {
+        const countA = typeof a[1] === "object" ? Object.values(a[1]).reduce((s, v) => s + v, 0) : Number(a[1]) || 0;
+        const countB = typeof b[1] === "object" ? Object.values(b[1]).reduce((s, v) => s + v, 0) : Number(b[1]) || 0;
+        return countB - countA;
+      })
+      .slice(0, 2)
+      .map(([charId]) => charId);
+
+    const allIds = [...new Set([...dueIds, ...confusedIds])].slice(0, 5);
+    this.queue = allIds
       .map((id) => CHARACTER_DATABASE.find((c) => c.id === id))
       .filter(Boolean);
 

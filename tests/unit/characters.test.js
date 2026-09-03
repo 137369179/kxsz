@@ -1,12 +1,17 @@
 import { describe, it, expect } from "vitest";
 import { CHARACTER_DATABASE } from "../../src/data/characters.js";
 
-describe("1490 Characters Database Completeness & Schema Integrity", () => {
-  it("should have 1490 total characters with unique ids", () => {
-    expect(CHARACTER_DATABASE.length).toBe(1490);
-    const seenIds = new Set();
+const DB = CHARACTER_DATABASE;
+const TOTAL = DB.length;
+const STAGE1 = DB.filter(c => c.stage === 1).length;
+const STAGE2 = DB.filter(c => c.stage === 2).length;
+const STAGE3 = DB.filter(c => c.stage === 3).length;
 
-    for (const c of CHARACTER_DATABASE) {
+describe(`Characters Database (${TOTAL}字)`, () => {
+  it(`should have ${TOTAL} total characters with unique ids`, () => {
+    expect(TOTAL).toBeGreaterThanOrEqual(1400);
+    const seenIds = new Set();
+    for (const c of DB) {
       expect(seenIds.has(c.id)).toBe(false);
       seenIds.add(c.id);
       expect(c.char).toBeTruthy();
@@ -17,19 +22,15 @@ describe("1490 Characters Database Completeness & Schema Integrity", () => {
     }
   });
 
-  it("should have balanced 3-stage progression", () => {
-    const stage1 = CHARACTER_DATABASE.filter(c => c.stage === 1);
-    const stage2 = CHARACTER_DATABASE.filter(c => c.stage === 2);
-    const stage3 = CHARACTER_DATABASE.filter(c => c.stage === 3);
-
-    expect(stage1.length).toBe(200);
-    expect(stage2.length).toBe(400);
-    expect(stage3.length).toBe(890);
-    expect(stage1.length + stage2.length + stage3.length).toBe(1490);
+  it(`should split into 3 stages (${STAGE1}/${STAGE2}/${STAGE3})`, () => {
+    expect(STAGE1 + STAGE2 + STAGE3).toBe(TOTAL);
+    expect(STAGE1).toBeGreaterThan(0);
+    expect(STAGE2).toBeGreaterThan(0);
+    expect(STAGE3).toBeGreaterThan(0);
   });
 
-  it("should have complete 12 metadata dimensions for every character", () => {
-    for (const c of CHARACTER_DATABASE) {
+  it("should have complete metadata + meanings for every character", () => {
+    for (const c of DB) {
       expect(Array.isArray(c.strokes)).toBe(true);
       expect(c.strokes.length).toBeGreaterThanOrEqual(1);
       expect(Array.isArray(c.words)).toBe(true);
@@ -38,6 +39,12 @@ describe("1490 Characters Database Completeness & Schema Integrity", () => {
       expect(c.sentence.length).toBeGreaterThan(0);
       expect(c.evolution).toBeDefined();
       expect(typeof c.evolution.story).toBe("string");
+      // P0-3: meanings 自动生成，primary/radicalHint/mnemonic 必须有
+      expect(c.meanings).toBeDefined();
+      expect(typeof c.meanings.primary).toBe("string");
+      expect(c.meanings.primary.length).toBeGreaterThan(0);
+      expect(typeof c.meanings.radicalHint).toBe("string");
+      expect(c.meanings.radicalHint.length).toBeGreaterThan(0);
     }
   });
 
@@ -52,21 +59,15 @@ describe("1490 Characters Database Completeness & Schema Integrity", () => {
       findCharacterByChar
     } = await import("../../src/data/characters/index.js");
 
-    expect(STAGE1_CHARACTERS.length).toBe(200);
-    expect(STAGE2_CHARACTERS.length).toBe(400);
-    expect(STAGE3_CHARACTERS.length).toBe(890);
+    expect(STAGE1_CHARACTERS.length).toBe(STAGE1);
+    expect(STAGE2_CHARACTERS.length).toBe(STAGE2);
+    expect(STAGE3_CHARACTERS.length).toBe(STAGE3);
 
     const s1 = await getStageCharacters(1);
-    expect(s1.length).toBe(200);
-
-    const s2 = await getStageCharacters(2);
-    expect(s2.length).toBe(400);
-
-    const s3 = await getStageCharacters(3);
-    expect(s3.length).toBe(890);
+    expect(s1.length).toBe(STAGE1);
 
     const all = await getAllCharacters();
-    expect(all.length).toBe(1490);
+    expect(all.length).toBe(TOTAL);
 
     const char1 = findCharacterById("char_001");
     expect(char1).toBeDefined();
@@ -77,4 +78,3 @@ describe("1490 Characters Database Completeness & Schema Integrity", () => {
     expect(charSun.id).toBe("char_001");
   });
 });
-

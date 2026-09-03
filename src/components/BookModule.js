@@ -23,6 +23,7 @@ import { GAME_ICONS } from "../utils/gameIcons.js";
 import { g2p } from "../utils/g2p.js";
 import { pronunciationEval } from "../utils/pronunciationEval.js";
 import { storageManager } from "../utils/storageManager.js";
+import { rewardEngine } from "../utils/rewardEngine.js";
 
 export class BookModule extends BaseModule {
   constructor(container) {

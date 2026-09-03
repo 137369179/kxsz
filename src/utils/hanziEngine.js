@@ -321,6 +321,15 @@ export class HanziEngine {
         hasReverseStroke = true;
       }
 
+      // T4: 笔顺方向角严格验证 (无折角直线/弧线笔画)
+      if (!targetStroke.corner && !hasReverseStroke) {
+        const age = (typeof window !== "undefined" && window.ebbinghausManager?.getAge?.()) || 6;
+        const degTol = age <= 6 ? 60 : 45;
+        if (!this.strokeDirectionValidator(this.userCurrentPath, targetStroke, degTol)) {
+          hasReverseStroke = true;
+        }
+      }
+
       if (targetStroke.corner) {
         let minCornerDist = Infinity;
         for (const pt of this.userCurrentPath) {
@@ -385,6 +394,40 @@ export class HanziEngine {
     this.gridType = this.gridType === "mi" ? "tian" : "mi";
     this.render();
     return this.gridType;
+  }
+
+  /**
+   * T4: 笔顺方向角验证 (5-6 岁容差 60°，7-8 岁容差 45°)
+   */
+  strokeDirectionValidator(userPath, expected, toleranceDeg = 60) {
+    if (!userPath || userPath.length < 3) return true;
+
+    // 计算用户轨迹平均方向
+    const userAngle = this._avgPathAngle(userPath);
+    // 计算期望笔画方向
+    const expectedAngle = Math.atan2(
+      expected.end.y - expected.start.y,
+      expected.end.x - expected.start.x
+    ) * 180 / Math.PI;
+
+    // 容差对比 (处理 360 度循环)
+    let diff = Math.abs(userAngle - expectedAngle);
+    if (diff > 180) diff = 360 - diff;
+    return diff < toleranceDeg;
+  }
+
+  _avgPathAngle(path) {
+    let sum = 0;
+    let count = 0;
+    for (let i = 1; i < path.length; i++) {
+      const dx = path[i].x - path[i - 1].x;
+      const dy = path[i].y - path[i - 1].y;
+      if (Math.abs(dx) + Math.abs(dy) > 0.01) {
+        sum += Math.atan2(dy, dx);
+        count++;
+      }
+    }
+    return count > 0 ? (sum / count) * 180 / Math.PI : 0;
   }
 
   triggerError(msg) {

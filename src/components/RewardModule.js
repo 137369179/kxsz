@@ -11,7 +11,7 @@ import { ebbinghausManager } from "../utils/ebbinghaus.js";
 import { soundAndFX } from "../utils/soundEngine.js";
 import { BaseModule } from "../utils/BaseModule.js";
 import { mountGameShell, showGameToast } from "./SharedShell.js";
-import { getStickers, getMedals, getCalendar, getNewMedalIds, getShopData } from "../utils/rewardEngine.js";
+import { getStickers, getMedals, getCalendar, getNewMedalIds, getShopData, rewardEngine } from "../utils/rewardEngine.js";
 import { GAME_ICONS } from "../utils/gameIcons.js";
 import { storageManager } from "../utils/storageManager.js";
 

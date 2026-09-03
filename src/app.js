@@ -234,8 +234,16 @@ class CathyAppManager extends BaseModule {
   /**  listener */
   _sparkleAt(x, y) {
     const now = Date.now();
-    if (now - (this._lastSparkleTime || 0) < 60) return; //  60ms
+    if (now - (this._lastSparkleTime || 0) < 60) return; // 60ms 节流
     this._lastSparkleTime = now;
+
+    // T9: 视觉降噪与内存保护 —— 粒子总量上限 25 个，避免快速点击满屏粒子过载
+    const existing = document.querySelectorAll(".magic-particle");
+    if (existing.length > 25) {
+      for (let i = 0; i < existing.length - 25; i++) {
+        existing[i].remove();
+      }
+    }
 
     const ripple = document.createElement("div");
     ripple.className = "magic-ripple";

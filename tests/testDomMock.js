@@ -224,6 +224,11 @@ export function setupTestDom() {
     }
   };
 
+  global.requestAnimationFrame = global.requestAnimationFrame || ((cb) => setTimeout(cb, 16));
+  global.cancelAnimationFrame = global.cancelAnimationFrame || ((id) => clearTimeout(id));
+  global.window.requestAnimationFrame = global.requestAnimationFrame;
+  global.window.cancelAnimationFrame = global.cancelAnimationFrame;
+
   global.document = global.document || {
     body: createMockElement("body"),
     createElement: vi.fn((tag) => {
