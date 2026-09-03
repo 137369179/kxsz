@@ -422,6 +422,18 @@ class CathyAudioEngine {
     this._initDone = true;
     this._setupVisibilityRecovery();
     this._emitBusChange("init");
+    // P0-13 页面加载后自动探测 voice-server，失败则全链路 fallback 到 SpeechSynthesis
+    // 注意：probe() 会写入 sessionStorage.cathy_neural_unavailable 熔断标记
+    try {
+      neuralVoice.probe(1200).then((ok) => {
+        if (!ok) {
+          console.info("[P0-13] voice-server 不可用，已自动降级为浏览器原生 SpeechSynthesis");
+          this.neuralVoiceEnabled = false;
+        } else {
+          console.info("[P0-13] voice-server 就绪，使用 Edge Neural 音色");
+        }
+      }).catch(() => {});
+    } catch {}
   }
 
   /**  (AudioContext Resiliency) */

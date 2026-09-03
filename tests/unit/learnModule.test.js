@@ -7,6 +7,7 @@ import { LearnModule } from "../../src/components/LearnModule.js";
 import { soundAndFX } from "../../src/utils/soundEngine.js";
 import { CHARACTER_DATABASE } from "../../src/data/characters.js";
 import { ensureDetails } from "../../src/utils/charDetailLoader.js";
+import { clearLearnProgress } from "../../src/utils/learnProgressStore.js";
 
 await ensureDetails();
 
@@ -24,6 +25,7 @@ describe("LearnModule (六步闭环识字学习)", () => {
   };
 
   beforeEach(() => {
+    clearLearnProgress(mockChar.id);
     container = createMockElement("div", "learn-container");
     vi.spyOn(soundAndFX, "stopSpeaking").mockImplementation(() => {});
     vi.spyOn(soundAndFX, "playPop").mockImplementation(() => {});

@@ -14,6 +14,11 @@ describe('EbbinghausManager', () => {
     expect(mgr.progress.currentIsland).toBe(1)
   })
 
+  it('should start with empty charRecords (no demo pollution)', () => {
+    expect(mgr.progress.charRecords).toEqual({})
+    expect(Object.keys(mgr.progress.charRecords).length).toBe(0)
+  })
+
   it('should add coins correctly', () => {
     const initial = mgr.progress.coins
     mgr.addCoins(20)

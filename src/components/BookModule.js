@@ -22,6 +22,7 @@ import { BaseModule, escapeHtml } from "../utils/BaseModule.js";
 import { GAME_ICONS } from "../utils/gameIcons.js";
 import { g2p } from "../utils/g2p.js";
 import { pronunciationEval } from "../utils/pronunciationEval.js";
+import { resolveBookVoiceReward } from "../utils/bookVoiceReward.js";
 import { storageManager } from "../utils/storageManager.js";
 import { checkBookReadiness, READING_STATUS } from "../utils/readingGatekeeper.js";
 export class BookModule extends BaseModule {
@@ -215,7 +216,7 @@ export class BookModule extends BaseModule {
                   const r = checkBookReadiness(book, charRecords);
                   if (r.status === READING_STATUS.READY || r.status === READING_STATUS.EMPTY) return "";
                   const color = r.status === READING_STATUS.PARTIAL ? "bg-sky-500" : "bg-rose-500";
-                  return `<div class="absolute bottom-2.5 left-2.5 ${color} text-white text-[10px] font-black px-2 py-0.5 rounded-full shadow-md">${r.status === "blocked" ? "🔒" : "📚"}${r.stats.unknownCount}字</div>`;
+                  return `<div class="absolute bottom-2.5 left-2.5 ${color} text-white text-[10px] font-black px-2 py-0.5 rounded-full shadow-md">${r.status === "blocked" ? "未解锁·" : "待学·"}${r.stats.unknownCount}字</div>`;
                 })()}
 
                 ${
@@ -293,7 +294,7 @@ export class BookModule extends BaseModule {
         if (readiness.status === READING_STATUS.BLOCKED) {
           // B10: 超过一半没学 → 引导去学
           soundAndFX.playErrorSound?.();
-          showGameToast(this.container, readiness.message, { duration: 2800, icon: "📚" });
+          showGameToast(this.container, readiness.message, { duration: 2800 });
           return;
         }
 
@@ -965,26 +966,31 @@ export class BookModule extends BaseModule {
       }
 
       const pe = pronunciationEval || (typeof window !== "undefined" ? window.pronunciationEval : null);
-      let score = 98;
+      let evalResult = null;
 
       if (pe && typeof pe.evaluate === "function") {
         try {
-          const result = await pe.evaluate(page.text, { mode: "sentence", maxSeconds: 5 });
-          if (typeof result?.score === "number" && !isNaN(result.score)) {
-            score = result.score;
-          }
+          evalResult = await pe.evaluate(page.text, { mode: "sentence", maxSeconds: 5 });
         } catch (err) {
-          console.warn("[BookModule] 语音评测失败，使用默认分数:", err);
+          console.warn("[BookModule] 语音评测失败:", err);
+          evalResult = null;
         }
       }
 
       if (!this.isVoiceModalOpen) return;
 
-      soundAndFX.playParentCheer();
-      soundAndFX.triggerConfetti(this.container);
-      ebbinghausManager.addCoins(20);
-      ebbinghausManager.save();
-      statusText.innerHTML = `<span class="text-emerald-600 font-black text-sm">${roleName} 朗读得分：${score} 分！获得 20 凯茜星币！</span>`;
+      const reward = resolveBookVoiceReward(evalResult);
+      if (reward.ok) {
+        soundAndFX.playParentCheer();
+        soundAndFX.triggerConfetti(this.container);
+        ebbinghausManager.addCoins(reward.coins);
+        ebbinghausManager.save();
+        statusText.innerHTML = `<span class="text-emerald-600 font-black text-sm">${roleName} 朗读得分：${reward.score} 分！获得 ${reward.coins} 凯茜星币！</span>`;
+      } else {
+        if (typeof soundAndFX.playEncouragement === "function") soundAndFX.playEncouragement();
+        else if (typeof soundAndFX.playPop === "function") soundAndFX.playPop();
+        statusText.innerHTML = `<span class="text-amber-600 font-black text-sm">这次没评到分，再试一次大声朗读吧！</span>`;
+      }
       recordBtnLabel.textContent = "重新录音";
       startRecordBtn.classList.remove("bg-rose-500", "animate-pulse");
       if (glowBg) {

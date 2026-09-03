@@ -13,7 +13,7 @@
 - **游乐场** — 5 种微游戏（Boss 战/消消乐/PK 竞技/成语接龙/部首家族）
 - **同音字特训** — 意符线索与情境挖空，突破目/木、石/十、在/再等常见易混难点
 - **家长中心** — 算术门禁、数据罗盘、AI 伴学诊断日志与 A4 规范字帖打印工坊
-- **PWA 离线支持** — 首次访问后完全离线可用
+- **PWA 离线支持** — 核心字库、地图、微课与复习可在首次缓存后离线使用；神经 TTS（本机 8766）与麦克风评测需本机服务或浏览器权限，不保证完全离线
 
 ## 技术架构
 
@@ -22,9 +22,9 @@ src/
 ├── app.js              # 主控制器（路由/生命周期/事件总线）
 ├── components/         # 10 个核心业务模块
 │   ├── MapModule.js    # 世界大地图
-│   ├── LearnModule.js  # 8 步微课学习流（支持断点续学）
+│   ├── LearnModule.js  # 8 步微课编排层（步骤实现见 learnSteps/）
 │   ├── BookModule.js   # 分级绘本馆
-│   ├── PlayModule.js   # 游戏游乐场
+│   ├── PlayModule.js   # 游戏游乐场（样式/取题见 playHub/）
 │   ├── CardModule.js   # 1490 字卡字典
 │   ├── ParentModule.js # 家长中心与 AI 伴学日志
 │   ├── RewardModule.js # 奖励城堡与成长荣誉
@@ -33,7 +33,12 @@ src/
 │   └── PinyinModule.js # 奇趣拼音乐园
 ├── utils/              # 核心引擎与教育学工具层
 │   ├── fsrsScheduler.js   # FSRS-6 认知记忆调度器
-│   ├── ebbinghaus.js      # 艾宾浩斯复习调度管理器
+│   ├── ebbinghaus.js      # 进度门面（委托 FSRS）
+│   ├── learnProgressStore.js # 微课断点续学 JSON 持久化
+│   ├── learnScoring.js    # 评测星级/进度纯函数
+│   ├── learnSteps/        # Learn 八步 UI 实现
+│   ├── playHub/           # Play 样式与取题工具
+│   ├── bookVoiceReward.js # 绘本朗读评测发币结算
 │   ├── hanziEngine.js     # 笔顺方向角容差验证与描红引擎 (含防绕路与综合校验)
 │   ├── prewriteEngine.js  # 控笔训练与 Letter School 运笔演示
 │   ├── drillEngine.js     # 11 种题型闪卡与主动回忆练习引擎 (含字义选字)
@@ -57,12 +62,12 @@ src/
 
 ### 核心设计与测试保证
 
-- **单元测试全覆盖**: 全量 49 个测试套件，490 个测试用例 100% 通过 (0 failures)
+- **单元测试**: Vitest 全量套件持续维护（以 `npm test` 为准）
 - **BaseModule 生命周期**: 所有模块继承 BaseModule，通过 `_cleanups` 数组统一管理资源清理
-- **EventBus 通信**: 28 个预定义事件，模块间松耦合通信
-- **PWA**: Service Worker Cache-First 策略，37 文件预缓存
-- **无障碍**: role/aria-label/aria-live 全覆盖
-- **工程红线**: 100% 纯矢量与 Canvas 渲染，绝对零 Unicode Emoji，零 SVG 图标泄漏
+- **EventBus 通信**: 预定义事件，模块间松耦合通信
+- **PWA**: Service Worker Cache-First；版本号与 `src/utils/version.js` 对齐；神经 TTS 请求不进 SW 缓存
+- **无障碍**: role/aria-label/aria-live 覆盖主流程
+- **工程红线**: 优先纯矢量与 Canvas 渲染，UI 避免 Unicode Emoji 装饰
 
 ## 快速开始
 

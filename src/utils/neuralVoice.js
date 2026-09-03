@@ -162,6 +162,23 @@ class NeuralVoiceEngine {
     return `${voice || this.voice}|${rate}|${pitch}|${text}`;
   }
 
+  /** 按 lastUsed 淘汰最久未用条目，直到 size <= _memMax */
+  _evictIfNeeded() {
+    while (this._mem.size > this._memMax) {
+      let oldestKey = null;
+      let oldestAt = Infinity;
+      for (const [k, v] of this._mem) {
+        const t = (v && typeof v.lastUsed === "number") ? v.lastUsed : 0;
+        if (t < oldestAt) {
+          oldestAt = t;
+          oldestKey = k;
+        }
+      }
+      if (!oldestKey) break;
+      this._mem.delete(oldestKey);
+    }
+  }
+
   _decode(ctx, arrayBuf) {
     return new Promise((resolve, reject) => {
       // Chrome 87 现代环境支持 promise, 旧版走 callback
@@ -209,12 +226,9 @@ class NeuralVoiceEngine {
       this._recordSuccess();
       const ab = await res.arrayBuffer();
       const buf = await this._decode(ctx, ab);
-      // LRU 淘汰（Map 保持插入顺序，FIFO 淘汰最旧的）
+      // LRU 淘汰：按 lastUsed，而非 Map 插入顺序 FIFO
       this._mem.set(key, { buffer: buf, lastUsed: Date.now() });
-      if (this._mem.size > this._memMax) {
-        const firstKey = this._mem.keys().next().value;
-        if (firstKey) this._mem.delete(firstKey);
-      }
+      this._evictIfNeeded();
       return buf;
     })();
     this._fetching.set(key, p);
@@ -453,10 +467,7 @@ class NeuralVoiceEngine {
         const ab = this._b64ToArrayBuffer(p.audio);
         const buf = await this._decode(ctx, ab);
         this._mem.set(key, { buffer: buf, lastUsed: Date.now() });
-        if (this._mem.size > this._memMax) {
-          const firstKey = this._mem.keys().next().value;
-          if (firstKey) this._mem.delete(firstKey);
-        }
+        this._evictIfNeeded();
         buffers.push(buf);
       }
     } catch (e) {

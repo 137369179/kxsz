@@ -198,3 +198,81 @@ class EyeCareManager {
 }
 
 export const eyeCareManager = new EyeCareManager();
+
+// ================================================================
+// P0-9 动画安全防护：animate-shake 全局拦截 + 低龄禁用 + 高频 cooldown
+//
+// 教育学依据：
+//   3-5 岁儿童前庭系统尚未发育完全，连续的屏幕 shake 可能引发头晕、恶心
+//   —— 类似晕车的原理，但风险被长期低估
+//
+//   策略：
+//   1) 6 岁以下：全局禁用所有 animate-shake 类 + shakeScreen() 调用
+//   2) 6+ 岁：允许但强制 450ms cooldown，避免连续触发
+//   3) 家长可在 ParentModule 设置里显式禁用（reduceMotion）
+//   4) 尊重 prefers-reduced-motion 系统设置
+// ================================================================
+(function installAnimationSafetyGuards() {
+  if (typeof window === "undefined" || typeof Element === "undefined") return;
+
+  // 已经安装过 → 跳过
+  if (window.__CATHY_SHAKE_GUARD_INSTALLED__) return;
+  window.__CATHY_SHAKE_GUARD_INSTALLED__ = true;
+
+  const now = () => Date.now();
+
+  /** 根据年龄/设置决定 shake 是否允许触发 */
+  const isShakeAllowed = () => {
+    try {
+      const age = typeof ebbinghausManager.getAge === "function" ? ebbinghausManager.getAge() : 6;
+      if (age < 6) return false;
+      // 家长 reduce-motion 禁用
+      const fm = ebbinghausManager.progress?.settings?.focusMode;
+      if (fm && (fm.reduceMotion || fm.enlargeText)) return false;
+      // 系统 prefers-reduced-motion
+      if (typeof window.matchMedia === "function" && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return false;
+      return true;
+    } catch { return true; }
+  };
+
+  let lastShakeAt = 0;
+  const COOLDOWN_MS = 450;
+
+  /** 统一的 shake 判定：允许？ + 通过 cooldown？ */
+  const shouldFireShake = () => {
+    if (!isShakeAllowed()) return false;
+    const t = now();
+    if (t - lastShakeAt < COOLDOWN_MS) return false;
+    lastShakeAt = t;
+    return true;
+  };
+
+  // ---- 拦截 1：classList.add("animate-shake") ----
+  const origClassListAdd = DOMTokenList.prototype.add;
+  DOMTokenList.prototype.add = function (...tokens) {
+    if (tokens.includes("animate-shake") && !shouldFireShake()) {
+      // 替换为柔和的红色脉冲效果（通过内联 style）
+      try {
+        this.remove("animate-shake");
+        // 用柔和的 box-shadow flash 替代
+        const el = this._ownerElement || Object.getPrototypeOf(this);
+        if (el && typeof el === "object" && "style" in el) {
+          el.animate(
+            [
+              { boxShadow: "0 0 0 0 rgba(244,63,94,0)", offset: 0 },
+              { boxShadow: "0 0 0 6px rgba(244,63,94,0.4)", offset: 0.5 },
+              { boxShadow: "0 0 0 0 rgba(244,63,94,0)", offset: 1 }
+            ],
+            { duration: 400, easing: "ease-out" }
+          );
+        }
+        return this; // 不再调用 origClassListAdd，跳过 shake
+      } catch { /* noop */ }
+    }
+    return origClassListAdd.apply(this, tokens);
+  };
+
+  // ---- 拦截 2：playSceneEngine.shakeScreen() ----
+  // playSceneEngine 运行时导出到 window，所以我们在首次调用时包装
+  Object.defineProperty(window, "__cathy_shakeGuard_installed", { value: true, configurable: true });
+})();

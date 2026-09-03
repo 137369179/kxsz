@@ -1,5 +1,5 @@
 // 版本号单一来源：注册 URL ?v= 由 index.html 从 version.js 注入
-const _ver = new URL(self.location.href).searchParams.get("v") || "2.9.1";
+const _ver = new URL(self.location.href).searchParams.get("v") || "2.9.7";
 const CACHE_NAME = `cathy-literacy-v${_ver.replace(/\./g, "-")}`; // 动态读取版本，避免硬编码（与 version.js 对齐）
 
 // 核心数据文件预缓存列表（源码直出模式默认；构建模式优先用 sw-manifest.json）

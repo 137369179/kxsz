@@ -48,10 +48,17 @@ export class EbbinghausManager {
         enableWriteStep: true,
         enablePrewriteStep: true,    // 控笔训练总开关（家长可关）
         eyeProtectionMinutes: 20,
+        // P0-4 每日学习总时长上限：null 表示用年龄自适应默认值，家长可手动覆盖
+        // 年龄自适应：3-6岁 40min (卫健委) / 6-12岁 60min / 12+岁 90min
+        dailyTimeLimitMinutes: null,
         audioLanguage: "mandarin",
         soundEnabled: true,
         strokeTolerance: "standard",  // "strict" | "standard" | "kid"
-        focusMode: false            // E7: 专注模式（减弱动画 + 简化音效）
+        focusMode: false,            // E7: 专注模式（减弱动画 + 简化音效）
+        // P0-7 家长手动覆盖 LearnModule 步骤序列（null=按年龄自动）
+        stepSequenceOverride: null,
+        // P0-4 家长可强制跳过每日时长硬限（算术题验证）
+        parentCanOverridDailyLimit: true
       },
       shop: {
         owned: ["av_cathy", "av_fairy", "av_hero", "frame_none"],
@@ -69,10 +76,16 @@ export class EbbinghausManager {
       },
       charRecords: {},
       todayLearnedCount: 0,
+      // P0-4 今日已学分钟数（用于每日时长硬限）
+      dailyStudyMinutes: 0,
+      dailyStudyStartedAt: null,     // 今日开始学习的时间戳（用于会话中累计）
       lastActiveDate: today,
       todaySignedIn: false,
       signInStreak: 0,
       lastSignInDate: "",
+      todayStudyMs: 0,       // 今日累计学习毫秒（防沉迷每日总量，跨日清零）
+      todayStudyDate: "",    // 累计所属日期 YYYY-MM-DD
+      dailyLimitTriggered: false, // 今日已完成/触发过上限收尾（跨日重置）
       studyHistory: [
         { date: "周一", count: 0 },
         { date: "周二", count: 0 },
@@ -106,6 +119,10 @@ export class EbbinghausManager {
         merged.lastActiveDate = today;
         merged.todayLearnedCount = 0;
         merged.todaySignedIn = false;
+        // P0-4 跨日清零学习时长
+        merged.dailyStudyMinutes = 0;
+        merged.dailyStudyStartedAt = null;
+        if (typeof merged.todayStudyMs === "number") merged.todayStudyMs = 0;
       }
       // 旧存档补齐：用真实日期列表重算连胜（比历史字段可靠）
       merged.attendance.streakDays = this._calcStreak(merged.attendance.dates);
@@ -174,6 +191,152 @@ export class EbbinghausManager {
   /** 仅 <5 岁时强制跳过描红（B1 铁律硬约束） */
   isWriteBlockedByAge() {
     return this.getWritingStage() === "prewrite_only";
+  }
+
+  /**
+   * P0-7 年龄自适应步骤序列（B1/B6 铁律）
+   *
+   * 教育学依据：
+   *   3-4 岁（前运算早期）→ 4 步：玩→认→练→测。跳过 Read/控笔/描红/写（皮亚杰前运算早期不具备符号-声音抽象对应）
+   *   5-6 岁（前运算晚期）→ 6 步：玩→认→练→控笔→描红→测。跳过 Read 拼音（拼音教学起始于大班末/一年级）和独立写
+   *   7+ 岁（具体运算期）→ 8 步全流程
+   *
+   * 家长可在 settings.stepSequenceOverride 里覆盖此默认序列
+   *
+   * @param {object} [opts]
+   * @param {number} [opts.age] — 可选覆盖年龄，默认取 this.getAge()
+   * @param {number[]} [opts.override] — 可选家长手动指定的步骤数组
+   * @returns {number[]} 步骤编号数组（1-8 的子集，升序，首=1，尾=8）
+   */
+  getStepSequence(opts = {}) {
+    const age = opts.age ?? this.getAge();
+
+    if (Array.isArray(opts.override) && opts.override.length >= 2) {
+      // 家长显式 override：至少 2 步且首末必须是 1 和 8
+      const seq = opts.override.filter(n => typeof n === "number" && n >= 1 && n <= 8).sort((a, b) => a - b);
+      if (seq[0] !== 1) seq.unshift(1);
+      if (seq[seq.length - 1] !== 8) seq.push(8);
+      return seq;
+    }
+
+    if (age < 5) {
+      // 3-4 岁：4 步闭环。教育部指南：3-4 岁"能指认常见汉字"，不需要读/写
+      return [1, 2, 4, 8];
+    }
+    if (age < 7) {
+      // 5-6 岁：6 步。5 岁可开始控笔和描红（指南：5-6 岁"会写自己的名字"），但跳过 Read 拼音
+      return [1, 2, 4, 5, 6, 8];
+    }
+    // 7+ 岁：8 步全流程
+    return [1, 2, 3, 4, 5, 6, 7, 8];
+  }
+
+  /** 返回当前步骤序列的总长度（给 LearnModule 进度条用） */
+  getTotalSteps() {
+    return this.getStepSequence().length;
+  }
+
+  // ================================================================
+  // P0-4 每日学习时长硬限（国家卫健委 + WHO 2-18 岁屏幕时间指南）
+  // ================================================================
+
+  /**
+   * P0-4 年龄自适应每日学习时长上限（分钟）
+   *
+   * 教育学依据：
+   *   3-6 岁（学龄前）→ 40 min/天（卫健委 2021 指南：每次≤20min，累计≤40min）
+   *   6-12 岁（小学） → 60 min/天（指南：每次≤30min，累计≤60min）
+   *   12+ 岁（初中）  → 90 min/天（指南：每次≤45min，累计≤90min）
+   *
+   * 如果家长在 ParentModule 设置里手动覆盖（settings.dailyTimeLimitMinutes !== null），
+   * 则优先用家长设置的值。
+   *
+   * @returns {number} 每日上限分钟数
+   */
+  getDailyLimitMinutes() {
+    const override = this.progress?.settings?.dailyTimeLimitMinutes;
+    if (typeof override === "number" && override > 0) return Math.min(override, 180); // 硬帽 180min
+
+    const age = this.getAge();
+    if (age < 6) return 40;
+    if (age < 12) return 60;
+    return 90;
+  }
+
+  /** P0-4 累加今日已学分钟数（模块进入/退出时调用） */
+  addStudyMinutes(minutes) {
+    if (!minutes || minutes <= 0) return;
+    const limit = this.getDailyLimitMinutes();
+    this.progress.dailyStudyMinutes = Math.min(
+      limit + 30, // 允许家长 override 后的缓冲上限（最多多给 30min）
+      Math.floor((this.progress.dailyStudyMinutes || 0) + minutes)
+    );
+    this.save();
+    eventBus.emit(EVENTS.PROGRESS_CHANGED, { progress: this.progress });
+  }
+
+  /**
+   * P0-4 检查是否达到今日学习上限
+   * @returns {{ reached: boolean, minutesLeft: number, limit: number, current: number }}
+   */
+  checkDailyLimit() {
+    const limit = this.getDailyLimitMinutes();
+    const current = this.progress.dailyStudyMinutes || 0;
+    const minutesLeft = Math.max(0, limit - current);
+    return {
+      reached: current >= limit,
+      minutesLeft,
+      limit,
+      current
+    };
+  }
+
+  /** P0-4 家长通过算术验证后解锁额外学习时长（最多 +30min/次，最多 +2 次/天） */
+  overrideDailyLimit(addMinutes = 30) {
+    const todayKey = new Date().toDateString();
+    const caps = this.progress.dailyOverrideCaps || { date: null, used: 0 };
+    if (caps.date !== todayKey) { caps.date = todayKey; caps.used = 0; }
+    if (caps.used >= 2) return false;
+    caps.used++;
+    this.progress.dailyOverrideCaps = caps;
+    this.progress.settings.dailyTimeLimitMinutes = (this.progress.settings.dailyTimeLimitMinutes || this.getDailyLimitMinutes()) + addMinutes;
+    this.save();
+    return true;
+  }
+
+  /**
+   * P0-4 创建会话计时器。模块进入时 start，退出时 stop，跨 document.hidden 暂停。
+   * 返回 { stop: () => void } — 调用 stop() 时自动 addStudyMinutes 累加
+   */
+  createStudySession() {
+    const startMs = Date.now();
+    let suspendedAt = null;
+    let totalVisibleMs = 0;
+    let stopped = false;
+
+    const onVisChange = () => {
+      if (document.hidden) {
+        suspendedAt = Date.now();
+      } else if (suspendedAt) {
+        totalVisibleMs += (suspendedAt - startMs);
+        suspendedAt = null;
+      }
+    };
+
+    document.addEventListener("visibilitychange", onVisChange);
+    if (this._studySessionCleanups) this._studySessionCleanups.push(() => document.removeEventListener("visibilitychange", onVisChange));
+
+    return {
+      stop: () => {
+        if (stopped) return;
+        stopped = true;
+        document.removeEventListener("visibilitychange", onVisChange);
+        const finalMs = suspendedAt ? (suspendedAt - startMs) : (Date.now() - startMs);
+        const minutes = Math.max(1, Math.floor(finalMs / 60000)); // 至少 1 分钟
+        this.addStudyMinutes(minutes);
+        return minutes;
+      }
+    };
   }
 
   // E7: 专注模式

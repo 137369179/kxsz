@@ -470,11 +470,10 @@ class CathyAppManager extends BaseModule {
     const safetyTimeout = setTimeout(() => {
       if (_settled) return;
       _settled = true;
-      console.warn("[App] transition timeout — force resetting");
+      console.warn("[App] transition timeout — force resetting overlay only");
       overlay.remove();
       this.isTransitioning = false;
-      // 恢复到地图模式
-      this.currentMode = "map";
+      // 不改 currentMode：模块可能已加载成功，强制 map 会导致状态与 UI 脱节
     }, FADE_TIMEOUT_MS);
 
     // Phase 1: Close curtain

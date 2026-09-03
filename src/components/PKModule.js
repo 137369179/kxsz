@@ -195,6 +195,11 @@ export class PKModule extends BaseModule {
        targetBtn.classList.add("bg-rose-50");
        soundAndFX.playErrorSound();
        soundAndFX.speakPriority(`这是“${selected.char}”字，要找的是“${this.targetChar.char}”字！`, { kind: "sentence", emotion: "correction" });
+
+       ebbinghausManager.recordMistake(this.targetChar.id, "similar_confuse", {
+         targetChar: this.targetChar.char,
+         selectedChar: selected.char,
+       });
        
        // Show correct one
        const correctIdx = this.options.findIndex(o => o.id === this.targetChar.id);

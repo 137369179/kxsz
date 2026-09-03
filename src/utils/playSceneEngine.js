@@ -99,6 +99,17 @@ export class PlaySceneEngine {
 
   // --- Game Feel Utilities ---
   shakeScreen() {
+    // P0-9 安全防护：6 岁以下禁用 + 450ms cooldown
+    try {
+      const age = typeof window !== "undefined" && window.__EBH__ ? window.__EBH__.getAge?.() ?? 6 : 6;
+      if (age < 6) return;
+      // reduce-motion 跳过
+      if (typeof matchMedia === "function" && matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+      const t = Date.now();
+      if (this._lastShakeAt && t - this._lastShakeAt < 450) return;
+      this._lastShakeAt = t;
+    } catch { /* noop */ }
+
     const container = this.mount.firstElementChild;
     if (!container) return;
     container.classList.remove("game-shake");

@@ -64,6 +64,11 @@ export const EVENTS = Object.freeze({
   // 家长录音
   AUDIO_PARENT_VOICE_SAVED: "audio:parent-voice-saved",   // 家长录音已保存
   AUDIO_PARENT_VOICE_PLAYED: "audio:parent-voice-played", // 家长录音已播放
+
+  // P0-4 每日学习时长硬限
+  DAILY_LIMIT_REACHED: "daily:limit-reached",       // 达到今日学习上限（payload: { minutesLeft, limit, current }）
+  STUDY_SESSION_START: "study:session-start",      // 学习会话开始
+  STUDY_SESSION_END: "study:session-end"           // 学习会话结束
 });
 
 class EventBus {
