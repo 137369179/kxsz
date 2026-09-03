@@ -34,3 +34,4 @@ __pycache__/
 
 # Session memory (local)
 .workbuddy/memory/
+dist/
