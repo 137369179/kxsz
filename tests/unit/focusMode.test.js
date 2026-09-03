@@ -93,16 +93,12 @@ describe('focusMode', () => {
     expect(shouldEnlargeText()).toBe(false);
   });
 
-  it('updateFocusPrefs 不改变 enabled', () => {
+  it('updateFocusPrefs 不改变 enabled', async () => {
+    const { updateFocusPrefs } = await import('../../src/utils/focusMode.js');
     enableFocusMode();
-    const before = getFocusPrefs().enabled;
-    // 模拟 updateFocusPrefs
-    import('../../src/utils/focusMode.js').then(({ updateFocusPrefs }) => {
-      updateFocusPrefs({ enlargeText: false });
-    });
-    return Promise.resolve().then(() => {
-      expect(getFocusPrefs().enlargeText).toBe(false);
-    });
+    updateFocusPrefs({ enlargeText: false });
+    expect(getFocusPrefs().enlargeText).toBe(false);
+    expect(getFocusPrefs().enabled).toBe(true);
   });
 
   it('onFocusModeChange 触发回调', () => {

@@ -40,4 +40,41 @@ describe("1490 Characters Database Completeness & Schema Integrity", () => {
       expect(typeof c.evolution.story).toBe("string");
     }
   });
+
+  it("should support modular stage splitting and async loaders", async () => {
+    const {
+      STAGE1_CHARACTERS,
+      STAGE2_CHARACTERS,
+      STAGE3_CHARACTERS,
+      getStageCharacters,
+      getAllCharacters,
+      findCharacterById,
+      findCharacterByChar
+    } = await import("../../src/data/characters/index.js");
+
+    expect(STAGE1_CHARACTERS.length).toBe(200);
+    expect(STAGE2_CHARACTERS.length).toBe(400);
+    expect(STAGE3_CHARACTERS.length).toBe(890);
+
+    const s1 = await getStageCharacters(1);
+    expect(s1.length).toBe(200);
+
+    const s2 = await getStageCharacters(2);
+    expect(s2.length).toBe(400);
+
+    const s3 = await getStageCharacters(3);
+    expect(s3.length).toBe(890);
+
+    const all = await getAllCharacters();
+    expect(all.length).toBe(1490);
+
+    const char1 = findCharacterById("char_001");
+    expect(char1).toBeDefined();
+    expect(char1.char).toBe("日");
+
+    const charSun = findCharacterByChar("日");
+    expect(charSun).toBeDefined();
+    expect(charSun.id).toBe("char_001");
+  });
 });
+

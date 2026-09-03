@@ -9,7 +9,7 @@
  * - this._busOn / this._busEmit : 
  * - this.destroy() : 
  */
-import { eventBus } from "./eventBus.js";
+import { eventBus, EVENTS } from "./eventBus.js";
 
 export class BaseModule {
   constructor(container) {
@@ -17,13 +17,15 @@ export class BaseModule {
     this._cleanups = [];
     this.bus = eventBus;
     // E7: 专注模式 — 订阅文档级切换
-    this._focusCleanup = eventBus.on(EVENTS.FOCUS_MODE_CHANGED, ({ enabled }) => {
+    const focusHandler = ({ enabled }) => {
       if (typeof document !== "undefined") {
         document.body.classList.toggle("focus-mode", enabled);
         document.documentElement.classList.toggle("focus-mode", enabled);
         document.body.dataset.focusMode = enabled ? "true" : "false";
       }
-    });
+    };
+    const focusCleanup = eventBus.on(EVENTS.FOCUS_MODE_CHANGED, focusHandler);
+    this._addCleanup(focusCleanup);
     // 初始化时同步当前状态
     eventBus.once("app:init", () => {
       const { ebbinghausManager } = window._modules || {};
@@ -33,7 +35,6 @@ export class BaseModule {
         document.documentElement.classList.add("focus-mode");
       }
     });
-    this._addCleanup(() => eventBus.off(EVENTS.FOCUS_MODE_CHANGED, this._focusCleanup));
   }
 
   /** destroy  */
