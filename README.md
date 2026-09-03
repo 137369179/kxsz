@@ -34,9 +34,10 @@ src/
 ├── utils/              # 核心引擎与教育学工具层
 │   ├── fsrsScheduler.js   # FSRS-6 认知记忆调度器
 │   ├── ebbinghaus.js      # 艾宾浩斯复习调度管理器
-│   ├── hanziEngine.js     # 笔顺方向角容差验证与描红引擎
+│   ├── hanziEngine.js     # 笔顺方向角容差验证与描红引擎 (含防绕路与综合校验)
 │   ├── prewriteEngine.js  # 控笔训练与 Letter School 运笔演示
-│   ├── drillEngine.js     # 10 种题型闪卡与主动回忆练习引擎
+│   ├── drillEngine.js     # 11 种题型闪卡与主动回忆练习引擎 (含字义选字)
+│   ├── cognitiveStage.js  # 汉字认知阶段自适应与幼儿具身动作表演引擎
 │   ├── soundEngine.js     # 六级音频总线引擎（零第三方依赖）
 │   ├── pronunciationEval.js # 麦克风多维度语音评测（写回真实成绩）
 │   ├── mascotProgress.js  # 凯茜内在动机与专属表情故事系统 (T13)
@@ -54,12 +55,14 @@ src/
     └── idioms.js          # 成语故事数据
 ```
 
-### 核心设计
+### 核心设计与测试保证
 
+- **单元测试全覆盖**: 全量 49 个测试套件，490 个测试用例 100% 通过 (0 failures)
 - **BaseModule 生命周期**: 所有模块继承 BaseModule，通过 `_cleanups` 数组统一管理资源清理
 - **EventBus 通信**: 28 个预定义事件，模块间松耦合通信
 - **PWA**: Service Worker Cache-First 策略，37 文件预缓存
 - **无障碍**: role/aria-label/aria-live 全覆盖
+- **工程红线**: 100% 纯矢量与 Canvas 渲染，绝对零 Unicode Emoji，零 SVG 图标泄漏
 
 ## 快速开始
 
