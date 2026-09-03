@@ -24,4 +24,14 @@ describe("createStudySession visibility accounting", () => {
     expect(r.reached).toBe(true);
     expect(r.minutesLeft).toBe(0);
   });
+
+  it("dailyLimitTriggered resets across calendar days", () => {
+    mgr.progress.dailyLimitDate = "1999-01-01";
+    mgr.progress.dailyLimitTriggered = true;
+    expect(mgr.isDailyLimitTriggered()).toBe(false);
+    mgr.markDailyLimitTriggered(true);
+    expect(mgr.isDailyLimitTriggered()).toBe(true);
+    mgr.markDailyLimitTriggered(false);
+    expect(mgr.isDailyLimitTriggered()).toBe(false);
+  });
 });

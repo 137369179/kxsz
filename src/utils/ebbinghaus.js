@@ -86,6 +86,7 @@ export class EbbinghausManager {
       todayStudyMs: 0,       // 今日累计学习毫秒（防沉迷每日总量，跨日清零）
       todayStudyDate: "",    // 累计所属日期 YYYY-MM-DD
       dailyLimitTriggered: false, // 今日已完成/触发过上限收尾（跨日重置）
+      dailyLimitDate: "",         // 上限触发标记所属日期 YYYY-MM-DD（跨日自动清）
       studyHistory: [
         { date: "周一", count: 0 },
         { date: "周二", count: 0 },
@@ -289,6 +290,24 @@ export class EbbinghausManager {
       limit,
       current
     };
+  }
+
+  /** P0-4 今日上限收尾是否已触发过（跨日自动重置；取消门禁后防反复弹窗） */
+  isDailyLimitTriggered() {
+    const todayKey = this._fmtKey(new Date());
+    if (this.progress.dailyLimitDate !== todayKey) {
+      this.progress.dailyLimitDate = todayKey;
+      this.progress.dailyLimitTriggered = false;
+    }
+    return !!this.progress.dailyLimitTriggered;
+  }
+
+  /** P0-4 标记今日上限收尾触发状态（家长延长成功后可置 false） */
+  markDailyLimitTriggered(flag = true) {
+    const todayKey = this._fmtKey(new Date());
+    this.progress.dailyLimitDate = todayKey;
+    this.progress.dailyLimitTriggered = !!flag;
+    this.save();
   }
 
   /** P0-4 家长通过算术验证后解锁额外学习时长（最多 +30min/次，最多 +2 次/天） */

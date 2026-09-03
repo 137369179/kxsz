@@ -537,7 +537,15 @@ class CathyAppManager extends BaseModule {
    */
   async _ensureDailyLimitAllowsStudy() {
     const check = ebbinghausManager.checkDailyLimit();
-    if (!check.reached) return true;
+    if (!check.reached) {
+      ebbinghausManager.markDailyLimitTriggered(false);
+      return true;
+    }
+    // 今日已取消/拒绝过延长：不再反复弹门禁，直接拦截
+    if (ebbinghausManager.isDailyLimitTriggered()) {
+      showToast(`今日已学 ${check.current}/${check.limit} 分钟，先休息吧`, { variant: "warn" });
+      return false;
+    }
     try {
       eventBus.emit(EVENTS.DAILY_LIMIT_REACHED, check);
     } catch {}
@@ -548,13 +556,16 @@ class CathyAppManager extends BaseModule {
       cancelText: "明天再学",
     });
     if (!passed) {
+      ebbinghausManager.markDailyLimitTriggered(true);
       showToast(`今日已学 ${check.current}/${check.limit} 分钟，先休息吧`, { variant: "warn" });
       return false;
     }
     if (!ebbinghausManager.overrideDailyLimit(30)) {
+      ebbinghausManager.markDailyLimitTriggered(true);
       showToast("今日延长次数已用完，明天再来吧", { variant: "warn" });
       return false;
     }
+    ebbinghausManager.markDailyLimitTriggered(false);
     showToast("已延长 30 分钟学习时间", { variant: "info" });
     return true;
   }
