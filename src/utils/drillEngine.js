@@ -354,14 +354,19 @@ export class DrillEngine {
   announce(type) {
     const c = this.char;
     const text = {
-      audio_choice: `请仔细听发音，选出对应的汉字“${c.char}”！`,
-      image_choice: `请观察卡片图景，选出汉字“${c.char}”！`,
-      similar_pick: `拼音读作“${c.pinyin}”，请找出正确的汉字“${c.char}”！`,
-      word_fill: `词语填空大挑战，请选出丢失的汉字“${c.char}”！`,
-      sentence_fill: `趣味造句，请为句子送回正确的汉字“${c.char}”！`,
-      balloon_pop: `戳破气球！连续击中3次带有“${c.char}”字的气球！`,
-    }[type] ?? `请找出汉字“${c.char}”！`;
-    soundAndFX.speakPriority(text, { kind: "sentence", emotion: "gentle" });
+      audio_choice: "请仔细听发音，选出对应的汉字！",
+      image_choice: "请观察卡片图景，选出汉字！",
+      similar_pick: `拼音读作"${c.pinyin}"，请找出正确的汉字！`,
+      word_fill: "词语填空大挑战，请选出丢失的汉字！",
+      sentence_fill: "趣味造句，请为句子送回正确的汉字！",
+      balloon_pop: "戳破气球！连续击中3次目标字气球！",
+      // E4
+      cloze_hint: `句子填空！提示拼音是"${c.pinyin}"，请选出正确的汉字！`,
+      pinyin_spell: "拼音拼读！仔细听发音，选出声母和韵母！",
+      stroke_trace: `笔画描红！请在画布上描出汉字"${c.char}"！`,
+    };
+    const msg = text[type] || `请找出汉字"${c.char}"！`;
+    soundAndFX.speakPriority(msg, { kind: "sentence", emotion: "gentle" });
   }
 
   // ------------------------------------------------------------------
