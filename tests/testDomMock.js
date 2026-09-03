@@ -151,9 +151,20 @@ export function createMockElement(tag = "div", id = "", classes = []) {
       return el.children.find((c) => c.tagName === sel.toUpperCase()) || null;
     }),
     querySelectorAll: vi.fn(() => []),
+    getBoundingClientRect: vi.fn(() => ({
+      width: 360,
+      height: 360,
+      top: 0,
+      left: 0,
+      bottom: 360,
+      right: 360
+    })),
     getContext: vi.fn(() => ({
       clearRect: vi.fn(),
       fillRect: vi.fn(),
+      strokeRect: vi.fn(),
+      roundRect: vi.fn(),
+      rect: vi.fn(),
       fillText: vi.fn(),
       strokeText: vi.fn(),
       beginPath: vi.fn(),
@@ -166,6 +177,9 @@ export function createMockElement(tag = "div", id = "", classes = []) {
       drawImage: vi.fn(),
       save: vi.fn(),
       restore: vi.fn(),
+      scale: vi.fn(),
+      translate: vi.fn(),
+      rotate: vi.fn(),
       setLineDash: vi.fn(),
       createLinearGradient: vi.fn(() => ({ addColorStop: vi.fn() })),
       createRadialGradient: vi.fn(() => ({ addColorStop: vi.fn() })),

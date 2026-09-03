@@ -7,12 +7,16 @@ import { soundEngine } from "./soundEngine.js";
 import { ebbinghausManager } from "./ebbinghaus.js";
 
 export class HanziEngine {
-  constructor(canvas, charData, onCompleteCallback, onStrokeCompleteCallback) {
+  constructor(canvas, charData, onCompleteCallback, onStrokeCompleteCallback, options = {}) {
     this.canvas = canvas;
     this.ctx = canvas.getContext("2d");
     this.charData = charData;
     this.onComplete = onCompleteCallback;
     this.onStrokeComplete = onStrokeCompleteCallback;
+    this.options = options || {};
+    this.freeWriteMode = Boolean(this.options.freeWrite);
+    this.isPeeking = false;
+    this._peekTimer = null;
 
     this.gridType = "mi"; // "mi" | "tian"
     this.drawSealStamp = false;
@@ -76,6 +80,10 @@ export class HanziEngine {
   destroy() {
     this.isDestroyed = true;
     this.stopDemo();
+    if (this._peekTimer) {
+      clearTimeout(this._peekTimer);
+      this._peekTimer = null;
+    }
     if (this.animGuideTimer) {
       cancelAnimationFrame(this.animGuideTimer);
       this.animGuideTimer = null;
@@ -94,6 +102,18 @@ export class HanziEngine {
     this.canvas.removeEventListener("touchstart", this.handleStart);
     window.removeEventListener("touchmove", this.handleMove);
     window.removeEventListener("touchend", this.handleEnd);
+  }
+
+  /** 独立书写模式下：短时偷看提示（2秒后自动重新隐藏） */
+  peekGuide(ms = 2000) {
+    this.isPeeking = true;
+    this.render();
+    if (this._peekTimer) clearTimeout(this._peekTimer);
+    this._peekTimer = setTimeout(() => {
+      if (this.isDestroyed) return;
+      this.isPeeking = false;
+      this.render();
+    }, ms);
   }
 
   /** 自动全字笔顺动画演示 */
@@ -419,6 +439,11 @@ export class HanziEngine {
       const isDone = this.isDemonstrating ? idx < (this.demoPos ? this.demoPos.strokeIdx : this.completedStrokes.length) : idx < this.currentStrokeIndex;
       const isCurrent = this.isDemonstrating ? (this.demoPos && idx === this.demoPos.strokeIdx) : idx === this.currentStrokeIndex;
 
+      // 独立书写模式：未完成笔画默认隐藏（除非正在演示或偷看提示）
+      if (this.freeWriteMode && !this.isPeeking && !this.isDemonstrating && !isDone) {
+        return;
+      }
+
       ctx.save();
       ctx.lineWidth = 18;
       if (isDone) {
@@ -510,8 +535,8 @@ export class HanziEngine {
       ctx.restore();
     }
 
-    // 5. 绘制当前笔画的发光引导光球与起点光环 (仅非演示状态)
-    if (!this.isDemonstrating && this.currentStrokeIndex < this.charData.strokes.length) {
+    // 5. 绘制当前笔画的发光引导光球与起点光环 (仅非演示状态，且非独立书写盲写模式)
+    if (!this.isDemonstrating && (!this.freeWriteMode || this.isPeeking) && this.currentStrokeIndex < this.charData.strokes.length) {
       const curStroke = this.charData.strokes[this.currentStrokeIndex];
       this.drawGuideOrb(ctx, curStroke, w, h);
     }

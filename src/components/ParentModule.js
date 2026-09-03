@@ -579,6 +579,15 @@ export class ParentModule extends BaseModule {
               <input type="checkbox" id="check-enable-write" ${settings.enableWriteStep ? "checked" : ""} class="w-5 h-5 accent-orange-500 rounded" />
             </div>
 
+            <!-- E7: 专注模式开关 -->
+            <div class="flex items-center justify-between bg-gradient-to-r from-indigo-50 to-purple-50 p-3 rounded-2xl border-2 border-indigo-200">
+              <div class="flex flex-col gap-1">
+                <span class="text-xs font-bold text-indigo-900">专注模式</span>
+                <span class="text-[10px] text-indigo-600 leading-tight">减弱动画与激励装饰，减少分心</span>
+              </div>
+              <input type="checkbox" id="check-focus-mode" ${settings.focusMode ? "checked" : ""} class="w-5 h-5 accent-indigo-500 rounded" />
+            </div>
+
           </div>
 
           <div class="mt-6 pt-4 border-t border-amber-100 flex items-center justify-end">

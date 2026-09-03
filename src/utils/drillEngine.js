@@ -44,6 +44,71 @@ function shuffle(arr) {
   return a;
 }
 
+// ── E4: 拼音验证助手 ──────────────────────────────────────────
+const PINYIN_INITIALS = [
+  "b","p","m","f","d","t","n","l","g","k","h",
+  "j","q","x","zh","ch","sh","r","z","c","s","y","w"
+];
+// 包含所有两字母声母，按从长到短排序确保最长匹配优先
+const PINYIN_INITIALS_SORTED = [...PINYIN_INITIALS].sort((a, b) => b.length - a.length);
+
+/**
+ * 提取拼音的声母
+ * @param {string} pinyin 拼音（如 "shuang"）
+ * @returns {string} 声母（如 "sh"）；无声母返回 ""
+ */
+function extractPinyinInitial(pinyin) {
+  if (!pinyin) return "";
+  for (const init of PINYIN_INITIALS_SORTED) {
+    if (pinyin.startsWith(init)) return init;
+  }
+  return "";
+}
+
+/**
+ * 提取拼音的韵母（去除声母后的部分）
+ * @param {string} pinyin 拼音（如 "shuang"）
+ * @returns {string} 韵母（如 "uang"）
+ */
+function extractPinyinFinal(pinyin) {
+  if (!pinyin) return "";
+  const init = extractPinyinInitial(pinyin);
+  return init ? pinyin.slice(init.length) : pinyin;
+}
+
+/**
+ * 验证给定的声母是否正确
+ * @param {string} pinyin 拼音
+ * @param {string} candidate 候选声母
+ * @returns {boolean}
+ */
+export function isCorrectPinyinInitial(pinyin, candidate) {
+  return extractPinyinInitial(pinyin) === candidate;
+}
+
+/**
+ * 验证给定的韵母是否正确（需传入已选的声母）
+ * @param {string} pinyin 拼音
+ * @param {string} initial 已选的声母
+ * @param {string} candidate 候选韵母
+ * @returns {boolean}
+ */
+export function isCorrectPinyinFinal(pinyin, initial, candidate) {
+  const realInit = extractPinyinInitial(pinyin);
+  const final = extractPinyinFinal(pinyin);
+  if (initial !== realInit) return false;
+  return final === candidate;
+}
+
+// 导出提取函数（供测试与外部调用）
+export const _pinyinHelpers = {
+  extractPinyinInitial,
+  extractPinyinFinal,
+  isCorrectPinyinInitial,
+  isCorrectPinyinFinal,
+  PINYIN_INITIALS,
+};
+
 export class DrillEngine {
   constructor(mountEl, charData, onCompleteCallback, options = {}) {
     this.mount = mountEl;
@@ -283,9 +348,10 @@ export class DrillEngine {
     // E4 stroke_trace: 笔画描红（Canvas 路径追踪）
     if (type === "stroke_trace") {
       return `
-        <div class="flex flex-col items-center gap-2">
+        <div class="flex flex-col items-center gap-3">
           <canvas id="stroke-trace-canvas" width="280" height="280" class="bg-white rounded-2xl border-4 border-emerald-400 shadow-[0_0_30px_rgba(16,185,129,0.5)] cursor-crosshair touch-none"></canvas>
-          <p class="text-emerald-200 font-black text-xs">提示：沿着虚线描出"${c.char}"字</p>
+          <p class="text-emerald-200 font-black text-xs">提示：沿着虚线描出"${c.char}"字，至少画一笔</p>
+          <button id="stroke-trace-submit" class="px-8 py-3 bg-gradient-to-r from-emerald-400 to-teal-500 text-white font-black text-lg rounded-2xl border-b-4 border-emerald-700 shadow-lg active:translate-y-1 cursor-pointer">提交描红</button>
         </div>
         <p class="text-white font-black text-sm mt-1">${meta.tip}</p>
       `;
@@ -373,6 +439,10 @@ export class DrillEngine {
   // 
   // ------------------------------------------------------------------
   bindRound(type) {
+    // E4: 派发到专用处理器
+    if (type === "pinyin_spell") return this.bindPinyinSpellRound();
+    if (type === "stroke_trace") return this.bindStrokeTraceRound();
+
     const isBalloon = type === "balloon_pop";
     const needHits = 3;
     let isRoundLocked = false;
@@ -402,7 +472,6 @@ export class DrillEngine {
           return;
         }
 
-        // 答对处理
         soundAndFX.playAttackHit();
 
         if (isBalloon) {
@@ -430,6 +499,168 @@ export class DrillEngine {
         this.registerCorrect();
       });
     });
+  }
+
+  // ------------------------------------------------------------------
+  // E4: 拼音拼读处理器（声母 + 韵母双选）
+  // ------------------------------------------------------------------
+  bindPinyinSpellRound() {
+    const c = this.char;
+    let stage = "initial";   // initial → chooseInitial → chooseFinal → done
+    let chosenInitial = null;
+    let isLocked = false;
+
+    // 自动发音
+    this._timeout(() => soundAndFX.speakPriority(c.char, { kind: "char" }), 400);
+
+    const replay = this.mount.querySelector("#btn-replay-pinyin");
+    if (replay) {
+      replay.addEventListener("click", () => {
+        soundAndFX.speakPriority(c.char, { kind: "char", priority: 1 });
+      });
+    }
+
+    this.mount.querySelectorAll(".drill-opt[data-initial]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        if (isLocked || stage !== "initial") return;
+        const val = btn.dataset.initial;
+        const correct = isCorrectPinyinInitial(c.pinyin, val);
+        if (!correct) {
+          soundAndFX.playSoftError();
+          ebbinghausManager.markDifficult(c.id);
+          this.combo = 0;
+          btn.classList.add("animate-shake", "opacity-50");
+          this._timeout(() => btn.classList.remove("animate-shake", "opacity-50"), 420);
+          return;
+        }
+        chosenInitial = val;
+        stage = "chooseFinal";
+        btn.classList.add("ring-4", "ring-emerald-400", "bg-emerald-200");
+        // 锁定声母选项
+        this.mount.querySelectorAll(".drill-opt[data-initial]").forEach((b) => {
+          b.style.pointerEvents = "none";
+        });
+        soundAndFX.playAttackHit();
+      });
+    });
+
+    this.mount.querySelectorAll(".drill-opt[data-final]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        if (isLocked || stage !== "chooseFinal") return;
+        const val = btn.dataset.final;
+        const correct = isCorrectPinyinFinal(c.pinyin, chosenInitial || "", val);
+        if (!correct) {
+          soundAndFX.playSoftError();
+          ebbinghausManager.markDifficult(c.id);
+          this.combo = 0;
+          btn.classList.add("animate-shake", "opacity-50");
+          this._timeout(() => btn.classList.remove("animate-shake", "opacity-50"), 420);
+          return;
+        }
+        isLocked = true;
+        btn.classList.add("ring-4", "ring-emerald-400", "bg-emerald-200");
+        this.mount.querySelectorAll(".drill-opt").forEach((b) => {
+          b.style.pointerEvents = "none";
+        });
+        soundAndFX.playAttackHit();
+        this.registerCorrect();
+      });
+    });
+  }
+
+  // ------------------------------------------------------------------
+  // E4: 笔画描红处理器（Canvas 触控轨迹采样）
+  // ------------------------------------------------------------------
+  bindStrokeTraceRound() {
+    const canvas = this.mount.querySelector("#stroke-trace-canvas");
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    const W = canvas.width;
+    const H = canvas.height;
+
+    // 1) 绘制目标汉字（灰色虚线 = 描红底图）
+    ctx.clearRect(0, 0, W, H);
+    ctx.font = "200px 'KaiTi', 'SimSun', serif";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillStyle = "rgba(180, 180, 180, 0.25)";
+    ctx.fillText(this.char.char, W / 2, H / 2);
+    ctx.strokeStyle = "rgba(99, 99, 99, 0.4)";
+    ctx.lineWidth = 4;
+    ctx.setLineDash([8, 6]);
+    ctx.strokeText(this.char.char, W / 2, H / 2);
+    ctx.setLineDash([]);
+
+    // 2) 触控/鼠标轨迹
+    let drawing = false;
+    let lastX = 0, lastY = 0;
+    let strokesCount = 0;
+    let totalLength = 0;
+    const TARGET_MIN_LENGTH = 800;  // 笔迹长度阈值（像素）
+
+    const onStart = (x, y) => {
+      drawing = true;
+      lastX = x; lastY = y;
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+    };
+    const onMove = (x, y) => {
+      if (!drawing) return;
+      ctx.strokeStyle = "rgba(16, 185, 129, 0.9)";
+      ctx.lineWidth = 10;
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
+      ctx.lineTo(x, y);
+      ctx.stroke();
+      totalLength += Math.hypot(x - lastX, y - lastY);
+      lastX = x; lastY = y;
+    };
+    const onEnd = () => {
+      if (!drawing) return;
+      drawing = false;
+      strokesCount++;
+    };
+
+    const pointerMove = (e) => {
+      e.preventDefault();
+      const rect = canvas.getBoundingClientRect();
+      const x = (e.clientX || e.touches?.[0]?.clientX || 0) - rect.left;
+      const y = (e.clientY || e.touches?.[0]?.clientY || 0) - rect.top;
+      onMove(x, y);
+    };
+
+    canvas.addEventListener("pointerdown", (e) => {
+      e.preventDefault();
+      const rect = canvas.getBoundingClientRect();
+      onStart(e.clientX - rect.left, e.clientY - rect.top);
+    });
+    canvas.addEventListener("pointermove", pointerMove);
+    canvas.addEventListener("pointerup", onEnd);
+    canvas.addEventListener("pointerleave", onEnd);
+
+    // 3) 提交按钮
+    const submit = this.mount.querySelector("#stroke-trace-submit");
+    if (submit) {
+      submit.addEventListener("click", () => {
+        const ok = strokesCount >= 1 && totalLength >= TARGET_MIN_LENGTH;
+        if (ok) {
+          soundAndFX.playAttackHit();
+          this.registerCorrect();
+          canvas.style.boxShadow = "0 0 40px rgba(16, 185, 129, 0.8)";
+        } else {
+          soundAndFX.playSoftError();
+          ebbinghausManager.markDifficult(this.char.id);
+          this.combo = 0;
+          ctx.fillStyle = "rgba(239, 68, 68, 0.2)";
+          ctx.fillRect(0, 0, W, H);
+          this._timeout(() => {
+            ctx.fillStyle = "rgba(180, 180, 180, 0.25)";
+            ctx.fillRect(0, 0, W, H);
+            ctx.fillText(this.char.char, W / 2, H / 2);
+          }, 800);
+        }
+      });
+    }
   }
 
   registerCorrect() {

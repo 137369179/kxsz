@@ -54,15 +54,26 @@ describe("LearnModule (六步闭环识字学习)", () => {
       learn.render();
 
       expect(container.innerHTML).toContain("返回大地图");
-      // B1/B6 铁律：7 步闭环（控笔训练已插入写之前）
+      // B1/B6 铁律：8 步闭环（玩/认/读/练/控笔/描红/独立写/测）
       expect(container.innerHTML).toContain("玩");
       expect(container.innerHTML).toContain("认");
       expect(container.innerHTML).toContain("读");
       expect(container.innerHTML).toContain("练");
       expect(container.innerHTML).toContain("控笔");
+      expect(container.innerHTML).toContain("描红");
       expect(container.innerHTML).toContain("写");
       expect(container.innerHTML).toContain("测");
     });
+
+  it("should advance through 8 steps cleanly", () => {
+    const learn = new LearnModule(container, mockChar, vi.fn(), vi.fn());
+    for (let i = 1; i <= 8; i++) {
+      expect(learn.currentStep).toBe(i);
+      learn.nextStep();
+    }
+    // Cap at step 8
+    expect(learn.currentStep).toBe(8);
+  });
 
   it("should properly destroy sub-engines, timers, and listeners on destroy()", () => {
     const learn = new LearnModule(container, mockChar, vi.fn(), vi.fn());
