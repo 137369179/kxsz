@@ -144,6 +144,24 @@ export function migrateToFSRS(record) {
 }
 
 /**
+ * 判断本次复习是否为同日复习（Intra-day review）
+ * 定义：lastReview 与当前时间在同一日历天（本地时区）
+ * 同日复习应用温和惩罚，避免过度学习失真
+ * @param {number|null} lastReview  上次复习时间戳（毫秒）
+ * @returns {boolean}
+ */
+export function isIntradayReview(lastReview) {
+  if (!lastReview) return false;
+  const nowDate = new Date();
+  const lastDate = new Date(lastReview);
+  return (
+    nowDate.getFullYear() === lastDate.getFullYear() &&
+    nowDate.getMonth()    === lastDate.getMonth() &&
+    nowDate.getDate()     === lastDate.getDate()
+  );
+}
+
+/**
  * 核心 FSRS 调度函数
  * @param {object} fsrsState 当前 FSRS 状态
  * @param {number} rating   FSRGRating 评级 (0=Again, 1=Hard, 2=Good, 3=Easy)
@@ -152,6 +170,10 @@ export function migrateToFSRS(record) {
 export function scheduleFSRS(fsrsState, rating) {
   const now = Date.now();
   const w = FSRS_PARAMS.ratingWeights[rating] || FSRS_PARAMS.ratingWeights[FSRGRating.GOOD];
+
+  // 同日复习检测（Intra-day review）
+  // 同日内的 AGAIN/HARD 惩罚系数减半，防止过度学习失真
+  const intraday = isIntradayReview(fsrsState.lastReview);
 
   // 计算新的稳定性和难度
   let { stability, difficulty } = fsrsState;
@@ -164,19 +186,25 @@ export function scheduleFSRS(fsrsState, rating) {
 
   // 稳定度更新（简化版：按权重调整）
   // AGAIN：大幅降低；HARD：略降；GOOD：不变；EASY：提升
-  let newStability = stability * Math.pow(10, w.sDec);
+  // 同日复习时惩罚减半（sDec 取平均值向 0 收缩一半）
+  const effectiveSdec = intraday && w.sDec < 0 ? w.sDec * 0.5 : w.sDec;
+  let newStability = stability * Math.pow(10, effectiveSdec);
 
   // AGAIN 处理：lapse 计数 + 进入再学习
   if (rating === FSRGRating.AGAIN) {
     const newLapses = lapses + 1;
-    const nextDue = now + FSRS_PARAMS.relearnSteps[0] * 1000;
+    // 同日复习的 AGAIN：使用 5 分钟温和重练间隔（不使用 relearnSteps[0] 的全量 10 分钟）
+    const againInterval = intraday
+      ? 5 * 60 * 1000          // 5 分钟温和重练
+      : FSRS_PARAMS.relearnSteps[0] * 1000;  // 跨日：10 分钟完整再学习
+    const nextDue = now + againInterval;
     return buildResult(fsrsState, {
       state: FSRSState.RELEARNING,
       stability: Math.max(0.01, newStability),
       difficulty,
       lapses: newLapses,
       reps: reps + 1,
-      interval: FSRS_PARAMS.relearnSteps[0] * 1000,
+      interval: againInterval,
       due: nextDue,
       lastReview: now,
       learningStep: 0,

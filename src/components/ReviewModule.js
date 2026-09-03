@@ -33,6 +33,9 @@ export class ReviewModule extends BaseModule {
     this.correctCount = 0;
     this.wrongCount = 0;
     this.drillEngine = null;
+    // SM-18 遗忘警报追踪
+    this.consecutiveMistakes = {};  // { charId: number } 连续失误计数
+    this.forgottenChars = [];       // 警报字列表（charId）
     this.initQueue();
   }
 
@@ -71,6 +74,8 @@ export class ReviewModule extends BaseModule {
     this.currentIndex = 0;
     this.correctCount = 0;
     this.wrongCount = 0;
+    this.consecutiveMistakes = {};
+    this.forgottenChars = [];
   }
 
   destroy() {
@@ -222,14 +227,32 @@ export class ReviewModule extends BaseModule {
     this.drillEngine = new DrillEngine(drillStage, charData, () => {
       // 完成单个字的强化训练
       const perfect = (this.drillEngine.bestCombo || 0) >= 2;
+      const charId = charData.id;
+
       if (perfect) {
         this.correctCount++;
-        ebbinghausManager.completeReview(charData.id, true);
+        this.consecutiveMistakes[charId] = 0;  // 重置连错计数
+        ebbinghausManager.completeReview(charId, true);
         ebbinghausManager.addCoins(5);
       } else {
         this.wrongCount++;
-        ebbinghausManager.completeReview(charData.id, false);
+        // 连续失误计数 +1
+        this.consecutiveMistakes[charId] = (this.consecutiveMistakes[charId] || 0) + 1;
+        ebbinghausManager.completeReview(charId, false);
         ebbinghausManager.addCoins(1);
+
+        // SM-18 遗忘警报：连续错 2 次及以上触发
+        if (this.consecutiveMistakes[charId] >= 2 && !this.forgottenChars.includes(charId)) {
+          this.forgottenChars.push(charId);
+          // 在队列末尾追加巳固题（该字再别练一次）
+          if (!this.queue.slice(this.currentIndex + 1).some(c => c.id === charId)) {
+            this.queue.push(charData);
+          }
+          // 语音提示
+          soundAndFX.speakPriority('这个字小有困难，再练一次吧', { kind: 'tutorial', priority: 1 });
+          // 遗忘警报横幅
+          this._showForgottenAlert(charData);
+        }
       }
 
       this.currentIndex++;
@@ -241,11 +264,47 @@ export class ReviewModule extends BaseModule {
     });
   }
 
+  /**
+   * 遗忘警报横幅（SM-18 遗忘警报）
+   * @param {object} charData
+   */
+  _showForgottenAlert(charData) {
+    const banner = document.createElement('div');
+    banner.id = 'forgotten-alert-banner';
+    banner.style.cssText = [
+      'position:fixed',
+      'top:80px',
+      'left:50%',
+      'transform:translateX(-50%)',
+      'z-index:9999',
+      'background:linear-gradient(135deg,#dc2626,#b91c1c)',
+      'color:#fff',
+      'padding:12px 28px',
+      'border-radius:999px',
+      'font-weight:900',
+      'font-size:15px',
+      'box-shadow:0 8px 32px rgba(220,38,38,0.4)',
+      'display:flex',
+      'align-items:center',
+      'gap:10px',
+      'letter-spacing:0.03em',
+      'pointer-events:none',
+      'animation:slideDown 0.3s ease',
+    ].join(';');
+    banner.innerHTML = [
+      GAME_ICONS.star('w-5 h-5', false),
+      `<span>「${charData.char}」需要加强巳固！已加入本轮末尾重练</span>`,
+    ].join('');
+    document.body.appendChild(banner);
+    setTimeout(() => { banner.remove(); }, 3200);
+  }
+
   renderSummary() {
     const __rvProgress = ebbinghausManager.progress;
     const __rvSpeakerIcon = soundAndFX.isMuted ? GAME_ICONS.speaker("w-5 h-5", true) : GAME_ICONS.speaker("w-5 h-5", false);
     const total = this.queue.length;
     const perfect = this.wrongCount === 0;
+    const forgottenSet = new Set(this.forgottenChars);
 
     if (perfect) {
       soundAndFX.playCrownFanfare();
@@ -275,12 +334,24 @@ export class ReviewModule extends BaseModule {
 
           <div class="flex items-center gap-2 mb-4 flex-wrap justify-center">
             ${this.queue.map(c => `
-              <div class="reviewed-char-chip w-12 h-12 rounded-2xl bg-white/20 hover:bg-white/30 border-2 border-yellow-300/50 flex flex-col items-center justify-center cursor-pointer active:scale-90 transition-transform font-serif shadow" data-char="${c.char}">
+              <div class="reviewed-char-chip w-12 h-12 rounded-2xl
+                ${forgottenSet.has(c.id)
+                  ? 'bg-red-500/30 border-2 border-red-400'
+                  : 'bg-white/20 border-2 border-yellow-300/50'}
+                hover:bg-white/30 flex flex-col items-center justify-center cursor-pointer active:scale-90 transition-transform font-serif shadow" data-char="${c.char}">
                 <span class="text-xl font-black text-white leading-none">${c.char}</span>
-                <span class="text-[9px] text-yellow-300 font-sans mt-0.5">${c.pinyin}</span>
+                <span class="text-[9px] ${forgottenSet.has(c.id) ? 'text-red-300' : 'text-yellow-300'} font-sans mt-0.5">
+                  ${forgottenSet.has(c.id) ? '加强' : c.pinyin}
+                </span>
               </div>
             `).join("")}
           </div>
+
+          ${this.forgottenChars.length > 0 ? `
+          <div class="w-full bg-red-900/30 border border-red-500/40 rounded-2xl px-4 py-2.5 mb-4 text-xs text-red-300 font-bold flex items-center gap-2">
+            ${GAME_ICONS.star('w-4 h-4', false)}
+            <span>需加强：${this.forgottenChars.map(id => { const c = this.queue.find(q => q.id === id); return c ? c.char : id; }).join('、')}（明日优先安排复习）</span>
+          </div>` : ''}
 
           <div class="candy-pill rounded-2xl px-6 py-2.5 mb-6 text-sm text-yellow-300 font-black flex items-center gap-2 border border-yellow-300/40">
             ${GAME_ICONS.coin("w-5 h-5")}

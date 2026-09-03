@@ -440,3 +440,64 @@ describe('stabilityToInterval / intervalToStability 互逆', () => {
     expect(ms).toBeGreaterThan(0);
   });
 });
+
+// ── isIntradayReview — 同日复习识别（调研报告 §2.3 建议C）─────────
+
+import { isIntradayReview } from '../../src/utils/fsrsScheduler.js';
+
+describe('isIntradayReview — 同日复习识别', () => {
+  it('null lastReview → false（从未复习过）', () => {
+    expect(isIntradayReview(null)).toBe(false);
+    expect(isIntradayReview(undefined)).toBe(false);
+  });
+
+  it('lastReview 是今天 → true', () => {
+    const todayTs = Date.now() - 30 * 60 * 1000; // 30 分钟前（今天）
+    expect(isIntradayReview(todayTs)).toBe(true);
+  });
+
+  it('lastReview 是昨天 → false', () => {
+    const yesterdayTs = Date.now() - 25 * 60 * 60 * 1000; // 25 小时前（昨天）
+    expect(isIntradayReview(yesterdayTs)).toBe(false);
+  });
+
+  it('同日 AGAIN 惩罚减半：稳定性下降幅度 < 跨日 AGAIN', () => {
+    const baseState = initFSRSRecord('字_intraday');
+    baseState.stability = 5.0;
+
+    // 跨日 AGAIN（lastReview = 昨天）
+    const crossDayState = { ...baseState, lastReview: Date.now() - 25 * 60 * 60 * 1000 };
+    const crossDayResult = scheduleFSRS(crossDayState, FSRGRating.AGAIN);
+
+    // 同日 AGAIN（lastReview = 1 小时前）
+    const intradayState = { ...baseState, lastReview: Date.now() - 60 * 60 * 1000 };
+    const intradayResult = scheduleFSRS(intradayState, FSRGRating.AGAIN);
+
+    // 同日惩罚应更轻，稳定性应更高（下降更少）
+    expect(intradayResult.stability).toBeGreaterThan(crossDayResult.stability);
+  });
+
+  it('同日 AGAIN 间隔 ≤ 5 分钟（跨日 AGAIN ≥ 9 分钟）', () => {
+    const baseState = initFSRSRecord('字_interval');
+
+    // 同日 AGAIN
+    const intradayState = { ...baseState, lastReview: Date.now() - 30 * 60 * 1000 };
+    const intradayResult = scheduleFSRS(intradayState, FSRGRating.AGAIN);
+    expect(intradayResult.interval).toBeLessThanOrEqual(5 * 60 * 1000 + 1000); // ≤ 5min+1s
+
+    // 跨日 AGAIN
+    const crossDayState = { ...baseState, lastReview: Date.now() - 25 * 60 * 60 * 1000 };
+    const crossDayResult = scheduleFSRS(crossDayState, FSRGRating.AGAIN);
+    expect(crossDayResult.interval).toBeGreaterThan(9 * 60 * 1000); // > 9min
+  });
+
+  it('同日 GOOD/EASY 不受影响（sDec 非负，无减半）', () => {
+    const baseState = { ...initFSRSRecord('字_good'), lastReview: Date.now() - 30 * 60 * 1000 };
+    const goodResult = scheduleFSRS(baseState, FSRGRating.GOOD);
+    const easyResult = scheduleFSRS(baseState, FSRGRating.EASY);
+    // GOOD/EASY 稳定性应正常增长
+    expect(goodResult.stability).toBeGreaterThanOrEqual(baseState.stability);
+    expect(easyResult.stability).toBeGreaterThanOrEqual(goodResult.stability);
+  });
+});
+
