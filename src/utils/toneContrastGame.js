@@ -243,6 +243,10 @@ function shuffle(arr) {
  */
 export function checkAnswer(question, answer) {
   if (!question) return false;
+  if (Array.isArray(question.correctAnswer) && Array.isArray(answer)) {
+    if (question.correctAnswer.length !== answer.length) return false;
+    return question.correctAnswer.every((v, idx) => v === answer[idx]);
+  }
   return question.correctAnswer === answer;
 }
 

@@ -18,6 +18,15 @@ import {
   PINYIN_WHOLE_SYLLABLES,
   PINYIN_COLLISION_PAIRS
 } from "../data/pinyinList.js";
+import { CHARACTER_DATABASE } from "../data/characters.js";
+import {
+  generateSession,
+  checkAnswer,
+  TONE_INFO,
+  TONE_MNEMONICS,
+  TONE_GAME_TYPES
+} from "../utils/toneContrastGame.js";
+import { ebbinghausManager } from "../utils/ebbinghaus.js";
 
 export class PinyinModule extends BaseModule {
   constructor(container) {
@@ -27,6 +36,13 @@ export class PinyinModule extends BaseModule {
     this.selectedPinyin = PINYIN_INITIALS[0];
     this.collisionIndex = 0;
     this.currentTone = 1;
+
+    // B5 声调意识训练状态
+    this.toneQuizActive = false;
+    this.toneQuizSession = null;
+    this.toneQuizIndex = 0;
+    this.toneQuizScore = 0;
+    this.toneQuizLastResult = null;
   }
 
   /**
@@ -229,9 +245,13 @@ export class PinyinModule extends BaseModule {
   }
 
   // ----------------------------------------------------
-  // 2. 声调过山车
+  // 2. 声调过山车 & 声调大挑战 (B5 声调意识训练)
   // ----------------------------------------------------
   _renderCoasterView() {
+    if (this.toneQuizActive) {
+      return this._renderToneQuizView();
+    }
+
     const tonesData = [
       { tone: 1, name: "第一声 · 一声平", symbol: "ā", desc: "平平地开，小车平稳跑 (高平调 55)", icon: "car" },
       { tone: 2, name: "第二声 · 二声扬", symbol: "á", desc: "上坡加油，由低往高冲 (中升调 35)", icon: "car" },
@@ -244,9 +264,19 @@ export class PinyinModule extends BaseModule {
     return `
       <div class="bg-white/95 rounded-3xl p-6 sm:p-8 shadow-xl border-4 border-indigo-200 flex flex-col items-center">
         
-        <div class="text-center max-w-lg mb-6">
+        <div class="text-center max-w-lg mb-4">
           <h2 class="text-xl font-black text-indigo-950 mb-1">四声调趣味过山车</h2>
           <p class="text-xs text-indigo-700 font-semibold">四声调像过山车的小轨道！一声平、二声扬、三声拐弯、四声降！</p>
+        </div>
+
+        <!-- 模式切换：轨道演示 vs 声调大挑战 -->
+        <div class="flex items-center gap-2 mb-6 bg-indigo-50 p-1.5 rounded-full border border-indigo-200">
+          <button id="btn-subtab-track" class="px-5 py-2 rounded-full text-xs font-black bg-indigo-600 text-white shadow-md cursor-pointer">
+            过山车轨道演示
+          </button>
+          <button id="btn-start-tone-quiz" class="px-5 py-2 rounded-full text-xs font-black text-indigo-900 hover:bg-white/60 cursor-pointer">
+            声调大挑战 (5题)
+          </button>
         </div>
 
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 w-full max-w-3xl mb-8">
@@ -284,6 +314,146 @@ export class PinyinModule extends BaseModule {
             <span>发车出发！体验声调过山车 (${currentToneInfo.symbol})</span>
           </button>
 
+        </div>
+
+        <!-- B5 声调意识强化大挑战入口 -->
+        <div class="w-full max-w-2xl mt-6 p-4 bg-gradient-to-r from-amber-50 to-orange-50 rounded-2xl border-2 border-amber-200 shadow flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div class="flex items-center gap-3">
+            <span class="flex items-center text-amber-500">${GAME_ICONS.sparkle("w-8 h-8")}</span>
+            <div>
+              <h3 class="text-sm font-black text-amber-950">四声调辨识大挑战 (B5 意识训练)</h3>
+              <p class="text-xs text-amber-800">听音辨调、选字辨调，建立 4 声调敏锐语感！</p>
+            </div>
+          </div>
+          <button id="btn-start-tone-quiz-bottom" class="btn-game-orange text-white text-xs font-black px-6 py-2.5 rounded-full shadow cursor-pointer active:scale-95 whitespace-nowrap">
+            开始挑战 (5题)
+          </button>
+        </div>
+
+      </div>
+    `;
+  }
+
+  startToneQuiz() {
+    this.toneQuizActive = true;
+    this.toneQuizSession = generateSession(CHARACTER_DATABASE, {
+      numQuestions: 5,
+      types: [TONE_GAME_TYPES.LISTEN_PICK_TONE, TONE_GAME_TYPES.TONE_PICK_CHAR]
+    });
+    this.toneQuizIndex = 0;
+    this.toneQuizScore = 0;
+    this.toneQuizLastResult = null;
+    if (this.toneQuizSession?.questions?.[0]?.speakText) {
+      soundAndFX.speakPriority(this.toneQuizSession.questions[0].speakText, { kind: "pinyin", priority: 1 });
+    }
+    this.render();
+  }
+
+  _renderToneQuizView() {
+    if (!this.toneQuizSession) {
+      return `
+        <div class="bg-white/95 rounded-3xl p-8 shadow-xl border-4 border-indigo-200 flex flex-col items-center max-w-2xl mx-auto">
+          <div class="text-center mb-6">
+            <h2 class="text-xl font-black text-indigo-950 mb-1">四声调辨识大挑战</h2>
+            <p class="text-xs text-indigo-700 font-semibold">汉语拼读的核心钥匙 · 每天 5 题练就神耳朵</p>
+          </div>
+          <button id="btn-start-tone-quiz" class="btn-game-orange text-white text-sm font-black px-8 py-3 rounded-full shadow-lg active:scale-95 cursor-pointer">
+            开始挑战 (5题)
+          </button>
+          <button id="btn-back-track" class="mt-4 text-xs font-bold text-indigo-600 underline cursor-pointer">
+            返回轨道演示
+          </button>
+        </div>
+      `;
+    }
+
+    const { questions } = this.toneQuizSession;
+    if (this.toneQuizIndex >= questions.length) {
+      const perfect = this.toneQuizScore === questions.length;
+      return `
+        <div class="bg-white/95 rounded-3xl p-8 shadow-xl border-4 border-indigo-200 flex flex-col items-center max-w-2xl mx-auto text-center">
+          <div class="w-16 h-16 rounded-full bg-amber-100 flex items-center justify-center text-amber-500 mb-4 shadow-inner">
+            ${GAME_ICONS.sparkle("w-10 h-10")}
+          </div>
+          <h2 class="text-2xl font-black text-indigo-950 mb-2">${perfect ? "太棒啦！满分通关！" : "挑战完成！真棒！"}</h2>
+          <p class="text-sm text-indigo-700 mb-6 font-semibold">你答对了 ${this.toneQuizScore} / ${questions.length} 题！声调意识又提升啦！</p>
+          
+          <div class="flex items-center gap-4">
+            <button id="btn-restart-tone-quiz" class="btn-game-orange text-white text-xs font-black px-8 py-3 rounded-full shadow active:scale-95 cursor-pointer">
+              再挑战一次
+            </button>
+            <button id="btn-back-track" class="bg-indigo-100 hover:bg-indigo-200 text-indigo-900 text-xs font-black px-8 py-3 rounded-full shadow active:scale-95 cursor-pointer">
+              返回轨道演示
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    const q = questions[this.toneQuizIndex];
+    const isAnswered = this.toneQuizLastResult !== null;
+
+    return `
+      <div class="bg-white/95 rounded-3xl p-6 sm:p-8 shadow-xl border-4 border-indigo-200 flex flex-col items-center max-w-2xl mx-auto w-full">
+        
+        <!-- 头部导航与进度 -->
+        <div class="w-full flex items-center justify-between mb-6">
+          <button id="btn-back-track" class="text-xs font-black text-indigo-600 hover:text-indigo-800 flex items-center gap-1 cursor-pointer">
+            返回轨道演示
+          </button>
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-black text-indigo-900 bg-indigo-50 px-3 py-1 rounded-full border border-indigo-200">
+              第 ${this.toneQuizIndex + 1} / ${questions.length} 题
+            </span>
+            <span class="text-xs font-black text-amber-600 bg-amber-50 px-3 py-1 rounded-full border border-amber-200">
+              得分：${this.toneQuizScore}
+            </span>
+          </div>
+        </div>
+
+        <!-- 题目语音卡片 -->
+        <div class="w-full bg-gradient-to-b from-indigo-50 to-purple-50 rounded-2xl p-6 border-2 border-indigo-200 flex flex-col items-center mb-6 text-center">
+          <h3 class="text-base font-black text-indigo-950 mb-3">${q.question}</h3>
+          
+          <button id="btn-play-tone-sound" class="btn-game-primary text-white text-xs font-black px-6 py-2.5 rounded-full shadow flex items-center gap-2 cursor-pointer active:scale-95 hover:brightness-105" data-sound="${q.speakText || ''}">
+            <span class="flex items-center">${GAME_ICONS.sparkle("w-4 h-4")}</span>
+            <span>点击重听读音</span>
+          </button>
+          
+          ${isAnswered ? `
+            <div class="mt-4 p-3 rounded-xl text-xs font-bold ${
+              this.toneQuizLastResult.correct
+                ? "bg-emerald-100 text-emerald-800 border border-emerald-300"
+                : "bg-amber-100 text-amber-800 border border-amber-300"
+            }">
+              ${this.toneQuizLastResult.correct ? "答对啦！" : "再记一记：" + (q.explanation || "")}
+            </div>
+          ` : ""}
+        </div>
+
+        <!-- 选项区域 -->
+        <div class="grid grid-cols-2 gap-4 w-full">
+          ${q.options.map((opt) => {
+            const optVal = opt.tone !== undefined ? opt.tone : (opt.char || opt);
+            let btnClass = "bg-indigo-50/80 hover:bg-indigo-100 text-indigo-950 border-indigo-200";
+            if (isAnswered) {
+              if (optVal === q.correctAnswer) {
+                btnClass = "bg-emerald-500 text-white border-emerald-600 shadow-md scale-102";
+              } else if (optVal === this.toneQuizLastResult.selected) {
+                btnClass = "bg-rose-400 text-white border-rose-500 opacity-80";
+              } else {
+                btnClass = "bg-gray-100 text-gray-400 border-gray-200 opacity-50";
+              }
+            }
+            return `
+              <button class="btn-tone-quiz-opt p-4 rounded-2xl border-2 transition-all flex flex-col items-center justify-center cursor-pointer active:scale-95 ${btnClass}"
+                data-val="${optVal}" ${isAnswered ? "disabled" : ""}>
+                <span class="text-xl sm:text-2xl font-black mb-1">${opt.label || opt.char || optVal}</span>
+                ${opt.pinyin ? `<span class="text-xs font-bold text-gray-500">${opt.pinyin}</span>` : ""}
+                ${opt.tone && TONE_MNEMONICS[opt.tone] ? `<span class="text-[11px] font-medium opacity-80">${TONE_MNEMONICS[opt.tone].split("～")[0]}</span>` : ""}
+              </button>
+            `;
+          }).join("")}
         </div>
 
       </div>
