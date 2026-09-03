@@ -29,6 +29,28 @@ export class PinyinModule extends BaseModule {
     this.currentTone = 1;
   }
 
+  /**
+   * T14: 接收汉字拼音，精准定位并高亮对应声母/韵母
+   */
+  locatePinyin(pinyinStr) {
+    if (!pinyinStr) return;
+    const clean = pinyinStr.replace(/[^a-zA-Z]/g, "").toLowerCase();
+    const foundInit = PINYIN_INITIALS.find(x => x.pinyin === clean || clean.startsWith(x.pinyin));
+    if (foundInit) {
+      this.currentTab = "atlas";
+      this.selectedCategory = "initial";
+      this.selectedPinyin = foundInit;
+      return;
+    }
+    const foundFinal = PINYIN_FINALS.find(x => x.pinyin === clean || clean.endsWith(x.pinyin));
+    if (foundFinal) {
+      this.currentTab = "atlas";
+      this.selectedCategory = "final";
+      this.selectedPinyin = foundFinal;
+      return;
+    }
+  }
+
   render() {
     this.destroy();
 

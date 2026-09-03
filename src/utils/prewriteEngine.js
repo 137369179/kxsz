@@ -136,6 +136,17 @@ export class PrewriteEngine {
     this.tolerance = this._toleranceForAge(this.age);
     this.targetProgressRatio = 0.6 + Math.min(0.2, this.age * 0.03); // 4岁 0.72, 7岁 0.81
 
+    // T10: 年龄自适应触屏策略 (<=6 岁 手指模式，触控区放大40%；>=7 岁 手写笔精细模式)
+    if (this.age <= 6) {
+      this.inputMode = "finger";
+      this.touchTargetScale = 1.4;
+      this.traceTolerance = 0.35;
+    } else {
+      this.inputMode = "stylus";
+      this.touchTargetScale = 1.0;
+      this.traceTolerance = 0.20;
+    }
+
     // 状态
     this.isDestroyed = false;
     this.isDrawing = false;
@@ -338,7 +349,7 @@ export class PrewriteEngine {
    */
   _computeCoverage(targetPath, userPath) {
     if (userPath.length < 2) return 0;
-    const tol = this.tolerance; // 百分比距离
+    const tol = this.tolerance * (this.touchTargetScale || 1.0); // T10: 年龄自适应触控区与容差
 
     let covered = 0;
     const step = Math.max(1, Math.floor(targetPath.length / 60));

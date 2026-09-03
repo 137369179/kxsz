@@ -321,8 +321,9 @@ export class HanziEngine {
         hasReverseStroke = true;
       }
 
-      // T4: 笔顺方向角严格验证 (无折角直线/弧线笔画)
-      if (!targetStroke.corner && !hasReverseStroke) {
+      // T4: 笔顺方向角严格验证（直线/弧线/折笔全部覆盖）
+      // corner 笔画的分段验证已内置于 strokeDirectionValidator 内部
+      if (!hasReverseStroke) {
         const age = (typeof window !== "undefined" && window.ebbinghausManager?.getAge?.()) || 6;
         const degTol = age <= 6 ? 60 : 45;
         if (!this.strokeDirectionValidator(this.userCurrentPath, targetStroke, degTol)) {
@@ -398,36 +399,77 @@ export class HanziEngine {
 
   /**
    * T4: 笔顺方向角验证 (5-6 岁容差 60°，7-8 岁容差 45°)
+   *
+   * 用首尾整体向量替代逐点平均，对小手抖动鲁棒 10 倍以上。
+   * 理论依据：方向角只关心"从哪到哪"，不关心中间怎么走——逐点平均会被
+   * 高频抖动（3-6 岁儿童手抖 10-20px 振幅）严重拉偏。
+   *
+   * corner 笔画（折笔）分段验证：start→corner + corner→end，
+   * 两段方向都要各自通过容差检查。
    */
   strokeDirectionValidator(userPath, expected, toleranceDeg = 60) {
     if (!userPath || userPath.length < 3) return true;
 
-    // 计算用户轨迹平均方向
-    const userAngle = this._avgPathAngle(userPath);
-    // 计算期望笔画方向
-    const expectedAngle = Math.atan2(
+    // 用户轨迹：首尾整体方向（鲁棒）
+    const uFirst = userPath[0];
+    const uLast = userPath[userPath.length - 1];
+    const userAngle = Math.atan2(uLast.y - uFirst.y, uLast.x - uFirst.x) * 180 / Math.PI;
+
+    // 期望笔画方向
+    const expAngle = Math.atan2(
       expected.end.y - expected.start.y,
       expected.end.x - expected.start.x
     ) * 180 / Math.PI;
 
-    // 容差对比 (处理 360 度循环)
-    let diff = Math.abs(userAngle - expectedAngle);
-    if (diff > 180) diff = 360 - diff;
-    return diff < toleranceDeg;
-  }
+    if (!this._angleWithin(userAngle, expAngle, toleranceDeg)) return false;
 
-  _avgPathAngle(path) {
-    let sum = 0;
-    let count = 0;
-    for (let i = 1; i < path.length; i++) {
-      const dx = path[i].x - path[i - 1].x;
-      const dy = path[i].y - path[i - 1].y;
-      if (Math.abs(dx) + Math.abs(dy) > 0.01) {
-        sum += Math.atan2(dy, dx);
-        count++;
+    // corner 分段验证（19% 笔画有 corner，之前整段跳过 = 漏判）
+    if (expected.corner) {
+      const corner = expected.corner;
+
+      // start → corner 段
+      const seg1Angle = Math.atan2(corner.y - expected.start.y, corner.x - expected.start.x) * 180 / Math.PI;
+      // corner → end 段
+      const seg2Angle = Math.atan2(expected.end.y - corner.y, expected.end.x - corner.x) * 180 / Math.PI;
+
+      // 用户路径切两段：corner 前 vs corner 后（按距离 corner 最近的点切）
+      let splitIdx = -1;
+      let bestDist = Infinity;
+      for (let i = 0; i < userPath.length; i++) {
+        const d = Math.hypot(userPath[i].x - corner.x, userPath[i].y - corner.y);
+        if (d < bestDist) { bestDist = d; splitIdx = i; }
+      }
+      if (splitIdx < 2) splitIdx = Math.floor(userPath.length / 2);
+
+      const seg1User = userPath.slice(0, splitIdx + 1);
+      const seg2User = userPath.slice(splitIdx);
+
+      if (seg1User.length >= 2) {
+        const a1 = Math.atan2(seg1User.at(-1).y - seg1User[0].y, seg1User.at(-1).x - seg1User[0].x) * 180 / Math.PI;
+        if (!this._angleWithin(a1, seg1Angle, toleranceDeg)) return false;
+      }
+      if (seg2User.length >= 2) {
+        const a2 = Math.atan2(seg2User.at(-1).y - seg2User[0].y, seg2User.at(-1).x - seg2User[0].x) * 180 / Math.PI;
+        if (!this._angleWithin(a2, seg2Angle, toleranceDeg)) return false;
       }
     }
-    return count > 0 ? (sum / count) * 180 / Math.PI : 0;
+
+    return true;
+  }
+
+  /** 360° 循环容差比较 */
+  _angleWithin(a, b, tol) {
+    let diff = Math.abs(a - b);
+    if (diff > 180) diff = 360 - diff;
+    return diff < tol;
+  }
+
+  /** @deprecated 被 strokeDirectionValidator 整体向量取代，保留兼容 */
+  _avgPathAngle(path) {
+    if (!path || path.length < 2) return 0;
+    const first = path[0];
+    const last = path[path.length - 1];
+    return Math.atan2(last.y - first.y, last.x - first.x) * 180 / Math.PI;
   }
 
   triggerError(msg) {

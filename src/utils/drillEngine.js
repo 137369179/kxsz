@@ -32,6 +32,8 @@ const TYPE_META = {
   cloze_hint: { iconSvg: (cls) => GAME_ICONS.scroll(cls), name: "句子填空", tip: "提示拼音，填入正确汉字" },
   pinyin_spell: { iconSvg: (cls) => GAME_ICONS.mic(cls), name: "拼读练习", tip: "听拼音，选声母韵母组合" },
   stroke_trace: { iconSvg: (cls) => GAME_ICONS.pen(cls), name: "笔画描红", tip: "跟着虚线，描出汉字笔画" },
+  // T7 新增：主动回忆（听音写字/选字）
+  audio_to_text: { iconSvg: (cls) => GAME_ICONS.mic(cls), name: "听音写字", tip: "听准发音，找出对应的汉字" },
 };
 
 /** Fisher-Yates */
@@ -159,6 +161,8 @@ export class DrillEngine {
     if ((c.sentence || "").includes(c.char)) pool.push("cloze_hint");
     if (c.pinyin && c.pinyin.length > 1) pool.push("pinyin_spell");
     if (c.char && c.char.length === 1) pool.push("stroke_trace");
+    // T7 新增题型
+    if (c.pinyin) pool.push("audio_to_text");
     return pool;
   }
 
@@ -357,6 +361,18 @@ export class DrillEngine {
       `;
     }
 
+    // T7 audio_to_text: 听音写字/选字
+    if (type === "audio_to_text") {
+      return `
+        <div class="flex flex-col items-center gap-3">
+          <button id="btn-replay-audio" class="w-24 h-24 rounded-full bg-gradient-to-tr from-cyan-400 to-blue-600 border-4 border-white shadow-[0_0_35px_rgba(6,182,212,0.8)] flex items-center justify-center active:scale-90 transition-transform animate-bounce-slow cursor-pointer" title="点击播放发音">
+            ${GAME_ICONS.speaker("w-12 h-12")}
+          </button>
+          <div class="text-xs text-cyan-200 font-bold bg-black/40 px-4 py-1.5 rounded-full border border-cyan-400/30">听发音，找出对应的汉字</div>
+        </div>
+      `;
+    }
+
     // balloon_pop
     return `
       <div class="flex flex-col items-center gap-2">
@@ -466,6 +482,7 @@ export class DrillEngine {
         if (!correct) {
           soundAndFX.playSoftError();
           ebbinghausManager.markDifficult(this.char.id);
+          this.afterQuestionAnswer(this.char, type, 0, false);
           this.combo = 0;
           btn.classList.add("animate-shake");
           this._timeout(() => btn.classList.remove("animate-shake"), 420);
@@ -473,6 +490,7 @@ export class DrillEngine {
         }
 
         soundAndFX.playAttackHit();
+        this.afterQuestionAnswer(this.char, type, 3, true);
 
         if (isBalloon) {
           btn.style.pointerEvents = "none";
@@ -685,6 +703,24 @@ export class DrillEngine {
       this.roundIndex += 1;
       this.render();
     }, 720);
+  }
+
+  /**
+   * T7: 每题作答自动关联 FSRS 记忆复习与难字档案
+   */
+  afterQuestionAnswer(char, type, rating, correct) {
+    if (ebbinghausManager?.completeReview && char?.id) {
+      ebbinghausManager.completeReview(char.id, correct);
+    }
+  }
+
+  /**
+   * T7: 验证填空句子中目标字的唯一性，避免歧义挖空
+   */
+  validateClozeUniqueness(sentence, targetChar) {
+    if (!sentence || !targetChar) return true;
+    const parts = sentence.split(targetChar);
+    return parts.length === 2; // targetChar 仅在句子中出现 1 次
   }
 
   // ------------------------------------------------------------------

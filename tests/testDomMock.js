@@ -61,7 +61,18 @@ export function createMockElement(tag = "div", id = "", classes = []) {
         }
       }
     },
-    textContent: "",
+    get textContent() {
+      // innerHTML 去掉所有 HTML 标签 + script/style 内容 → 纯文本
+      let html = el.innerHTML;
+      html = html.replace(/<script[\s\S]*?<\/script>/gi, "");
+      html = html.replace(/<style[\s\S]*?<\/style>/gi, "");
+      html = html.replace(/<[^>]+>/g, "");
+      html = html.replace(/&nbsp;/g, " ").replace(/&amp;/g, "&");
+      return html;
+    },
+    set textContent(val) {
+      _innerHTML = String(val).replace(/[<>&]/g, (c) => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;" }[c]));
+    },
     classList: {
       add: vi.fn((...cls) => cls.forEach((c) => classSet.add(c))),
       remove: vi.fn((...cls) => cls.forEach((c) => classSet.delete(c))),
@@ -150,7 +161,29 @@ export function createMockElement(tag = "div", id = "", classes = []) {
       }
       return el.children.find((c) => c.tagName === sel.toUpperCase()) || null;
     }),
-    querySelectorAll: vi.fn(() => []),
+    querySelectorAll: vi.fn((sel) => {
+      const results = [];
+      const walk = (node) => {
+        if (!node) return;
+        if (sel && sel.startsWith(".")) {
+          const cls = sel.slice(1);
+          if (node.classList && typeof node.classList.contains === "function" && node.classList.contains(cls)) {
+            results.push(node);
+          }
+        }
+        if (Array.isArray(node.children)) {
+          for (const c of node.children) walk(c);
+        }
+      };
+      walk(el);
+      if (results.length === 0 && _innerHTML && sel && sel.startsWith(".")) {
+        const cls = sel.slice(1);
+        const re = new RegExp(`class=["'][^"']*?${cls}[^"']*?["']`, "g");
+        const matches = [..._innerHTML.matchAll(re)];
+        for (const _m of matches) results.push(createMockElement("div", "", [cls]));
+      }
+      return results;
+    }),
     getBoundingClientRect: vi.fn(() => ({
       width: 360,
       height: 360,
@@ -244,7 +277,29 @@ export function setupTestDom() {
       }
       return null;
     }),
-    querySelectorAll: vi.fn(() => []),
+    querySelectorAll: vi.fn((sel) => {
+      const results = [];
+      const walk = (node) => {
+        if (!node) return;
+        if (sel && sel.startsWith(".")) {
+          const cls = sel.slice(1);
+          if (node.classList && typeof node.classList.contains === "function" && node.classList.contains(cls)) {
+            results.push(node);
+          }
+        }
+        if (Array.isArray(node.children)) {
+          for (const c of node.children) walk(c);
+        }
+      };
+      walk(el);
+      if (results.length === 0 && _innerHTML && sel && sel.startsWith(".")) {
+        const cls = sel.slice(1);
+        const re = new RegExp(`class=["'][^"']*?${cls}[^"']*?["']`, "g");
+        const matches = [..._innerHTML.matchAll(re)];
+        for (const _m of matches) results.push(createMockElement("div", "", [cls]));
+      }
+      return results;
+    }),
     addEventListener: vi.fn(),
     removeEventListener: vi.fn()
   };

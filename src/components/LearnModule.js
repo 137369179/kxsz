@@ -20,6 +20,7 @@ import { pronunciationEval } from "../utils/pronunciationEval.js";
 import { openMorphTheater } from "../utils/morphEngine.js";
 import { createPlayGame } from "../utils/playGames/index.js";
 import { storageManager } from "../utils/storageManager.js";
+import { mascotProgress } from "../utils/mascotProgress.js";
 
 export class LearnModule extends BaseModule {
   constructor(container, charData, onFinishCallback, onBackToMapCallback) {
@@ -398,10 +399,16 @@ export class LearnModule extends BaseModule {
             </span>
           </div>
 
-          <button id="btn-open-morph-rec" class="mt-4 bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 text-white text-xs font-black px-6 py-2.5 rounded-full shadow-lg border-2 border-white/40 active:scale-95 transition-transform flex items-center gap-2 cursor-pointer">
-            <span class="flex items-center">${GAME_ICONS.sparkle("w-4 h-4")}</span>
-            <span>象形字源蜕变微剧场</span>
-          </button>
+          <div class="flex items-center gap-2.5 mt-4">
+            <button id="btn-open-morph-rec" class="bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 text-white text-xs font-black px-4 py-2 rounded-full shadow-lg border-2 border-white/40 active:scale-95 transition-transform flex items-center gap-1.5 cursor-pointer">
+              <span class="flex items-center">${GAME_ICONS.sparkle("w-4 h-4")}</span>
+              <span>字源微剧场</span>
+            </button>
+            <button id="btn-goto-pinyin-island" class="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white text-xs font-black px-4 py-2 rounded-full shadow-lg border-2 border-white/40 active:scale-95 transition-transform flex items-center gap-1.5 cursor-pointer" title="前往拼音乐园复习此拼音">
+              <span class="flex items-center">${GAME_ICONS.mic("w-4 h-4")}</span>
+              <span>拼音岛复习</span>
+            </button>
+          </div>
         </div>
 
         <div class="w-88 sm:w-96 flex flex-col justify-between h-full bg-white/10 backdrop-blur-md rounded-3xl p-6 border-2 border-white/30">
@@ -488,6 +495,15 @@ export class LearnModule extends BaseModule {
       this._on(morphRecBtn, "click", () => {
         soundAndFX.playPop();
         openMorphTheater(char);
+      });
+    }
+
+    const pinyinIslandBtn = stage.querySelector("#btn-goto-pinyin-island");
+    if (pinyinIslandBtn) {
+      this._on(pinyinIslandBtn, "click", () => {
+        soundAndFX.playPop();
+        soundAndFX.speakPriority(`去拼音乐园复习拼音“${char.pinyin}”吧！`, { kind: "sentence", emotion: "gentle" });
+        this._busEmit(EVENTS.SWITCH_MODE, { mode: "pinyin", highlightPinyin: char.pinyin });
       });
     }
 
@@ -1115,6 +1131,7 @@ export class LearnModule extends BaseModule {
     // 依据真实评测得分分档美化呈现
     if (score >= 85) {
       // 满分/优秀 (3星)
+      mascotProgress.onCorrectPronunciation();
       if (praiseTxt) {
         praiseTxt.innerHTML = `<span class="text-emerald-300 font-bold">发音超级标准！太厉害了！</span><br/><span class="text-white/80 text-[11px]">声母韵母饱满，获得 3 颗星与 5 金币！</span>`;
       }
@@ -1128,6 +1145,7 @@ export class LearnModule extends BaseModule {
       }
     } else if (score >= 60) {
       // 良好 (2星)
+      mascotProgress.onCorrectPronunciation();
       if (praiseTxt) {
         praiseTxt.innerHTML = `<span class="text-amber-300 font-bold">读得很棒！声音再清晰一点就满分啦！</span><br/><span class="text-white/80 text-[11px]">获得 2 颗星，再练一次可拿满分哦！</span>`;
       }
@@ -1140,6 +1158,7 @@ export class LearnModule extends BaseModule {
       }
     } else {
       // 不准 / 读错 (0~1星)
+      mascotProgress.onWrongAttempt();
       const heard = res.hypothesis || "未检测到清晰发音";
       if (praiseTxt) {
         praiseTxt.innerHTML = `<div class="bg-rose-950/60 border border-rose-400/40 rounded-xl px-3 py-1.5 mb-1"><span class="text-yellow-300 font-bold">识别到读音：“${heard}”</span></div><span class="text-rose-200 text-xs">没有读准哦，请点击【听示范】并大声朗读【${char.char}】！</span>`;

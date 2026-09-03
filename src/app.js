@@ -168,7 +168,10 @@ class CathyAppManager extends BaseModule {
     window.addEventListener("touchstart", unlockAudio, { once: true });
 
     // 
-    eventBus.on(EVENTS.SWITCH_MODE, ({ mode }) => {
+    eventBus.on(EVENTS.SWITCH_MODE, ({ mode, highlightPinyin }) => {
+      if (mode === "pinyin" && highlightPinyin && this.pinyinModule?.locatePinyin) {
+        this.pinyinModule.locatePinyin(highlightPinyin);
+      }
       this.transitionToMode(mode);
     });
 
