@@ -38,6 +38,86 @@ export const FSRGRating = {
   EASY: 3,
 };
 
+/**
+ * FSRS-6 完整 21 个核心参数（参考 open-spaced-repetition/srs-benchmark 与 yazu.app 最新生产标准）
+ * 调研报告 §2.1 & §2.2：w20 为遗忘曲线衰减因子，支持每用户/年龄段个性化
+ */
+export const FSRS_6_DEFAULT_WEIGHTS = [
+  0.212,    // w0: Again初始稳定性
+  1.2931,   // w1: Hard初始稳定性
+  2.3065,   // w2: Good初始稳定性
+  8.2956,   // w3: Easy初始稳定性
+  6.4133,   // w4: Again初始难度
+  0.8334,   // w5: Hard初始难度
+  3.0194,   // w6: Good初始难度
+  0.001,    // w7: Easy初始难度
+  1.8722,   // w8: 难度稳定性系数
+  0.1666,   // w9: 难度衰减
+  0.796,    // w10: 稳定性对数底数
+  1.4835,   // w11: 稳定性初始值
+  0.0614,   // w12: 遗忘后稳定性恢复
+  0.2629,   // w13: 遗忘后难度增加
+  1.6483,   // w14: Easy增长因子
+  0.6014,   // w15: Easy bonus
+  1.8729,   // w16: Hard乘数
+  0.5425,   // w17: 同日复习参数
+  0.0912,   // w18: 同日Hard调整
+  0.0658,   // w19: 同日复习稳定性衰减
+  0.1542    // w20: 遗忘曲线衰减参数（FSRS-6核心：可针对儿童/用户个性化微调）
+];
+
+/**
+ * 计算 FSRS-6 幂律遗忘曲线的可检索性 (Retrievability R)
+ * 公式：R(t, S) = (1 + factor * (t / S))^(-decay)
+ * 其中 factor = 0.9^(-1/decay) - 1
+ * 当 t = S 时，R 恒等于 0.9 (90% 目标保持率)
+ * @param {number} elapsedDays 距离上次复习过去的天数 (t)
+ * @param {number} stability   稳定性 (S，以天为单位)
+ * @param {number} [decay=0.1542] 衰减系数 w20
+ * @returns {number} 0 ~ 1 之间的留存概率
+ */
+export function calculateRetrievabilityFSRS6(elapsedDays, stability, decay = FSRS_6_DEFAULT_WEIGHTS[20]) {
+  if (stability <= 0) return 0;
+  if (elapsedDays <= 0) return 1.0;
+  const d = Math.max(0.01, decay);
+  const factor = Math.pow(0.9, -1 / d) - 1;
+  return Math.pow(1 + factor * (elapsedDays / stability), -d);
+}
+
+/** 别名 retrievability (标准化 API) */
+export const retrievability = calculateRetrievabilityFSRS6;
+
+/**
+ * 计算 FSRS-6 闭式最优复习间隔 (Optimal Interval I)
+ * 公式：I = (S / factor) * (R_d^(-1/decay) - 1)
+ * 当 desiredRetention = 0.9 时，I 严格等于 S 天
+ * @param {number} stability 稳定性 (S，以天为单位)
+ * @param {number} [desiredRetention=0.9] 目标留存率 (0.7 ~ 0.98)
+ * @param {number} [decay=0.1542] 衰减系数 w20
+ * @returns {number} 间隔天数（天）
+ */
+export function calculateIntervalFSRS6(stability, desiredRetention = 0.9, decay = FSRS_6_DEFAULT_WEIGHTS[20]) {
+  if (stability <= 0) return 0.01;
+  const clampedR = Math.max(0.7, Math.min(0.98, desiredRetention));
+  const d = Math.max(0.01, decay);
+  const factor = Math.pow(0.9, -1 / d) - 1;
+  const intervalDays = (stability / factor) * (Math.pow(clampedR, -1 / d) - 1);
+  return Math.max(0.01, intervalDays);
+}
+
+/**
+ * 调研报告 §2.2 建议B：儿童个性化衰减率
+ * 5-6 岁幼儿突触重塑快、短期遗忘略快，衰减参数设为 0.18；
+ * 7-8 岁学龄期采用标准 0.1542。
+ * @param {number} [age=6]
+ * @returns {number}
+ */
+export function getDecayForAge(age = 6) {
+  if (age <= 5) return 0.19;
+  if (age === 6) return 0.175;
+  return FSRS_6_DEFAULT_WEIGHTS[20]; // 0.1542
+}
+
 // 参数配置（来自 open-fsrs 默认参数，对应 S1-S3 段）
 const FSRS_PARAMS = {
   // 学习阶段参数（秒）
@@ -62,6 +142,7 @@ const FSRS_PARAMS = {
     [FSRGRating.EASY]:  { sDec: 0.5, r: 1.3 },    // 快速提升
   },
 };
+
 
 // ── 核心调度函数 ────────────────────────────────────────────────
 

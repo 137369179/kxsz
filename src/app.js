@@ -279,13 +279,14 @@ class CathyAppManager extends BaseModule {
   /**  listener */
   _sparkleAt(x, y) {
     const now = Date.now();
-    if (now - (this._lastSparkleTime || 0) < 60) return; // 60ms 节流
+    // 调研报告 §4 建议B：消除老虎机式视觉刺激，240ms 节流
+    if (now - (this._lastSparkleTime || 0) < 240) return;
     this._lastSparkleTime = now;
 
-    // T9: 视觉降噪与内存保护 —— 粒子总量上限 25 个，避免快速点击满屏粒子过载
+    // 视觉降噪：同屏粒子硬上限由 25 压制到 8
     const existing = document.querySelectorAll(".magic-particle");
-    if (existing.length > 25) {
-      for (let i = 0; i < existing.length - 25; i++) {
+    if (existing.length > 8) {
+      for (let i = 0; i < existing.length - 8; i++) {
         existing[i].remove();
       }
     }
@@ -295,20 +296,21 @@ class CathyAppManager extends BaseModule {
     ripple.style.left = x + "px";
     ripple.style.top = y + "px";
     document.body.appendChild(ripple);
-    setTimeout(() => ripple.remove(), 550);
+    setTimeout(() => ripple.remove(), 450);
 
-    const colors = ["#FFD700", "#FFA500", "#FF69B4", "#00FFFF", "#7FFF00"];
-    for (let i = 0; i < 5; i++) {
+    const colors = ["#FBBF24", "#F59E0B", "#F472B6", "#38BDF8", "#4ADE80"];
+    const particleCount = 2 + Math.floor(Math.random() * 2); // 仅 2-3 个轻量微光粒子
+    for (let i = 0; i < particleCount; i++) {
       const particle = document.createElement("div");
-      const angle = (Math.PI * 2 * i) / 5 + (Math.random() - 0.5) * 0.5;
-      const dist = 30 + Math.random() * 40;
+      const angle = (Math.PI * 2 * i) / particleCount + (Math.random() - 0.5) * 0.4;
+      const dist = 18 + Math.random() * 24;
       const tx = Math.cos(angle) * dist;
       const ty = Math.sin(angle) * dist;
-      const rot = Math.random() * 180 - 90;
+      const rot = Math.random() * 120 - 60;
 
       particle.className = "magic-particle";
       const color = colors[Math.floor(Math.random() * colors.length)];
-      const size = 6 + Math.random() * 6;
+      const size = 4 + Math.random() * 3; // 4-7px，更小更克制
 
       particle.style.cssText = `
         position: fixed;
@@ -316,13 +318,13 @@ class CathyAppManager extends BaseModule {
         width: ${size}px; height: ${size}px;
         background: ${color};
         border-radius: 50%;
-        box-shadow: 0 0 12px ${color}, 0 0 20px ${color};
+        box-shadow: 0 0 6px ${color};
         pointer-events: none;
         z-index: 99999;
         --tx: ${tx}px; --ty: ${ty}px; --rot: ${rot};
       `;
       document.body.appendChild(particle);
-      setTimeout(() => particle.remove(), 650);
+      setTimeout(() => particle.remove(), 500);
     }
   }
 
@@ -481,14 +483,14 @@ class CathyAppManager extends BaseModule {
       setTimeout(() => {
         centerIcon.style.transform = "translate(-50%, -50%) scale(1) rotate(360deg)";
 
-        // Phase 2: Switch underlying DOM
-        setTimeout(() => {
+        // Phase 2: Switch underlying DOM (async — 等待按需模块加载完成后再揭幕)
+        setTimeout(async () => {
           try {
-            this.switchMode(modeName);
+            await this.switchMode(modeName);
           } catch (err) {
             console.error(`[App] switchMode("${modeName}") threw:`, err);
             eventBus.emit(EVENTS.MODE_ERROR, { mode: modeName, error: err.message, stack: err.stack });
-            this.switchMode("map"); // 
+            await this.switchMode("map"); // 
           }
 
           // Phase 3: Open curtain
@@ -511,7 +513,7 @@ class CathyAppManager extends BaseModule {
   }
 
   /**  ——  */
-  switchMode(modeName) {
+  async switchMode(modeName) {
     this.currentMode = modeName;
 
     // 
@@ -522,6 +524,11 @@ class CathyAppManager extends BaseModule {
 
     // 
     try {
+      // 非 map/learn 模式：先确保目标模块已按需加载并实例化
+      if (modeName !== "map" && modeName !== "learn") {
+        const inst = await this._ensureModule(modeName);
+        if (!inst) throw new Error(`模块 "${modeName}" 加载失败`);
+      }
       if (modeName === "idiom") {
         this.playModule.currentMode = "idiom";
         this.playModule.render();
@@ -551,11 +558,18 @@ class CathyAppManager extends BaseModule {
 
   async startLearnFlow(charData) {
     await ensureDetails();
+    // LearnModule 为按需加载模块，动态 import 后缓存其类
+    let LearnModuleCls = this._moduleClasses.get("learn");
+    if (!LearnModuleCls) {
+      const mod = await import("./components/LearnModule.js");
+      LearnModuleCls = mod.LearnModule;
+      this._moduleClasses.set("learn", LearnModuleCls);
+    }
     this.currentMode = "learn";
     if (this.learnModule) {
       this.learnModule.destroy();
     }
-    this.learnModule = new LearnModule(
+    this.learnModule = new LearnModuleCls(
       this.container,
       charData,
       () => {
