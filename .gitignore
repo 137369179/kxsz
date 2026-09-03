@@ -17,3 +17,17 @@ enhance_app_js.py
 .env
 node_modules/
 __pycache__/
+
+# Python bytecode (已经在 git 里的)
+*.pyc
+__pycache__/
+
+# Backup files
+*.bak
+*.orig
+
+# Trae spec reports (runtime debug artifacts)
+.trae/specs/*/reports/
+
+# Session memory (local)
+.workbuddy/memory/*.md
