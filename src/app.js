@@ -557,6 +557,15 @@ class CathyAppManager extends BaseModule {
   }
 
   async startLearnFlow(charData) {
+    // 防御性检查：确保 charData 有效
+    if (!charData || !charData.id || !charData.char) {
+      console.error("[App] startLearnFlow: 无效的 charData", charData);
+      if (typeof showGameToast === "function") {
+        showGameToast(this.container, "学习数据异常，请重试", "error");
+      }
+      return;
+    }
+    
     await ensureDetails();
     // LearnModule 为按需加载模块，动态 import 后缓存其类
     let LearnModuleCls = this._moduleClasses.get("learn");

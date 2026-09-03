@@ -174,17 +174,19 @@ export class BaseModule {
   }
 
   /**
-   *  super.destroy()
-   * 
+   * 清理所有生命周期资源（子类应在 super.destroy() 之前先清理自己的资源）
+   * 翻转清理队列确保子组件先于父组件被清理（FILO 顺序）
    */
   destroy() {
-    while (this._cleanups.length) {
-      const fn = this._cleanups.pop();
+    // 翻转确保子组件/后添加的资源先于父组件/先添加的资源被清理
+    const cleanups = this._cleanups.reverse();
+    for (const fn of cleanups) {
       try {
         fn && fn();
       } catch (err) {
         console.warn("[BaseModule] cleanup error:", err);
       }
     }
+    this._cleanups = [];
   }
 }

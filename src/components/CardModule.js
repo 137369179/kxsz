@@ -16,6 +16,17 @@ import { GAME_ICONS } from "../utils/gameIcons.js";
 import { printWorksheet } from "../utils/worksheetGenerator.js";
 import { openMorphTheater } from "../utils/morphEngine.js";
 
+// ============================================================
+// 常量定义
+// ============================================================
+const CARD_PAGE_SIZE = 48;                                        // 每页加载数量
+const SCROLL_LOAD_THRESHOLD = 150;                               // 滚动加载触发阈值(px)
+// 移动端防抖时间（在运行时检查以兼容 Node.js 测试环境）
+let SEARCH_DEBOUNCE_MS = 150;
+if (typeof window !== "undefined" && 'ontouchstart' in window) {
+  SEARCH_DEBOUNCE_MS = 200;
+}
+
 const RADICAL_ORIGINS = {
   "氵": "三点水：造字本源与江河水流液体有关",
   "艹": "草字头：造字本源与花草植物农作物有关",
@@ -46,8 +57,8 @@ export class CardModule extends BaseModule {
     this.isCardFlipped = false;
 
     // 高性能分页/分片加载
-    this.pageSize = 48;
-    this.displayCount = 48;
+    this.pageSize = CARD_PAGE_SIZE;
+    this.displayCount = CARD_PAGE_SIZE;
     this._debounceTimer = null;
   }
 
@@ -304,7 +315,7 @@ export class CardModule extends BaseModule {
       });
     }
 
-    // 搜索框防抖处理 (150ms)
+    // 搜索框防抖处理
     const searchInput = mainEl.querySelector("#card-search-input");
     if (searchInput) {
       this._on(searchInput, "input", (e) => {
@@ -315,7 +326,7 @@ export class CardModule extends BaseModule {
           this.displayCount = this.pageSize;
           this._savedScrollTop = 0;
           this.render();
-        }, 150);
+        }, SEARCH_DEBOUNCE_MS);
       });
     }
 
@@ -377,7 +388,7 @@ export class CardModule extends BaseModule {
     const viewport = mainEl.querySelector("#cards-page-viewport");
     if (viewport) {
       this._on(viewport, "scroll", () => {
-        if (viewport.scrollTop + viewport.clientHeight >= viewport.scrollHeight - 150) {
+        if (viewport.scrollTop + viewport.clientHeight >= viewport.scrollHeight - SCROLL_LOAD_THRESHOLD) {
           const allFiltered = this.getFilteredList();
           if (this.displayCount < allFiltered.length) {
             this.displayCount += this.pageSize;

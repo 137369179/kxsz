@@ -54,6 +54,7 @@ export const MODALITIES = Object.freeze({
   SEMANTIC_CONFUSE: "semantic_confuse",  // 易错对比
   MOTOR_INTERACT:   "motor_interact",    // 动觉交互（拖拽/点击类型）
   MOTOR_HINT:       "motor_hint",        // playHint 引导
+  MOTOR_HINT_MECHANISM: "motor_hint_mechanism", // mechanism 机制（rise/fall/...）
   GAME_CONFIG:      "game_config",       // 小游戏配置
 });
 
@@ -75,7 +76,9 @@ const SCENE_WEIGHTS = {
     [MODALITIES.SEMANTIC_MEANING]:4,
     [MODALITIES.SEMANTIC_WORD]:   3,
     [MODALITIES.SEMANTIC_CONFUSE]:2,  // 易错提示（E12）
+    [MODALITIES.MOTOR_INTERACT]:  3,  // 动觉交互（drag_up 等）
     [MODALITIES.MOTOR_HINT]:      3,
+    [MODALITIES.MOTOR_HINT_MECHANISM]: 3,  // mechanism（rise/fall）
   },
   [SCENES.REVIEW]: {
     [MODALITIES.VISUAL_GLYPH]:    5,
@@ -154,7 +157,7 @@ export function extractModalities(charItem) {
 
   // 动觉
   if (charItem.interaction) mod[MODALITIES.MOTOR_INTERACT] = charItem.interaction;
-  if (charItem.mechanism) mod[MODALITIES.MOTOR_HINT + '_mechanism'] = charItem.mechanism;
+  if (charItem.mechanism) mod[MODALITIES.MOTOR_HINT_MECHANISM] = charItem.mechanism;
   if (charItem.playHint) mod[MODALITIES.MOTOR_HINT] = charItem.playHint;
 
   // 游戏

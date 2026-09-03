@@ -35,6 +35,72 @@ const RECORD_MAX_DURATION_MS = 3200;    // 录音最大时长（毫秒）
 const RECORD_SILENCE_TIMEOUT_MS = 2500; // 静音超时（毫秒）
 const HAZARD_PEEK_DURATION_MS = 2500;   // 象形动画 peek 展示时长
 
+// ============================================================
+// 可测试的纯函数（与组件解耦，便于单元测试）
+// ============================================================
+
+/**
+ * 计算星星数对应的掌握度评分
+ * @param {number} starsEarned 获得的星星数（0-3）
+ * @returns {number} 掌握度评分（0-100）
+ */
+export function starsToMasteryRate(starsEarned) {
+  const stars = Math.max(0, Math.min(3, starsEarned ?? 3));
+  return 55 + stars * 10;
+}
+
+/**
+ * 将分数转换为星星数
+ * @param {number} score 评测分数（0-100）
+ * @returns {number} 星星数（0-3）
+ */
+export function scoreToStars(score) {
+  if (score >= 90) return 3;
+  if (score >= 75) return 2;
+  if (score >= 60) return 1;
+  return 0;
+}
+
+/**
+ * 验证 charData 是否有效
+ * @param {object} charData 字符数据
+ * @returns {boolean} 是否有效
+ */
+export function isValidCharData(charData) {
+  return !!(charData && charData.id && charData.char);
+}
+
+/**
+ * 计算步骤进度百分比
+ * @param {number} currentStep 当前步骤（1-8）
+ * @param {number[]} completedSteps 已完成步骤列表
+ * @returns {number} 进度百分比（0-100）
+ */
+export function calculateStepProgress(currentStep, completedSteps = []) {
+  const total = 8;
+  const completed = completedSteps.length;
+  return Math.round((completed / total) * 100);
+}
+
+/**
+ * 获取步骤持续时间（毫秒）
+ * @param {number} stepNum 步骤编号（1-8）
+ * @returns {number} 持续时间（毫秒）
+ */
+export function getStepDuration(stepNum) {
+  const durations = {
+    1: 5000,   // 玩
+    2: 8000,   // 认
+    3: 10000,  // 读
+    4: 15000,  // 练
+    5: 30000,  // 控笔
+    6: 20000,  // 描红
+    7: 30000,  // 写
+    8: 10000,  // 测
+  };
+  return durations[stepNum] || 10000;
+}
+
 export class LearnModule extends BaseModule {
   constructor(container, charData, onFinishCallback, onBackToMapCallback) {
     super(container);

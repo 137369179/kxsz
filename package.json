@@ -3,6 +3,8 @@
   "version": "2.8.0",
   "type": "module",
   "scripts": {
+    "build": "vite build && cp sw.js dist/sw.js",
+    "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage"
