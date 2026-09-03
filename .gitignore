@@ -31,3 +31,6 @@ __pycache__/
 
 # Session memory (local)
 .workbuddy/memory/*.md
+
+# Session memory (local)
+.workbuddy/memory/
