@@ -18,6 +18,7 @@ import { printWorksheet, getTodayWorksheetChars, getDifficultWorksheetChars } fr
 import { drawQRCode } from "../utils/qrCode.js";
 import { storageManager } from "../utils/storageManager.js";
 import { rewardEngine } from "../utils/rewardEngine.js";
+import { buildFullReport } from "../utils/reportEngine.js";
 
 const TROPHY_LIST = [
   { id: "first_char", name: "识字小萌新", desc: "学会第 1 个汉字", req: "1 个字", icon: "star" },
@@ -207,6 +208,9 @@ export class ParentModule extends BaseModule {
   }
 
   renderActiveTabContent(progress, charCount, settings, diffCount) {
+    // E14: 预计算多维报告数据（一次算完，所有面板复用）
+    const _report = buildFullReport(progress);
+
     if (this.currentTab === "dashboard") {
       const history = progress.studyHistory || [
         { date: "周一", count: 3 },
@@ -240,6 +244,32 @@ export class ParentModule extends BaseModule {
               <span class="flex items-center">${GAME_ICONS.star("w-7 h-7", false)}</span>
             </div>
             <span class="text-xs text-emerald-700 font-bold bg-emerald-50 px-3 py-1 rounded-full">星币余额: ${progress.coins || 60}</span>
+          </div>
+
+          <!-- E14: AI 多维诊断卡片 -->
+          <div class="bg-gradient-to-br from-violet-100 to-indigo-100 rounded-3xl p-5 shadow-xl border-2 border-violet-300 col-span-full">
+            <div class="flex items-center gap-2 mb-3">
+              <span class="flex items-center">${GAME_ICONS.sparkle("w-5 h-5")}</span>
+              <h3 class="text-base font-black text-violet-900">AI 学习诊断（E14 多维度报告）</h3>
+              <span class="ml-auto text-xs font-bold text-violet-700 bg-violet-200 px-2 py-0.5 rounded-full">健康度 ${_report.mastery.healthScore}/100</span>
+            </div>
+            <div class="grid grid-cols-3 gap-2 mb-3 text-center text-xs">
+              <div class="bg-white/60 rounded-xl py-2 border border-violet-200">
+                <div class="font-black text-violet-900 text-sm">${_report.mastery.mastered}</div>
+                <div class="text-gray-500 font-bold">已掌握</div>
+              </div>
+              <div class="bg-white/60 rounded-xl py-2 border border-violet-200">
+                <div class="font-black text-amber-700 text-sm">${_report.mastery.learning}</div>
+                <div class="text-gray-500 font-bold">学习中</div>
+              </div>
+              <div class="bg-white/60 rounded-xl py-2 border border-violet-200">
+                <div class="font-black text-rose-700 text-sm">${_report.mastery.difficult}</div>
+                <div class="text-gray-500 font-bold">难字</div>
+              </div>
+            </div>
+            <div class="bg-white/80 rounded-xl p-3 text-xs text-gray-700 leading-relaxed border border-violet-200 whitespace-pre-line">
+              ${_report.summary}
+            </div>
           </div>
 
           <div class="bg-white/95 rounded-3xl p-6 shadow-xl border-2 border-rose-200 text-center">
