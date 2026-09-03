@@ -107,6 +107,11 @@ export class PlaySceneEngine {
   }
 
   flashScreen() {
+    // PEP/眩晕安全：reduce-motion（系统偏好或专注模式）下跳过全屏白闪
+    const reduceMotion =
+      (typeof matchMedia === "function" && matchMedia("(prefers-reduced-motion: reduce)").matches) ||
+      (typeof document !== "undefined" && document.documentElement.classList.contains("reduce-motion"));
+    if (reduceMotion) return;
     const flash = document.createElement("div");
     flash.className = "absolute inset-0 z-50 pointer-events-none game-flash bg-white";
     this.mount.appendChild(flash);

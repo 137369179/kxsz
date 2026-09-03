@@ -47,6 +47,9 @@ export class BaseModule {
       if (focusOn) {
         document.body.classList.add("focus-mode");
         document.documentElement.classList.add("focus-mode");
+        document.body.dataset.focusMode = "true";
+        // 桥接 focusMode.js：完整应用 reduce-motion/大字/装饰屏蔽（替代手动 classList）
+        import("./focusMode.js").then((fm) => fm.enableFocusMode({ autoReduceMotion: true, muteAchievements: true, enlargeText: true })).catch(() => {});
       }
     });
   }

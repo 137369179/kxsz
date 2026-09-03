@@ -70,7 +70,9 @@
     })();
   </script>
   <!-- 生产级预编译 CSS（替代 398KB Tailwind 运行时编译器） -->
-  <link rel="stylesheet" href="assets/css/prod.css?v=2.9.6" />
+  <link rel="stylesheet" href="assets/css/prod.css?v=2.9.7" />
+  <!-- E7 专注/无障碍模式样式（reduce-motion 减弱动画 + 大字模式 + 激励装饰屏蔽） -->
+  <link rel="stylesheet" href="assets/css/focusMode.css?v=2.9.6" />
   <style>
     /* 隐藏滚动条 */
     .no-scrollbar::-webkit-scrollbar {
@@ -111,7 +113,7 @@
 
   <!-- 核心逻辑脚本 (带版本防缓存) -->
   <!-- [版本同步] 版本号与 src/utils/version.js 的 APP_VERSION 保持一致，升级时同步修改 -->
-  <script type="module" src="src/app.js?v=2.9.6"></script>
+  <script type="module" src="src/app.js?v=2.9.7"></script>
 
   <!-- 统一版本号注入：从 version.js 读取 APP_VERSION 供运行时与 SW 注册使用 -->
   <script type="module">
@@ -125,7 +127,7 @@
   <script>
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", () => {
-        const v = window.__APP_VERSION || "2.9.1";
+        const v = window.__APP_VERSION || "2.9.7";
         navigator.serviceWorker.register("./sw.js?v=" + v).then((reg) => {
           reg.update();
         }).catch((err) => {

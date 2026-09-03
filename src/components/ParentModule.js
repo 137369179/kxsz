@@ -923,6 +923,10 @@ export class ParentModule extends BaseModule {
         ebbinghausManager.progress.settings.enableWriteStep = enableWrite;
         ebbinghausManager.save();
 
+        // E7 专注模式：读复选框并桥接 focusMode.js（减弱动画/大字模式/装饰屏蔽）
+        const focusModeChecked = mainEl.querySelector("#check-focus-mode")?.checked ?? false;
+        ebbinghausManager.setFocusMode(focusModeChecked);
+
         soundAndFX.playSuccessSound();
         showGameToast(this.container, "学习、描红容差与护眼设置已成功保存！", "success");
       });

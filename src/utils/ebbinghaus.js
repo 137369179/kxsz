@@ -67,28 +67,18 @@ export class EbbinghausManager {
         pronunciationErrors: {},  // { charId: count }
         updatedAt: 0
       },
-      charRecords: {
-        char_001: {
-          charId: "char_001",
-          learnedAt: Date.now() - 86400000 * 2,
-          reviewCount: 3,
-          correctStreak: 3,
-          masteryRate: 98,
-          nextReviewDate: Date.now() + 86400000 * 4,
-          isDifficult: false
-        }
-      },
+      charRecords: {},
       todayLearnedCount: 0,
       lastActiveDate: today,
       todaySignedIn: false,
       signInStreak: 0,
       lastSignInDate: "",
       studyHistory: [
-        { date: "周一", count: 3 },
-        { date: "周二", count: 2 },
-        { date: "周三", count: 4 },
-        { date: "周四", count: 1 },
-        { date: "周五", count: 5 },
+        { date: "周一", count: 0 },
+        { date: "周二", count: 0 },
+        { date: "周三", count: 0 },
+        { date: "周四", count: 0 },
+        { date: "周五", count: 0 },
         { date: "周六", count: 0 },
         { date: "周日", count: 0 }
       ]
@@ -195,6 +185,11 @@ export class EbbinghausManager {
     this.progress.settings.focusMode = !!enabled;
     this.save();
     eventBus.emit(EVENTS.FOCUS_MODE_CHANGED, { enabled: this.progress.settings.focusMode });
+    // 桥接 focusMode.js 应用 DOM class（reduce-motion 减弱动画 / 大字模式 / 装饰屏蔽）
+    import("./focusMode.js").then((fm) => {
+      if (enabled) fm.enableFocusMode({ autoReduceMotion: true, muteAchievements: true, enlargeText: true });
+      else fm.disableFocusMode();
+    }).catch(() => {});
   }
 
   // ------------------------------------------------------------
