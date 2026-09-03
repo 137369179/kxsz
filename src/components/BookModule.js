@@ -22,6 +22,7 @@ import { BaseModule } from "../utils/BaseModule.js";
 import { GAME_ICONS } from "../utils/gameIcons.js";
 import { g2p } from "../utils/g2p.js";
 import { pronunciationEval } from "../utils/pronunciationEval.js";
+import { storageManager } from "../utils/storageManager.js";
 
 export class BookModule extends BaseModule {
   constructor(container) {
@@ -50,23 +51,23 @@ export class BookModule extends BaseModule {
     this._loadProgress();
   }
 
-  /** 从 localStorage 恢复阅读进度 */
+  /** 从 storageManager 恢复阅读进度 */
   _loadProgress() {
     try {
-      const raw = localStorage.getItem(this._progressKey);
+      const raw = storageManager.getItem(this._progressKey);
       if (raw) {
         this.progressMap = JSON.parse(raw);
       }
     } catch {}
   }
 
-  /** 保存阅读进度到 localStorage */
+  /** 保存阅读进度到 storageManager */
   _saveProgress() {
     if (this.currentBook) {
       this.progressMap[this.currentBook.id] = this.currentPageIndex;
     }
     try {
-      localStorage.setItem(this._progressKey, JSON.stringify(this.progressMap));
+      storageManager.setItem(this._progressKey, JSON.stringify(this.progressMap));
     } catch {}
   }
 
@@ -124,7 +125,6 @@ export class BookModule extends BaseModule {
     mainEl.innerHTML = `
       <div class="relative w-full max-w-5xl mx-auto flex flex-col select-none animate-fade-in pt-16 sm:pt-20 px-4 pb-12 overflow-y-auto no-scrollbar max-h-[calc(100vh-60px)]">
         
-        <!-- 顶部精美标题与进度卡 -->
         <div class="flex items-center justify-between mb-4 flex-wrap gap-3">
           <div class="flex items-center gap-3">
             <div class="w-11 h-11 rounded-2xl bg-amber-400 shadow-md flex items-center justify-center border-2 border-white flex-shrink-0">
@@ -139,7 +139,6 @@ export class BookModule extends BaseModule {
             </div>
           </div>
 
-          <!-- 学习成就小胶囊 -->
           <div class="flex items-center gap-2 bg-white/90 backdrop-blur-md px-4 py-1.5 rounded-full border border-amber-200 shadow-sm">
             <span class="text-xs text-amber-900/70 font-bold">已读进度:</span>
             <span class="text-xs font-black text-orange-600">${readBooks.length} / ${STORYBOOKS_DATABASE.length} 本</span>
@@ -151,7 +150,6 @@ export class BookModule extends BaseModule {
           </div>
         </div>
 
-        <!-- 阶段切换药丸栏 -->
         <div class="flex items-center gap-2 mb-5 overflow-x-auto no-scrollbar py-1">
           ${[
             { key: "all", label: "全部绘本", count: STORYBOOKS_DATABASE.length },
@@ -174,7 +172,6 @@ export class BookModule extends BaseModule {
             .join("")}
         </div>
 
-        <!-- 绘本书籍网格 -->
         ${
           filteredBooks.length === 0
             ? `
@@ -194,16 +191,13 @@ export class BookModule extends BaseModule {
               isRead ? "border-amber-400 ring-2 ring-amber-300/40" : "border-amber-200/80 hover:border-orange-400"
             } transition-all duration-300 hover:-translate-y-1.5 hover:shadow-2xl cursor-pointer flex flex-col justify-between" data-book-id="${book.id}">
               
-              <!-- 封面图 -->
               <div class="relative w-full h-44 overflow-hidden bg-amber-100">
                 <img src="${book.coverImg}" alt="${book.title}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                 
-                <!-- 阶梯标签 -->
                 <div class="absolute top-2.5 left-2.5 bg-black/50 backdrop-blur-md text-white text-[10px] font-black px-2.5 py-0.5 rounded-full border border-white/20">
                   第 ${book.level || 1} 阶
                 </div>
 
-                <!-- 通关小皇冠印章 -->
                 ${
                   isRead
                     ? `
@@ -216,14 +210,13 @@ export class BookModule extends BaseModule {
                 }
               </div>
 
-              <!-- 卡片信息区 -->
               <div class="p-4 flex flex-col justify-between flex-1 bg-white">
                 <div>
                   <div class="flex items-center justify-between">
                     <h3 class="text-base font-black text-amber-950 group-hover:text-orange-600 transition-colors">
                       ${book.title}
                     </h3>
-                    <!-- 3 颗小星星 -->
+                    // 3 颗小星星
                     <div class="flex items-center gap-0.5">
                       <span class="flex items-center">${GAME_ICONS.star("w-4 h-4", !isRead)}</span>
                       <span class="flex items-center">${GAME_ICONS.star("w-4 h-4", !isRead)}</span>
@@ -306,7 +299,6 @@ export class BookModule extends BaseModule {
     mainEl.innerHTML = `
       <div class="relative w-full max-w-5xl mx-auto flex flex-col justify-between pt-16 sm:pt-20 pb-6 px-4 select-none animate-fade-in">
         
-        <!-- 阅读器顶部控制栏 (Sleek Glass Toolbar) -->
         <div class="w-full flex items-center justify-between bg-white/95 backdrop-blur-md px-4 sm:px-5 py-2.5 rounded-2xl shadow-xl border-2 border-amber-200/90 mb-3 flex-wrap gap-2">
           
           <div class="flex items-center gap-2">
@@ -315,7 +307,6 @@ export class BookModule extends BaseModule {
               <span>书架</span>
             </button>
 
-            <!-- 目录抽屉按钮 -->
             <button id="btn-open-catalog" class="flex items-center gap-1 text-amber-900 hover:text-orange-600 font-black text-xs px-3 py-1.5 rounded-full hover:bg-amber-100 transition-all cursor-pointer border border-amber-200" title="打开全书目录与快速跳页">
               <span class="flex items-center">${GAME_ICONS.cards("w-3.5 h-3.5")}</span>
               <span>目录</span>
@@ -331,14 +322,12 @@ export class BookModule extends BaseModule {
 
           <div class="flex items-center gap-1.5 sm:gap-2 flex-wrap">
             
-            <!-- 拼音注音显隐切换 -->
             <button id="btn-toggle-pinyin" class="flex items-center gap-1 px-2.5 sm:px-3 py-1.5 rounded-full text-xs font-black shadow-sm transition-all cursor-pointer ${
               this.showPinyin ? "bg-amber-400 text-amber-950 font-black ring-2 ring-amber-300" : "bg-gray-100 text-gray-600 hover:bg-gray-200 border border-gray-200"
             }" title="切换汉字上方标准拼音注音">
               <span>${this.showPinyin ? "拼音: 开" : "拼音: 关"}</span>
             </button>
 
-            <!-- 自动连读开关 -->
             <button id="btn-toggle-autoplay" class="flex items-center gap-1 px-2.5 sm:px-3 py-1.5 rounded-full text-xs font-black shadow-sm transition-all cursor-pointer ${
               this.isAutoPlay ? "bg-gradient-to-r from-emerald-500 to-green-500 text-white animate-pulse ring-2 ring-emerald-300" : "bg-gray-100 text-gray-600 hover:bg-gray-200 border border-gray-200"
             }" title="开启后自动朗读并连续翻页">
@@ -346,13 +335,11 @@ export class BookModule extends BaseModule {
               <span>${this.isAutoPlay ? "连读中" : "自动连读"}</span>
             </button>
 
-            <!-- 我来读一读 -->
             <button id="btn-user-read" class="bg-gradient-to-r from-rose-500 to-pink-500 text-white font-black text-xs px-3 sm:px-3.5 py-1.5 rounded-full shadow-md flex items-center gap-1 active:scale-95 cursor-pointer hover:brightness-110" title="点击录音自己读一页">
               <span class="flex items-center">${GAME_ICONS.speaker("w-3.5 h-3.5")}</span>
               <span>我来读</span>
             </button>
 
-            <!-- 伴读整页 -->
             <button id="btn-play-karaoke" class="btn-game-orange text-white font-black text-xs px-3.5 sm:px-4 py-1.5 rounded-full shadow-md flex items-center gap-1 active:scale-95 cursor-pointer">
               <span class="flex items-center">${GAME_ICONS.speaker("w-3.5 h-3.5")}</span>
               <span>伴读</span>
@@ -360,15 +347,12 @@ export class BookModule extends BaseModule {
           </div>
         </div>
 
-        <!-- 16:9 沉浸式绘本画卷对开本 (Picture Book Spread) -->
         <div class="w-full bg-white/95 backdrop-blur-md rounded-3xl overflow-hidden shadow-2xl border-4 border-amber-300/90 mb-4 flex flex-col md:flex-row items-stretch min-h-[380px] relative">
           
-          <!-- 左页：插画 + 隐藏互动寻宝热区 -->
           <div class="w-full md:w-1/2 bg-amber-50/40 flex flex-col justify-center border-b-4 md:border-b-0 md:border-r-2 border-amber-200/80 relative shadow-[inset_-6px_0_12px_rgba(0,0,0,0.03)]">
             <div class="relative w-full aspect-video md:aspect-auto md:h-full min-h-[240px] bg-amber-100/50 group overflow-hidden flex items-center justify-center">
               <img src="${page.image}" alt="绘本插图" loading="lazy" decoding="async" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
               
-              <!-- 隐藏寻宝热区气泡 -->
               ${(page.interactions || page.hotspots || []).map((hp, idx) => `
                 <button class="hotspot-trigger-btn absolute z-20 w-11 h-11 rounded-full bg-gradient-to-tr from-amber-400 to-yellow-300 border-2 border-white text-amber-950 font-black text-xs flex items-center justify-center shadow-xl animate-bounce-slow active:scale-90 hover:scale-125 transition-transform cursor-pointer" style="top: ${hp.y}; left: ${hp.x};" data-sound="${hp.sound || ''}" data-label="${hp.text || hp.label || ''}">
                   <span class="flex items-center pointer-events-none">${GAME_ICONS.sparkle("w-6 h-6")}</span>
@@ -382,10 +366,8 @@ export class BookModule extends BaseModule {
             </div>
           </div>
 
-          <!-- 右页：纯美故事文字排版 (儿童绘本大字标准) -->
           <div class="w-full md:w-1/2 p-6 sm:p-8 flex flex-col justify-between text-center bg-gradient-to-br from-[#FFFDF9] to-[#FFF9EE]">
             
-            <!-- 顶部小提示 -->
             <div class="flex items-center justify-between">
               <span class="text-[11px] font-black text-amber-800/80 bg-amber-100/80 px-3 py-0.5 rounded-full border border-amber-200/80 shadow-sm">
                 点读伴读 · 点击生字查字源
@@ -395,7 +377,6 @@ export class BookModule extends BaseModule {
               </span>
             </div>
 
-            <!-- 核心排版：汉字 + 拼音精准居中对齐 -->
             <div id="karaoke-text-container" class="flex flex-wrap justify-center items-end gap-x-1.5 sm:gap-x-2 gap-y-3 my-auto py-4">
               ${pinyinTokens.map((token, idx) => {
                 if (token.isPunct) {
@@ -425,7 +406,6 @@ export class BookModule extends BaseModule {
               }).join("")}
             </div>
 
-            <!-- 底部核心生字点读栏 -->
             <div class="mt-4 pt-3 border-t border-amber-200/60 flex items-center justify-between flex-wrap gap-2">
               <div class="flex items-center gap-1.5 flex-wrap">
                 <span class="text-xs font-black text-amber-800/80 flex items-center gap-1">
@@ -449,7 +429,6 @@ export class BookModule extends BaseModule {
 
         </div>
 
-        <!-- 底部翻页控制器 -->
         <div class="w-full flex items-center justify-between px-2 sm:px-6">
           <button id="btn-prev-page" class="bg-white hover:bg-amber-50 text-amber-900 font-black text-xs px-6 py-2.5 rounded-full shadow-lg border-2 border-amber-200 transition-all active:scale-95 cursor-pointer ${
             this.currentPageIndex === 0 ? "opacity-40 pointer-events-none" : ""
@@ -457,7 +436,6 @@ export class BookModule extends BaseModule {
             上一页
           </button>
 
-          <!-- 进度小药丸指示器 -->
           <div class="flex items-center gap-2 bg-white/80 backdrop-blur-md px-3 py-1.5 rounded-full border border-amber-200 shadow-sm">
             ${book.pages
               .map(
@@ -477,6 +455,14 @@ export class BookModule extends BaseModule {
     `;
 
     this.bindReaderEvents(mainEl, page, book);
+
+    if (this.isAutoPlay) {
+      this._timeout(() => {
+        if (this.isAutoPlay && this.currentBook && !this.isQuizMode && !this.isCertificateMode) {
+          this.playKaraoke(page, mainEl);
+        }
+      }, 350);
+    }
   }
 
   // ----------------------------------------------------
@@ -523,7 +509,6 @@ export class BookModule extends BaseModule {
         this.isAutoPlay = !this.isAutoPlay;
         if (this.isAutoPlay) {
           showGameToast(this.container, "已开启自动连读伴读模式", "success");
-          this.playKaraoke(page, mainEl);
         } else {
           showGameToast(this.container, "已暂停自动连读", "info");
           if (this.autoPlayTimer) {
@@ -666,12 +651,10 @@ export class BookModule extends BaseModule {
     overlay.innerHTML = `
       <div class="relative w-full max-w-lg bg-gradient-to-b from-[#FFFDF8] to-[#FFF6E5] rounded-3xl p-6 sm:p-7 shadow-2xl border-4 border-amber-300 flex flex-col items-center select-none animate-scale-up">
         
-        <!-- 关闭按钮 -->
         <button id="btn-close-popover" class="absolute -top-3.5 -right-3.5 w-10 h-10 rounded-full bg-white text-gray-800 font-extrabold text-base flex items-center justify-center shadow-xl hover:bg-gray-100 active:scale-95 cursor-pointer border-2 border-amber-200">
           <span class="font-sans font-bold leading-none">X</span>
         </button>
 
-        <!-- 顶部生字卡标题 -->
         <div class="flex items-center gap-2 mb-4">
           <span class="flex items-center">${GAME_ICONS.sparkle("w-6 h-6")}</span>
           <h3 class="text-lg font-black text-amber-950">生字全息卡 · 深度认知</h3>
@@ -679,16 +662,13 @@ export class BookModule extends BaseModule {
 
         <div class="w-full flex flex-col sm:flex-row items-center gap-6 mb-4">
           
-          <!-- 田字格标准大字展示 -->
           <div class="w-36 h-36 bg-red-50/70 border-4 border-red-500 rounded-3xl relative flex flex-col items-center justify-center flex-shrink-0 shadow-md">
-            <!-- 虚线米字格 -->
             <div class="absolute inset-0 border-t-2 border-dashed border-red-300 top-1/2 -translate-y-1/2 pointer-events-none"></div>
             <div class="absolute inset-0 border-l-2 border-dashed border-red-300 left-1/2 -translate-x-1/2 pointer-events-none"></div>
             <div class="absolute top-2 text-xs font-black text-red-600">${charData.pinyin}</div>
             <span class="text-6xl font-black text-red-900 font-serif relative z-10">${charData.char}</span>
           </div>
 
-          <!-- 生字释义与生活组词 -->
           <div class="flex-1 flex flex-col gap-2 w-full text-left">
             <div class="bg-white/80 p-3 rounded-2xl border border-amber-200">
               <span class="text-[11px] font-black text-amber-800/70 block mb-1">常用组词与释义：</span>
@@ -704,20 +684,18 @@ export class BookModule extends BaseModule {
             <div class="bg-white/80 p-3 rounded-2xl border border-amber-200">
               <span class="text-[11px] font-black text-amber-800/70 block mb-1">字源故事：</span>
               <p class="text-xs text-amber-950 font-semibold leading-relaxed line-clamp-2">
-                ${charData.originStory || charData.evolution || "形象描摹天地万物之形，传承千年华夏文明。"}
+                ${charData.originStory || charData.evolution?.story || (typeof charData.evolution === "string" ? charData.evolution : "") || "形象描摹天地万物之形，传承千年华夏文明。"}
               </p>
             </div>
           </div>
 
         </div>
 
-        <!-- 例句展示 -->
         <div class="w-full bg-amber-100/60 p-3 rounded-2xl border border-amber-200/80 mb-5 text-left">
           <span class="text-[11px] font-black text-amber-800/80 block mb-0.5">例句巩固：</span>
-          <p class="text-xs text-amber-950 font-bold">${charData.exampleSentence || `我们在日常生活中常常用到“${charData.char}”字。`}</p>
+          <p class="text-xs text-amber-950 font-bold">${charData.exampleSentence || charData.sentence || `我们在日常生活中常常用到“${charData.char}”字。`}</p>
         </div>
 
-        <!-- 底部发音与互动按钮 -->
         <div class="w-full flex items-center justify-center gap-4">
           <button id="btn-popover-speak" class="btn-game-orange text-white font-black text-xs px-8 py-3 rounded-full shadow-lg flex items-center gap-2 active:scale-95 cursor-pointer">
             <span class="flex items-center">${GAME_ICONS.speaker("w-4 h-4")}</span>
@@ -761,7 +739,6 @@ export class BookModule extends BaseModule {
     overlay.innerHTML = `
       <div class="relative w-full max-w-md h-full bg-gradient-to-b from-[#FFFDF9] to-[#FFF7E8] p-6 shadow-2xl border-l-4 border-amber-300 flex flex-col justify-between select-none animate-slide-left">
         
-        <!-- 抽屉顶部 -->
         <div>
           <div class="flex items-center justify-between pb-4 border-b border-amber-200 mb-4">
             <div class="flex items-center gap-2">
@@ -777,7 +754,6 @@ export class BookModule extends BaseModule {
           <p class="text-xs text-amber-800/70 font-bold mb-3">共 ${book.pages.length} 页 · 点击任意页码快速跳转</p>
         </div>
 
-        <!-- 目录列表滚动区 -->
         <div class="flex-1 overflow-y-auto no-scrollbar flex flex-col gap-3 pr-1 my-2">
           ${book.pages.map((p, idx) => {
             const isCurrent = idx === this.currentPageIndex;
@@ -788,12 +764,10 @@ export class BookModule extends BaseModule {
                   : "bg-white border-amber-200 hover:border-orange-400 hover:shadow"
               }" data-page-index="${idx}">
                 
-                <!-- 缩略图 -->
                 <div class="w-16 h-12 rounded-xl overflow-hidden bg-amber-100 flex-shrink-0 border border-amber-200">
                   <img src="${p.image}" alt="第${idx + 1}页" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition-transform" />
                 </div>
 
-                <!-- 信息 -->
                 <div class="flex-1 overflow-hidden">
                   <div class="flex items-center justify-between mb-0.5">
                     <span class="text-xs font-black ${isCurrent ? "text-orange-700" : "text-amber-950"}">第 ${idx + 1} 页</span>
@@ -807,7 +781,6 @@ export class BookModule extends BaseModule {
           }).join("")}
         </div>
 
-        <!-- 抽屉底部 -->
         <div class="pt-3 border-t border-amber-200 flex items-center justify-between">
           <span class="text-[11px] text-amber-800/70 font-bold">凯茜分级绘本精选</span>
           <button id="btn-catalog-back" class="btn-game-orange text-white font-black text-xs px-6 py-2 rounded-full shadow cursor-pointer">
@@ -868,25 +841,22 @@ export class BookModule extends BaseModule {
         </div>
         <p class="text-xs text-amber-800/80 mb-3 font-bold">选择录音角色，录制属于我们家的专属有声绘本！</p>
 
-        <!-- 角色切换选择器 -->
         <div class="flex items-center gap-2 mb-4 bg-white/80 p-1.5 rounded-full border border-amber-200 shadow-sm">
           <button class="role-select-btn px-3 py-1 rounded-full text-xs font-black transition-all active:scale-95 bg-orange-500 text-white shadow" data-role="kid">
-            👧 宝贝读
+            宝贝朗读
           </button>
           <button class="role-select-btn px-3 py-1 rounded-full text-xs font-black transition-all active:scale-95 text-amber-900 hover:bg-amber-100" data-role="parent">
-            👨 家长读
+            家长朗读
           </button>
           <button class="role-select-btn px-3 py-1 rounded-full text-xs font-black transition-all active:scale-95 text-amber-900 hover:bg-amber-100" data-role="duet">
-            👨‍👧 亲子合读
+            亲子合读
           </button>
         </div>
 
-        <!-- 示范跟读句子 -->
         <div class="w-full bg-white/90 p-4 rounded-2xl border-2 border-amber-200 shadow-inner mb-4">
           <p class="text-lg font-black text-amber-950 leading-relaxed">${page.text}</p>
         </div>
 
-        <!-- 智能波形动画区 -->
         <div class="relative w-24 h-24 mb-3 flex items-center justify-center">
           <div id="voice-glow-bg" class="absolute inset-0 rounded-full bg-rose-400/30 blur-xl opacity-0 transition-opacity"></div>
           <button id="btn-start-record" class="relative z-10 w-20 h-20 rounded-full bg-gradient-to-tr from-rose-500 to-red-500 text-white shadow-2xl flex flex-col items-center justify-center active:scale-90 transition-all cursor-pointer border-4 border-white">
@@ -895,10 +865,8 @@ export class BookModule extends BaseModule {
           </button>
         </div>
 
-        <!-- 评测反馈状态 -->
         <div id="voice-status-text" class="text-xs font-bold text-amber-900 mb-3 h-6">准备就绪，点击麦克风开始录制</div>
 
-        <!-- 回放我的录音 -->
         <button id="btn-playback-voice" class="hidden bg-emerald-500 hover:bg-emerald-600 text-white font-black text-xs px-6 py-2.5 rounded-full shadow-md flex items-center gap-1.5 active:scale-95 cursor-pointer transition-all">
           <span class="flex items-center">${GAME_ICONS.speaker("w-4 h-4")}</span>
           <span id="playback-btn-text">听听我们的朗读录音</span>
@@ -946,7 +914,7 @@ export class BookModule extends BaseModule {
       if (isRecording) return;
       isRecording = true;
       soundAndFX.playFamilyRecordChime(true);
-      const roleName = selectedRole === "kid" ? "👧 宝贝" : selectedRole === "parent" ? "👨 家长" : "👨‍👧 亲子";
+      const roleName = selectedRole === "kid" ? "宝贝" : selectedRole === "parent" ? "家长" : "亲子";
       statusText.textContent = `正在录制【${roleName}】的声音... 请大声朗读`;
       recordBtnLabel.textContent = "录音中";
       
@@ -1088,6 +1056,7 @@ export class BookModule extends BaseModule {
         if (pickedIdx === activeQuiz.correctIndex) {
           soundAndFX.playSuccessSound();
           btn.classList.add("ring-4", "ring-emerald-500", "bg-emerald-100");
+          mainEl.querySelectorAll(".quiz-option-btn").forEach((b) => { b.style.pointerEvents = "none"; });
 
           this._timeout(() => {
             if (this.currentQuizStage === 1) {
@@ -1136,10 +1105,8 @@ export class BookModule extends BaseModule {
     mainEl.innerHTML = `
       <div class="relative w-full max-w-2xl mx-auto flex flex-col items-center justify-center pt-16 sm:pt-20 pb-8 px-4 select-none animate-scale-up">
         
-        <!-- 金色证书主体卡片 -->
         <div class="relative w-full bg-gradient-to-b from-[#FFFDF5] via-[#FFF8E7] to-[#FFF3D6] rounded-3xl p-8 sm:p-10 shadow-2xl border-8 border-amber-400 flex flex-col items-center text-center">
           
-          <!-- 金色皇冠与彩带勋章 -->
           <div class="absolute -top-7 bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-500 px-6 py-2 rounded-full border-4 border-white shadow-xl flex items-center gap-2">
             <span class="flex items-center">${GAME_ICONS.crown("w-6 h-6")}</span>
             <span class="text-sm font-black text-amber-950">小小阅读家 · 荣誉通关证书</span>
@@ -1156,14 +1123,13 @@ export class BookModule extends BaseModule {
             凯茜识字分级阅读 · 顺利掌握全书精髓与核心生字
           </p>
 
-          <!-- 3 颗金色大星星 -->
+          // 3 颗金色大星星
           <div class="flex items-center gap-2 mb-6">
             <span class="flex items-center transform hover:scale-125 transition-transform">${GAME_ICONS.star("w-8 h-8", false)}</span>
             <span class="flex items-center transform hover:scale-125 transition-transform scale-125">${GAME_ICONS.star("w-8 h-8", false)}</span>
             <span class="flex items-center transform hover:scale-125 transition-transform">${GAME_ICONS.star("w-8 h-8", false)}</span>
           </div>
 
-          <!-- 掌握核心字印章墙 -->
           <div class="w-full bg-white/90 p-4 rounded-2xl border-2 border-amber-200/90 mb-6 text-center">
             <span class="text-xs font-black text-amber-900 block mb-2">本次阅读巩固生字：</span>
             <div class="flex flex-wrap justify-center gap-2">
@@ -1175,13 +1141,11 @@ export class BookModule extends BaseModule {
             </div>
           </div>
 
-          <!-- 奖励星币与星星胶囊 -->
           <div class="candy-pill rounded-full px-6 py-2 mb-6 text-sm text-yellow-300 font-black flex items-center gap-4 border-2 border-yellow-300 shadow-xl">
             <span class="flex items-center gap-1.5"><span class="flex items-center">${GAME_ICONS.coin("w-5 h-5")}</span> +15 凯茜星币</span>
             <span class="flex items-center gap-1.5"><span class="flex items-center">${GAME_ICONS.star("w-5 h-5", true)}</span> +5 智慧星</span>
           </div>
 
-          <!-- 底部操作按钮 -->
           <div class="flex items-center gap-4 flex-wrap justify-center">
             <button id="btn-cert-replay" class="bg-white hover:bg-amber-50 text-amber-900 font-black text-xs px-6 py-3 rounded-full shadow-lg border-2 border-amber-200 active:scale-95 cursor-pointer">
               再次精读重温

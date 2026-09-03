@@ -44,15 +44,19 @@ export class PKModule extends BaseModule {
     this.container.innerHTML = `
       <div class="relative w-full h-full min-h-[640px] bg-gradient-to-b from-indigo-950 via-purple-900 to-slate-900 overflow-hidden flex flex-col font-sans select-none">
         
-        <!-- Background Decor -->
         <div class="absolute inset-0 z-0 opacity-40 pointer-events-none">
            <div class="absolute top-10 left-10 w-96 h-96 bg-fuchsia-600 rounded-full blur-[120px]"></div>
            <div class="absolute bottom-10 right-10 w-96 h-96 bg-blue-600 rounded-full blur-[120px]"></div>
         </div>
 
-        <!-- Header: Health Bars -->
-        <div class="relative z-10 w-full p-6 flex items-center justify-between pl-20">
-           <!-- Player -->
+        <button id="btn-pk-battle-exit" class="absolute top-5 left-6 z-50 bg-black/60 hover:bg-black/80 text-white font-black text-xs sm:text-sm px-4 py-2.5 rounded-full border-2 border-amber-300 active:scale-95 transition-transform flex items-center gap-2 cursor-pointer shadow-2xl" title="退出竞技场返回大地图">
+          <span class="flex items-center">${GAME_ICONS.home("w-4 h-4")}</span>
+          <span>返回地图</span>
+        </button>
+
+        // Header: Health Bars
+        <div class="relative z-10 w-full p-6 flex items-center justify-between pl-36">
+           // Player
            <div class="flex items-center gap-3 sm:gap-4">
               <div class="w-14 h-14 sm:w-16 sm:h-16 aspect-square rounded-full bg-slate-200 border-4 border-emerald-400 shadow-[0_0_20px_rgba(52,211,153,0.6)] flex items-center justify-center overflow-hidden shrink-0">
                  <img src="${playerAvatarSrc}" class="w-full h-full object-cover rounded-full" alt="player" onerror="this.src='assets/images/cathy_mascot.webp'" />
@@ -70,7 +74,7 @@ export class PKModule extends BaseModule {
               <span>VS</span>
            </div>
 
-           <!-- Boss -->
+           // Boss
            <div class="flex items-center gap-3 sm:gap-4 flex-row-reverse">
               <div class="w-14 h-14 sm:w-16 sm:h-16 aspect-square rounded-full bg-slate-800 border-4 border-rose-500 shadow-[0_0_20px_rgba(244,63,94,0.6)] flex items-center justify-center overflow-hidden shrink-0">
                  <img src="assets/images/cathy_boss_monster.webp" class="w-full h-full object-cover rounded-full" alt="boss" onerror="this.src='assets/images/icon_chest.webp'" />
@@ -84,15 +88,15 @@ export class PKModule extends BaseModule {
            </div>
         </div>
 
-        <!-- Arena Stage -->
+        // Arena Stage
         <div class="relative flex-1 flex flex-col items-center justify-center z-10">
-           <!-- Battle Area -->
+           // Battle Area
            <div class="absolute inset-0 flex items-center justify-between px-20">
               <div id="pk-player-sprite" class="w-40 h-40 bg-white/10 backdrop-blur-sm border-2 border-emerald-400/50 rounded-3xl animate-bounce-slow flex items-center justify-center shadow-[0_20px_40px_rgba(0,0,0,0.3)] overflow-hidden p-3">
                  <img src="${playerAvatarSrc}" class="w-full h-full object-cover rounded-2xl" alt="player" onerror="this.src='assets/images/cathy_mascot.webp'" />
               </div>
               
-              <!-- Projectile container -->
+              // Projectile container
               <div id="pk-projectile-layer" class="absolute inset-0 pointer-events-none"></div>
 
               <div id="pk-boss-sprite" class="w-48 h-48 bg-black/40 backdrop-blur-md border-2 border-rose-500/50 rounded-3xl animate-bounce-slow flex items-center justify-center shadow-[0_20px_40px_rgba(0,0,0,0.5)] overflow-hidden p-3" style="animation-delay: 0.5s">
@@ -100,32 +104,30 @@ export class PKModule extends BaseModule {
               </div>
            </div>
 
-           <!-- Question UI -->
+           // Question UI
            <div class="z-20 flex flex-col items-center mt-20">
               <div class="bg-black/60 backdrop-blur-lg border-2 border-amber-300/50 rounded-full px-10 py-3 mb-8 shadow-2xl flex items-center gap-4 cursor-pointer active:scale-95 transition-transform" id="pk-btn-listen">
                  <div class="w-8 h-8">${GAME_ICONS.speaker("w-full h-full")}</div>
                  <span class="text-2xl font-black text-yellow-300 tracking-widest">听音选字</span>
               </div>
 
-              <!-- Options -->
+              // Options
               <div class="grid grid-cols-2 gap-6" id="pk-options-grid">
-                 <!-- Generated dynamically -->
+                 // Generated dynamically
               </div>
            </div>
         </div>
         
-        <!-- Back Button -->
-        <button id="btn-pk-back" class="absolute top-6 left-6 z-50 w-12 h-12 bg-black/40 backdrop-blur-md rounded-full text-white flex items-center justify-center hover:bg-black/60 transition-transform active:scale-90 border-2 border-amber-300 shadow-xl">
-           ${GAME_ICONS.back()}
-        </button>
-
       </div>
     `;
 
-    this._on(this.container.querySelector("#btn-pk-back"), "click", () => {
-      soundAndFX.playPop();
-      this._busEmit(EVENTS.SWITCH_MODE, { mode: "map" });
-    });
+    const battleExitBtn = this.container.querySelector("#btn-pk-battle-exit");
+    if (battleExitBtn) {
+      this._on(battleExitBtn, "click", () => {
+        soundAndFX.playPop();
+        this._busEmit(EVENTS.SWITCH_MODE, { mode: "map" });
+      });
+    }
 
     this._on(this.container.querySelector("#pk-btn-listen"), "click", () => {
       if (this.targetChar) {
@@ -149,6 +151,7 @@ export class PKModule extends BaseModule {
     this.targetChar = this.options[Math.floor(Math.random() * this.options.length)];
 
     const grid = this.container.querySelector("#pk-options-grid");
+    if (!grid) return;
     grid.innerHTML = this.options.map((opt, i) => `
       <button class="pk-option-btn w-36 h-36 sm:w-44 sm:h-44 bg-gradient-to-tr from-slate-100 to-white rounded-3xl border-4 border-slate-300 shadow-2xl flex items-center justify-center text-6xl sm:text-7xl font-black text-slate-800 hover:border-amber-400 hover:scale-105 active:scale-95 transition-all cursor-pointer aspect-square shrink-0" data-idx="${i}">
          ${opt.char}
@@ -235,8 +238,10 @@ export class PKModule extends BaseModule {
            anim.onfinish = () => {
               proj.remove();
               const boss = this.container.querySelector("#pk-boss-sprite");
-              boss.classList.add("animate-shake", "brightness-150", "bg-rose-500/50");
-              this._timeout(() => boss.classList.remove("animate-shake", "brightness-150", "bg-rose-500/50"), 400);
+              if (boss) {
+                boss.classList.add("animate-shake", "brightness-150", "bg-rose-500/50");
+                this._timeout(() => boss.classList.remove("animate-shake", "brightness-150", "bg-rose-500/50"), 400);
+              }
               resolve();
            };
         } else {
@@ -253,8 +258,10 @@ export class PKModule extends BaseModule {
            anim.onfinish = () => {
               proj.remove();
               const player = this.container.querySelector("#pk-player-sprite");
-              player.classList.add("animate-shake", "brightness-150", "bg-rose-500/50");
-              this._timeout(() => player.classList.remove("animate-shake", "brightness-150", "bg-rose-500/50"), 400);
+              if (player) {
+                player.classList.add("animate-shake", "brightness-150", "bg-rose-500/50");
+                this._timeout(() => player.classList.remove("animate-shake", "brightness-150", "bg-rose-500/50"), 400);
+              }
               resolve();
            };
         }
@@ -285,10 +292,11 @@ export class PKModule extends BaseModule {
              </div>
            ` : ""}
 
-           <button id="btn-pk-exit" class="btn-game-orange text-white font-black text-lg px-12 py-3.5 rounded-full shadow-2xl active:scale-95 transition-transform border-2 border-white">
-              返回大地图
-           </button>
-        </div>
+            <button id="btn-pk-exit" class="btn-game-orange text-white font-black text-base sm:text-lg px-12 py-3.5 rounded-full shadow-2xl active:scale-95 transition-transform border-2 border-white flex items-center justify-center gap-2 cursor-pointer hover:brightness-105">
+               <span class="flex items-center">${GAME_ICONS.home("w-5 h-5")}</span>
+               <span>返回大地图</span>
+            </button>
+         </div>
      `;
 
      this._on(this.container.querySelector("#btn-pk-exit"), "click", () => {

@@ -45,7 +45,7 @@ export class RewardModule extends BaseModule {
     contentEl.innerHTML = `
       <div class="w-full h-full overflow-y-auto no-scrollbar bg-gradient-to-b from-indigo-950 via-purple-950 to-slate-950 text-white select-none">
 
-        <!--  -->
+        // 
         <div class="relative mx-5 mt-20 rounded-3xl overflow-hidden border-4 border-amber-300/70 shadow-[0_18px_40px_rgba(0,0,0,0.55)]">
           <img src="assets/images/cathy_island_life.webp" alt="" class="absolute inset-0 w-full h-full object-cover opacity-40 pointer-events-none" />
           <div class="relative z-10 flex items-center justify-between gap-4 bg-gradient-to-r from-amber-950/80 via-amber-900/60 to-transparent px-6 py-5">
@@ -73,7 +73,7 @@ export class RewardModule extends BaseModule {
           </div>
         </div>
 
-        <!--  -->
+        // 
         <div class="mx-5 mt-4 grid grid-cols-4 gap-2 bg-black/40 backdrop-blur-md p-1.5 rounded-2xl border border-white/15">
           ${[
             { key: "stickers", label: "贴纸墙", iconSvg: (cls) => GAME_ICONS.cards(cls) },
@@ -88,7 +88,7 @@ export class RewardModule extends BaseModule {
           `).join("")}
         </div>
 
-        <!--  -->
+        // 
         <div id="reward-panel" class="mx-5 my-5 pb-10"></div>
       </div>
     `;
@@ -129,8 +129,9 @@ export class RewardModule extends BaseModule {
           
           <div class="flex items-center justify-between flex-wrap gap-2">
             <div class="flex items-center gap-2">
-              <button id="btn-exit-scrapbook" class="btn-game-wood text-white font-black text-xs px-3.5 py-1.5 rounded-full flex items-center gap-1 cursor-pointer">
-                <span>← 返回贴纸墙</span>
+              <button id="btn-exit-scrapbook" class="btn-game-wood text-white font-black text-xs px-3.5 py-1.5 rounded-full flex items-center gap-1.5 cursor-pointer active:scale-95">
+                <span class="flex items-center">${GAME_ICONS.back("w-3.5 h-3.5")}</span>
+                <span>返回贴纸墙</span>
               </button>
               <h2 class="font-black text-amber-200 text-sm flex items-center gap-1.5">
                 <span class="flex items-center">${GAME_ICONS.cards("w-4 h-4")}</span>
@@ -138,17 +139,16 @@ export class RewardModule extends BaseModule {
               </h2>
             </div>
 
-            <!-- 背景切换与保存 -->
             <div class="flex items-center gap-2 flex-wrap">
               <div class="flex items-center gap-1 bg-black/40 p-1 rounded-full border border-white/10 text-xs">
                 <button class="bg-choice-btn px-2.5 py-1 rounded-full text-[11px] font-bold ${currentBg.includes("forest") ? "bg-amber-400 text-amber-950 font-black" : "text-white/70"}" data-bg="assets/images/cathy_island_forest.webp">
-                  🌲 森林
+                  森林
                 </button>
                 <button class="bg-choice-btn px-2.5 py-1 rounded-full text-[11px] font-bold ${currentBg.includes("life") ? "bg-amber-400 text-amber-950 font-black" : "text-white/70"}" data-bg="assets/images/cathy_island_life.webp">
-                  🏘️ 小镇
+                  小镇
                 </button>
                 <button class="bg-choice-btn px-2.5 py-1 rounded-full text-[11px] font-bold ${currentBg.includes("space") ? "bg-amber-400 text-amber-950 font-black" : "text-white/70"}" data-bg="assets/images/cathy_island_space.webp">
-                  🪐 星空
+                  星空
                 </button>
               </div>
 
@@ -157,12 +157,11 @@ export class RewardModule extends BaseModule {
               </button>
 
               <button id="btn-save-scrapbook" class="btn-game-orange text-white font-black text-xs px-5 py-1.5 rounded-full shadow-lg active:scale-95 cursor-pointer flex items-center gap-1">
-                <span>📸 保存作品</span>
+                <span>保存作品</span>
               </button>
             </div>
           </div>
 
-          <!-- 手帐主画布 (DIY Canvas) -->
           <div id="scrapbook-canvas" class="relative w-full h-80 sm:h-96 rounded-2xl overflow-hidden border-4 border-amber-300/80 shadow-2xl bg-slate-900 group">
             <img id="scrapbook-bg-img" src="${currentBg}" alt="" class="absolute inset-0 w-full h-full object-cover pointer-events-none opacity-90 transition-all" />
             
@@ -180,11 +179,10 @@ export class RewardModule extends BaseModule {
             </div>
 
             <div class="absolute bottom-2 left-3 z-20 bg-black/60 backdrop-blur-md text-white text-[11px] font-bold px-3 py-1 rounded-full pointer-events-none border border-white/20">
-              💡 点击下方贴纸贴到画布上，点击画布贴纸可发音朗读！
+              点击下方贴纸贴到画布上，点击画布贴纸可发音朗读！
             </div>
           </div>
 
-          <!-- 底部贴纸抽屉 (Sticker Tray) -->
           <div class="bg-black/40 p-3 rounded-2xl border border-white/10">
             <div class="text-xs font-black text-amber-200 mb-2">我的贴纸库 (点击贴入手帐)：</div>
             <div class="flex items-center gap-2 overflow-x-auto no-scrollbar py-1">
@@ -264,7 +262,7 @@ export class RewardModule extends BaseModule {
           soundAndFX.playCrownFanfare();
           soundAndFX.triggerConfetti(this.container);
           rewardEngine.addCoins(30);
-          showGameToast(this.container, "🎨 专属贴纸手帐作品已保存！奖励 +30 星币！", "success");
+          showGameToast(this.container, "专属贴纸手帐作品已保存！奖励 +30 星币！", "success");
         });
       }
 
@@ -284,7 +282,7 @@ export class RewardModule extends BaseModule {
 
           <button id="btn-open-scrapbook" class="btn-game-orange text-white font-black text-xs px-4 py-2 rounded-full shadow-md active:scale-95 transition-all flex items-center gap-1.5 cursor-pointer">
             <span class="flex items-center">${GAME_ICONS.brush("w-3.5 h-3.5")}</span>
-            <span>🎨 贴纸手帐 DIY 创作台</span>
+            <span>贴纸手帐 DIY 创作台</span>
           </button>
         </div>
 
@@ -312,7 +310,6 @@ export class RewardModule extends BaseModule {
                </div>`
         }
 
-        <!-- 待解锁 -->
         ${
           s.upcoming.length
             ? `<div class="mt-5">
@@ -509,7 +506,6 @@ export class RewardModule extends BaseModule {
     panel.innerHTML = `
       <div class="bg-white/5 backdrop-blur-md rounded-3xl border border-white/15 p-5">
 
-        <!-- 打卡统计卡片 -->
         <div class="grid grid-cols-3 gap-3 mb-4">
           <div class="bg-gradient-to-b from-orange-500/30 to-red-600/20 border border-orange-400/40 rounded-2xl p-3 text-center">
             <div class="text-[10px] text-white/60 font-black">当前连续打卡</div>
@@ -525,19 +521,19 @@ export class RewardModule extends BaseModule {
           </div>
         </div>
 
-        <!--  -->
+        // 
         <div class="flex items-center justify-between mb-3">
           <button data-cal-nav="-1" class="cal-nav-btn w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 border border-white/15 font-black">‹</button>
           <h2 class="font-black text-amber-200 text-sm">${monthLabel} ·  ${cal.monthActive} 天</h2>
           <button data-cal-nav="1" class="cal-nav-btn w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 border border-white/15 font-black">›</button>
         </div>
 
-        <!--  -->
+        // 
         <div class="grid grid-cols-7 gap-1.5 mb-1.5 text-center">
           ${WEEKDAY_LABELS.map((w) => `<div class="text-[10px] font-black text-white/40 py-1">${w}</div>`).join("")}
         </div>
 
-        <!--  -->
+        // 
         <div class="grid grid-cols-7 gap-1.5">
           ${cal.weeks.flat().map((cell) => {
             if (!cell.key) return '<div></div>';

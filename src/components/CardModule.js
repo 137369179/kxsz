@@ -1,7 +1,7 @@
 /**
- * 凯茜识字 (Cathy Literacy) - 1300 字字卡中心与生词字典组件
+ * 凯茜识字 (Cathy Literacy) - 1490 字字卡中心与生词字典组件
  * 高性能优化版：
- *  1. 1300 字卡虚拟分片加载（首屏 48 张，滚动按需增量呈现，DOM 减负 85%+）
+ *  1. 1490 字卡虚拟分片加载（首屏 48 张，滚动按需增量呈现，DOM 减负 85%+）
  *  2. 搜索 150ms 智能防抖
  *  3. CSS content-visibility: auto 硬件跳跃渲染 (cv-auto)
  *  4. 3D 翻转卡片偏旁专项生词发音与难字本管理
@@ -13,6 +13,8 @@ import { soundAndFX } from "../utils/soundEngine.js";
 import { mountGameShell, showGameToast } from "./SharedShell.js";
 import { BaseModule } from "../utils/BaseModule.js";
 import { GAME_ICONS } from "../utils/gameIcons.js";
+import { printWorksheet } from "../utils/worksheetGenerator.js";
+import { openMorphTheater } from "../utils/morphEngine.js";
 
 const RADICAL_ORIGINS = {
   "氵": "三点水：造字本源与江河水流液体有关",
@@ -49,11 +51,15 @@ export class CardModule extends BaseModule {
     this._debounceTimer = null;
   }
 
-  /** 清理事件监听与防抖定时器 */
+  /** 清理事件监听与防抖定时器及未销毁的弹窗 */
   destroy() {
     if (this._debounceTimer) {
       clearTimeout(this._debounceTimer);
       this._debounceTimer = null;
+    }
+    if (typeof document !== "undefined") {
+      document.getElementById("stroke-demo-overlay")?.remove();
+      document.getElementById("flashcard-slideshow-overlay")?.remove();
     }
     super.destroy();
   }
@@ -93,6 +99,10 @@ export class CardModule extends BaseModule {
   }
 
   render() {
+    const prevViewport = this.container.querySelector("#cards-page-viewport");
+    if (prevViewport) {
+      this._savedScrollTop = prevViewport.scrollTop;
+    }
     this.destroy();
     const progress = ebbinghausManager.progress;
     const allFiltered = this.getFilteredList();
@@ -111,22 +121,20 @@ export class CardModule extends BaseModule {
     mainEl.innerHTML = `
       <div id="cards-page-viewport" class="relative w-full max-w-5xl mx-auto flex flex-col select-none animate-fade-in pb-6 overflow-y-auto no-scrollbar max-h-[calc(100vh-100px)]">
         
-        <!-- 顶部搜索与多维筛选控制栏 -->
         <div class="w-full flex flex-col gap-3 bg-white/95 backdrop-blur-md px-6 py-4 rounded-3xl shadow-xl border-2 border-amber-200 mb-4 sticky top-0 z-20">
           <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
             <div class="flex items-center gap-3">
               <span class="flex items-center">${GAME_ICONS.cards()}</span>
               <div>
                 <h1 class="text-base font-black text-amber-950">生词字卡库 · 偏旁部首专项板块</h1>
-                <p class="text-xs text-amber-700 font-semibold">1300 汉字造字本源解析 · 3D 翻转卡片 · 偏旁归纳与组词例句</p>
+                <p class="text-xs text-amber-700 font-semibold">1490 汉字造字本源解析 · 3D 翻转卡片 · 偏旁归纳与组词例句</p>
               </div>
             </div>
 
-            <!-- 搜索框与沉浸式闪卡轮播 -->
             <div class="flex items-center gap-2 w-full sm:w-auto">
               <button id="btn-start-slideshow" class="btn-game-orange text-white font-black text-xs px-4 py-2 rounded-full shadow-md active:scale-95 transition-all flex items-center gap-1.5 cursor-pointer whitespace-nowrap">
                 <span class="flex items-center">${GAME_ICONS.sparkle("w-3.5 h-3.5")}</span>
-                <span>▶️ 闪卡轮播</span>
+                <span>闪卡轮播</span>
               </button>
               <div class="relative w-full sm:w-56">
                 <input id="card-search-input" type="text" value="${this.searchQuery}" placeholder="搜索汉字或拼音 (如: 日 / ri)" class="w-full bg-amber-50 border-2 border-amber-300 rounded-full px-4 py-1.5 text-xs font-black text-amber-950 focus:outline-none focus:ring-2 focus:ring-orange-400 placeholder:text-amber-400" />
@@ -134,16 +142,14 @@ export class CardModule extends BaseModule {
             </div>
           </div>
 
-          <!-- 筛选第一行：阶段与掌握状态 -->
           <div class="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-amber-100">
             
-            <!-- 三大识字阶段 -->
             <div class="flex items-center gap-1 bg-amber-50 p-1 rounded-full border border-amber-200">
               ${[
                 { key: "all", label: "全阶段" },
                 { key: "1", label: "第1阶·启蒙 (1-200)" },
                 { key: "2", label: "第2阶·常用 (201-600)" },
-                { key: "3", label: "第3阶·进阶 (601-1300)" }
+                { key: "3", label: "第3阶·进阶 (601-1490)" }
               ]
                 .map(
                   (st) => `
@@ -159,7 +165,6 @@ export class CardModule extends BaseModule {
                 .join("")}
             </div>
 
-            <!-- 掌握状态 -->
             <div class="flex items-center gap-1 bg-amber-50 p-1 rounded-full border border-amber-200">
               ${[
                 { key: "all", label: "全部" },
@@ -183,7 +188,6 @@ export class CardModule extends BaseModule {
 
           </div>
 
-          <!-- 筛选第二行：偏旁部首专项横向胶囊专区 -->
           <div class="flex items-center gap-2 pt-2 border-t border-amber-100 overflow-x-auto no-scrollbar py-1">
             <span class="text-xs font-black text-amber-950 whitespace-nowrap">偏旁专区：</span>
             ${popularRadicals.map((rad) => `
@@ -199,7 +203,6 @@ export class CardModule extends BaseModule {
 
         </div>
 
-        <!-- 偏旁造字本源解析气泡 (若选中特定部首) -->
         ${
           this.selectedRadical !== "all" && RADICAL_ORIGINS[this.selectedRadical]
             ? `
@@ -214,13 +217,11 @@ export class CardModule extends BaseModule {
             : ""
         }
 
-        <!-- 数量统计标签 -->
         <div class="w-full flex items-center justify-between text-xs font-black text-amber-950 mb-3 px-2">
           <span>共找到 <b class="text-orange-600">${allFiltered.length}</b> 个生字 (当前已呈现 ${visibleChars.length} 个)</span>
           ${hasMore ? '<span class="text-amber-700 text-[11px] font-semibold"> 向下滚动自动呈现更多</span>' : ""}
         </div>
 
-        <!-- 字卡网格列表 (采用 content-visibility: auto 高性能渲染) -->
         <div id="card-grid-container" class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-3.5">
           ${
             visibleChars.length === 0
@@ -243,7 +244,6 @@ export class CardModule extends BaseModule {
                         : "border-gray-200 opacity-65"
                     } flex flex-col items-center justify-between cursor-pointer transition-all duration-200 hover:scale-105" data-char-id="${c.id}">
                       
-                      <!-- 掌握状态角标 -->
                       ${
                         isDifficult
                           ? '<span class="absolute top-1.5 right-1.5 text-[9px] bg-rose-500 text-white font-black px-1.5 py-0.5 rounded-full shadow">难字</span>'
@@ -269,7 +269,6 @@ export class CardModule extends BaseModule {
           }
         </div>
 
-        <!-- 分页增量加载触发按钮 -->
         ${
           hasMore
             ? `
@@ -282,7 +281,7 @@ export class CardModule extends BaseModule {
             : ""
         }
 
-        <!-- 3D 翻转卡片弹窗详情 (若选中) -->
+        // 3D 翻转卡片弹窗详情 (若选中)
         ${this.selectedCard ? this.renderCardDetailModal() : ""}
 
       </div>
@@ -315,6 +314,7 @@ export class CardModule extends BaseModule {
         this._debounceTimer = setTimeout(() => {
           this.searchQuery = val;
           this.displayCount = this.pageSize;
+          this._savedScrollTop = 0;
           this.render();
         }, 150);
       });
@@ -325,6 +325,7 @@ export class CardModule extends BaseModule {
       this._on(btn, "click", () => {
         this.currentStage = btn.dataset.stage;
         this.displayCount = this.pageSize;
+        this._savedScrollTop = 0;
         soundAndFX.playPop();
         this.render();
       });
@@ -335,6 +336,7 @@ export class CardModule extends BaseModule {
       this._on(btn, "click", () => {
         this.currentFilter = btn.dataset.key;
         this.displayCount = this.pageSize;
+        this._savedScrollTop = 0;
         soundAndFX.playPop();
         this.render();
       });
@@ -345,6 +347,7 @@ export class CardModule extends BaseModule {
       this._on(btn, "click", () => {
         this.selectedRadical = btn.dataset.rad;
         this.displayCount = this.pageSize;
+        this._savedScrollTop = 0;
         soundAndFX.playPop();
         this.render();
       });
@@ -457,6 +460,30 @@ export class CardModule extends BaseModule {
       });
     }
 
+    // 单字田字格字帖打印按钮
+    const printCharBtn = mainEl.querySelector("#btn-modal-print-char");
+    if (printCharBtn) {
+      this._on(printCharBtn, "click", (e) => {
+        e.stopPropagation();
+        if (this.selectedCard) {
+          soundAndFX.playPop();
+          printWorksheet([this.selectedCard], `凯茜识字 · 【${this.selectedCard.char}】字专项田字格练字帖`);
+        }
+      });
+    }
+
+    // 象形字源蜕变微剧场
+    const morphTheaterBtn = mainEl.querySelector("#btn-modal-morph-theater");
+    if (morphTheaterBtn) {
+      this._on(morphTheaterBtn, "click", (e) => {
+        e.stopPropagation();
+        if (this.selectedCard) {
+          soundAndFX.playPop();
+          openMorphTheater(this.selectedCard);
+        }
+      });
+    }
+
     // 笔顺演示按钮
     const demoStrokesBtn = mainEl.querySelector("#btn-modal-demo-strokes");
     if (demoStrokesBtn) {
@@ -494,6 +521,12 @@ export class CardModule extends BaseModule {
         }
       });
     }
+
+    // 恢复之前的滚动位置，防止因增量加载或弹窗操作导致跳顶
+    const newViewport = mainEl.querySelector("#cards-page-viewport");
+    if (newViewport && this._savedScrollTop > 0) {
+      newViewport.scrollTop = this._savedScrollTop;
+    }
   }
 
   openStrokeDemoModal(c) {
@@ -514,7 +547,6 @@ export class CardModule extends BaseModule {
           <span id="demo-stroke-name" class="text-xs sm:text-sm font-black bg-amber-200 text-amber-950 px-3 py-1 rounded-full shadow-sm">准备起笔</span>
         </div>
 
-        <!-- 田字格 Canvas (巨幅高清演示台) -->
         <div class="relative w-72 h-72 sm:w-80 sm:h-80 bg-amber-50 rounded-3xl border-4 border-amber-400 shadow-2xl overflow-hidden flex items-center justify-center my-3">
           <canvas id="stroke-demo-canvas" width="320" height="320" class="w-full h-full"></canvas>
         </div>
@@ -622,7 +654,7 @@ export class CardModule extends BaseModule {
             ctx.stroke();
 
             if (progress < 1) {
-              requestAnimationFrame(animStep);
+              if (!cancelCurrentAnim) requestAnimationFrame(animStep);
             } else {
               setTimeout(resolve, 400);
             }
@@ -658,19 +690,25 @@ export class CardModule extends BaseModule {
       <div id="card-modal-backdrop" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 animate-fade-in perspective-1000 select-none">
         <div class="relative w-full max-w-md sm:max-w-lg flex flex-col items-center">
           
-          <!-- 关闭按钮 (大触控靶心) -->
           <button id="btn-close-modal" class="absolute -top-14 right-0 w-11 h-11 rounded-full bg-white text-gray-800 font-extrabold text-xl flex items-center justify-center shadow-2xl hover:bg-gray-100 active:scale-90 z-50 cursor-pointer border-2 border-amber-300" title="关闭">
             ${GAME_ICONS.back("w-6 h-6")}
           </button>
 
-          <!-- 3D 翻转卡片容器 (巨幕 3D 字卡) -->
+          // 3D 翻转卡片容器 (巨幕 3D 字卡)
           <div id="flip-card" class="relative w-full h-[460px] sm:h-[480px] cursor-pointer preserve-3d transition-transform duration-500 ease-out ${this.isCardFlipped ? 'rotate-y-180' : ''}">
             
-            <!-- 卡片正面 (Front Face) -->
             <div class="absolute inset-0 bg-gradient-to-b from-amber-50 to-orange-50 rounded-3xl shadow-2xl border-4 border-amber-300 p-8 flex flex-col justify-between backface-hidden ${this.isCardFlipped ? 'pointer-events-none' : ''}">
               <div class="flex items-center justify-between">
                 <span class="text-xs sm:text-sm font-black bg-amber-200 text-amber-950 px-4 py-1.5 rounded-full shadow-sm">${c.radical}部 · ${c.strokeCount || 4}画</span>
-                <div class="flex items-center gap-2.5">
+                <div class="flex items-center gap-2">
+                  <button id="btn-modal-print-char" class="flex items-center gap-1.5 bg-rose-200 hover:bg-rose-300 text-rose-950 px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-black shadow-md active:scale-90 transition-all cursor-pointer" title="打印该字A4田字格字帖">
+                    <span class="flex items-center">${GAME_ICONS.print("w-4 h-4 sm:w-5 sm:h-5")}</span>
+                    <span>打印字帖</span>
+                  </button>
+                  <button id="btn-modal-morph-theater" class="flex items-center gap-1.5 bg-gradient-to-r from-amber-400 to-orange-400 hover:from-amber-500 hover:to-orange-500 text-white px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-black shadow-md active:scale-90 transition-all cursor-pointer" title="查看象形字源蜕变动效">
+                    <span class="flex items-center">${GAME_ICONS.sparkle("w-4 h-4 sm:w-5 sm:h-5")}</span>
+                    <span>象形微剧场</span>
+                  </button>
                   <button id="btn-modal-demo-strokes" class="flex items-center gap-1.5 bg-amber-200 hover:bg-amber-300 text-amber-950 px-4 py-1.5 rounded-full text-xs sm:text-sm font-black shadow-md active:scale-90 transition-all cursor-pointer" title="笔顺笔画动画演示">
                     <span class="flex items-center">${GAME_ICONS.brush("w-4 h-4 sm:w-5 sm:h-5")}</span>
                     <span>笔顺</span>
@@ -695,12 +733,11 @@ export class CardModule extends BaseModule {
 
               <div class="w-full text-center">
                 <span class="text-xs text-amber-800 font-bold bg-white/90 px-5 py-1.5 rounded-full shadow-sm animate-pulse border border-amber-200">
-                  👆 点击卡片翻转查看字源与常用组词
+                  轻触卡片翻转查看字源与常用组词
                 </span>
               </div>
             </div>
 
-            <!-- 卡片背面 (Back Face) -->
             <div class="absolute inset-0 bg-gradient-to-b from-orange-50 to-amber-100 rounded-3xl shadow-2xl border-4 border-orange-300 p-6 flex flex-col justify-between backface-hidden rotate-y-180 ${!this.isCardFlipped ? 'pointer-events-none' : ''}">
               <div class="flex items-center justify-between pb-3 border-b border-amber-200">
                 <span class="text-sm font-black text-amber-950 flex items-center gap-2">
@@ -763,11 +800,10 @@ export class CardModule extends BaseModule {
       const isDiff = ebbinghausManager.isDifficultChar(c.id);
 
       overlay.innerHTML = `
-        <!-- 顶栏：进度与控制 -->
         <header class="w-full max-w-3xl flex items-center justify-between border-b border-white/10 pb-3">
           <div class="flex items-center gap-3">
             <button id="btn-close-slideshow" class="btn-game-wood text-white font-black text-xs px-3.5 py-1.5 rounded-full flex items-center gap-1 cursor-pointer">
-              <span>✕ 退出轮播</span>
+              <span>退出轮播</span>
             </button>
             <span class="text-xs sm:text-sm font-black text-amber-300">
               第 <b class="text-yellow-300 text-base sm:text-lg">${currentIndex + 1}</b> / ${chars.length} 张字卡
@@ -780,18 +816,16 @@ export class CardModule extends BaseModule {
                 ? "bg-emerald-500 border-emerald-400 text-white animate-pulse"
                 : "bg-white/10 border-white/20 text-white/80 hover:bg-white/20"
             } cursor-pointer">
-              ${isAutoPlaying ? "⏸️ 暂停自动轮播" : "▶️ 开启 3秒轮播"}
+              ${isAutoPlaying ? "暂停自动轮播" : "开启 3秒轮播"}
             </button>
           </div>
         </header>
 
-        <!-- 中间：3D 巨幅闪卡主体 -->
         <main class="flex-1 flex items-center justify-center w-full max-w-lg my-3">
           <div id="slideshow-card-box" class="relative w-full aspect-[4/5] max-h-[460px] preserve-3d transition-transform duration-500 cursor-pointer ${
             isFlipped ? "rotate-y-180" : ""
           }">
             
-            <!-- 正面 -->
             <div class="absolute inset-0 bg-gradient-to-b from-amber-50 to-orange-50 rounded-3xl shadow-2xl border-4 border-amber-300 p-6 flex flex-col justify-between backface-hidden text-amber-950 ${
               isFlipped ? "pointer-events-none" : ""
             }">
@@ -814,12 +848,11 @@ export class CardModule extends BaseModule {
 
               <div class="text-center">
                 <span class="text-[11px] font-bold text-amber-800 bg-white/80 px-4 py-1 rounded-full shadow-sm">
-                  👆 点击卡片翻转查看词组造句
+                  轻触卡片翻转查看词组造句
                 </span>
               </div>
             </div>
 
-            <!-- 背面 -->
             <div class="absolute inset-0 bg-gradient-to-b from-orange-50 to-amber-100 rounded-3xl shadow-2xl border-4 border-orange-300 p-6 flex flex-col justify-between backface-hidden rotate-y-180 text-amber-950 ${
               !isFlipped ? "pointer-events-none" : ""
             }">
@@ -849,7 +882,7 @@ export class CardModule extends BaseModule {
 
               <div class="text-center">
                 <span class="text-[11px] font-bold text-amber-800 bg-white/80 px-4 py-1 rounded-full shadow-sm">
-                  👆 点击卡片翻回正面
+                  轻触卡片翻回正面
                 </span>
               </div>
             </div>
@@ -857,7 +890,6 @@ export class CardModule extends BaseModule {
           </div>
         </main>
 
-        <!-- 底栏：翻页与操作 -->
         <footer class="w-full max-w-lg flex items-center justify-between gap-2 border-t border-white/10 pt-3">
           <button id="btn-slideshow-prev" class="btn-game-wood text-white font-black text-xs px-4 py-2 rounded-full cursor-pointer active:scale-95 disabled:opacity-40 disabled:pointer-events-none" ${
             currentIndex === 0 ? "disabled" : ""
@@ -867,12 +899,12 @@ export class CardModule extends BaseModule {
 
           <div class="flex items-center gap-2">
             <button id="btn-slideshow-flip" class="bg-amber-400 hover:bg-amber-300 text-amber-950 font-black text-xs px-4 py-2 rounded-full shadow-md active:scale-95 cursor-pointer">
-              🔄 翻转卡片
+              翻转卡片
             </button>
             <button id="btn-slideshow-diff" class="text-xs font-black px-3.5 py-2 rounded-full shadow-md active:scale-95 cursor-pointer ${
               isDiff ? "bg-rose-500 text-white" : "bg-white/10 text-white hover:bg-white/20"
             }">
-              ${isDiff ? "❤️ 已标难字" : "🤍 标为难字"}
+              ${isDiff ? "已标难字" : "标为难字"}
             </button>
           </div>
 

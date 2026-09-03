@@ -20,10 +20,8 @@ export function mountGameShell(container, { activeMode, heading }) {
     container.innerHTML = `
       <div class="relative w-full h-full min-h-[640px] flex flex-col select-none overflow-hidden bg-gradient-to-b from-sky-400 via-amber-200 to-orange-200" role="application" aria-label="凯茜识字学习应用">
 
-        <!-- 3D HUD (Head-Up Display) -->
         <div class="absolute top-4 left-4 right-4 z-40 flex items-center justify-between pointer-events-none" role="toolbar" aria-label="顶部导航栏">
 
-          <!-- 返回 / 家长入口 (大触控大图标) -->
           <div class="flex items-center gap-3 pointer-events-auto">
             ${
               activeMode !== "map"
@@ -42,7 +40,6 @@ export function mountGameShell(container, { activeMode, heading }) {
             </button>
           </div>
 
-          <!-- 星星 & 金币 (大图大药丸) -->
           <div class="flex items-center gap-3 pointer-events-auto">
             <div class="candy-pill flex items-center gap-2 text-yellow-300 font-black text-sm sm:text-base px-4 sm:px-5 py-1.5 sm:py-2 rounded-full border-2 border-yellow-300 shadow-xl bg-black/50 backdrop-blur-md" title="星星" aria-label="星星数量">
               ${GAME_ICONS.star("w-6 h-6 sm:w-7 sm:h-7", false)}
@@ -58,7 +55,6 @@ export function mountGameShell(container, { activeMode, heading }) {
 
         </div>
 
-        <!-- 主内容区 -->
         <main class="shell-content relative z-10 flex-1 w-full overflow-hidden no-scrollbar" role="main" aria-label="学习内容区域">
         </main>
 
@@ -127,6 +123,16 @@ export function mountGameShell(container, { activeMode, heading }) {
 }
 
 export function showGameToast(container, message, tone = "info") {
+  if (typeof container === "string") {
+    tone = message || "info";
+    message = container;
+    container = (typeof document !== "undefined" && (document.getElementById("game-app-viewport") || document.body)) || null;
+  }
+  if (!container || typeof container.appendChild !== "function") {
+    container = (typeof document !== "undefined" && (document.getElementById("game-app-viewport") || document.body)) || null;
+  }
+  if (!container || typeof document === "undefined") return;
+
   const toast = document.createElement("div");
   const toneClass =
     tone === "error"
@@ -142,6 +148,6 @@ export function showGameToast(container, message, tone = "info") {
   setTimeout(() => {
     toast.style.transition = "opacity 0.4s";
     toast.style.opacity = "0";
-    setTimeout(() => toast.remove(), 400);
+    setTimeout(() => { try { toast.remove(); } catch {} }, 400);
   }, 2200);
 }

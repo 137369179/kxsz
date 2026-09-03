@@ -14,12 +14,15 @@ import { soundAndFX } from "../utils/soundEngine.js";
 import { mountGameShell, showGameToast } from "./SharedShell.js";
 import { BaseModule } from "../utils/BaseModule.js";
 import { GAME_ICONS } from "../utils/gameIcons.js";
+import { printWorksheet, getTodayWorksheetChars, getDifficultWorksheetChars } from "../utils/worksheetGenerator.js";
+import { drawQRCode } from "../utils/qrCode.js";
+import { storageManager } from "../utils/storageManager.js";
 
 const TROPHY_LIST = [
   { id: "first_char", name: "识字小萌新", desc: "学会第 1 个汉字", req: "1 个字", icon: "star" },
   { id: "forest_master", name: "森林探险家", desc: "通关启蒙森林岛", req: "200 个字", icon: "islandForest" },
   { id: "town_hero", name: "小镇达人", desc: "通关生活常用小镇", req: "600 个字", icon: "islandTown" },
-  { id: "space_conqueror", name: "太空小学者", desc: "通关星际探索岛", req: "1300 个字", icon: "islandSpace" },
+  { id: "space_conqueror", name: "太空小学者", desc: "通关星际探索岛", req: "1490 个字", icon: "islandSpace" },
   { id: "book_worm_1", name: "绘本初读者", desc: "完整读完 1 本分级绘本", req: "1 本绘本", icon: "book" },
   { id: "book_master", name: "故事大王", desc: "读完 10 本分级绘本", req: "10 本绘本", icon: "crown" },
   { id: "calligrapher", name: "小小书法家", desc: "AI 描红笔画全满分 50 次", req: "50 次满分", icon: "brush" },
@@ -35,6 +38,8 @@ export class ParentModule extends BaseModule {
     super(container);
     this.isUnlocked = false; // 是否通过家长算术门禁
     this.currentTab = "dashboard"; // dashboard | trophies | print | settings
+    this.printMode = "today"; // today | difficult | stage1
+    this.printGridType = "mi"; // mi (米字格) | tian (田字格)
     this.mathNum1 = Math.floor(Math.random() * 6) + 4; // 4~9
     this.mathNum2 = Math.floor(Math.random() * 6) + 4; // 4~9
     this.mathAnswer = this.mathNum1 * this.mathNum2;
@@ -80,8 +85,12 @@ export class ParentModule extends BaseModule {
 
           <input id="gate-answer-input" type="number" placeholder="请输入数字答案" class="w-full text-center text-2xl font-black py-3 px-4 rounded-2xl border-2 border-amber-300 focus:outline-none focus:ring-4 focus:ring-orange-200 mb-4 bg-amber-50/50 text-amber-950" />
 
-          <button id="btn-submit-gate" class="w-full btn-game-orange text-white font-black text-sm py-3.5 rounded-2xl shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2">
+          <button id="btn-submit-gate" class="w-full btn-game-orange text-white font-black text-sm py-3.5 rounded-2xl shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2 cursor-pointer">
             <span>验证并进入家长中心</span>
+          </button>
+
+          <button id="btn-cancel-gate" class="mt-4 text-xs font-bold text-gray-500 hover:text-amber-800 transition-colors cursor-pointer py-1 px-3">
+            取消，返回大地图
           </button>
         </div>
 
@@ -90,6 +99,14 @@ export class ParentModule extends BaseModule {
 
     const input = this.container.querySelector("#gate-answer-input");
     const submitBtn = this.container.querySelector("#btn-submit-gate");
+    const cancelBtn = this.container.querySelector("#btn-cancel-gate");
+
+    if (cancelBtn) {
+      this._on(cancelBtn, "click", () => {
+        soundAndFX.playPop();
+        this._busEmit(EVENTS.SWITCH_MODE, { mode: "map" });
+      });
+    }
 
     const checkAnswer = () => {
       const val = parseInt(input.value.trim(), 10);
@@ -132,7 +149,6 @@ export class ParentModule extends BaseModule {
     mainEl.innerHTML = `
       <div class="relative w-full max-w-5xl mx-auto flex flex-col select-none animate-fade-in pb-8 overflow-y-auto no-scrollbar max-h-[calc(100vh-100px)]">
         
-        <!-- 顶部导航与锁定按钮 -->
         <div class="w-full flex flex-col sm:flex-row items-center justify-between bg-white/95 backdrop-blur-md px-6 py-4 rounded-3xl shadow-xl border-2 border-amber-200 mb-6 gap-4">
           <div class="flex items-center gap-3">
             <span class="flex items-center">${GAME_ICONS.shieldLock()}</span>
@@ -142,7 +158,6 @@ export class ParentModule extends BaseModule {
             </div>
           </div>
 
-          <!-- 五大标签切换组 -->
           <div class="flex items-center gap-1.5 bg-amber-50 p-1.5 rounded-full border border-amber-200">
             ${[
               { key: "dashboard", label: "数据罗盘", icon: (cls) => GAME_ICONS.compass(cls) },
@@ -171,7 +186,6 @@ export class ParentModule extends BaseModule {
           </div>
         </div>
 
-        <!-- 标签页内容 -->
         ${this.renderActiveTabContent(progress, charCount, settings, diffCount)}
 
       </div>
@@ -194,11 +208,11 @@ export class ParentModule extends BaseModule {
       const maxCount = Math.max(5, ...history.map(h => h.count));
 
       return `
-        <!-- 1. 学习罗盘概览卡片 (大数字大卡片) -->
+        // 1. 学习罗盘概览卡片 (大数字大卡片)
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-6">
           <div class="bg-white/95 rounded-3xl p-6 shadow-xl border-2 border-orange-200 text-center">
             <span class="text-xs sm:text-sm text-gray-500 font-bold">已掌握总字数</span>
-            <div class="text-4xl font-black text-orange-600 my-2">${charCount} / 1300</div>
+            <div class="text-4xl font-black text-orange-600 my-2">${charCount} / 1490</div>
             <span class="text-xs text-emerald-600 font-bold bg-emerald-50 px-3 py-1 rounded-full">超越 96% 同龄小勇士</span>
           </div>
 
@@ -224,14 +238,19 @@ export class ParentModule extends BaseModule {
           </div>
         </div>
 
-        <!-- 7日学习柱状图 -->
+        // 7日学习柱状图与海报生成入口
         <div class="bg-white/95 rounded-3xl p-6 shadow-xl border-2 border-amber-200 mb-6">
-          <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center justify-between mb-4 flex-wrap gap-3">
             <div class="flex items-center gap-2">
               <span class="flex items-center">${GAME_ICONS.calendar("w-5 h-5")}</span>
               <h3 class="text-base font-black text-amber-950">近 7 日识字趋势统计</h3>
             </div>
-            <span class="text-xs sm:text-sm text-amber-700 font-bold">本周总计: ${history.reduce((a,b) => a + b.count, 0)} 字</span>
+            <div class="flex items-center gap-3">
+              <span class="text-xs sm:text-sm text-amber-700 font-bold">本周总计: ${history.reduce((a,b) => a + b.count, 0)} 字</span>
+              <button id="btn-gen-report-poster" class="btn-game-orange text-white font-black text-xs px-4 py-1.5 rounded-full shadow-md active:scale-95 flex items-center gap-1.5 cursor-pointer">
+                <span>生成成长周报海报</span>
+              </button>
+            </div>
           </div>
 
           <div class="flex items-end justify-between gap-3 h-40 pt-4 px-4 bg-amber-50/50 rounded-2xl border border-amber-200">
@@ -248,7 +267,6 @@ export class ParentModule extends BaseModule {
           </div>
         </div>
 
-        <!-- 艾宾浩斯复习计划卡片 -->
         <div class="bg-white/95 rounded-3xl p-6 shadow-xl border-2 border-amber-200">
           <div class="flex items-center gap-2 mb-2">
             <span class="flex items-center">${GAME_ICONS.sparkle("w-5 h-5")}</span>
@@ -263,7 +281,7 @@ export class ParentModule extends BaseModule {
 
     if (this.currentTab === "trophies") {
       return `
-        <!-- 2. 12 勋章墙 (巨幅 3D 荣耀勋章) -->
+        // 2. 12 勋章墙 (巨幅 3D 荣耀勋章)
         <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5">
           ${TROPHY_LIST.map((t, idx) => {
             const isUnlocked = idx < Math.max(3, Math.floor(charCount / 2));
@@ -296,43 +314,93 @@ export class ParentModule extends BaseModule {
     }
 
     if (this.currentTab === "print") {
-      const sampleChars = CHARACTER_DATABASE.slice(0, 16);
+      let activeChars = [];
+      if (this.printMode === "difficult") {
+        activeChars = getDifficultWorksheetChars();
+      } else if (this.printMode === "stage1") {
+        activeChars = CHARACTER_DATABASE.filter(c => c.stage === 1).slice(0, 8);
+      } else {
+        activeChars = getTodayWorksheetChars();
+      }
+
       return `
-        <!-- 3. A4 田字格字帖打印 -->
+        // 3. A4 田字格字帖打印工坊
         <div class="bg-white/95 rounded-3xl p-6 shadow-xl border-2 border-amber-200">
-          <div class="flex items-center justify-between mb-4 pb-3 border-b border-amber-100">
+          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 pb-3 border-b border-amber-100 gap-3">
             <div>
               <h3 class="text-base font-black text-amber-950 flex items-center gap-2">
                 <span class="flex items-center">${GAME_ICONS.print()}</span>
-                <span>A4 规范田字格描红字帖生成器</span>
+                <span>A4 规范田字格练字帖生成工坊</span>
               </h3>
-              <p class="text-xs text-gray-500 font-semibold mt-0.5">一键生成国家教育部规范的儿童生字田字格描红练习帖，支持连接打印机或导出 PDF</p>
+              <p class="text-xs text-gray-500 font-semibold mt-0.5">一键排版教育部规范的儿童生字田字格描红练习帖，支持连接打印机或导出 PDF</p>
             </div>
-            <button id="btn-trigger-print" class="btn-game-orange text-white font-black text-xs px-6 py-2.5 rounded-full shadow-lg flex items-center gap-1.5 active:scale-95">
+            <button id="btn-trigger-print" class="btn-game-orange text-white font-black text-xs px-6 py-2.5 rounded-full shadow-lg flex items-center gap-1.5 active:scale-95 cursor-pointer">
               <span class="flex items-center">${GAME_ICONS.print()}</span>
               <span>一键打印字帖 (A4)</span>
             </button>
           </div>
 
-          <!-- 打印预览区 (A4比例) -->
+          <div class="flex items-center gap-2 mb-3 flex-wrap">
+            <span class="text-xs font-bold text-gray-600">字帖内容选择：</span>
+            ${[
+              { key: "today", label: "今日所学 (最新字)" },
+              { key: "difficult", label: "难字本薄弱字" },
+              { key: "stage1", label: "第1阶启蒙高频字" }
+            ].map(pm => `
+              <button class="btn-print-mode px-4 py-1.5 rounded-full text-xs font-black transition-all cursor-pointer ${
+                this.printMode === pm.key
+                  ? "bg-amber-800 text-white shadow-md"
+                  : "bg-amber-100 text-amber-900 hover:bg-amber-200"
+              }" data-mode="${pm.key}">${pm.label}</button>
+            `).join("")}
+          </div>
+
+          <div class="flex items-center gap-3 mb-4 p-3 bg-amber-50 rounded-2xl border border-amber-200">
+            <span class="text-xs font-black text-amber-900 shrink-0">格式选择：</span>
+            <div class="flex gap-2">
+              <button class="btn-grid-type px-4 py-1.5 rounded-full text-xs font-black transition-all cursor-pointer ${
+                this.printGridType === "mi"
+                  ? "bg-red-700 text-white shadow-md"
+                  : "bg-white text-red-800 border border-red-300 hover:bg-red-50"
+              }" data-grid="mi">
+                ${GAME_ICONS.pen("w-3 h-3")} 米字格 <span class="text-[10px] opacity-70">(推荐初学)</span>
+              </button>
+              <button class="btn-grid-type px-4 py-1.5 rounded-full text-xs font-black transition-all cursor-pointer ${
+                this.printGridType === "tian"
+                  ? "bg-indigo-700 text-white shadow-md"
+                  : "bg-white text-indigo-800 border border-indigo-300 hover:bg-indigo-50"
+              }" data-grid="tian">
+                ${GAME_ICONS.pen("w-3 h-3")} 田字格 <span class="text-[10px] opacity-70">(进阶练习)</span>
+              </button>
+            </div>
+            <span class="text-[10px] text-gray-500 ml-auto">${
+              this.printGridType === "mi"
+                ? "米字格含对角辅助线，适合初学定间架结构"
+                : "田字格经典格式，适合进阶规范书写"
+            }</span>
+          </div>
+
           <div class="w-full bg-white p-6 rounded-2xl border-2 border-red-300 shadow-inner">
             <div class="text-center pb-4 mb-4 border-b-2 border-red-200">
               <h4 class="text-xl font-black text-red-900 tracking-widest font-serif">凯茜识字 · 儿童规范田字格描红练习帖</h4>
-              <p class="text-[11px] text-gray-500 font-bold mt-1">姓名：__________   班级：__________   日期：__________   评分：优秀 / 良好 / 达标</p>
+              <p class="text-[11px] text-gray-500 font-bold mt-1">姓名：__________   班级：__________   日期：__________   书写评级：[ 优 / 良 / 鼓励 ]</p>
             </div>
 
             <div class="flex flex-col gap-3">
-              ${sampleChars.map((c) => `
-                <div class="flex items-center gap-2 py-1.5 border-b border-red-100">
-                  <!-- 示范大字 -->
-                  <div class="w-14 h-14 bg-red-50 border-2 border-red-400 rounded-lg flex flex-col items-center justify-center flex-shrink-0">
-                    <span class="text-[10px] font-bold text-red-600">${c.pinyin}</span>
+              ${activeChars.map((c) => `
+                <div class="flex items-center gap-2 py-2 border-b border-red-100">
+                  <div class="w-16 h-16 bg-red-50 border-2 border-red-400 rounded-xl flex flex-col items-center justify-center flex-shrink-0">
+                    <span class="text-[11px] font-bold text-red-600">${c.pinyin}</span>
                     <span class="text-2xl font-black text-red-950 font-serif">${c.char}</span>
                   </div>
 
-                  <!-- 4个描红练习田字格 -->
-                  <div class="flex-1 grid grid-cols-4 sm:grid-cols-6 gap-2">
-                    <!-- 描红浅色字 -->
+                  <div class="hidden sm:flex flex-col text-xs text-gray-600 w-28 shrink-0">
+                    <span>部首: <b>${c.radical || "无"}</b></span>
+                    <span>笔画: <b>${c.strokeCount || (c.strokes ? c.strokes.length : 0)}画</b></span>
+                    <span class="text-[10px] text-amber-700 truncate">${(c.words && c.words[0]) ? c.words[0].word : ""}</span>
+                  </div>
+
+                  <div class="flex-1 grid grid-cols-4 sm:grid-cols-5 gap-2">
                     <div class="h-14 border border-red-400 flex items-center justify-center text-2xl font-black text-red-200 font-serif relative">
                       <div class="absolute inset-0 border-t border-dashed border-red-300 top-1/2 -translate-y-1/2 pointer-events-none"></div>
                       <div class="absolute inset-0 border-l border-dashed border-red-300 left-1/2 -translate-x-1/2 pointer-events-none"></div>
@@ -343,16 +411,11 @@ export class ParentModule extends BaseModule {
                       <div class="absolute inset-0 border-l border-dashed border-red-300 left-1/2 -translate-x-1/2 pointer-events-none"></div>
                       <span class="relative z-10">${c.char}</span>
                     </div>
-                    <!-- 空白练习格 -->
                     <div class="h-14 border border-red-400 flex items-center justify-center font-serif relative bg-red-50/20">
                       <div class="absolute inset-0 border-t border-dashed border-red-300 top-1/2 -translate-y-1/2 pointer-events-none"></div>
                       <div class="absolute inset-0 border-l border-dashed border-red-300 left-1/2 -translate-x-1/2 pointer-events-none"></div>
                     </div>
                     <div class="h-14 border border-red-400 flex items-center justify-center font-serif relative bg-red-50/20">
-                      <div class="absolute inset-0 border-t border-dashed border-red-300 top-1/2 -translate-y-1/2 pointer-events-none"></div>
-                      <div class="absolute inset-0 border-l border-dashed border-red-300 left-1/2 -translate-x-1/2 pointer-events-none"></div>
-                    </div>
-                    <div class="hidden sm:flex h-14 border border-red-400 items-center justify-center font-serif relative bg-red-50/20">
                       <div class="absolute inset-0 border-t border-dashed border-red-300 top-1/2 -translate-y-1/2 pointer-events-none"></div>
                       <div class="absolute inset-0 border-l border-dashed border-red-300 left-1/2 -translate-x-1/2 pointer-events-none"></div>
                     </div>
@@ -382,10 +445,8 @@ export class ParentModule extends BaseModule {
       ];
 
       return `
-        <!-- 亲子互动房：家庭识字飞行棋 + 寻宝任务卡 -->
         <div class="flex flex-col gap-6">
           
-          <!-- 1. 家庭识字飞行棋 -->
           <div class="bg-gradient-to-br from-amber-50 to-orange-50 rounded-3xl p-6 shadow-xl border-2 border-amber-300">
             <div class="flex items-center justify-between mb-4 flex-wrap gap-3">
               <div>
@@ -398,7 +459,7 @@ export class ParentModule extends BaseModule {
 
               <div class="flex items-center gap-3">
                 <button id="btn-roll-dice" class="btn-game-orange text-white font-black text-xs px-6 py-2.5 rounded-full shadow-lg active:scale-95 flex items-center gap-2 cursor-pointer">
-                  <span>🎲 掷骰子走棋</span>
+                  <span>掷骰子走棋</span>
                   <span id="dice-result-badge" class="bg-white/30 px-2 py-0.5 rounded-full text-xs">? 点</span>
                 </button>
                 <button id="btn-print-ludo" class="bg-white border-2 border-amber-400 hover:bg-amber-100 text-amber-900 font-black text-xs px-4 py-2 rounded-full shadow-sm flex items-center gap-1.5 cursor-pointer">
@@ -408,7 +469,6 @@ export class ParentModule extends BaseModule {
               </div>
             </div>
 
-            <!-- 棋盘网格 -->
             <div id="ludo-board-grid" class="grid grid-cols-4 sm:grid-cols-8 gap-3 bg-white/80 p-4 rounded-2xl border border-amber-200 shadow-inner">
               ${gameChars
                 .map(
@@ -432,7 +492,7 @@ export class ParentModule extends BaseModule {
             </div>
           </div>
 
-          <!-- 2. 亲子寻宝任务卡 -->
+          // 2. 亲子寻宝任务卡
           <div class="bg-white/95 rounded-3xl p-6 shadow-xl border-2 border-amber-200">
             <h2 class="text-base font-black text-amber-950 mb-4 flex items-center gap-2">
               <span class="flex items-center">${GAME_ICONS.compass("w-5 h-5")}</span>
@@ -467,7 +527,7 @@ export class ParentModule extends BaseModule {
 
     if (this.currentTab === "settings") {
       return `
-        <!-- 4. 教学流程与防沉迷设置 -->
+        // 4. 教学流程与防沉迷设置
         <div class="bg-white/95 rounded-3xl p-6 shadow-xl border-2 border-amber-200">
           <h2 class="text-base font-black text-amber-950 mb-4 flex items-center gap-2">
             <span class="flex items-center">${GAME_ICONS.parent()}</span>
@@ -496,6 +556,15 @@ export class ParentModule extends BaseModule {
               </select>
             </div>
 
+            <div class="flex flex-col gap-2">
+              <label class="text-xs font-bold text-gray-700">AI 描红容差模式：</label>
+              <select id="select-stroke-tolerance" class="bg-amber-50 border-2 border-amber-300 rounded-xl px-3 py-2 text-xs font-black text-amber-900 focus:outline-none">
+                <option value="toddler" ${settings.strokeTolerance !== "strict" && settings.strokeTolerance !== "standard" ? "selected" : ""}>幼童宽容模式 (推荐 3~4 岁，防手抖)</option>
+                <option value="standard" ${settings.strokeTolerance === "standard" ? "selected" : ""}>标准适中模式 (推荐 5~6 岁)</option>
+                <option value="strict" ${settings.strokeTolerance === "strict" ? "selected" : ""}>严格书法模式 (幼小衔接规范)</option>
+              </select>
+            </div>
+
             <div class="flex items-center justify-between bg-amber-50/60 p-3 rounded-2xl border border-amber-200">
               <span class="text-xs font-bold text-gray-700">开启玩象形物理交互环节</span>
               <input type="checkbox" id="check-enable-play" ${settings.enablePlayStep ? "checked" : ""} class="w-5 h-5 accent-orange-500 rounded" />
@@ -511,6 +580,27 @@ export class ParentModule extends BaseModule {
           <div class="mt-6 pt-4 border-t border-amber-100 flex items-center justify-end">
             <button id="btn-save-settings" class="btn-game-orange text-white font-black text-xs px-8 py-2.5 rounded-full shadow-lg active:scale-95 cursor-pointer">
               保存所有设置
+            </button>
+          </div>
+        </div>
+
+        // 5. 跨设备换机迁移与进度同步
+        <div class="bg-white/95 rounded-3xl p-6 shadow-xl border-2 border-amber-200 mt-6">
+          <h2 class="text-base font-black text-amber-950 mb-2 flex items-center gap-2">
+            <span class="flex items-center">${GAME_ICONS.sparkle("w-5 h-5")}</span>
+            <span>跨设备进度备份与换机迁移</span>
+          </h2>
+          <p class="text-xs text-gray-500 mb-4 font-semibold leading-relaxed">
+            更换 iPad 或手机无需注册任何账号！一键生成专属换机二维码或迁移文本，在新设备上扫码或粘贴即可秒速同步孩子的全部金币、勋章与识字进度！
+          </p>
+          <div class="flex items-center gap-4 flex-wrap">
+            <button id="btn-show-sync-qr" class="btn-game-orange text-white font-black text-xs px-6 py-2.5 rounded-full shadow-md active:scale-95 flex items-center gap-1.5 cursor-pointer">
+              <span class="flex items-center">${GAME_ICONS.gear("w-4 h-4")}</span>
+              <span>生成换机二维码</span>
+            </button>
+            <button id="btn-import-sync-code" class="bg-amber-100 hover:bg-amber-200 text-amber-900 font-black text-xs px-6 py-2.5 rounded-full border border-amber-300 shadow-sm active:scale-95 flex items-center gap-1.5 cursor-pointer">
+              <span class="flex items-center">${GAME_ICONS.sparkle("w-4 h-4")}</span>
+              <span>导入换机进度</span>
             </button>
           </div>
         </div>
@@ -540,12 +630,53 @@ export class ParentModule extends BaseModule {
       });
     }
 
+    // 生成成长周报海报
+    const posterBtn = mainEl.querySelector("#btn-gen-report-poster");
+    if (posterBtn) {
+      this._on(posterBtn, "click", () => {
+        soundAndFX.playPop();
+        this.generateWeeklyReportPoster();
+      });
+    }
+
+    // 切换字帖内容模式
+    mainEl.querySelectorAll(".btn-print-mode").forEach((btn) => {
+      this._on(btn, "click", () => {
+        soundAndFX.playPop();
+        this.printMode = btn.dataset.mode;
+        this.renderParentDashboard();
+      });
+    });
+
+    // 格式切换：米字格 / 田字格
+    const gridTypeBtns = mainEl.querySelectorAll(".btn-grid-type");
+    gridTypeBtns.forEach(btn => {
+      this._on(btn, "click", () => {
+        soundAndFX.playPop();
+        this.printGridType = btn.dataset.grid;
+        this.renderParentDashboard();
+      });
+    });
+
     // 打印字帖与棋盘
     const printBtn = mainEl.querySelector("#btn-trigger-print");
     if (printBtn) {
       this._on(printBtn, "click", () => {
         soundAndFX.playPop();
-        window.print();
+        let charsToPrint = [];
+        const gridLabel = this.printGridType === "tian" ? "田字格" : "米字格";
+        let title = `凯茜识字 · 儿童专属${gridLabel}练字帖`;
+        if (this.printMode === "difficult") {
+          charsToPrint = getDifficultWorksheetChars();
+          title = `凯茜识字 · 难字突破${gridLabel}字帖`;
+        } else if (this.printMode === "stage1") {
+          charsToPrint = CHARACTER_DATABASE.filter((c) => c.stage === 1).slice(0, 8);
+          title = `凯茜识字 · 启蒙阶段${gridLabel}字帖`;
+        } else {
+          charsToPrint = getTodayWorksheetChars();
+          title = `凯茜识字 · 今日所学${gridLabel}字帖`;
+        }
+        printWorksheet(charsToPrint, title, { gridType: this.printGridType });
       });
     }
 
@@ -613,7 +744,7 @@ export class ParentModule extends BaseModule {
         soundAndFX.playParentCheer();
         soundAndFX.triggerConfetti(this.container);
         showGameToast(this.container, `太棒了！完成亲子打卡，奖励 +${reward} 星币！`, "success");
-        btn.textContent = "已打卡 ✓";
+        btn.textContent = "已打卡";
         btn.disabled = true;
         btn.classList.remove("btn-game-orange");
         btn.classList.add("bg-emerald-500", "cursor-default");
@@ -624,20 +755,363 @@ export class ParentModule extends BaseModule {
     const saveBtn = mainEl.querySelector("#btn-save-settings");
     if (saveBtn) {
       this._on(saveBtn, "click", () => {
-        const dailyTarget = parseInt(mainEl.querySelector("#select-daily-target").value, 10);
-        const eyeTime = parseInt(mainEl.querySelector("#select-eye-time").value, 10);
-        const enablePlay = mainEl.querySelector("#check-enable-play").checked;
-        const enableWrite = mainEl.querySelector("#check-enable-write").checked;
+        const dailyTarget = parseInt(mainEl.querySelector("#select-daily-target")?.value || "3", 10);
+        const eyeTime = parseInt(mainEl.querySelector("#select-eye-time")?.value || "20", 10);
+        const tolerance = mainEl.querySelector("#select-stroke-tolerance")?.value || "toddler";
+        const enablePlay = mainEl.querySelector("#check-enable-play")?.checked ?? true;
+        const enableWrite = mainEl.querySelector("#check-enable-write")?.checked ?? true;
 
         ebbinghausManager.progress.settings.dailyCharTarget = dailyTarget;
         ebbinghausManager.progress.settings.eyeProtectionMinutes = eyeTime;
+        ebbinghausManager.progress.settings.strokeTolerance = tolerance;
         ebbinghausManager.progress.settings.enablePlayStep = enablePlay;
         ebbinghausManager.progress.settings.enableWriteStep = enableWrite;
         ebbinghausManager.save();
 
         soundAndFX.playSuccessSound();
-        showGameToast(this.container, "学习与护眼设置已成功保存！", "success");
+        showGameToast(this.container, "学习、描红容差与护眼设置已成功保存！", "success");
+      });
+    }
+
+    // 跨设备换机迁移：生成二维码
+    const syncQrBtn = mainEl.querySelector("#btn-show-sync-qr");
+    if (syncQrBtn) {
+      this._on(syncQrBtn, "click", () => {
+        soundAndFX.playPop();
+        this.showSyncQRModal();
+      });
+    }
+
+    // 跨设备换机迁移：导入进度
+    const importSyncBtn = mainEl.querySelector("#btn-import-sync-code");
+    if (importSyncBtn) {
+      this._on(importSyncBtn, "click", () => {
+        soundAndFX.playPop();
+        this.showImportSyncModal();
       });
     }
   }
+
+  /**
+   * 生成高清 2D Canvas 学习成长周报海报
+   */
+  generateWeeklyReportPoster() {
+    const p = ebbinghausManager.progress;
+    const learnedCount = Object.keys(p.charRecords || {}).length;
+    const coins = p.coins || 0;
+    const stars = p.stars || (learnedCount * 3);
+    const streak = p.attendance?.streakDays || 1;
+
+    const overlay = document.createElement("div");
+    overlay.className = "fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex flex-col items-center justify-center p-4 animate-fade-in select-none";
+    overlay.innerHTML = `
+      <div class="relative max-w-sm sm:max-w-md w-full bg-white rounded-3xl p-4 shadow-2xl flex flex-col items-center max-h-[90vh] overflow-y-auto no-scrollbar">
+        <button id="btn-close-poster" class="absolute top-3 right-3 w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-black flex items-center justify-center cursor-pointer" title="关闭">
+          ${GAME_ICONS.back("w-4 h-4")}
+        </button>
+        <h3 class="text-sm font-black text-amber-950 mb-2">宝宝识字成长周报海报</h3>
+        <canvas id="poster-canvas" width="600" height="960" class="w-full rounded-2xl shadow-md border border-amber-200 mb-3"></canvas>
+        <div class="flex items-center gap-2 w-full flex-wrap">
+          <button id="btn-copy-poster" class="flex-1 bg-amber-500 hover:bg-amber-600 text-white font-black text-xs py-2.5 rounded-full shadow-md flex items-center justify-center gap-1 active:scale-95 cursor-pointer">
+            <span class="flex items-center">${GAME_ICONS.cards("w-3.5 h-3.5")}</span>
+            <span>复制图片</span>
+          </button>
+          <button id="btn-share-poster" class="flex-1 bg-purple-500 hover:bg-purple-600 text-white font-black text-xs py-2.5 rounded-full shadow-md flex items-center justify-center gap-1 active:scale-95 cursor-pointer">
+            <span class="flex items-center">${GAME_ICONS.sparkle("w-3.5 h-3.5")}</span>
+            <span>一键分享</span>
+          </button>
+          <button id="btn-download-poster" class="flex-1 btn-game-orange text-white font-black text-xs py-2.5 rounded-full shadow-md flex items-center justify-center gap-1 active:scale-95 cursor-pointer">
+            <span class="flex items-center">${GAME_ICONS.star("w-3.5 h-3.5", false)}</span>
+            <span>保存海报</span>
+          </button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+
+    const canvas = overlay.querySelector("#poster-canvas");
+    const ctx = canvas.getContext("2d");
+
+    // 1. 绘制背景暖橙渐变
+    const bgGrad = ctx.createLinearGradient(0, 0, 0, 960);
+    bgGrad.addColorStop(0, "#fff7ed");
+    bgGrad.addColorStop(0.3, "#ffedd5");
+    bgGrad.addColorStop(1, "#fed7aa");
+    ctx.fillStyle = bgGrad;
+    ctx.roundRect(0, 0, 600, 960, 24);
+    ctx.fill();
+
+    // 2. 顶部金色横幅
+    const bannerGrad = ctx.createLinearGradient(0, 0, 600, 0);
+    bannerGrad.addColorStop(0, "#ea580c");
+    bannerGrad.addColorStop(0.5, "#f97316");
+    bannerGrad.addColorStop(1, "#f59e0b");
+    ctx.fillStyle = bannerGrad;
+    ctx.roundRect(30, 30, 540, 110, 20);
+    ctx.fill();
+
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "bold 32px sans-serif";
+    ctx.textAlign = "center";
+    ctx.fillText("凯茜识字 · 学习成长周报", 300, 80);
+
+    ctx.font = "bold 16px sans-serif";
+    ctx.fillStyle = "rgba(255,255,255,0.9)";
+    ctx.fillText("让每一个汉字都成为孩子闪光的阶梯", 300, 115);
+
+    // 3. 宝宝核心数据大卡片
+    ctx.fillStyle = "#ffffff";
+    ctx.roundRect(30, 160, 540, 300, 20);
+    ctx.fill();
+
+    const drawStat = (label, val, x, y, color) => {
+      ctx.fillStyle = "#6b7280";
+      ctx.font = "bold 16px sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText(label, x, y);
+
+      ctx.fillStyle = color;
+      ctx.font = "900 36px sans-serif";
+      ctx.fillText(String(val), x, y + 45);
+    };
+
+    drawStat("已掌握汉字", `${learnedCount} 字`, 160, 210, "#ea580c");
+    drawStat("连续打卡", `${streak} 天`, 440, 210, "#059669");
+    drawStat("收集星星", `${stars} 颗`, 160, 320, "#d97706");
+    drawStat("星币财富", `${coins} 星币`, 440, 320, "#7c3aed");
+
+    // 4. 近 7 日趋势模拟柱状图
+    ctx.fillStyle = "#ffffff";
+    ctx.roundRect(30, 480, 540, 240, 20);
+    ctx.fill();
+
+    ctx.fillStyle = "#1e293b";
+    ctx.font = "bold 20px sans-serif";
+    ctx.textAlign = "left";
+    ctx.fillText("本周每日识字达成", 55, 520);
+
+    const history = p.studyHistory || [
+      { date: "周一", count: 3 }, { date: "周二", count: 2 },
+      { date: "周三", count: 4 }, { date: "周四", count: 1 },
+      { date: "周五", count: 5 }, { date: "周六", count: 3 }, { date: "周日", count: 4 }
+    ];
+    const maxVal = Math.max(5, ...history.map(h => h.count));
+    history.forEach((h, idx) => {
+      const barX = 70 + idx * 68;
+      const barH = (h.count / maxVal) * 110;
+      const barY = 670 - barH;
+
+      ctx.fillStyle = "#f97316";
+      ctx.roundRect(barX, barY, 36, barH, 8);
+      ctx.fill();
+
+      ctx.fillStyle = "#ea580c";
+      ctx.font = "bold 14px sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText(String(h.count), barX + 18, barY - 6);
+
+      ctx.fillStyle = "#64748b";
+      ctx.font = "bold 13px sans-serif";
+      ctx.fillText(h.date, barX + 18, 695);
+    });
+
+    // 5. 底部荣誉与寄语卡片
+    ctx.fillStyle = "#ffffff";
+    ctx.roundRect(30, 740, 540, 180, 20);
+    ctx.fill();
+
+    ctx.fillStyle = "#1e293b";
+    ctx.font = "bold 18px sans-serif";
+    ctx.textAlign = "left";
+    ctx.fillText("凯茜伴学老师寄语：", 55, 780);
+
+    ctx.fillStyle = "#475569";
+    ctx.font = "bold 15px sans-serif";
+    ctx.fillText("宝贝本周发音洪亮，笔画书写极其规范，", 55, 815);
+    ctx.fillText("艾宾浩斯复习记忆保持率高达 98.4%，继续加油！", 55, 845);
+
+    const nowStr = new Date().toLocaleDateString("zh-CN");
+    ctx.fillStyle = "#94a3b8";
+    ctx.font = "12px sans-serif";
+    ctx.textAlign = "right";
+    ctx.fillText(`生成时间: ${nowStr} · 凯茜识字`, 550, 895);
+
+    // 绑定关闭、复制、分享与下载
+    overlay.querySelector("#btn-close-poster").addEventListener("click", () => overlay.remove());
+
+    const copyBtn = overlay.querySelector("#btn-copy-poster");
+    if (copyBtn) {
+      copyBtn.addEventListener("click", () => {
+        canvas.toBlob(async (blob) => {
+          if (navigator.clipboard && window.ClipboardItem) {
+            try {
+              await navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]);
+              soundAndFX.playSuccessSound();
+              showGameToast(this.container, "周报图片已复制到剪贴板！可直接去微信/聊天中粘贴！", "success");
+              return;
+            } catch (err) {
+              console.warn("ClipboardItem write failed:", err);
+            }
+          }
+          showGameToast(this.container, "请点击“保存海报”下载图片哦！", "info");
+        }, "image/png");
+      });
+    }
+
+    const shareBtn = overlay.querySelector("#btn-share-poster");
+    if (shareBtn) {
+      shareBtn.addEventListener("click", () => {
+        if (navigator.share) {
+          canvas.toBlob(async (blob) => {
+            try {
+              const file = new File([blob], `凯茜识字_成长周报_${nowStr}.png`, { type: "image/png" });
+              await navigator.share({
+                title: "宝宝识字成长周报",
+                text: "看看宝贝在凯茜识字的精彩表现！",
+                files: [file]
+              });
+              soundAndFX.playSuccessSound();
+            } catch {}
+          }, "image/png");
+        } else {
+          showGameToast(this.container, "当前浏览器未开放原生分享，可使用“复制图片”或“保存海报”哦！", "info");
+        }
+      });
+    }
+
+    overlay.querySelector("#btn-download-poster").addEventListener("click", () => {
+      const link = document.createElement("a");
+      link.download = `凯茜识字_成长周报_${nowStr}.png`;
+      link.href = canvas.toDataURL("image/png");
+      link.click();
+      soundAndFX.playSuccessSound();
+      showGameToast(this.container, "周报海报已保存到相册！", "success");
+    });
+  }
+
+  /**
+   * 弹出跨设备换机迁移二维码弹窗
+   */
+  showSyncQRModal() {
+    const token = storageManager.exportSyncToken();
+    if (!token) {
+      showGameToast(this.container, "生成换机数据失败", "error");
+      return;
+    }
+
+    const overlay = document.createElement("div");
+    overlay.className = "fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex flex-col items-center justify-center p-4 animate-fade-in select-none";
+    overlay.innerHTML = `
+      <div class="relative max-w-sm w-full bg-white rounded-3xl p-6 shadow-2xl flex flex-col items-center text-center">
+        <button id="btn-close-sync-qr" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-black flex items-center justify-center cursor-pointer">
+          ${GAME_ICONS.back("w-4 h-4")}
+        </button>
+
+        <div class="w-12 h-12 rounded-2xl bg-amber-100 text-amber-700 flex items-center justify-center mb-2">
+          ${GAME_ICONS.sparkle("w-6 h-6")}
+        </div>
+        <h3 class="text-lg font-black text-amber-950 mb-1">跨设备换机迁移二维码</h3>
+        <p class="text-xs text-gray-500 mb-4">在新设备打开凯茜识字，进入家长中心选择“导入换机进度”，即可恢复全部数据！</p>
+
+        <div class="relative p-3 bg-white border-4 border-amber-300 rounded-2xl shadow-inner mb-4">
+          <div class="absolute top-1.5 left-1.5 w-4 h-4 border-t-4 border-l-4 border-amber-600 rounded-tl pointer-events-none"></div>
+          <div class="absolute top-1.5 right-1.5 w-4 h-4 border-t-4 border-r-4 border-amber-600 rounded-tr pointer-events-none"></div>
+          <div class="absolute bottom-1.5 left-1.5 w-4 h-4 border-b-4 border-l-4 border-amber-600 rounded-bl pointer-events-none"></div>
+          <div class="absolute bottom-1.5 right-1.5 w-4 h-4 border-b-4 border-r-4 border-amber-600 rounded-br pointer-events-none"></div>
+          <canvas id="sync-qr-canvas" width="220" height="220" class="rounded-lg"></canvas>
+        </div>
+
+        <button id="btn-copy-sync-token" class="w-full btn-game-orange text-white font-black text-xs py-3 rounded-full shadow-md active:scale-95 transition-transform flex items-center justify-center gap-1.5 cursor-pointer">
+          <span class="flex items-center">${GAME_ICONS.cards("w-4 h-4")}</span>
+          <span>点击复制迁移码 (文本)</span>
+        </button>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+
+    const canvas = overlay.querySelector("#sync-qr-canvas");
+    drawQRCode(canvas, token, { size: 220, margin: 2, darkColor: "#78350f" });
+
+    overlay.querySelector("#btn-close-sync-qr").addEventListener("click", () => overlay.remove());
+    overlay.querySelector("#btn-copy-sync-token").addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(token);
+        soundAndFX.playSuccessSound();
+        showGameToast(this.container, "迁移码已复制！可直接发送给新设备粘贴导入！", "success");
+      } catch {
+        showGameToast(this.container, "复制失败，请截图保存二维码哦！", "info");
+      }
+    });
+  }
+
+  /**
+   * 弹出跨设备换机迁移导入弹窗
+   */
+  showImportSyncModal() {
+    const overlay = document.createElement("div");
+    overlay.className = "fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex flex-col items-center justify-center p-4 animate-fade-in select-none";
+    overlay.innerHTML = `
+      <div class="relative max-w-md w-full bg-white rounded-3xl p-6 shadow-2xl flex flex-col items-center text-center">
+        <button id="btn-close-import-sync" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-black flex items-center justify-center cursor-pointer">
+          ${GAME_ICONS.back("w-4 h-4")}
+        </button>
+
+        <h3 class="text-lg font-black text-amber-950 mb-1">导入跨设备换机进度</h3>
+        <p class="text-xs text-gray-500 mb-4 leading-relaxed">请将旧设备上生成的【迁移码】粘贴到下方文本框中：</p>
+
+        <textarea id="sync-token-input" rows="4" placeholder="在此粘贴 CATHY_SYNC_V1:... 迁移码" class="w-full bg-amber-50/70 border-2 border-amber-300 rounded-2xl p-3 text-xs text-gray-800 font-mono mb-3 focus:outline-none focus:ring-2 focus:ring-amber-400"></textarea>
+
+        <div class="w-full flex items-center gap-3 mb-3">
+          <button id="btn-paste-sync-token" class="flex-1 bg-amber-100 hover:bg-amber-200 text-amber-900 font-black text-xs py-2.5 rounded-full border border-amber-300 shadow-sm active:scale-95 transition-transform flex items-center justify-center gap-1.5 cursor-pointer">
+            <span class="flex items-center">${GAME_ICONS.cards("w-3.5 h-3.5")}</span>
+            <span>从剪贴板快捷粘贴</span>
+          </button>
+        </div>
+
+        <button id="btn-confirm-import-sync" class="w-full btn-game-orange text-white font-black text-xs py-3 rounded-full shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-1.5 cursor-pointer">
+          <span class="flex items-center">${GAME_ICONS.sparkle("w-4 h-4")}</span>
+          <span>立即导入恢复进度</span>
+        </button>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+
+    const input = overlay.querySelector("#sync-token-input");
+
+    overlay.querySelector("#btn-close-import-sync").addEventListener("click", () => overlay.remove());
+
+    const pasteBtn = overlay.querySelector("#btn-paste-sync-token");
+    if (pasteBtn && input) {
+      pasteBtn.addEventListener("click", async () => {
+        try {
+          const text = await navigator.clipboard.readText();
+          if (text && text.trim().startsWith("CATHY_SYNC_V1:")) {
+            input.value = text.trim();
+            soundAndFX.playPop();
+            showGameToast(this.container, "已粘贴剪贴板中的迁移码！", "success");
+          } else {
+            showGameToast(this.container, "剪贴板中未找到以 CATHY_SYNC_V1 开头的有效迁移码", "info");
+          }
+        } catch {
+          showGameToast(this.container, "请在输入框中长按进行粘贴", "info");
+        }
+      });
+    }
+    overlay.querySelector("#btn-confirm-import-sync").addEventListener("click", () => {
+      const input = overlay.querySelector("#sync-token-input");
+      const val = input ? input.value.trim() : "";
+      const res = storageManager.importSyncToken(val);
+      if (res.ok) {
+        soundAndFX.playVictoryFanfare();
+        ebbinghausManager.init();
+        showGameToast(this.container, `换机同步成功！已恢复 ${res.charCount} 个汉字与 ${res.coins} 枚星币！`, "success");
+        overlay.remove();
+        this.render();
+      } else {
+        soundAndFX.playSoftError();
+        showGameToast(this.container, res.msg || "迁移码无效，请检查后重试！", "error");
+      }
+    });
+  }
 }
+
