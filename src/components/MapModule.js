@@ -10,6 +10,7 @@ import { mountGameShell, showGameToast } from "./SharedShell.js";
 import { BaseModule } from "../utils/BaseModule.js";
 import { EVENTS } from "../utils/eventBus.js";
 import { GAME_ICONS } from "../utils/gameIcons.js";
+import { setDeps as _spSetDeps } from "../utils/sessionPlanner.js";
 
 const ISLAND_CONFIG = {
   1: {
@@ -54,6 +55,8 @@ export class MapModule extends BaseModule {
     this.scrollX = 0;
     this.showWorldOverview = false;
     this._userSelectedIsland = false;
+    // E6 B4 米勒 7±2 块化：注入 deps，供 sessionPlanner 使用
+    _spSetDeps({ ebbinghaus: ebbinghausManager, characterDB: CHARACTER_DATABASE });
   }
 
   render() {

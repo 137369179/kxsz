@@ -257,6 +257,14 @@ export function setupTestDom() {
     }
   };
 
+  const mockStorage = {};
+  global.localStorage = global.localStorage || {
+    getItem: vi.fn((key) => (key in mockStorage ? mockStorage[key] : null)),
+    setItem: vi.fn((key, val) => { mockStorage[key] = String(val); }),
+    removeItem: vi.fn((key) => { delete mockStorage[key]; }),
+    clear: vi.fn(() => { Object.keys(mockStorage).forEach((k) => delete mockStorage[k]); })
+  };
+
   global.requestAnimationFrame = global.requestAnimationFrame || ((cb) => setTimeout(cb, 16));
   global.cancelAnimationFrame = global.cancelAnimationFrame || ((id) => clearTimeout(id));
   global.window.requestAnimationFrame = global.requestAnimationFrame;

@@ -172,6 +172,7 @@ export class ParentModule extends BaseModule {
           <div class="flex items-center gap-1.5 bg-amber-50 p-1.5 rounded-full border border-amber-200">
             ${[
               { key: "dashboard", label: "数据罗盘", icon: (cls) => GAME_ICONS.compass(cls) },
+              { key: "ai_log", label: "AI伴学日志", icon: (cls) => GAME_ICONS.sparkle(cls) },
               { key: "family", label: "亲子互动房", icon: (cls) => GAME_ICONS.swords(cls) },
               { key: "trophies", label: "荣誉勋章墙", icon: (cls) => GAME_ICONS.trophy(cls) },
               { key: "print", label: "字帖打印", icon: (cls) => GAME_ICONS.print(cls) },

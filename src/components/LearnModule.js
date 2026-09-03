@@ -21,6 +21,8 @@ import { openMorphTheater } from "../utils/morphEngine.js";
 import { createPlayGame } from "../utils/playGames/index.js";
 import { storageManager } from "../utils/storageManager.js";
 import { mascotProgress } from "../utils/mascotProgress.js";
+import { openEtymologyQuiz } from "../utils/etymologyQuiz.js";
+import { voiceGuide } from "../utils/voiceGuide.js";
 
 export class LearnModule extends BaseModule {
   constructor(container, charData, onFinishCallback, onBackToMapCallback) {
@@ -283,6 +285,9 @@ export class LearnModule extends BaseModule {
         this.renderStepTestAndChest(stage);
         break;
     }
+
+    // T16: 自动为当前步骤容器内的交互按钮绑定语音引导
+    voiceGuide.attach(stage);
   }
 
   // ----------------------------------------------------------------
@@ -511,6 +516,15 @@ export class LearnModule extends BaseModule {
     if (finishBtn) {
       this._on(finishBtn, "click", () => {
         soundAndFX.playPop();
+        // T15: 认字后进入跟读评测前，进行启发式字理问答微交互
+        if (!this._etymologyQuizAnswered) {
+          this._etymologyQuizAnswered = true;
+          openEtymologyQuiz(char, () => {
+            this.currentStep = 3;
+            this.render();
+          });
+          return;
+        }
         this.currentStep = 3;
         this.render();
       });

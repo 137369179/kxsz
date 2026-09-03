@@ -14,6 +14,7 @@ import { DrillEngine } from "../utils/drillEngine.js";
 import { EVENTS } from "../utils/eventBus.js";
 import { GAME_ICONS } from "../utils/gameIcons.js";
 import { printWorksheet } from "../utils/worksheetGenerator.js";
+import { getSessionConfig } from "../utils/sessionPlanner.js";
 
 function shuffle(arr) {
   const a = [...arr];
@@ -36,7 +37,11 @@ export class ReviewModule extends BaseModule {
   }
 
   initQueue() {
-    const dueIds = ebbinghausManager.getDueReviewCharIds().slice(0, 3);
+    // E6 B4 米勒 7±2：按年龄决定复习块大小，不再硬编码 5
+    const cfg = getSessionConfig(ebbinghausManager.getAge());
+    const wantRev = cfg.reviews;
+
+    const dueIds = ebbinghausManager.getDueReviewCharIds().slice(0, Math.max(wantRev, 3));
     const errorProfile = ebbinghausManager.progress.errorProfiles || {};
     const confusedPairs = errorProfile.confusedPairs || {};
     const confusedIds = Object.entries(confusedPairs)
@@ -45,10 +50,10 @@ export class ReviewModule extends BaseModule {
         const countB = typeof b[1] === "object" ? Object.values(b[1]).reduce((s, v) => s + v, 0) : Number(b[1]) || 0;
         return countB - countA;
       })
-      .slice(0, 2)
+      .slice(0, Math.max(wantRev - dueIds.length, 2))
       .map(([charId]) => charId);
 
-    const allIds = [...new Set([...dueIds, ...confusedIds])].slice(0, 5);
+    const allIds = [...new Set([...dueIds, ...confusedIds])].slice(0, wantRev);
     this.queue = allIds
       .map((id) => CHARACTER_DATABASE.find((c) => c.id === id))
       .filter(Boolean);
@@ -57,9 +62,9 @@ export class ReviewModule extends BaseModule {
     if (this.queue.length === 0) {
       const learnedIds = Object.keys(ebbinghausManager.progress.charRecords || {});
       if (learnedIds.length > 0) {
-        this.queue = learnedIds.slice(0, 5).map((id) => CHARACTER_DATABASE.find((c) => c.id === id)).filter(Boolean);
+        this.queue = learnedIds.slice(0, wantRev).map((id) => CHARACTER_DATABASE.find((c) => c.id === id)).filter(Boolean);
       } else {
-        this.queue = CHARACTER_DATABASE.slice(0, 5);
+        this.queue = CHARACTER_DATABASE.slice(0, wantRev);
       }
     }
 
