@@ -28,6 +28,10 @@ const TYPE_META = {
   word_fill: { iconSvg: (cls) => GAME_ICONS.brush(cls), name: "词语填空", tip: "帮词语找回丢失的核心汉字" },
   sentence_fill: { iconSvg: (cls) => GAME_ICONS.scroll(cls), name: "趣味造句", tip: "把汉字宝宝送回句子中" },
   balloon_pop: { iconSvg: (cls) => GAME_ICONS.monster(cls), name: "戳破气球", tip: "瞄准目标字气球，快速戳破" },
+  // E4 新增
+  cloze_hint: { iconSvg: (cls) => GAME_ICONS.scroll(cls), name: "句子填空", tip: "提示拼音，填入正确汉字" },
+  pinyin_spell: { iconSvg: (cls) => GAME_ICONS.mic(cls), name: "拼读练习", tip: "听拼音，选声母韵母组合" },
+  stroke_trace: { iconSvg: (cls) => GAME_ICONS.pen(cls), name: "笔画描红", tip: "跟着虚线，描出汉字笔画" },
 };
 
 /** Fisher-Yates */
@@ -77,17 +81,25 @@ export class DrillEngine {
     this._timeouts = [];
   }
 
-  /**  */
+  /**
+   * 构建题池（E4: 新增 cloze_hint / pinyin_spell / stroke_trace）
+   */
   buildTypePool() {
     const c = this.char;
     const pool = ["audio_choice", "similar_pick", "balloon_pop"];
-    
+
     if ((c.words || []).some((w) => w.word.includes(c.char))) pool.push("word_fill");
     if ((c.sentence || "").includes(c.char)) pool.push("sentence_fill");
+    // E4 新增题型
+    if ((c.sentence || "").includes(c.char)) pool.push("cloze_hint");
+    if (c.pinyin && c.pinyin.length > 1) pool.push("pinyin_spell");
+    if (c.char && c.char.length === 1) pool.push("stroke_trace");
     return pool;
   }
 
-  /**  4 1  + 3  */
+  /**
+   * 构造 4 选项 + 3 干扰项（E4: 新增 stroke_trace 干扰项）
+   */
   buildOptions(preferSimilar = false) {
     const c = this.char;
     let distractors = (c.confusingChars || []).filter((x) => x !== c.char);
@@ -217,6 +229,68 @@ export class DrillEngine {
       `;
     }
 
+    // E4 cloze_hint: 句子填空 + 拼音提示 + 高亮目标位置
+    if (type === "cloze_hint") {
+      const pinyin = c.pinyin || "";
+      const sentence = c.sentence || "";
+      const parts = sentence.split(c.char);
+      const blanked = parts.join(`<span class="inline-block w-12 h-12 bg-yellow-400/80 rounded-lg border-b-4 border-yellow-600 text-center text-4xl font-black text-yellow-900 animate-pulse align-middle">?</span>`);
+      return `
+        <div class="flex flex-col items-center gap-4">
+          <div class="bg-purple-900/60 text-purple-200 text-sm font-bold px-6 py-2 rounded-full border border-purple-400/40 flex items-center gap-2">
+            <span>提示拼音：</span><span class="text-2xl font-black text-purple-100">${pinyin}</span>
+          </div>
+          <div class="max-w-2xl text-2xl font-black text-white leading-loose tracking-wide bg-black/40 px-8 py-5 rounded-3xl border-2 border-purple-400/60 text-center">
+            ${blanked}
+          </div>
+        </div>
+        <p class="text-white font-black text-sm mt-1">${meta.tip}</p>
+      `;
+    }
+
+    // E4 pinyin_spell: 拼音拼读（听发音，选声母+韵母组合）
+    if (type === "pinyin_spell") {
+      // 简化：从 pinyin 提取声母韵母候选
+      const pinyin = c.pinyin || "yi";
+      const initials = ["b","p","m","f","d","t","n","l","g","k","h","j","q","x","zh","ch","sh","r","z","c","s","y","w"];
+      const finals = ["a","o","e","i","u","ai","ei","ui","ao","ou","iu","ie","ve","er","an","en","in","un","ang","eng","ing","ong"];
+      const pinyinInitial = initials.find(i => pinyin.startsWith(i)) || "";
+      const pinyinFinal = finals.find(f => pinyin.startsWith(pinyinInitial ? pinyin.slice(pinyinInitial.length) : pinyin)) || pinyin;
+      const wrongInitials = initials.filter(i => i !== pinyinInitial).slice(0, 3);
+      const wrongFinals = finals.filter(f => f !== pinyinFinal).slice(0, 3);
+      const initOpts = shuffle([pinyinInitial, ...wrongInitials]);
+      const finalOpts = shuffle([pinyinFinal, ...wrongFinals]);
+      return `
+        <div class="flex flex-col items-center gap-6">
+          <button id="btn-replay-pinyin" class="w-24 h-24 rounded-full bg-gradient-to-tr from-purple-400 to-pink-600 border-4 border-white shadow-[0_0_35px_rgba(168,85,247,0.7)] flex items-center justify-center active:scale-90 transition-transform" title="听发音">
+            ${GAME_ICONS.speaker("w-12 h-12")}
+          </button>
+          <div class="flex flex-col gap-3">
+            <div class="flex items-center gap-3">
+              <span class="text-purple-200 font-black text-sm">声母：</span>
+              ${initOpts.map(i => `<button class="drill-opt px-5 py-2 bg-gradient-to-b from-purple-200 to-purple-400 text-purple-900 font-black text-xl rounded-xl border-b-4 border-purple-600 shadow cursor-pointer active:translate-y-1 transition-all" data-initial="${i}">${i}</button>`).join("")}
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="text-pink-200 font-black text-sm">韵母：</span>
+              ${finalOpts.map(f => `<button class="drill-opt px-5 py-2 bg-gradient-to-b from-pink-200 to-pink-400 text-pink-900 font-black text-xl rounded-xl border-b-4 border-pink-600 shadow cursor-pointer active:translate-y-1 transition-all" data-final="${f}">${f}</button>`).join("")}
+            </div>
+          </div>
+        </div>
+        <p class="text-white font-black text-sm mt-1">${meta.tip}</p>
+      `;
+    }
+
+    // E4 stroke_trace: 笔画描红（Canvas 路径追踪）
+    if (type === "stroke_trace") {
+      return `
+        <div class="flex flex-col items-center gap-2">
+          <canvas id="stroke-trace-canvas" width="280" height="280" class="bg-white rounded-2xl border-4 border-emerald-400 shadow-[0_0_30px_rgba(16,185,129,0.5)] cursor-crosshair touch-none"></canvas>
+          <p class="text-emerald-200 font-black text-xs">提示：沿着虚线描出"${c.char}"字</p>
+        </div>
+        <p class="text-white font-black text-sm mt-1">${meta.tip}</p>
+      `;
+    }
+
     // balloon_pop
     return `
       <div class="flex flex-col items-center gap-2">
@@ -244,6 +318,24 @@ export class DrillEngine {
       `
         )
         .join("");
+    }
+
+    // E4 cloze_hint: 4 个字选项按钮
+    if (type === "cloze_hint") {
+      return opts
+        .map(
+          (opt) => `
+        <button class="drill-opt relative bg-gradient-to-b from-yellow-100 to-yellow-300 text-yellow-900 font-black text-4xl w-24 h-24 rounded-2xl border-b-6 border-yellow-600 shadow-[0_8px_16px_rgba(0,0,0,0.3)] hover:from-yellow-200 hover:to-yellow-400 active:border-b-0 active:translate-y-2 transition-all cursor-pointer" data-char="${opt}">
+          ${opt}
+        </button>
+      `
+        )
+        .join("");
+    }
+
+    // E4 pinyin_spell / stroke_trace: 自包含选项，无需标准 buildOptionsFor
+    if (type === "pinyin_spell" || type === "stroke_trace") {
+      return "";
     }
 
     return opts
