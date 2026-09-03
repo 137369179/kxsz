@@ -20,6 +20,8 @@
  *   3. 跨引擎调度（etymologyEngine / chantEngine / difficultyEngine / reportEngine）
  */
 
+import { buildPlan, CHANT_MODES } from "./chantEngine.js";
+
 // ──────────────────────────────────────────────────────────
 // 场景定义
 // ──────────────────────────────────────────────────────────
@@ -300,7 +302,7 @@ export async function assembleEnhanced(charItem, scene, opts = {}) {
   }).catch(() => {}));
 
   // E16: chantEngine → 生成节拍计划
-  enhancers.push(import("./chantEngine.js").then(({ buildPlan, CHANT_MODES }) => {
+  enhancers.push(Promise.resolve().then(() => {
     if (base.modalities[MODALITIES.AUDITORY_CHANT]) {
       const chantPlan = buildPlan(charItem, { mode: CHANT_MODES.CHANT, bpm: 110 });
       base.modalities[MODALITIES.AUDITORY_CHANT] = {
