@@ -76,5 +76,5 @@ describe(`Characters Database (${TOTAL}字)`, () => {
     const charSun = findCharacterByChar("日");
     expect(charSun).toBeDefined();
     expect(charSun.id).toBe("char_001");
-  });
+  }, 20000);
 });

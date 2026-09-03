@@ -24,6 +24,7 @@ import { mascotProgress } from "../utils/mascotProgress.js";
 import { openEtymologyQuiz } from "../utils/etymologyQuiz.js";
 import { buildEtymologyCard } from "../utils/etymologyEngine.js";
 import { voiceGuide } from "../utils/voiceGuide.js";
+import { getCognitiveStageData } from "../utils/cognitiveStage.js";
 
 export class LearnModule extends BaseModule {
   constructor(container, charData, onFinishCallback, onBackToMapCallback) {
@@ -403,6 +404,8 @@ export class LearnModule extends BaseModule {
   // ----------------------------------------------------------------
   renderStepRecognize(stage) {
     const char = this.charData;
+    const childAge = ebbinghausManager.getAge();
+    const cog = getCognitiveStageData(char, childAge);
     soundAndFX.speakPriority(`认一认：“${char.char}”，拼音读作 ${char.pinyin}。点击大字听发音！`, { kind: "sentence", emotion: "gentle" });
 
     stage.innerHTML = `
@@ -443,7 +446,27 @@ export class LearnModule extends BaseModule {
 
         <div class="w-88 sm:w-96 flex flex-col justify-between h-full bg-white/10 backdrop-blur-md rounded-3xl p-6 border-2 border-white/30">
           <div>
-            <h3 class="text-sm font-black text-yellow-300 mb-3 flex items-center gap-2">
+            ${cog ? `
+            <!-- 分层字义启蒙导引卡 (外部调研建议A / 发展心理学分阶) -->
+            <div id="cognitive-stage-card" class="mb-3 p-3 bg-gradient-to-r from-amber-500/20 to-orange-500/20 rounded-2xl border border-amber-300/40 text-left shadow-sm cursor-pointer active:scale-95 transition-all hover:border-amber-300" title="点击听字义启蒙">
+              <div class="flex items-center justify-between gap-1 mb-1">
+                <span class="text-[11px] font-black text-amber-300 flex items-center gap-1">
+                  ${GAME_ICONS.book("w-3.5 h-3.5")}
+                  <span>${cog.title}</span>
+                </span>
+                <span class="text-[9px] font-black bg-amber-400 text-amber-950 px-2 py-0.5 rounded-full">${cog.badge}</span>
+              </div>
+              <p class="text-xs text-yellow-100 font-medium leading-relaxed">${cog.text}</p>
+              ${cog.actionPrompt ? `
+              <div class="mt-2 pt-2 border-t border-amber-300/30 flex items-start gap-1.5 text-[11px] text-amber-200">
+                <span class="shrink-0 mt-0.5">${GAME_ICONS.sparkle("w-3.5 h-3.5")}</span>
+                <span><strong>身体动一动：</strong>${cog.actionPrompt}</span>
+              </div>
+              ` : ""}
+            </div>
+            ` : ""}
+
+            <h3 class="text-sm font-black text-yellow-300 mb-2.5 flex items-center gap-2">
               <span class="flex items-center">${GAME_ICONS.chest("w-5 h-5")}</span>
               <span>生活词语百宝箱：</span>
             </h3>
@@ -509,6 +532,17 @@ export class LearnModule extends BaseModule {
         this._timeout(() => btn.classList.remove("ring-2", "ring-yellow-400"), 400);
       });
     });
+
+    const cogCard = stage.querySelector("#cognitive-stage-card");
+    if (cogCard && cog) {
+      this._on(cogCard, "click", () => {
+        soundAndFX.playPop();
+        const spoken = cog.actionPrompt ? `${cog.text}。凯茜邀请你：${cog.actionPrompt}` : cog.text;
+        soundAndFX.speakPriority(spoken, { kind: "sentence", emotion: "gentle" });
+        cogCard.classList.add("ring-2", "ring-amber-400", "bg-amber-500/30");
+        this._timeout(() => cogCard.classList.remove("ring-2", "ring-amber-400", "bg-amber-500/30"), 600);
+      });
+    }
 
     const sentenceCard = stage.querySelector("#sentence-card");
     if (sentenceCard) {

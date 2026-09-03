@@ -454,7 +454,37 @@ export class HanziEngine {
       }
     }
 
+    // 绕路检测：当用户路径总长度超过期望笔画理论长度 2.2 倍，判定为绕路不通过
+    let totalLen = 0;
+    for (let i = 1; i < userPath.length; i++) {
+      totalLen += Math.hypot(userPath[i].x - userPath[i - 1].x, userPath[i].y - userPath[i - 1].y);
+    }
+    const expectedLen = expected.corner
+      ? Math.hypot(expected.corner.x - expected.start.x, expected.corner.y - expected.start.y) +
+        Math.hypot(expected.end.x - expected.corner.x, expected.end.y - expected.corner.y)
+      : Math.hypot(expected.end.x - expected.start.x, expected.end.y - expected.start.y);
+
+    if (expectedLen > 5 && totalLen > expectedLen * 2.2) {
+      return false;
+    }
+
     return true;
+  }
+
+  /**
+   * T4 笔画书写精准度综合判定 (起点、终点距离 + 方向角与防绕路验证)
+   * @param {Array<{x: number, y: number}>} userPath 用户手写点集
+   * @param {object} expectedStroke 期望笔画定义
+   * @param {number} [toleranceDeg=60] 方向角容差
+   * @returns {boolean}
+   */
+  checkTraceAccuracy(userPath, expectedStroke, toleranceDeg = 60) {
+    if (!userPath || userPath.length < 2) return false;
+    const tol = this.strokeTolerance || { start: 25, end: 25 };
+    const startOk = Math.hypot(userPath[0].x - expectedStroke.start.x, userPath[0].y - expectedStroke.start.y) <= (tol.start || 25);
+    const endOk = Math.hypot(userPath[userPath.length - 1].x - expectedStroke.end.x, userPath[userPath.length - 1].y - expectedStroke.end.y) <= (tol.end || 25);
+    const dirOk = this.strokeDirectionValidator(userPath, expectedStroke, toleranceDeg);
+    return Boolean(startOk && endOk && dirOk);
   }
 
   /** 360° 循环容差比较 */

@@ -132,3 +132,43 @@ describe('T4 _angleWithin 360° 循环比较', () => {
     expect(_eng()._angleWithin(0, 180, 60)).toBe(false);
   });
 });
+
+describe('T4 绕路检测与 checkTraceAccuracy 综合判定', () => {
+  it('验证绕路轨迹不通过（路径长度超过理论值 2.2 倍）', () => {
+    const expected = { start: { x: 10, y: 50 }, end: { x: 90, y: 50 } };
+    // 首尾对齐，但中间严重绕大弯
+    const detourPath = [
+      { x: 10, y: 50 },
+      { x: 10, y: 150 },
+      { x: 50, y: 180 },
+      { x: 90, y: 150 },
+      { x: 90, y: 50 },
+    ];
+    expect(_eng().strokeDirectionValidator(detourPath, expected, 60)).toBe(false);
+  });
+
+  it('checkTraceAccuracy 应综合起点、终点与方向角验证', () => {
+    const eng = _eng();
+    eng.strokeTolerance = { start: 25, end: 25 };
+    const expected = { start: { x: 10, y: 50 }, end: { x: 90, y: 50 } };
+
+    // 正常书写：起点准、终点准、方向正
+    const goodPath = [
+      { x: 10, y: 50 }, { x: 50, y: 50 }, { x: 90, y: 50 }
+    ];
+    expect(eng.checkTraceAccuracy(goodPath, expected, 60)).toBe(true);
+
+    // 起点偏差过大
+    const badStart = [
+      { x: 60, y: 50 }, { x: 80, y: 50 }, { x: 90, y: 50 }
+    ];
+    expect(eng.checkTraceAccuracy(badStart, expected, 60)).toBe(false);
+
+    // 终点未写完
+    const incomplete = [
+      { x: 10, y: 50 }, { x: 30, y: 50 }, { x: 45, y: 50 }
+    ];
+    expect(eng.checkTraceAccuracy(incomplete, expected, 60)).toBe(false);
+  });
+});
+

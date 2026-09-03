@@ -7,7 +7,11 @@ const sampleChar = {
   pinyin: "rì",
   confusingChars: ["目", "白", "田"],
   words: [{ word: "太阳", pinyin: "tài yáng", mean: "恒星" }, { word: "日光", pinyin: "rì guāng" }],
-  sentence: "红红的日头升起来了。"
+  sentence: "红红的日头升起来了。",
+  meanings: {
+    primary: "太阳、白天",
+    radicalHint: "日字旁和太阳有关"
+  }
 };
 
 describe("DrillEngine (6-Mode Micro Drills)", () => {
@@ -62,6 +66,21 @@ describe("DrillEngine (6-Mode Micro Drills)", () => {
 
     expect(engine.validateClozeUniqueness("红红的日头升起来了。", "日")).toBe(true);
     expect(engine.validateClozeUniqueness("红红的日头日的太阳。", "日")).toBe(false);
+  });
+
+  it("T3: should support meaning_pick drill type based on character meanings", () => {
+    const mount = { innerHTML: "", querySelector: vi.fn(), querySelectorAll: vi.fn(() => []) };
+    const engine = new DrillEngine(mount, sampleChar, vi.fn());
+
+    const pool = engine.buildTypePool();
+    expect(pool).toContain("meaning_pick");
+
+    const prompt = engine.buildPrompt("meaning_pick");
+    expect(prompt).toContain("根据字义找汉字");
+    expect(prompt).toContain("太阳、白天");
+
+    const opts = engine.buildOptionsFor("meaning_pick");
+    expect(opts).toContain("日");
   });
 });
 

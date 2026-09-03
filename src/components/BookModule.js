@@ -23,7 +23,6 @@ import { GAME_ICONS } from "../utils/gameIcons.js";
 import { g2p } from "../utils/g2p.js";
 import { pronunciationEval } from "../utils/pronunciationEval.js";
 import { storageManager } from "../utils/storageManager.js";
-import { rewardEngine } from "../utils/rewardEngine.js";
 import { checkBookReadiness, READING_STATUS } from "../utils/readingGatekeeper.js";
 export class BookModule extends BaseModule {
   constructor(container) {
@@ -972,7 +971,8 @@ export class BookModule extends BaseModule {
 
         soundAndFX.playParentCheer();
         soundAndFX.triggerConfetti(this.container);
-        rewardEngine.addCoins(20);
+        ebbinghausManager.addCoins(20);
+        ebbinghausManager.save();
         statusText.innerHTML = `<span class="text-emerald-600 font-black text-sm">${roleName} 朗读得分：${result.score || 98} 分！获得 20 凯茜星币！</span>`;
         recordBtnLabel.textContent = "重新录音";
         startRecordBtn.classList.remove("bg-rose-500", "animate-pulse");

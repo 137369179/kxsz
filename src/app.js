@@ -4,16 +4,6 @@
  */
 
 import { MapModule } from "./components/MapModule.js";
-import { LearnModule } from "./components/LearnModule.js";
-import { BookModule } from "./components/BookModule.js";
-import { PlayModule } from "./components/PlayModule.js";
-import { CardModule } from "./components/CardModule.js";
-import { ParentModule } from "./components/ParentModule.js";
-import { RewardModule } from "./components/RewardModule.js";
-import { ReviewModule } from "./components/ReviewModule.js";
-import { PKModule } from "./components/PKModule.js";
-import { PinyinModule } from "./components/PinyinModule.js";
-import { TreehouseModule } from "./components/TreehouseModule.js";
 import { soundAndFX } from "./utils/soundEngine.js";
 import { neuralVoice } from "./utils/neuralVoice.js";
 import { CHARACTER_DATABASE } from "./data/characters.js";
@@ -22,6 +12,44 @@ import { storageManager } from "./utils/storageManager.js";
 import { eyeCareManager } from "./utils/eyeCareManager.js";
 
 import { BaseModule } from "./utils/BaseModule.js";
+
+/**
+ * 按需模块加载器：首屏只加载 MapModule，其余模块进入对应模式时才动态 import。
+ * 键为模块 key（非 mode 名），由 MODE_TO_MODULE 做 mode → key 映射。
+ */
+const MODULE_LOADERS = {
+  books: () => import("./components/BookModule.js").then((m) => m.BookModule),
+  play: () => import("./components/PlayModule.js").then((m) => m.PlayModule),
+  cards: () => import("./components/CardModule.js").then((m) => m.CardModule),
+  parent: () => import("./components/ParentModule.js").then((m) => m.ParentModule),
+  reward: () => import("./components/RewardModule.js").then((m) => m.RewardModule),
+  review: () => import("./components/ReviewModule.js").then((m) => m.ReviewModule),
+  pk: () => import("./components/PKModule.js").then((m) => m.PKModule),
+  pinyin: () => import("./components/PinyinModule.js").then((m) => m.PinyinModule),
+  treehouse: () => import("./components/TreehouseModule.js").then((m) => m.TreehouseModule),
+  learn: () => import("./components/LearnModule.js").then((m) => m.LearnModule),
+};
+
+/** mode 名 → 模块 key */
+const MODE_TO_MODULE = {
+  map: "map",
+  books: "books",
+  book: "books",
+  play: "play",
+  arcade: "play",
+  idiom: "play",
+  poem: "play",
+  family: "play",
+  cards: "cards",
+  card: "cards",
+  parent: "parent",
+  reward: "reward",
+  rewards: "reward",
+  review: "review",
+  pk: "pk",
+  pinyin: "pinyin",
+  treehouse: "treehouse",
+};
 
 // CanvasRenderingContext2D.prototype.roundRect 跨平台垫片 (兼容低版本 Safari/Chrome/WebKit)
 if (typeof CanvasRenderingContext2D !== "undefined" && !CanvasRenderingContext2D.prototype.roundRect) {
@@ -82,58 +110,25 @@ class CathyAppManager extends BaseModule {
     this._restModalEl = null;
     this._restCountdownTimer = null;
 
-    //  (Lazy Initialization)
+    // 首屏仅实例化 MapModule；其余模块在首次进入对应模式时动态 import 后再实例化
     this.mapModule = new MapModule(this.container);
-    this._bookModule = null;
-    this._playModule = null;
-    this._cardModule = null;
-    this._parentModule = null;
-    this._rewardModule = null;
-    this._reviewModule = null;
-    this._pkModule = null;
-    this._pinyinModule = null;
-    this._treehouseModule = null;
+    this._moduleClasses = new Map();
+    this._moduleInstances = new Map([["map", this.mapModule]]);
     this.learnModule = null;
 
     this.init();
   }
 
-  get bookModule() {
-    if (!this._bookModule) this._bookModule = new BookModule(this.container);
-    return this._bookModule;
-  }
-  get playModule() {
-    if (!this._playModule) this._playModule = new PlayModule(this.container);
-    return this._playModule;
-  }
-  get cardModule() {
-    if (!this._cardModule) this._cardModule = new CardModule(this.container);
-    return this._cardModule;
-  }
-  get parentModule() {
-    if (!this._parentModule) this._parentModule = new ParentModule(this.container);
-    return this._parentModule;
-  }
-  get rewardModule() {
-    if (!this._rewardModule) this._rewardModule = new RewardModule(this.container);
-    return this._rewardModule;
-  }
-  get reviewModule() {
-    if (!this._reviewModule) this._reviewModule = new ReviewModule(this.container);
-    return this._reviewModule;
-  }
-  get pkModule() {
-    if (!this._pkModule) this._pkModule = new PKModule(this.container);
-    return this._pkModule;
-  }
-  get pinyinModule() {
-    if (!this._pinyinModule) this._pinyinModule = new PinyinModule(this.container);
-    return this._pinyinModule;
-  }
-  get treehouseModule() {
-    if (!this._treehouseModule) this._treehouseModule = new TreehouseModule(this.container);
-    return this._treehouseModule;
-  }
+  /** 以下 getter 只返回「已加载」的实例；未加载时为 null。取用请走 _ensureModule() */
+  get bookModule() { return this._moduleInstances.get("books") || null; }
+  get playModule() { return this._moduleInstances.get("play") || null; }
+  get cardModule() { return this._moduleInstances.get("cards") || null; }
+  get parentModule() { return this._moduleInstances.get("parent") || null; }
+  get rewardModule() { return this._moduleInstances.get("reward") || null; }
+  get reviewModule() { return this._moduleInstances.get("review") || null; }
+  get pkModule() { return this._moduleInstances.get("pk") || null; }
+  get pinyinModule() { return this._moduleInstances.get("pinyin") || null; }
+  get treehouseModule() { return this._moduleInstances.get("treehouse") || null; }
 
   get _moduleMap() {
     return {
@@ -152,6 +147,43 @@ class CathyAppManager extends BaseModule {
       pinyin: this.pinyinModule,
       treehouse: this.treehouseModule,
     };
+  }
+
+  /**
+   * 确保目标模式对应的模块已加载并实例化（按需动态 import + 双重缓存）。
+   * 未加载的模块会在此刻下载对应 chunk，已加载的直接返回缓存实例。
+   * @param {string} modeName 模式名
+   * @returns {Promise<object|null>} 模块实例；加载失败返回 null
+   */
+  async _ensureModule(modeName) {
+    const key = MODE_TO_MODULE[modeName];
+    if (!key || key === "map") return this.mapModule;
+    const cached = this._moduleInstances.get(key);
+    if (cached) return cached;
+    const loader = MODULE_LOADERS[key];
+    if (!loader) return null;
+    try {
+      let cls = this._moduleClasses.get(key);
+      if (!cls) {
+        cls = await loader();
+        this._moduleClasses.set(key, cls);
+      }
+      const inst = new cls(this.container);
+      this._moduleInstances.set(key, inst);
+      return inst;
+    } catch (err) {
+      console.error(`[App] 模块 "${key}" 动态加载失败:`, err);
+      return null;
+    }
+  }
+
+  /** 预取指定模式的模块（空闲期调用，提升首次进入速度） */
+  prefetchModule(modeName) {
+    const key = MODE_TO_MODULE[modeName];
+    if (!key || key === "map" || this._moduleInstances.has(key) || this._moduleClasses.has(key)) return;
+    const loader = MODULE_LOADERS[key];
+    if (!loader) return;
+    loader().then((cls) => this._moduleClasses.set(key, cls)).catch(() => {});
   }
 
   init() {

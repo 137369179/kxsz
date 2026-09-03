@@ -102,7 +102,8 @@ describe("Bug Fix Regression Audits", () => {
       addEventListener: () => {},
       removeEventListener: () => {},
       appendChild: () => {},
-      getBoundingClientRect: () => ({ left: 100, top: 200, width: 80, height: 40 })
+      getBoundingClientRect: () => ({ left: 100, top: 200, width: 80, height: 40 }),
+      getContext: () => ({ clearRect: () => {}, beginPath: () => {}, moveTo: () => {}, lineTo: () => {}, stroke: () => {}, fill: () => {}, fillText: () => {} })
     };
   });
 
