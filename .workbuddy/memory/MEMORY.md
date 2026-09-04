@@ -21,6 +21,7 @@
 - 旧 `strokeLoader.js` 与 `hanzi_strokes.js` 已废弃删除；旧按-stage 拆分 `characters/{index,stage1,stage2,stage3}.js` 也已删除（零引用）。
 - 组件路由懒加载：app.js 顶层仅静态 import MapModule，其余 10 组件 `() => import(...)` 动态加载。
 - 构建发布：`npm run build` → Vite → `dist/`（首屏 JS 4.31MB→459KB / gzip 82KB）。源码直出 src/app.js 仅开发/探针用。
+- ⚠️ 测试勿全局 `ensureDetails()`：2.8MB 详情层被 vitest 多 worker 重复 transform → 全量 OOM(Exit 137)。详情字段按需由各测试显式 `await ensureDetails()`（见 tests/setup.js 已改空操作）。
 
 ## 服务与验证
 - 本地预览：`node http-server -p 8848 --cors`（或 python 版易崩，勿用）
@@ -39,10 +40,22 @@
 7. 无头 Chrome 真实加载：`--enable-logging=stderr` 捕获控制台 + dump-dom 查 `undefined|NaN` 与关键 UI 标记计数
 8. **模板字符串内误用 // 注释检测**：用 acorn AST 定位 TemplateLiteral.quasis 文本段内的 `// 中文注释`（会被渲染成可见垃圾文字）。修复工具 `tools/_fix_tpl_comments.mjs`（--dry 预览）。⚠️ 用正则/词法状态机扫易因 `${}` 嵌套误报，务必用 acorn（node_modules 自带）
 9. CDP 真实浏览器探针：`tools/_cdp_flow_probe.mjs`（遍历 14 模块+学习六步）/ `tools/_cdp_char_sweep.mjs`（跨字符扫荡），需先起 `tools/_static_server.mjs 8902`
+10. **模块动态加载失败排查**（「node --check 全过但浏览器 import 报 SyntaxError」= 依赖链有文件破损）：CDP 抓 console.error 得 `[App] 模块 "X" 动态加载失败` → node import 该模块复现 → 逐个 import 依赖定位坏文件（2026-09-04 idioms.js 数组提前闭合致 play/arcade/idiom 静默回退地图）。修复后浏览器仍旧错 = SW 缓存，清 profile/硬刷新
 - 判「非BUG」前必须查消费点：字段缺失但所有调用方有回退（如 oracleGlyph||char.char）≠ BUG；story 已被 evolution.story 取代且无组件读顶层 story；emoji 字段已废弃(0 消费点)
 - 已知假象：python http.server 崩溃导致白屏截图（非应用问题）；SW 版本过渡期旧缓存可能一次性报错（硬刷新解决）
 - 并行会话的探针/审计工具常自身有 bug（选择器过时、正则转义、空指针），先修工具再信结论
 - 最新回归测试：`tests/unit/bugFixRegressions.test.js`（19 项深度边界测试），全量 Vitest 25 套件 125 项用例全绿通过
+- 调试工具全家桶（tools/_*.mjs）：_touch_audit(触控适龄，7 模块有效命中统计) / _check_tpl_comments(模板注释门禁) /
+  _fix_tpl_comments(批量修复) / _contract_audit(逐字契约) / _deep_contract_audit(DOM/事件/导入/资源契约) /
+  _audit_api_all(全量 API) / _cdp_flow_probe(已适配 T15 字理问答模态) / _cdp_char_sweep / _gen_sw_manifest(构建后生成 SW 清单)
+- 儿童适龄关键修复（勿回退）：focusMode.css 曾为孤儿 CSS(从未被 index.html 加载)须保留引用；
+  触控适龄用「伪元素 ::before inset:-7px 扩命中区」零布局成本补 40px 按钮（视觉 vs 有效命中是两维度）
+
+## 构建发布与 SW 双模式（2026-09-04 沉淀）
+- `npm run build` = vite build && cp sw.js dist/ && cp -r assets/images dist/assets/ && node tools/_gen_sw_manifest.mjs
+- ⚠️ Vite 只复制「被 import 或 index.html 静态引用」的资源；组件模板/CSS 里运行时路径的图片（assets/images/*）**必须手动 cp -r** 到 dist，否则构建产物破图
+- SW 双模式：install 先 fetch `./sw-manifest.json`（构建模式用实际产物清单 122 项），不存在（源码直出模式）回退 sw.js 内硬编码 DEFAULT_CORE_ASSETS
+- dist 产物健康基线：111 modules · 图片 101 · sw-manifest 122 项 · Chrome 加载核心 UI 齐全无 404
 
 ## 常用命令
 - 重生字库：`/Users/mac/.workbuddy/binaries/python/envs/default/bin/python tools/build_characters.py`
