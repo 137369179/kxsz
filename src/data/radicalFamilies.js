@@ -9,6 +9,7 @@ export const RADICAL_FAMILIES = [
   {
     id: "fam_qing",
     name: "青字家族",
+    image: "assets/images/family_qing.webp",
     desc: "青字添偏旁，清晴睛情请",
     rootChar: "青",
     pinyin: "qīng",
@@ -79,6 +80,7 @@ export const RADICAL_FAMILIES = [
   {
     id: "fam_mu",
     name: "木字家族",
+    image: "assets/images/family_mu.webp",
     desc: "独木不成林，三木变成森",
     rootChar: "木",
     pinyin: "mù",
@@ -129,6 +131,7 @@ export const RADICAL_FAMILIES = [
   {
     id: "fam_ye",
     name: "也字家族",
+    image: "assets/images/family_ye.webp",
     desc: "他也她池地，也字朋友多",
     rootChar: "也",
     pinyin: "yě",
@@ -179,6 +182,7 @@ export const RADICAL_FAMILIES = [
   {
     id: "fam_bao",
     name: "包字家族",
+    image: "assets/images/family_bao.webp",
     desc: "包裹大肚腩，跑炮泡饱拥",
     rootChar: "包",
     pinyin: "bāo",
@@ -229,6 +233,7 @@ export const RADICAL_FAMILIES = [
   {
     id: "fam_ri",
     name: "日字家族",
+    image: "assets/images/family_ri.webp",
     desc: "太阳金光闪，早明旦晶升",
     rootChar: "日",
     pinyin: "rì",

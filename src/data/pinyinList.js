@@ -81,14 +81,15 @@ export const PINYIN_WHOLE_SYLLABLES = [
 ];
 
 export const PINYIN_COLLISION_PAIRS = [
-  { initial: "b", final: "a", tone: 4, syllable: "bà", char: "爸", meaning: "高大慈爱的爸爸", word: "爸爸" },
-  { initial: "m", final: "a", tone: 1, syllable: "mā", char: "妈", meaning: "温柔亲切的妈妈", word: "妈妈" },
-  { initial: "d", final: "a", tone: 4, syllable: "dà", char: "大", meaning: "高大辽阔的大人", word: "大山" },
-  { initial: "t", final: "ian", tone: 1, syllable: "tiān", char: "天", meaning: "蓝蓝晴朗的天空", word: "天气" },
-  { initial: "r", final: "i", tone: 4, syllable: "rì", char: "日", meaning: "红红金光的太阳", word: "日出" },
-  { initial: "y", final: "ue", tone: 4, syllable: "yuè", char: "月", meaning: "夜晚皎洁的新月", word: "月亮" },
-  { initial: "sh", final: "ui", tone: 3, syllable: "shuǐ", char: "水", meaning: "清澈流淌的河水", word: "清水" },
-  { initial: "h", final: "uo", tone: 3, syllable: "huǒ", char: "火", meaning: "燃烧温暖的红火", word: "火车" },
-  { initial: "sh", final: "an", tone: 1, syllable: "shān", char: "山", meaning: "高大巍峨的群山", word: "大山" },
-  { initial: "f", final: "eng", tone: 1, syllable: "fēng", char: "风", meaning: "轻柔吹拂的微风", word: "风筝" }
+  { initial: "b", final: "a", tone: 4, syllable: "bà", char: "爸", meaning: "高大慈爱的爸爸", word: "爸爸", image: "assets/images/pinyin_pair_ba.webp" },
+  { initial: "m", final: "a", tone: 1, syllable: "mā", char: "妈", meaning: "温柔亲切的妈妈", word: "妈妈", image: "assets/images/pinyin_pair_ma.webp" },
+  { initial: "d", final: "a", tone: 4, syllable: "dà", char: "大", meaning: "高大辽阔的大人", word: "大山", image: "assets/images/pinyin_pair_da.webp" },
+  { initial: "t", final: "ian", tone: 1, syllable: "tiān", char: "天", meaning: "蓝蓝晴朗的天空", word: "天气", image: "assets/images/pinyin_pair_tian.webp" },
+  { initial: "r", final: "i", tone: 4, syllable: "rì", char: "日", meaning: "红红金光的太阳", word: "日出", image: "assets/images/pinyin_pair_ri.webp" },
+  { initial: "y", final: "ue", tone: 4, syllable: "yuè", char: "月", meaning: "夜晚皎洁的新月", word: "月亮", image: "assets/images/pinyin_pair_yue.webp" },
+  { initial: "sh", final: "ui", tone: 3, syllable: "shuǐ", char: "水", meaning: "清澈流淌的河水", word: "清水", image: "assets/images/pinyin_pair_shui.webp" },
+  { initial: "h", final: "uo", tone: 3, syllable: "huǒ", char: "火", meaning: "燃烧温暖的红火", word: "火车", image: "assets/images/pinyin_pair_huo.webp" },
+  { initial: "sh", final: "an", tone: 1, syllable: "shān", char: "山", meaning: "高大巍峨的群山", word: "大山", image: "assets/images/pinyin_pair_shan.webp" },
+  { initial: "f", final: "eng", tone: 1, syllable: "fēng", char: "风", meaning: "轻柔吹拂的微风", word: "风筝", image: "assets/images/pinyin_pair_feng.webp" }
 ];
+

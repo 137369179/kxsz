@@ -668,7 +668,7 @@ export const STORYBOOKS_DATABASE = [
       {
         "pageNumber": 1,
         "text": "三二一点火！金色火箭飞上了蓝蓝的天空",
-        "image": "assets/images/cover_space_rocket.webp",
+        "image": "assets/images/story_space_rocket_p1.webp",
         "interactions": [
           {
             "x": "50%",
@@ -779,7 +779,7 @@ export const STORYBOOKS_DATABASE = [
       {
         "pageNumber": 2,
         "text": "太空里真奇妙，一颗颗星星在眨眼睛",
-        "image": "assets/images/cover_space_rocket.webp",
+        "image": "assets/images/story_space_rocket_p2.webp",
         "interactions": [
           {
             "x": "70%",
@@ -878,7 +878,7 @@ export const STORYBOOKS_DATABASE = [
       {
         "pageNumber": 3,
         "text": "宇航员在太空中自由飞翔，向地球挥挥手",
-        "image": "assets/images/cover_space_rocket.webp",
+        "image": "assets/images/story_space_rocket_p3.webp",
         "interactions": [
           {
             "x": "40%",
@@ -1013,7 +1013,7 @@ export const STORYBOOKS_DATABASE = [
       {
         "pageNumber": 1,
         "text": "高高的大山下，有一片绿绿的古老森林",
-        "image": "assets/images/cover_dinosaur.webp",
+        "image": "assets/images/story_dinosaur_p1.webp",
         "interactions": [
           {
             "x": "65%",
@@ -1117,7 +1117,7 @@ export const STORYBOOKS_DATABASE = [
       {
         "pageNumber": 2,
         "text": "大恐龙在草地上慢慢走，吃着青青的小草",
-        "image": "assets/images/cover_dinosaur.webp",
+        "image": "assets/images/story_dinosaur_p2.webp",
         "interactions": [
           {
             "x": "50%",
@@ -1227,7 +1227,7 @@ export const STORYBOOKS_DATABASE = [
       {
         "pageNumber": 3,
         "text": "恐龙蛋破壳了，可爱的小恐龙走出来啦",
-        "image": "assets/images/cover_dinosaur.webp",
+        "image": "assets/images/story_dinosaur_p3.webp",
         "interactions": [
           {
             "x": "40%",
@@ -1356,7 +1356,7 @@ export const STORYBOOKS_DATABASE = [
       {
         "pageNumber": 1,
         "text": "我有一罐甜蜂蜜，你好小兔请你吃",
-        "image": "assets/images/cover_bear_share.webp",
+        "image": "assets/images/story_share_honey_p1.webp",
         "interactions": [
           {
             "x": "55%",
@@ -1451,7 +1451,7 @@ export const STORYBOOKS_DATABASE = [
       {
         "pageNumber": 2,
         "text": "小兔和小鸟都来了，大家都是好朋友",
-        "image": "assets/images/cover_bear_share.webp",
+        "image": "assets/images/story_share_honey_p2.webp",
         "interactions": [
           {
             "x": "70%",
@@ -1550,7 +1550,7 @@ export const STORYBOOKS_DATABASE = [
       {
         "pageNumber": 3,
         "text": "懂得分享真正好，我们一起哈哈笑",
-        "image": "assets/images/cover_bear_share.webp",
+        "image": "assets/images/story_share_honey_p3.webp",
         "interactions": [
           {
             "x": "45%",
@@ -1670,7 +1670,7 @@ export const STORYBOOKS_DATABASE = [
       {
         "pageNumber": 1,
         "text": "夜深了月光照，小熊躺在小床上",
-        "image": "assets/images/cover_sleep_alone.webp",
+        "image": "assets/images/story_sleep_alone_p1.webp",
         "interactions": [
           {
             "x": "75%",
@@ -1758,7 +1758,7 @@ export const STORYBOOKS_DATABASE = [
       {
         "pageNumber": 2,
         "text": "窗外星星眨眼睛，晚风送来平安夜",
-        "image": "assets/images/cover_sleep_alone.webp",
+        "image": "assets/images/story_sleep_alone_p2.webp",
         "interactions": [
           {
             "x": "35%",
@@ -1853,7 +1853,7 @@ export const STORYBOOKS_DATABASE = [
       {
         "pageNumber": 3,
         "text": "闭上眼睛做好梦，勇敢孩子睡得香",
-        "image": "assets/images/cover_sleep_alone.webp",
+        "image": "assets/images/story_sleep_alone_p3.webp",
         "interactions": [
           {
             "x": "50%",
@@ -2362,7 +2362,7 @@ export const STORYBOOKS_DATABASE = [
       {
         "pageNumber": 1,
         "text": "大山里有高高的木头大树，树上结满了甜甜的果子",
-        "image": "assets/images/cover_forest_squirrel.webp",
+        "image": "assets/images/story_forest_squirrel_p1.webp",
         "interactions": [
           {
             "x": "25%",
@@ -2495,7 +2495,7 @@ export const STORYBOOKS_DATABASE = [
       {
         "pageNumber": 2,
         "text": "松鼠张开口吃果子，好心的人们走过来给它拍照片",
-        "image": "assets/images/cover_forest_squirrel.webp",
+        "image": "assets/images/story_forest_squirrel_p2.webp",
         "interactions": [
           {
             "x": "65%",
@@ -2668,7 +2668,7 @@ export const STORYBOOKS_DATABASE = [
       {
         "pageNumber": 1,
         "text": "雨水落在大地的泥土上，小水滴醒来了",
-        "image": "assets/images/cover_water_drop.webp",
+        "image": "assets/images/story_water_drop_p1.webp",
         "interactions": [
           {
             "x": "50%",
@@ -2777,7 +2777,7 @@ export const STORYBOOKS_DATABASE = [
       {
         "pageNumber": 2,
         "text": "红日高照温暖如火，小水滴欢快地流向大海",
-        "image": "assets/images/cover_water_drop.webp",
+        "image": "assets/images/story_water_drop_p2.webp",
         "interactions": [
           {
             "x": "75%",
@@ -2926,7 +2926,7 @@ export const STORYBOOKS_DATABASE = [
       {
         "pageNumber": 1,
         "text": "金色的水田里，禾苗长得又高又壮",
-        "image": "assets/images/cover_forest_market.webp",
+        "image": "assets/images/story_forest_market_p1.webp",
         "interactions": [
           {
             "x": "35%",
@@ -3024,7 +3024,7 @@ export const STORYBOOKS_DATABASE = [
       {
         "pageNumber": 2,
         "text": "集市上人来人往，大家开口大笑尝美食",
-        "image": "assets/images/cover_forest_market.webp",
+        "image": "assets/images/story_forest_market_p2.webp",
         "interactions": [
           {
             "x": "70%",
@@ -3163,7 +3163,7 @@ export const STORYBOOKS_DATABASE = [
       {
         "pageNumber": 1,
         "text": "推开红色的大门，一辆木头小马车停在门前",
-        "image": "assets/images/cover_town_inventor.webp",
+        "image": "assets/images/story_town_inventor_p1.webp",
         "interactions": [
           {
             "x": "25%",
@@ -3290,7 +3290,7 @@ export const STORYBOOKS_DATABASE = [
       {
         "pageNumber": 2,
         "text": "天上飞过小鸟，水里游着小鱼，小车跑得飞快",
-        "image": "assets/images/cover_town_inventor.webp",
+        "image": "assets/images/story_town_inventor_p2.webp",
         "interactions": [
           {
             "x": "40%",
@@ -3451,7 +3451,7 @@ export const STORYBOOKS_DATABASE = [
       {
         "pageNumber": 1,
         "text": "蓝蓝的天空上，洁白的白云随风飘动",
-        "image": "assets/images/cover_space_ship.webp",
+        "image": "assets/images/story_space_ship_p1.webp",
         "interactions": [
           {
             "x": "35%",
@@ -3562,7 +3562,7 @@ export const STORYBOOKS_DATABASE = [
       {
         "pageNumber": 2,
         "text": "飞船穿过风雨和白雪，飞向美丽的银河星空",
-        "image": "assets/images/cover_space_ship.webp",
+        "image": "assets/images/story_space_ship_p2.webp",
         "interactions": [
           {
             "x": "50%",
@@ -3719,7 +3719,7 @@ export const STORYBOOKS_DATABASE = [
       {
         "pageNumber": 1,
         "text": "天上的小鸟欢快地唱歌，树下的小虫在草地里跳舞",
-        "image": "assets/images/cover_forest_animals.webp",
+        "image": "assets/images/story_forest_animals_p1.webp",
         "interactions": [
           {
             "x": "25%",
@@ -3854,7 +3854,7 @@ export const STORYBOOKS_DATABASE = [
       {
         "pageNumber": 2,
         "text": "小马在广阔的大地上奔跑，小牛和小羊在悠闲地吃草",
-        "image": "assets/images/cover_forest_animals.webp",
+        "image": "assets/images/story_forest_animals_p2.webp",
         "interactions": [
           {
             "x": "30%",
@@ -4027,7 +4027,7 @@ export const STORYBOOKS_DATABASE = [
       {
         "pageNumber": 1,
         "text": "小猴子爬上高山，向上看是蓝天，向下看是大地",
-        "image": "assets/images/cover_monkey_mountain.webp",
+        "image": "assets/images/story_monkey_mountain_p1.webp",
         "interactions": [
           {
             "x": "50%",
@@ -4160,7 +4160,7 @@ export const STORYBOOKS_DATABASE = [
       {
         "pageNumber": 2,
         "text": "向左是一片大森林，向右是一条清清的小河，中间开满了鲜花",
-        "image": "assets/images/cover_monkey_mountain.webp",
+        "image": "assets/images/story_monkey_mountain_p2.webp",
         "interactions": [
           {
             "x": "20%",
@@ -4358,7 +4358,7 @@ export const STORYBOOKS_DATABASE = [
       {
         "pageNumber": 1,
         "text": "春天来了，红红的花朵和绿绿的小草从泥土里钻出来",
-        "image": "assets/images/cover_flower_garden.webp",
+        "image": "assets/images/story_flower_garden_p1.webp",
         "interactions": [
           {
             "x": "35%",
@@ -4499,7 +4499,7 @@ export const STORYBOOKS_DATABASE = [
       {
         "pageNumber": 2,
         "text": "高大的树木喝饱了雨水，伸展出绿油油的树叶",
-        "image": "assets/images/cover_flower_garden.webp",
+        "image": "assets/images/story_flower_garden_p2.webp",
         "interactions": [
           {
             "x": "50%",
@@ -4647,7 +4647,7 @@ export const STORYBOOKS_DATABASE = [
       {
         "pageNumber": 1,
         "text": "我和凯茜是最要好的好朋友，我们每天手拉手一起去上学",
-        "image": "assets/images/cover_good_friends.webp",
+        "image": "assets/images/story_good_friends_p1.webp",
         "interactions": [
           {
             "x": "40%",
@@ -4792,7 +4792,7 @@ export const STORYBOOKS_DATABASE = [
       {
         "pageNumber": 2,
         "text": "我们在学校里认真学习写汉字，做一个爱读书的好孩子",
-        "image": "assets/images/cover_good_friends.webp",
+        "image": "assets/images/story_good_friends_p2.webp",
         "interactions": [
           {
             "x": "50%",
@@ -4963,7 +4963,7 @@ export const STORYBOOKS_DATABASE = [
       {
         "pageNumber": 1,
         "text": "推开大门，小车开来了，我们挥动小手向家人说再见",
-        "image": "assets/images/cover_happy_school.webp",
+        "image": "assets/images/story_happy_school_p1.webp",
         "interactions": [
           {
             "x": "25%",
@@ -5104,7 +5104,7 @@ export const STORYBOOKS_DATABASE = [
       {
         "pageNumber": 2,
         "text": "用明亮的双目看世界，用灵敏的双耳听鸟鸣，脚步轻快真高兴",
-        "image": "assets/images/cover_happy_school.webp",
+        "image": "assets/images/story_happy_school_p2.webp",
         "interactions": [
           {
             "x": "35%",
@@ -5295,7 +5295,7 @@ export const STORYBOOKS_DATABASE = [
       {
         "pageNumber": 1,
         "text": "父母用心抚育我们长大，我们要用心孝敬爸爸和妈妈",
-        "image": "assets/images/cover_good_children.webp",
+        "image": "assets/images/story_good_children_p1.webp",
         "interactions": [
           {
             "x": "50%",
@@ -5430,7 +5430,7 @@ export const STORYBOOKS_DATABASE = [
       {
         "pageNumber": 2,
         "text": "昂起头来大步走，开开心心去迎接美好的新一天",
-        "image": "assets/images/cover_good_children.webp",
+        "image": "assets/images/story_good_children_p2.webp",
         "interactions": [
           {
             "x": "50%",
@@ -5584,7 +5584,7 @@ export const STORYBOOKS_DATABASE = [
       {
         "pageNumber": 1,
         "text": "青翠的大山里，有一片茂密的大树林",
-        "image": "assets/images/cover_monkey_fruit.webp",
+        "image": "assets/images/story_monkey_fruit_p1.webp",
         "interactions": [
           {
             "x": "60%",
@@ -5682,7 +5682,7 @@ export const STORYBOOKS_DATABASE = [
       {
         "pageNumber": 2,
         "text": "高高的苹果树上，结满了红红的大苹果",
-        "image": "assets/images/cover_monkey_fruit.webp",
+        "image": "assets/images/story_monkey_fruit_p2.webp",
         "interactions": [
           {
             "x": "45%",
@@ -5786,7 +5786,7 @@ export const STORYBOOKS_DATABASE = [
       {
         "pageNumber": 3,
         "text": "小猴爬上高树枝，把香甜的果子带回家",
-        "image": "assets/images/cover_monkey_fruit.webp",
+        "image": "assets/images/story_monkey_fruit_p3.webp",
         "interactions": [
           {
             "x": "55%",
@@ -5919,7 +5919,7 @@ export const STORYBOOKS_DATABASE = [
       {
         "pageNumber": 1,
         "text": "春天花儿开，夏天绿树浓",
-        "image": "assets/images/cover_four_seasons.webp",
+        "image": "assets/images/story_four_seasons_p1.webp",
         "interactions": [
           {
             "x": "30%",
@@ -5993,7 +5993,7 @@ export const STORYBOOKS_DATABASE = [
       {
         "pageNumber": 2,
         "text": "秋天黄叶落，冬天白雪飘",
-        "image": "assets/images/cover_four_seasons.webp",
+        "image": "assets/images/story_four_seasons_p2.webp",
         "interactions": [
           {
             "x": "70%",
@@ -6097,7 +6097,7 @@ export const STORYBOOKS_DATABASE = [
       {
         "pageNumber": 1,
         "text": "画一朵红红的花，画一片绿绿的草",
-        "image": "assets/images/cover_color_magic.webp",
+        "image": "assets/images/story_color_magic_p1.webp",
         "interactions": [
           {
             "x": "35%",
@@ -6191,7 +6191,7 @@ export const STORYBOOKS_DATABASE = [
       {
         "pageNumber": 2,
         "text": "蓝蓝的天空上，飘着雪白的小云朵",
-        "image": "assets/images/cover_color_magic.webp",
+        "image": "assets/images/story_color_magic_p2.webp",
         "interactions": [
           {
             "x": "65%",
@@ -6314,7 +6314,7 @@ export const STORYBOOKS_DATABASE = [
       {
         "pageNumber": 1,
         "text": "早晨太阳升起，小镇打开了快乐的大门",
-        "image": "assets/images/cover_happy_town.webp",
+        "image": "assets/images/story_happy_town_p1.webp",
         "interactions": [
           {
             "x": "50%",
@@ -6416,7 +6416,7 @@ export const STORYBOOKS_DATABASE = [
       {
         "pageNumber": 2,
         "text": "汽车开过马路，小朋友们高高兴兴上学校",
-        "image": "assets/images/cover_happy_town.webp",
+        "image": "assets/images/story_happy_town_p2.webp",
         "interactions": [
           {
             "x": "30%",
@@ -6554,7 +6554,7 @@ export const STORYBOOKS_DATABASE = [
       {
         "pageNumber": 1,
         "text": "小蜜蜂展翅飞，飞到花丛中采蜜忙",
-        "image": "assets/images/cover_busy_bee.webp",
+        "image": "assets/images/story_busy_bee_p1.webp",
         "interactions": [
           {
             "x": "40%",
@@ -6677,7 +6677,7 @@ export const STORYBOOKS_DATABASE = [
       {
         "pageNumber": 1,
         "text": "火箭飞上天空，看见弯弯的月亮和明亮的星星",
-        "image": "assets/images/cover_little_astronaut.webp",
+        "image": "assets/images/story_little_astronaut_p1.webp",
         "interactions": [
           {
             "x": "60%",
@@ -6810,4 +6810,1891 @@ export const STORYBOOKS_DATABASE = [
       }
     ]
   }
+,
+{
+  "id": "book_theme_zodiac",
+  "level": 1,
+  "title": "十二生肖歌",
+  "coverImg": "assets/images/cover_zodiac.webp",
+  "stage": 1,
+  "theme": "中华传统文化",
+  "targetChars": [
+    "鼠",
+    "牛",
+    "虎",
+    "兔",
+    "龙"
+  ],
+  "desc": "生肖歌谣朗朗上口，十二小动物排排坐，快乐学习传统生肖文化",
+  "pages": [
+    {
+      "pageNumber": 1,
+      "text": "小老鼠打头阵，大水牛力气大",
+      "image": "assets/images/story_zodiac_p1.webp",
+      "interactions": [
+        {
+          "x": "32%",
+          "y": "42%",
+          "sound": "Pop",
+          "anim": "animate-bounce",
+          "text": "机灵聪明的小老鼠！"
+        },
+        {
+          "x": "68%",
+          "y": "52%",
+          "sound": "Pop",
+          "anim": "animate-pulse",
+          "text": "勤劳能干的大水牛！"
+        }
+      ],
+      "audioTimeTokens": [
+        {
+          "char": "小",
+          "start": 0.1,
+          "end": 0.45
+        },
+        {
+          "char": "老",
+          "start": 0.45,
+          "end": 0.8
+        },
+        {
+          "char": "鼠",
+          "start": 0.8,
+          "end": 1.15,
+          "highlight": true
+        },
+        {
+          "char": "打",
+          "start": 1.15,
+          "end": 1.5
+        },
+        {
+          "char": "头",
+          "start": 1.5,
+          "end": 1.85
+        },
+        {
+          "char": "阵",
+          "start": 1.85,
+          "end": 2.2
+        },
+        {
+          "char": "，",
+          "start": 2.2,
+          "end": 2.4
+        },
+        {
+          "char": "大",
+          "start": 2.4,
+          "end": 2.75
+        },
+        {
+          "char": "水",
+          "start": 2.75,
+          "end": 3.1
+        },
+        {
+          "char": "牛",
+          "start": 3.1,
+          "end": 3.45,
+          "highlight": true
+        },
+        {
+          "char": "力",
+          "start": 3.45,
+          "end": 3.8
+        },
+        {
+          "char": "气",
+          "start": 3.8,
+          "end": 4.15
+        },
+        {
+          "char": "大",
+          "start": 4.15,
+          "end": 4.5
+        }
+      ]
+    },
+    {
+      "pageNumber": 2,
+      "text": "威武的大老虎下高山，温顺的小白兔蹦蹦跳",
+      "image": "assets/images/story_zodiac_p2.webp",
+      "interactions": [
+        {
+          "x": "35%",
+          "y": "45%",
+          "sound": "CrownFanfare",
+          "anim": "animate-bounce",
+          "text": "百兽之王大老虎！"
+        },
+        {
+          "x": "72%",
+          "y": "58%",
+          "sound": "Pop",
+          "anim": "animate-pulse",
+          "text": "毛茸茸的小白兔！"
+        }
+      ],
+      "audioTimeTokens": [
+        {
+          "char": "威",
+          "start": 0.1,
+          "end": 0.45
+        },
+        {
+          "char": "武",
+          "start": 0.45,
+          "end": 0.8
+        },
+        {
+          "char": "的",
+          "start": 0.8,
+          "end": 1.15
+        },
+        {
+          "char": "大",
+          "start": 1.15,
+          "end": 1.5
+        },
+        {
+          "char": "老",
+          "start": 1.5,
+          "end": 1.85
+        },
+        {
+          "char": "虎",
+          "start": 1.85,
+          "end": 2.2,
+          "highlight": true
+        },
+        {
+          "char": "下",
+          "start": 2.2,
+          "end": 2.55
+        },
+        {
+          "char": "高",
+          "start": 2.55,
+          "end": 2.9
+        },
+        {
+          "char": "山",
+          "start": 2.9,
+          "end": 3.25
+        },
+        {
+          "char": "，",
+          "start": 3.25,
+          "end": 3.45
+        },
+        {
+          "char": "温",
+          "start": 3.45,
+          "end": 3.8
+        },
+        {
+          "char": "顺",
+          "start": 3.8,
+          "end": 4.15
+        },
+        {
+          "char": "的",
+          "start": 4.15,
+          "end": 4.5
+        },
+        {
+          "char": "小",
+          "start": 4.5,
+          "end": 4.85
+        },
+        {
+          "char": "白",
+          "start": 4.85,
+          "end": 5.2
+        },
+        {
+          "char": "兔",
+          "start": 5.2,
+          "end": 5.55,
+          "highlight": true
+        },
+        {
+          "char": "蹦",
+          "start": 5.55,
+          "end": 5.9
+        },
+        {
+          "char": "蹦",
+          "start": 5.9,
+          "end": 6.25
+        },
+        {
+          "char": "跳",
+          "start": 6.25,
+          "end": 6.6
+        }
+      ]
+    },
+    {
+      "pageNumber": 3,
+      "text": "金龙飞在云海间，十二生肖福运满",
+      "image": "assets/images/story_zodiac_p3.webp",
+      "interactions": [
+        {
+          "x": "50%",
+          "y": "40%",
+          "sound": "StarPopCombo",
+          "anim": "animate-spin-slow",
+          "text": "腾云驾雾中国吉祥金龙！"
+        }
+      ],
+      "audioTimeTokens": [
+        {
+          "char": "金",
+          "start": 0.1,
+          "end": 0.45
+        },
+        {
+          "char": "龙",
+          "start": 0.45,
+          "end": 0.8,
+          "highlight": true
+        },
+        {
+          "char": "飞",
+          "start": 0.8,
+          "end": 1.15
+        },
+        {
+          "char": "在",
+          "start": 1.15,
+          "end": 1.5
+        },
+        {
+          "char": "云",
+          "start": 1.5,
+          "end": 1.85
+        },
+        {
+          "char": "海",
+          "start": 1.85,
+          "end": 2.2
+        },
+        {
+          "char": "间",
+          "start": 2.2,
+          "end": 2.55
+        },
+        {
+          "char": "，",
+          "start": 2.55,
+          "end": 2.75
+        },
+        {
+          "char": "十",
+          "start": 2.75,
+          "end": 3.1
+        },
+        {
+          "char": "二",
+          "start": 3.1,
+          "end": 3.45
+        },
+        {
+          "char": "生",
+          "start": 3.45,
+          "end": 3.8
+        },
+        {
+          "char": "肖",
+          "start": 3.8,
+          "end": 4.15
+        },
+        {
+          "char": "福",
+          "start": 4.15,
+          "end": 4.5,
+          "highlight": true
+        },
+        {
+          "char": "运",
+          "start": 4.5,
+          "end": 4.85
+        },
+        {
+          "char": "满",
+          "start": 4.85,
+          "end": 5.2
+        }
+      ]
+    }
+  ],
+  "quiz": [
+    {
+      "question": "十二生肖歌里，排在最前面打头阵的是哪个小动物？",
+      "options": [
+        "机灵的小老鼠",
+        "威风的大老虎",
+        "可爱的小白兔",
+        "勇敢的小金龙"
+      ],
+      "correctIndex": 0
+    }
+  ]
+},
+{
+  "id": "book_theme_spring_festival",
+  "level": 1,
+  "title": "过大年贴春联",
+  "coverImg": "assets/images/cover_spring_festival.webp",
+  "stage": 1,
+  "theme": "中华传统节日",
+  "targetChars": [
+    "年",
+    "春",
+    "红",
+    "福",
+    "乐"
+  ],
+  "desc": "爆竹声声辞旧岁，红红火火贴春联，小鹿凯茜一家欢欢喜喜过大年",
+  "pages": [
+    {
+      "pageNumber": 1,
+      "text": "大年三十挂红灯，门前贴上红春联",
+      "image": "assets/images/story_spring_festival_p1.webp",
+      "interactions": [
+        {
+          "x": "30%",
+          "y": "30%",
+          "sound": "Pop",
+          "anim": "animate-bounce",
+          "text": "大红灯笼高高挂！"
+        },
+        {
+          "x": "70%",
+          "y": "45%",
+          "sound": "Pop",
+          "anim": "animate-pulse",
+          "text": "吉祥如意红春联！"
+        }
+      ],
+      "audioTimeTokens": [
+        {
+          "char": "大",
+          "start": 0.1,
+          "end": 0.45
+        },
+        {
+          "char": "年",
+          "start": 0.45,
+          "end": 0.8,
+          "highlight": true
+        },
+        {
+          "char": "三",
+          "start": 0.8,
+          "end": 1.15
+        },
+        {
+          "char": "十",
+          "start": 1.15,
+          "end": 1.5
+        },
+        {
+          "char": "挂",
+          "start": 1.5,
+          "end": 1.85
+        },
+        {
+          "char": "红",
+          "start": 1.85,
+          "end": 2.2,
+          "highlight": true
+        },
+        {
+          "char": "灯",
+          "start": 2.2,
+          "end": 2.55
+        },
+        {
+          "char": "，",
+          "start": 2.55,
+          "end": 2.75
+        },
+        {
+          "char": "门",
+          "start": 2.75,
+          "end": 3.1
+        },
+        {
+          "char": "前",
+          "start": 3.1,
+          "end": 3.45
+        },
+        {
+          "char": "贴",
+          "start": 3.45,
+          "end": 3.8
+        },
+        {
+          "char": "上",
+          "start": 3.8,
+          "end": 4.15
+        },
+        {
+          "char": "红",
+          "start": 4.15,
+          "end": 4.5,
+          "highlight": true
+        },
+        {
+          "char": "春",
+          "start": 4.5,
+          "end": 4.85,
+          "highlight": true
+        },
+        {
+          "char": "联",
+          "start": 4.85,
+          "end": 5.2
+        }
+      ]
+    },
+    {
+      "pageNumber": 2,
+      "text": "一家人吃团圆饭，香香甜甜年味足",
+      "image": "assets/images/story_spring_festival_p2.webp",
+      "interactions": [
+        {
+          "x": "50%",
+          "y": "60%",
+          "sound": "ChestOpen",
+          "anim": "animate-bounce",
+          "text": "年夜饭团团圆圆！"
+        }
+      ],
+      "audioTimeTokens": [
+        {
+          "char": "一",
+          "start": 0.1,
+          "end": 0.45
+        },
+        {
+          "char": "家",
+          "start": 0.45,
+          "end": 0.8
+        },
+        {
+          "char": "人",
+          "start": 0.8,
+          "end": 1.15
+        },
+        {
+          "char": "吃",
+          "start": 1.15,
+          "end": 1.5
+        },
+        {
+          "char": "团",
+          "start": 1.5,
+          "end": 1.85
+        },
+        {
+          "char": "圆",
+          "start": 1.85,
+          "end": 2.2
+        },
+        {
+          "char": "饭",
+          "start": 2.2,
+          "end": 2.55
+        },
+        {
+          "char": "，",
+          "start": 2.55,
+          "end": 2.75
+        },
+        {
+          "char": "香",
+          "start": 2.75,
+          "end": 3.1
+        },
+        {
+          "char": "香",
+          "start": 3.1,
+          "end": 3.45
+        },
+        {
+          "char": "甜",
+          "start": 3.45,
+          "end": 3.8
+        },
+        {
+          "char": "甜",
+          "start": 3.8,
+          "end": 4.15
+        },
+        {
+          "char": "年",
+          "start": 4.15,
+          "end": 4.5,
+          "highlight": true
+        },
+        {
+          "char": "味",
+          "start": 4.5,
+          "end": 4.85
+        },
+        {
+          "char": "足",
+          "start": 4.85,
+          "end": 5.2
+        }
+      ]
+    },
+    {
+      "pageNumber": 3,
+      "text": "爆竹声声辞旧岁，迎春接福万家欢",
+      "image": "assets/images/story_spring_festival_p3.webp",
+      "interactions": [
+        {
+          "x": "50%",
+          "y": "35%",
+          "sound": "StarPopCombo",
+          "anim": "animate-spin-slow",
+          "text": "新春大吉，万家欢乐！"
+        }
+      ],
+      "audioTimeTokens": [
+        {
+          "char": "爆",
+          "start": 0.1,
+          "end": 0.45
+        },
+        {
+          "char": "竹",
+          "start": 0.45,
+          "end": 0.8
+        },
+        {
+          "char": "声",
+          "start": 0.8,
+          "end": 1.15
+        },
+        {
+          "char": "声",
+          "start": 1.15,
+          "end": 1.5
+        },
+        {
+          "char": "辞",
+          "start": 1.5,
+          "end": 1.85
+        },
+        {
+          "char": "旧",
+          "start": 1.85,
+          "end": 2.2
+        },
+        {
+          "char": "岁",
+          "start": 2.2,
+          "end": 2.55
+        },
+        {
+          "char": "，",
+          "start": 2.55,
+          "end": 2.75
+        },
+        {
+          "char": "迎",
+          "start": 2.75,
+          "end": 3.1
+        },
+        {
+          "char": "春",
+          "start": 3.1,
+          "end": 3.45,
+          "highlight": true
+        },
+        {
+          "char": "接",
+          "start": 3.45,
+          "end": 3.8
+        },
+        {
+          "char": "福",
+          "start": 3.8,
+          "end": 4.15,
+          "highlight": true
+        },
+        {
+          "char": "万",
+          "start": 4.15,
+          "end": 4.5
+        },
+        {
+          "char": "家",
+          "start": 4.5,
+          "end": 4.85
+        },
+        {
+          "char": "欢",
+          "start": 4.85,
+          "end": 5.2
+        }
+      ]
+    }
+  ],
+  "quiz": [
+    {
+      "question": "过大年的时候，大门两旁要贴上什么吉庆的饰物？",
+      "options": [
+        "喜庆红火的春联",
+        "黑板白字",
+        "彩色气球",
+        "数字卡片"
+      ],
+      "correctIndex": 0
+    }
+  ]
+},
+{
+  "id": "book_theme_chongyang",
+  "level": 2,
+  "title": "重阳登高赏秋菊",
+  "coverImg": "assets/images/cover_chongyang.webp",
+  "stage": 2,
+  "theme": "中华传统节日",
+  "targetChars": [
+    "高",
+    "秋",
+    "菊",
+    "敬",
+    "老"
+  ],
+  "desc": "九九重阳敬老日，秋高气爽登高处，遍插茱萸赏金菊",
+  "pages": [
+    {
+      "pageNumber": 1,
+      "text": "九九重阳秋光好，金丝皇菊满山坡",
+      "image": "assets/images/story_chongyang_p1.webp",
+      "interactions": [
+        {
+          "x": "65%",
+          "y": "55%",
+          "sound": "Pop",
+          "anim": "animate-bounce",
+          "text": "金灿灿的美丽秋菊！"
+        }
+      ],
+      "audioTimeTokens": [
+        {
+          "char": "九",
+          "start": 0.1,
+          "end": 0.45
+        },
+        {
+          "char": "九",
+          "start": 0.45,
+          "end": 0.8
+        },
+        {
+          "char": "重",
+          "start": 0.8,
+          "end": 1.15
+        },
+        {
+          "char": "阳",
+          "start": 1.15,
+          "end": 1.5
+        },
+        {
+          "char": "秋",
+          "start": 1.5,
+          "end": 1.85,
+          "highlight": true
+        },
+        {
+          "char": "光",
+          "start": 1.85,
+          "end": 2.2
+        },
+        {
+          "char": "好",
+          "start": 2.2,
+          "end": 2.55
+        },
+        {
+          "char": "，",
+          "start": 2.55,
+          "end": 2.75
+        },
+        {
+          "char": "金",
+          "start": 2.75,
+          "end": 3.1
+        },
+        {
+          "char": "丝",
+          "start": 3.1,
+          "end": 3.45
+        },
+        {
+          "char": "皇",
+          "start": 3.45,
+          "end": 3.8
+        },
+        {
+          "char": "菊",
+          "start": 3.8,
+          "end": 4.15,
+          "highlight": true
+        },
+        {
+          "char": "满",
+          "start": 4.15,
+          "end": 4.5
+        },
+        {
+          "char": "山",
+          "start": 4.5,
+          "end": 4.85
+        },
+        {
+          "char": "坡",
+          "start": 4.85,
+          "end": 5.2
+        }
+      ]
+    },
+    {
+      "pageNumber": 2,
+      "text": "携手长辈登高楼，极目远眺天地宽",
+      "image": "assets/images/story_chongyang_p2.webp",
+      "interactions": [
+        {
+          "x": "50%",
+          "y": "45%",
+          "sound": "CrownFanfare",
+          "anim": "animate-pulse",
+          "text": "古塔高耸入云霄！"
+        }
+      ],
+      "audioTimeTokens": [
+        {
+          "char": "携",
+          "start": 0.1,
+          "end": 0.45
+        },
+        {
+          "char": "手",
+          "start": 0.45,
+          "end": 0.8
+        },
+        {
+          "char": "长",
+          "start": 0.8,
+          "end": 1.15
+        },
+        {
+          "char": "辈",
+          "start": 1.15,
+          "end": 1.5
+        },
+        {
+          "char": "登",
+          "start": 1.5,
+          "end": 1.85
+        },
+        {
+          "char": "高",
+          "start": 1.85,
+          "end": 2.2,
+          "highlight": true
+        },
+        {
+          "char": "楼",
+          "start": 2.2,
+          "end": 2.55
+        },
+        {
+          "char": "，",
+          "start": 2.55,
+          "end": 2.75
+        },
+        {
+          "char": "极",
+          "start": 2.75,
+          "end": 3.1
+        },
+        {
+          "char": "目",
+          "start": 3.1,
+          "end": 3.45
+        },
+        {
+          "char": "远",
+          "start": 3.45,
+          "end": 3.8
+        },
+        {
+          "char": "眺",
+          "start": 3.8,
+          "end": 4.15
+        },
+        {
+          "char": "天",
+          "start": 4.15,
+          "end": 4.5
+        },
+        {
+          "char": "地",
+          "start": 4.5,
+          "end": 4.85
+        },
+        {
+          "char": "宽",
+          "start": 4.85,
+          "end": 5.2
+        }
+      ]
+    },
+    {
+      "pageNumber": 3,
+      "text": "品糕饮茶敬长辈，尊老爱幼暖心窝",
+      "image": "assets/images/story_chongyang_p3.webp",
+      "interactions": [
+        {
+          "x": "55%",
+          "y": "55%",
+          "sound": "StarPopCombo",
+          "anim": "animate-bounce",
+          "text": "香甜软糯的重阳糕！"
+        }
+      ],
+      "audioTimeTokens": [
+        {
+          "char": "品",
+          "start": 0.1,
+          "end": 0.45
+        },
+        {
+          "char": "糕",
+          "start": 0.45,
+          "end": 0.8
+        },
+        {
+          "char": "饮",
+          "start": 0.8,
+          "end": 1.15
+        },
+        {
+          "char": "茶",
+          "start": 1.15,
+          "end": 1.5
+        },
+        {
+          "char": "敬",
+          "start": 1.5,
+          "end": 1.85,
+          "highlight": true
+        },
+        {
+          "char": "长",
+          "start": 1.85,
+          "end": 2.2
+        },
+        {
+          "char": "辈",
+          "start": 2.2,
+          "end": 2.55
+        },
+        {
+          "char": "，",
+          "start": 2.55,
+          "end": 2.75
+        },
+        {
+          "char": "尊",
+          "start": 2.75,
+          "end": 3.1
+        },
+        {
+          "char": "老",
+          "start": 3.1,
+          "end": 3.45,
+          "highlight": true
+        },
+        {
+          "char": "爱",
+          "start": 3.45,
+          "end": 3.8
+        },
+        {
+          "char": "幼",
+          "start": 3.8,
+          "end": 4.15
+        },
+        {
+          "char": "暖",
+          "start": 4.15,
+          "end": 4.5
+        },
+        {
+          "char": "心",
+          "start": 4.5,
+          "end": 4.85
+        },
+        {
+          "char": "窝",
+          "start": 4.85,
+          "end": 5.2
+        }
+      ]
+    }
+  ],
+  "quiz": [
+    {
+      "question": "重阳节人们通常会举行什么传统习俗？",
+      "options": [
+        "登高望远与赏菊",
+        "下河摸鱼",
+        "堆雪人",
+        "去海边游泳"
+      ],
+      "correctIndex": 0
+    }
+  ]
+},
+{
+  "id": "book_theme_qingming",
+  "level": 2,
+  "title": "清明踏青放纸鸢",
+  "coverImg": "assets/images/cover_qingming_kite.webp",
+  "stage": 2,
+  "theme": "中华传统节日",
+  "targetChars": [
+    "风",
+    "青",
+    "飞",
+    "草",
+    "春"
+  ],
+  "desc": "清明时节春风拂面，杨柳依依青草绿，奔跑草地放飞传统沙燕纸鸢",
+  "pages": [
+    {
+      "pageNumber": 1,
+      "text": "春风吹绿柳树梢，万物复苏草儿青",
+      "image": "assets/images/story_qingming_kite_p1.webp",
+      "interactions": [
+        {
+          "x": "40%",
+          "y": "40%",
+          "sound": "Pop",
+          "anim": "animate-pulse",
+          "text": "杨柳依依春风吹！"
+        }
+      ],
+      "audioTimeTokens": [
+        {
+          "char": "春",
+          "start": 0.1,
+          "end": 0.45,
+          "highlight": true
+        },
+        {
+          "char": "风",
+          "start": 0.45,
+          "end": 0.8,
+          "highlight": true
+        },
+        {
+          "char": "吹",
+          "start": 0.8,
+          "end": 1.15
+        },
+        {
+          "char": "绿",
+          "start": 1.15,
+          "end": 1.5
+        },
+        {
+          "char": "柳",
+          "start": 1.5,
+          "end": 1.85
+        },
+        {
+          "char": "树",
+          "start": 1.85,
+          "end": 2.2
+        },
+        {
+          "char": "梢",
+          "start": 2.2,
+          "end": 2.55
+        },
+        {
+          "char": "，",
+          "start": 2.55,
+          "end": 2.75
+        },
+        {
+          "char": "万",
+          "start": 2.75,
+          "end": 3.1
+        },
+        {
+          "char": "物",
+          "start": 3.1,
+          "end": 3.45
+        },
+        {
+          "char": "复",
+          "start": 3.45,
+          "end": 3.8
+        },
+        {
+          "char": "苏",
+          "start": 3.8,
+          "end": 4.15
+        },
+        {
+          "char": "草",
+          "start": 4.15,
+          "end": 4.5,
+          "highlight": true
+        },
+        {
+          "char": "儿",
+          "start": 4.5,
+          "end": 4.85
+        },
+        {
+          "char": "青",
+          "start": 4.85,
+          "end": 5.2,
+          "highlight": true
+        }
+      ]
+    },
+    {
+      "pageNumber": 2,
+      "text": "手拿传统沙燕鸢，迎着春风快步跑",
+      "image": "assets/images/story_qingming_kite_p2.webp",
+      "interactions": [
+        {
+          "x": "45%",
+          "y": "50%",
+          "sound": "Pop",
+          "anim": "animate-bounce",
+          "text": "传统非遗沙燕纸鸢！"
+        }
+      ],
+      "audioTimeTokens": [
+        {
+          "char": "手",
+          "start": 0.1,
+          "end": 0.45
+        },
+        {
+          "char": "拿",
+          "start": 0.45,
+          "end": 0.8
+        },
+        {
+          "char": "传",
+          "start": 0.8,
+          "end": 1.15
+        },
+        {
+          "char": "统",
+          "start": 1.15,
+          "end": 1.5
+        },
+        {
+          "char": "沙",
+          "start": 1.5,
+          "end": 1.85
+        },
+        {
+          "char": "燕",
+          "start": 1.85,
+          "end": 2.2
+        },
+        {
+          "char": "鸢",
+          "start": 2.2,
+          "end": 2.55
+        },
+        {
+          "char": "，",
+          "start": 2.55,
+          "end": 2.75
+        },
+        {
+          "char": "迎",
+          "start": 2.75,
+          "end": 3.1
+        },
+        {
+          "char": "着",
+          "start": 3.1,
+          "end": 3.45
+        },
+        {
+          "char": "春",
+          "start": 3.45,
+          "end": 3.8
+        },
+        {
+          "char": "风",
+          "start": 3.8,
+          "end": 4.15,
+          "highlight": true
+        },
+        {
+          "char": "快",
+          "start": 4.15,
+          "end": 4.5
+        },
+        {
+          "char": "步",
+          "start": 4.5,
+          "end": 4.85
+        },
+        {
+          "char": "跑",
+          "start": 4.85,
+          "end": 5.2
+        }
+      ]
+    },
+    {
+      "pageNumber": 3,
+      "text": "纸鸢飞上蓝云霄，欢歌笑语绕山冈",
+      "image": "assets/images/story_qingming_kite_p3.webp",
+      "interactions": [
+        {
+          "x": "60%",
+          "y": "30%",
+          "sound": "StarPopCombo",
+          "anim": "animate-spin-slow",
+          "text": "风筝越飞越高！"
+        }
+      ],
+      "audioTimeTokens": [
+        {
+          "char": "纸",
+          "start": 0.1,
+          "end": 0.45
+        },
+        {
+          "char": "鸢",
+          "start": 0.45,
+          "end": 0.8
+        },
+        {
+          "char": "飞",
+          "start": 0.8,
+          "end": 1.15,
+          "highlight": true
+        },
+        {
+          "char": "上",
+          "start": 1.15,
+          "end": 1.5
+        },
+        {
+          "char": "蓝",
+          "start": 1.5,
+          "end": 1.85
+        },
+        {
+          "char": "云",
+          "start": 1.85,
+          "end": 2.2
+        },
+        {
+          "char": "霄",
+          "start": 2.2,
+          "end": 2.55
+        },
+        {
+          "char": "，",
+          "start": 2.55,
+          "end": 2.75
+        },
+        {
+          "char": "欢",
+          "start": 2.75,
+          "end": 3.1
+        },
+        {
+          "char": "歌",
+          "start": 3.1,
+          "end": 3.45
+        },
+        {
+          "char": "笑",
+          "start": 3.45,
+          "end": 3.8
+        },
+        {
+          "char": "语",
+          "start": 3.8,
+          "end": 4.15
+        },
+        {
+          "char": "绕",
+          "start": 4.15,
+          "end": 4.5
+        },
+        {
+          "char": "山",
+          "start": 4.5,
+          "end": 4.85
+        },
+        {
+          "char": "冈",
+          "start": 4.85,
+          "end": 5.2
+        }
+      ]
+    }
+  ],
+  "quiz": [
+    {
+      "question": "春天清明踏青时，小朋友们手里拿着什么迎风奔跑？",
+      "options": [
+        "美丽的沙燕纸鸢(风筝)",
+        "沉重的大铁锤",
+        "游泳圈",
+        "小雨伞"
+      ],
+      "correctIndex": 0
+    }
+  ]
+},
+{
+  "id": "book_theme_dongzhi",
+  "level": 2,
+  "title": "冬至到吃水饺",
+  "coverImg": "assets/images/cover_dongzhi.webp",
+  "stage": 2,
+  "theme": "中华传统节日",
+  "targetChars": [
+    "冬",
+    "包",
+    "热",
+    "吃",
+    "暖"
+  ],
+  "desc": "冬至节气白昼短，一家围坐热气腾腾包饺子，暖胃暖心不冻耳",
+  "pages": [
+    {
+      "pageNumber": 1,
+      "text": "冬至白昼最短暂，窗外飘着小雪花",
+      "image": "assets/images/story_dongzhi_p1.webp",
+      "interactions": [
+        {
+          "x": "50%",
+          "y": "30%",
+          "sound": "Pop",
+          "anim": "animate-pulse",
+          "text": "屋外雪花静悄悄飘落！"
+        }
+      ],
+      "audioTimeTokens": [
+        {
+          "char": "冬",
+          "start": 0.1,
+          "end": 0.45,
+          "highlight": true
+        },
+        {
+          "char": "至",
+          "start": 0.45,
+          "end": 0.8
+        },
+        {
+          "char": "白",
+          "start": 0.8,
+          "end": 1.15
+        },
+        {
+          "char": "昼",
+          "start": 1.15,
+          "end": 1.5
+        },
+        {
+          "char": "最",
+          "start": 1.5,
+          "end": 1.85
+        },
+        {
+          "char": "短",
+          "start": 1.85,
+          "end": 2.2
+        },
+        {
+          "char": "暂",
+          "start": 2.2,
+          "end": 2.55
+        },
+        {
+          "char": "，",
+          "start": 2.55,
+          "end": 2.75
+        },
+        {
+          "char": "窗",
+          "start": 2.75,
+          "end": 3.1
+        },
+        {
+          "char": "外",
+          "start": 3.1,
+          "end": 3.45
+        },
+        {
+          "char": "飘",
+          "start": 3.45,
+          "end": 3.8
+        },
+        {
+          "char": "着",
+          "start": 3.8,
+          "end": 4.15
+        },
+        {
+          "char": "小",
+          "start": 4.15,
+          "end": 4.5
+        },
+        {
+          "char": "雪",
+          "start": 4.5,
+          "end": 4.85
+        },
+        {
+          "char": "花",
+          "start": 4.85,
+          "end": 5.2
+        }
+      ]
+    },
+    {
+      "pageNumber": 2,
+      "text": "擀面皮来包肉馅，小巧水饺像元宝",
+      "image": "assets/images/story_dongzhi_p2.webp",
+      "interactions": [
+        {
+          "x": "50%",
+          "y": "55%",
+          "sound": "ChestOpen",
+          "anim": "animate-bounce",
+          "text": "像金元宝一样的大水饺！"
+        }
+      ],
+      "audioTimeTokens": [
+        {
+          "char": "擀",
+          "start": 0.1,
+          "end": 0.45
+        },
+        {
+          "char": "面",
+          "start": 0.45,
+          "end": 0.8
+        },
+        {
+          "char": "皮",
+          "start": 0.8,
+          "end": 1.15
+        },
+        {
+          "char": "来",
+          "start": 1.15,
+          "end": 1.5
+        },
+        {
+          "char": "包",
+          "start": 1.5,
+          "end": 1.85,
+          "highlight": true
+        },
+        {
+          "char": "肉",
+          "start": 1.85,
+          "end": 2.2
+        },
+        {
+          "char": "馅",
+          "start": 2.2,
+          "end": 2.55
+        },
+        {
+          "char": "，",
+          "start": 2.55,
+          "end": 2.75
+        },
+        {
+          "char": "小",
+          "start": 2.75,
+          "end": 3.1
+        },
+        {
+          "char": "巧",
+          "start": 3.1,
+          "end": 3.45
+        },
+        {
+          "char": "水",
+          "start": 3.45,
+          "end": 3.8
+        },
+        {
+          "char": "饺",
+          "start": 3.8,
+          "end": 4.15
+        },
+        {
+          "char": "像",
+          "start": 4.15,
+          "end": 4.5
+        },
+        {
+          "char": "元",
+          "start": 4.5,
+          "end": 4.85
+        },
+        {
+          "char": "宝",
+          "start": 4.85,
+          "end": 5.2
+        }
+      ]
+    },
+    {
+      "pageNumber": 3,
+      "text": "热腾水饺端上桌，吃进肚里暖洋洋",
+      "image": "assets/images/story_dongzhi_p3.webp",
+      "interactions": [
+        {
+          "x": "50%",
+          "y": "60%",
+          "sound": "StarPopCombo",
+          "anim": "animate-bounce",
+          "text": "吃了饺子暖洋洋，不冻耳朵！"
+        }
+      ],
+      "audioTimeTokens": [
+        {
+          "char": "热",
+          "start": 0.1,
+          "end": 0.45,
+          "highlight": true
+        },
+        {
+          "char": "腾",
+          "start": 0.45,
+          "end": 0.8
+        },
+        {
+          "char": "水",
+          "start": 0.8,
+          "end": 1.15
+        },
+        {
+          "char": "饺",
+          "start": 1.15,
+          "end": 1.5
+        },
+        {
+          "char": "端",
+          "start": 1.5,
+          "end": 1.85
+        },
+        {
+          "char": "上",
+          "start": 1.85,
+          "end": 2.2
+        },
+        {
+          "char": "桌",
+          "start": 2.2,
+          "end": 2.55
+        },
+        {
+          "char": "，",
+          "start": 2.55,
+          "end": 2.75
+        },
+        {
+          "char": "吃",
+          "start": 2.75,
+          "end": 3.1,
+          "highlight": true
+        },
+        {
+          "char": "进",
+          "start": 3.1,
+          "end": 3.45
+        },
+        {
+          "char": "肚",
+          "start": 3.45,
+          "end": 3.8
+        },
+        {
+          "char": "里",
+          "start": 3.8,
+          "end": 4.15
+        },
+        {
+          "char": "暖",
+          "start": 4.15,
+          "end": 4.5,
+          "highlight": true
+        },
+        {
+          "char": "洋",
+          "start": 4.5,
+          "end": 4.85
+        },
+        {
+          "char": "洋",
+          "start": 4.85,
+          "end": 5.2
+        }
+      ]
+    }
+  ],
+  "quiz": [
+    {
+      "question": "中国民间俗语说：冬至吃了什么，耳朵就不会受冻？",
+      "options": [
+        "热腾腾的水饺",
+        "冰镇冰淇淋",
+        "爆米花",
+        "酸梅汤"
+      ],
+      "correctIndex": 0
+    }
+  ]
+},
+{
+  "id": "book_theme_maliang",
+  "level": 3,
+  "title": "神笔马良",
+  "coverImg": "assets/images/cover_maliang.webp",
+  "stage": 3,
+  "theme": "经典传统神话",
+  "targetChars": [
+    "笔",
+    "画",
+    "神",
+    "善",
+    "鸟"
+  ],
+  "desc": "勤奋少年得神笔，画鸟能飞画鱼能游，心怀善良造福乡亲",
+  "pages": [
+    {
+      "pageNumber": 1,
+      "text": "少年马良爱画画，树枝作笔沙作纸",
+      "image": "assets/images/story_maliang_p1.webp",
+      "interactions": [
+        {
+          "x": "40%",
+          "y": "50%",
+          "sound": "Pop",
+          "anim": "animate-bounce",
+          "text": "刻苦练习画画的小马良！"
+        }
+      ],
+      "audioTimeTokens": [
+        {
+          "char": "少",
+          "start": 0.1,
+          "end": 0.45
+        },
+        {
+          "char": "年",
+          "start": 0.45,
+          "end": 0.8
+        },
+        {
+          "char": "马",
+          "start": 0.8,
+          "end": 1.15
+        },
+        {
+          "char": "良",
+          "start": 1.15,
+          "end": 1.5
+        },
+        {
+          "char": "爱",
+          "start": 1.5,
+          "end": 1.85
+        },
+        {
+          "char": "画",
+          "start": 1.85,
+          "end": 2.2,
+          "highlight": true
+        },
+        {
+          "char": "画",
+          "start": 2.2,
+          "end": 2.55,
+          "highlight": true
+        },
+        {
+          "char": "，",
+          "start": 2.55,
+          "end": 2.75
+        },
+        {
+          "char": "树",
+          "start": 2.75,
+          "end": 3.1
+        },
+        {
+          "char": "枝",
+          "start": 3.1,
+          "end": 3.45
+        },
+        {
+          "char": "作",
+          "start": 3.45,
+          "end": 3.8
+        },
+        {
+          "char": "笔",
+          "start": 3.8,
+          "end": 4.15,
+          "highlight": true
+        },
+        {
+          "char": "沙",
+          "start": 4.15,
+          "end": 4.5
+        },
+        {
+          "char": "作",
+          "start": 4.5,
+          "end": 4.85
+        },
+        {
+          "char": "纸",
+          "start": 4.85,
+          "end": 5.2
+        }
+      ]
+    },
+    {
+      "pageNumber": 2,
+      "text": "白胡老人赠神笔，画出飞鸟展翅翔",
+      "image": "assets/images/story_maliang_p2.webp",
+      "interactions": [
+        {
+          "x": "55%",
+          "y": "45%",
+          "sound": "CrownFanfare",
+          "anim": "animate-pulse",
+          "text": "飞鸟扑棱棱飞向天空！"
+        }
+      ],
+      "audioTimeTokens": [
+        {
+          "char": "白",
+          "start": 0.1,
+          "end": 0.45
+        },
+        {
+          "char": "胡",
+          "start": 0.45,
+          "end": 0.8
+        },
+        {
+          "char": "老",
+          "start": 0.8,
+          "end": 1.15
+        },
+        {
+          "char": "人",
+          "start": 1.15,
+          "end": 1.5
+        },
+        {
+          "char": "赠",
+          "start": 1.5,
+          "end": 1.85
+        },
+        {
+          "char": "神",
+          "start": 1.85,
+          "end": 2.2,
+          "highlight": true
+        },
+        {
+          "char": "笔",
+          "start": 2.2,
+          "end": 2.55,
+          "highlight": true
+        },
+        {
+          "char": "，",
+          "start": 2.55,
+          "end": 2.75
+        },
+        {
+          "char": "画",
+          "start": 2.75,
+          "end": 3.1
+        },
+        {
+          "char": "出",
+          "start": 3.1,
+          "end": 3.45
+        },
+        {
+          "char": "飞",
+          "start": 3.45,
+          "end": 3.8
+        },
+        {
+          "char": "鸟",
+          "start": 3.8,
+          "end": 4.15,
+          "highlight": true
+        },
+        {
+          "char": "展",
+          "start": 4.15,
+          "end": 4.5
+        },
+        {
+          "char": "翅",
+          "start": 4.5,
+          "end": 4.85
+        },
+        {
+          "char": "翔",
+          "start": 4.85,
+          "end": 5.2
+        }
+      ]
+    },
+    {
+      "pageNumber": 3,
+      "text": "神笔专为乡亲画，犁地水牛引甘泉",
+      "image": "assets/images/story_maliang_p3.webp",
+      "interactions": [
+        {
+          "x": "50%",
+          "y": "50%",
+          "sound": "StarPopCombo",
+          "anim": "animate-spin-slow",
+          "text": "神笔造福贫苦乡亲！"
+        }
+      ],
+      "audioTimeTokens": [
+        {
+          "char": "神",
+          "start": 0.1,
+          "end": 0.45,
+          "highlight": true
+        },
+        {
+          "char": "笔",
+          "start": 0.45,
+          "end": 0.8
+        },
+        {
+          "char": "专",
+          "start": 0.8,
+          "end": 1.15
+        },
+        {
+          "char": "为",
+          "start": 1.15,
+          "end": 1.5
+        },
+        {
+          "char": "乡",
+          "start": 1.5,
+          "end": 1.85
+        },
+        {
+          "char": "亲",
+          "start": 1.85,
+          "end": 2.2
+        },
+        {
+          "char": "画",
+          "start": 2.2,
+          "end": 2.55,
+          "highlight": true
+        },
+        {
+          "char": "，",
+          "start": 2.55,
+          "end": 2.75
+        },
+        {
+          "char": "犁",
+          "start": 2.75,
+          "end": 3.1
+        },
+        {
+          "char": "地",
+          "start": 3.1,
+          "end": 3.45
+        },
+        {
+          "char": "水",
+          "start": 3.45,
+          "end": 3.8
+        },
+        {
+          "char": "牛",
+          "start": 3.8,
+          "end": 4.15
+        },
+        {
+          "char": "引",
+          "start": 4.15,
+          "end": 4.5
+        },
+        {
+          "char": "甘",
+          "start": 4.5,
+          "end": 4.85
+        },
+        {
+          "char": "泉",
+          "start": 4.85,
+          "end": 5.2
+        }
+      ]
+    }
+  ],
+  "quiz": [
+    {
+      "question": "白胡子老爷爷赠送给善良勤劳的马良什么宝物？",
+      "options": [
+        "一支画物成真的神笔",
+        "一个大金元宝",
+        "一把铁锄头",
+        "一件锦缎袍子"
+      ],
+      "correctIndex": 0
+    }
+  ]
+}
 ];
