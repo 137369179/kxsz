@@ -10,6 +10,75 @@
  *  IndexedDB 
  */
 
+const IDB_NAME = "cathy_literacy_db";
+const IDB_VERSION = 1;
+const IDB_STORE = "kv_store";
+
+function openIDB() {
+  if (typeof indexedDB === "undefined") return Promise.resolve(null);
+  return new Promise((resolve) => {
+    try {
+      const req = indexedDB.open(IDB_NAME, IDB_VERSION);
+      req.onupgradeneeded = (e) => {
+        const db = e.target.result;
+        if (!db.objectStoreNames.contains(IDB_STORE)) {
+          db.createObjectStore(IDB_STORE);
+        }
+      };
+      req.onsuccess = (e) => resolve(e.target.result);
+      req.onerror = () => resolve(null);
+    } catch {
+      resolve(null);
+    }
+  });
+}
+
+function idbSet(key, val) {
+  openIDB().then((db) => {
+    if (!db) return;
+    try {
+      const tx = db.transaction(IDB_STORE, "readwrite");
+      tx.objectStore(IDB_STORE).put(val, key);
+    } catch {}
+  }).catch(() => {});
+}
+
+function idbDelete(key) {
+  openIDB().then((db) => {
+    if (!db) return;
+    try {
+      const tx = db.transaction(IDB_STORE, "readwrite");
+      tx.objectStore(IDB_STORE).delete(key);
+    } catch {}
+  }).catch(() => {});
+}
+
+function idbGetAll() {
+  return openIDB().then((db) => {
+    if (!db) return {};
+    return new Promise((resolve) => {
+      try {
+        const tx = db.transaction(IDB_STORE, "readonly");
+        const store = tx.objectStore(IDB_STORE);
+        const req = store.openCursor();
+        const results = {};
+        req.onsuccess = (e) => {
+          const cursor = e.target.result;
+          if (cursor) {
+            results[cursor.key] = cursor.value;
+            cursor.continue();
+          } else {
+            resolve(results);
+          }
+        };
+        req.onerror = () => resolve({});
+      } catch {
+        resolve({});
+      }
+    });
+  });
+}
+
 export class StorageManager {
   constructor() {}
 
@@ -32,8 +101,14 @@ export class StorageManager {
     if (!this.isAvailable()) return false;
     try {
       localStorage.setItem(key, value);
+      // 渐进式异步双写到 IndexedDB 进行灾备持久化
+      idbSet(key, value);
       return true;
-    } catch { return false; }
+    } catch {
+      // 即使 localStorage 满 (QuotaExceededError)，仍尝试写入 IndexedDB
+      idbSet(key, value);
+      return false;
+    }
   }
 
   getJSON(key, fallback = null) {
@@ -51,6 +126,55 @@ export class StorageManager {
   removeItem(key) {
     if (!this.isAvailable()) return;
     try { localStorage.removeItem(key); } catch {}
+    idbDelete(key);
+  }
+
+  /**
+   * 自动从 IndexedDB 灾备恢复（当 localStorage 意外清空或 WebKit 7天失效时）
+   * @returns {Promise<boolean>} 是否恢复了数据
+   */
+  async restoreFromIndexedDB() {
+    try {
+      const idbData = await idbGetAll();
+      const keys = Object.keys(idbData);
+      if (keys.length === 0) return false;
+
+      let restoredCount = 0;
+      for (const k of keys) {
+        if (this.getItem(k) === null && idbData[k] != null) {
+          try {
+            localStorage.setItem(k, idbData[k]);
+            restoredCount++;
+          } catch {}
+        }
+      }
+      return restoredCount > 0;
+    } catch {
+      return false;
+    }
+  }
+
+  /**
+   * 将当前 localStorage 中所有凯茜识字数据全量同步备份到 IndexedDB
+   */
+  async backupToIndexedDB() {
+    if (!this.isAvailable()) return false;
+    const db = await openIDB();
+    if (!db) return false;
+    try {
+      const tx = db.transaction(IDB_STORE, "readwrite");
+      const store = tx.objectStore(IDB_STORE);
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (k && (k.startsWith("CATHY_") || k.startsWith("cathy_"))) {
+          const v = localStorage.getItem(k);
+          if (v != null) store.put(v, k);
+        }
+      }
+      return true;
+    } catch {
+      return false;
+    }
   }
 
   /** 清除所有凯茜识字相关的存储键 */
@@ -82,13 +206,36 @@ export class StorageManager {
 
   listProfiles() {
     return this.getJSON("CATHY_PROFILES_LIST", [
-      { id: "child_1", name: " ()" },
-      { id: "child_2", name: " ()" }
+      { id: "child_1", name: "大宝 (默认)" },
+      { id: "child_2", name: "二宝" }
     ]);
   }
 
   saveProfilesList(list) {
     this.putJSON("CATHY_PROFILES_LIST", list);
+  }
+
+  renameProfile(profileId, newName) {
+    if (!profileId || !newName || !newName.trim()) return false;
+    const list = this.listProfiles();
+    const item = list.find((p) => p.id === profileId);
+    if (!item) return false;
+    item.name = newName.trim();
+    this.saveProfilesList(list);
+    return true;
+  }
+
+  deleteProfile(profileId) {
+    if (!profileId) return false;
+    const list = this.listProfiles();
+    if (list.length <= 1) return false; // 至少保留 1 个档案
+    const filtered = list.filter((p) => p.id !== profileId);
+    this.saveProfilesList(filtered);
+    this.removeItem(`CATHY_LITERACY_PROGRESS_${profileId}`);
+    if (this.getActiveProfileId() === profileId) {
+      this.setActiveProfileId(filtered[0].id);
+    }
+    return true;
   }
 
   exportProgressJSON() {

@@ -3,6 +3,7 @@ import { soundAndFX } from "../soundEngine.js";
 import { GAME_ICONS } from "../gameIcons.js";
 import { HanziEngine } from "../hanziEngine.js";
 import { ebbinghausManager } from "../ebbinghaus.js";
+import { shouldUseAirTrace, openAirTracePrompt } from "./airTracePrompt.js";
 
 export function renderStepTrace(stage) {
     const char = this.charData;
@@ -180,9 +181,16 @@ export function renderStepTrace(stage) {
     if (nextBtn) {
       this._on(nextBtn, "click", () => {
         soundAndFX.playPop();
-        this.currentStep = 7;
-        this.render();
+        // P0：5–6 岁序列为 […,6,8]，禁止硬编码跳进独立写(7)
+        if (typeof this.nextStep === "function") this.nextStep();
       });
+    }
+
+    // ✅ P2-7 身体动觉：描红前「空中比划」热身（无摄像头降级为发光 ghost 动画）
+    // 真实描红画布已在背后就绪；热身模态关闭后儿童直接开始描红即可。
+    if (shouldUseAirTrace(age) && !this._airTraceDone) {
+      this._airTraceDone = true;
+      openAirTracePrompt(char, () => {});
     }
   }
 

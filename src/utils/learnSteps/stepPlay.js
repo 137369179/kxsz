@@ -157,8 +157,7 @@ export function renderStepPlay(stage) {
     if (nextBtn) {
       this._on(nextBtn, "click", () => {
         soundAndFX.playPop();
-        this.currentStep = 2;
-        this.render();
+        if (typeof this.nextStep === "function") this.nextStep();
       });
     }
   }

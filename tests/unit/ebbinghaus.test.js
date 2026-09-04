@@ -1,10 +1,14 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { EbbinghausManager } from '../../src/utils/ebbinghaus.js'
+import { storageManager } from '../../src/utils/storageManager.js'
 
 describe('EbbinghausManager', () => {
   let mgr
 
   beforeEach(() => {
+    // 隔离：清掉共享持久层，避免被其它文件 save() 的脏状态串味
+    // （单进程跑法下会暴露为 coins≠60 / char_001 残留；多进程隔离已掩盖）
+    try { storageManager.clearAllCathyKeys(); } catch (_) { /* node 环境无 localStorage，no-op */ }
     mgr = new EbbinghausManager()
   })
 
@@ -149,6 +153,13 @@ describe('EbbinghausManager', () => {
     it('【回归】completeCharacter 1 星 → masteryRate ≥ 55（不是 25）', () => {
       mgr.completeCharacter('char_fix_rate_1', 1)
       expect(mgr.progress.charRecords['char_fix_rate_1'].masteryRate).toBeGreaterThanOrEqual(55)
+    })
+
+    it('switchProfile saves current profile and switches to new child profile', () => {
+      mgr.progress.coins = 999
+      const newProgress = mgr.switchProfile('child_2')
+      expect(newProgress).toBeDefined()
+      expect(mgr.progress).toBe(newProgress)
     })
   })
 

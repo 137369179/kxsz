@@ -23,7 +23,14 @@ export class EbbinghausManager {
     let loaded = null;
     try {
       const activeId = typeof storageManager.getActiveProfileId === "function" ? storageManager.getActiveProfileId() : null;
-      const raw = (activeId ? storageManager.getItem(`CATHY_LITERACY_PROGRESS_${activeId}`) : null) || storageManager.getItem(STORAGE_KEY);
+      let raw = null;
+      if (activeId && activeId !== "child_1") {
+        // 多儿童隔离：二宝等独立档案仅读取专属存档，未存档时初始化全新 defaultState
+        raw = storageManager.getItem(`CATHY_LITERACY_PROGRESS_${activeId}`);
+      } else {
+        // child_1 或未设置档案：优先专属键，兼容回退通用 STORAGE_KEY
+        raw = storageManager.getItem("CATHY_LITERACY_PROGRESS_child_1") || storageManager.getItem(STORAGE_KEY);
+      }
       if (raw) loaded = JSON.parse(raw);
     } catch (e) {
       console.warn("读取本地进度失败，使用默认配置", e);
@@ -163,6 +170,24 @@ export class EbbinghausManager {
     } catch (e) {
       console.error("保存进度失败", e);
     }
+  }
+
+  /**
+   * 切换儿童档案：保存当前档案，设置活跃 ID，加载目标档案并通知总线
+   * @param {string} newProfileId
+   * @returns {object} 新档案的 progress
+   */
+  switchProfile(newProfileId) {
+    if (!newProfileId) return this.progress;
+    this.save();
+    if (typeof storageManager.setActiveProfileId === "function") {
+      storageManager.setActiveProfileId(newProfileId);
+    }
+    this.progress = this.loadProgress();
+    try {
+      eventBus.emit(EVENTS.PROGRESS_CHANGED, { progress: this.progress });
+    } catch {}
+    return this.progress;
   }
 
   // ------------------------------------------------------------

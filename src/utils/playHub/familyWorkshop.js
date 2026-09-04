@@ -71,9 +71,17 @@ export function renderFamilyWorkshop() {
           
           <div class="lg:col-span-7 bg-white/95 backdrop-blur-md rounded-3xl p-6 shadow-xl border-4 border-emerald-200 flex flex-col items-center justify-between relative overflow-hidden min-h-[420px]">
             
-            <div class="w-full flex items-center justify-between">
+            <div class="w-full flex items-center justify-between mb-3">
               <span class="text-xs font-black bg-emerald-100 text-emerald-800 px-3.5 py-1 rounded-full border border-emerald-300">字根积木底座</span>
               <span class="text-xs font-bold text-gray-500">点击偏旁积木，合体变新字！</span>
+            </div>
+
+            <!-- 国风字族专属情境画卷 -->
+            <div class="relative w-full rounded-2xl overflow-hidden border-2 border-emerald-300 shadow-md mb-2 h-28 sm:h-36 group shrink-0">
+              <img src="${currentFamily.image || 'assets/images/family_qing.webp'}" alt="${escapeHtml(currentFamily.name)}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+              <div class="absolute bottom-2 left-3 bg-black/60 backdrop-blur-md px-3 py-1 rounded-full text-white text-[11px] font-bold border border-white/20 flex items-center gap-1.5 shadow">
+                <span>${escapeHtml(currentFamily.name)} · 专属意境画卷</span>
+              </div>
             </div>
 
             <div class="relative my-6 flex flex-col items-center justify-center">

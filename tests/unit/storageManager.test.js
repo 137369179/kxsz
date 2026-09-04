@@ -97,4 +97,14 @@ describe('StorageManager', () => {
     const imported = sm.getJSON('CATHY_LITERACY_USER_PROGRESS_V1')
     expect(imported.coins).toBe(168)
   })
+
+  it('should handle restoreFromIndexedDB gracefully when indexedDB is undefined', async () => {
+    const res = await sm.restoreFromIndexedDB()
+    expect(res).toBe(false)
+  })
+
+  it('should handle backupToIndexedDB gracefully when indexedDB is undefined', async () => {
+    const res = await sm.backupToIndexedDB()
+    expect(res).toBe(false)
+  })
 })

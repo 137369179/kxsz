@@ -145,8 +145,7 @@ export function renderStepFreeWrite(stage) {
     if (nextBtn) {
       this._on(nextBtn, "click", () => {
         soundAndFX.playPop();
-        this.currentStep = 8;
-        this.render();
+        if (typeof this.nextStep === "function") this.nextStep();
       });
     }
   }

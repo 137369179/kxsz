@@ -2,9 +2,10 @@
 import { CHARACTER_DATABASE } from "../../data/characters.js";
 import { GAME_ICONS } from "../gameIcons.js";
 import { buildFullReport } from "../reportEngine.js";
-import { getTodayWorksheetChars, getDifficultWorksheetChars } from "../worksheetGenerator.js";
+import { getTodayWorksheetChars, getDifficultWorksheetChars, getQuestWorksheetChars } from "../worksheetGenerator.js";
 import { TROPHY_LIST, resolveTrophyUnlocks, describeStepSequenceForAge } from "./parentTrophies.js";
 import { ebbinghausManager } from "../ebbinghaus.js";
+import { storageManager } from "../storageManager.js";
 
 export function renderActiveTabContent(progress, charCount, settings, diffCount) {
   // E14: 预计算多维报告数据（一次算完，所有面板复用）
@@ -169,7 +170,9 @@ export function renderActiveTabContent(progress, charCount, settings, diffCount)
 
   if (this.currentTab === "print") {
     let activeChars = [];
-    if (this.printMode === "difficult") {
+    if (this.printMode === "quest") {
+      activeChars = getQuestWorksheetChars();
+    } else if (this.printMode === "difficult") {
       activeChars = getDifficultWorksheetChars();
     } else if (this.printMode === "stage1") {
       activeChars = CHARACTER_DATABASE.filter(c => c.stage === 1).slice(0, 8);
@@ -196,12 +199,13 @@ export function renderActiveTabContent(progress, charCount, settings, diffCount)
         <div class="flex items-center gap-2 mb-3 flex-wrap">
           <span class="text-xs font-bold text-gray-600">字帖内容选择：</span>
           ${[
+            { key: "quest", label: "今日学练 (Daily Quest 任务字)" },
             { key: "today", label: "今日所学 (最新字)" },
             { key: "difficult", label: "难字本薄弱字" },
             { key: "stage1", label: "第1阶启蒙高频字" }
           ].map(pm => `
             <button class="btn-print-mode px-4 py-1.5 rounded-full text-xs font-black transition-all cursor-pointer ${
-              this.printMode === pm.key
+              (this.printMode || "quest") === pm.key
                 ? "bg-amber-800 text-white shadow-md"
                 : "bg-amber-100 text-amber-900 hover:bg-amber-200"
             }" data-mode="${pm.key}">${pm.label}</button>
@@ -380,6 +384,9 @@ export function renderActiveTabContent(progress, charCount, settings, diffCount)
   if (this.currentTab === "settings") {
     const profileAge = progress.profile?.age ?? "";
     const agePreview = describeStepSequenceForAge(profileAge || ebbinghausManager.getAge());
+    const activeProfileId = storageManager.getActiveProfileId();
+    const profiles = storageManager.listProfiles();
+    const activeProfile = profiles.find((p) => p.id === activeProfileId) || { id: activeProfileId, name: "大宝" };
     return `
       <div class="bg-white/95 rounded-3xl p-6 shadow-xl border-2 border-amber-200">
         <h2 class="text-base font-black text-amber-950 mb-4 flex items-center gap-2">
@@ -488,6 +495,54 @@ export function renderActiveTabContent(progress, charCount, settings, diffCount)
           <button id="btn-import-sync-code" class="bg-amber-100 hover:bg-amber-200 text-amber-900 font-black text-xs px-6 py-2.5 rounded-full border border-amber-300 shadow-sm active:scale-95 flex items-center gap-1.5 cursor-pointer">
             <span class="flex items-center">${GAME_ICONS.sparkle("w-4 h-4")}</span>
             <span>导入换机进度</span>
+          </button>
+          <button id="btn-backup-idb" class="bg-emerald-100 hover:bg-emerald-200 text-emerald-900 font-black text-xs px-6 py-2.5 rounded-full border border-emerald-300 shadow-sm active:scale-95 flex items-center gap-1.5 cursor-pointer" title="全量备份当前数据至浏览器本地 IndexedDB 灾备数据库">
+            <span class="flex items-center">${GAME_ICONS.sparkle("w-4 h-4")}</span>
+            <span>全量 IndexedDB 灾备</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- 多儿童档案管理 -->
+      <div class="bg-white/95 rounded-3xl p-6 shadow-xl border-2 border-indigo-200 mt-6">
+        <div class="flex items-center justify-between mb-3 flex-wrap gap-2">
+          <h2 class="text-base font-black text-indigo-950 flex items-center gap-2">
+            <span class="flex items-center">${GAME_ICONS.sparkle("w-5 h-5")}</span>
+            <span>多儿童学习档案管理</span>
+          </h2>
+          <span class="text-xs font-bold text-indigo-700 bg-indigo-50 border border-indigo-200 px-3 py-1 rounded-full">
+            当前档案：${activeProfile.name}
+          </span>
+        </div>
+        <p class="text-xs text-gray-500 mb-4 font-semibold leading-relaxed">
+          家中多个宝宝可独立记录识字量、星币与记忆曲线，互不干扰；随时一键平滑切换。
+        </p>
+
+        <div class="flex flex-wrap items-center gap-3" id="child-profiles-list">
+          ${profiles.map((p) => `
+            <div class="child-profile-card flex items-center gap-1 p-1 rounded-2xl border transition-all ${
+              p.id === activeProfileId
+                ? "bg-indigo-600 text-white shadow-md ring-2 ring-indigo-300 scale-105 border-indigo-700"
+                : "bg-indigo-50 text-indigo-900 hover:bg-indigo-100 border-indigo-200"
+            }">
+              <button class="btn-switch-child px-3 py-1.5 font-black text-xs flex items-center gap-1.5 cursor-pointer" data-profile-id="${p.id}" data-profile-name="${p.name}">
+                <span class="flex items-center">${GAME_ICONS.parent("w-3.5 h-3.5")}</span>
+                <span>${p.name}</span>
+                ${p.id === activeProfileId ? '<span class="text-[9px] bg-white/25 px-1.5 py-0.2 rounded-full">使用中</span>' : ''}
+              </button>
+              <button class="btn-rename-child p-1 rounded-lg hover:bg-black/10 active:scale-90 transition-transform cursor-pointer" title="重命名小名" data-profile-id="${p.id}" data-profile-name="${p.name}">
+                <span class="flex items-center">${GAME_ICONS.pen("w-3 h-3")}</span>
+              </button>
+              ${profiles.length > 1 ? `
+                <button class="btn-delete-child p-1 rounded-lg hover:bg-red-500/20 active:scale-90 transition-transform cursor-pointer" title="删除此档案" data-profile-id="${p.id}" data-profile-name="${p.name}">
+                  <span class="text-xs font-bold leading-none">&times;</span>
+                </button>
+              ` : ''}
+            </div>
+          `).join("")}
+          <button id="btn-add-child-profile" class="px-3.5 py-2.5 rounded-2xl bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 font-black text-xs flex items-center gap-1.5 transition-all cursor-pointer">
+            <span class="text-sm font-black leading-none">+</span>
+            <span>添加宝宝档案</span>
           </button>
         </div>
       </div>

@@ -34,6 +34,7 @@ export function init() {
   this._initClickSparkles();
   this._initKeyboardShortcuts();
   this._initGlobalListeners();
+  try { storageManager.restoreFromIndexedDB().catch(() => {}); } catch {}
 
   this.switchMode("map");
 

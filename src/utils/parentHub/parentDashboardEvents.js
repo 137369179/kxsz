@@ -3,7 +3,7 @@ import { CHARACTER_DATABASE } from "../../data/characters.js";
 import { ebbinghausManager } from "../ebbinghaus.js";
 import { soundAndFX } from "../soundEngine.js";
 import { showGameToast } from "../../components/SharedShell.js";
-import { printWorksheet, getTodayWorksheetChars, getDifficultWorksheetChars } from "../worksheetGenerator.js";
+import { printWorksheet, getTodayWorksheetChars, getDifficultWorksheetChars, getQuestWorksheetChars } from "../worksheetGenerator.js";
 import { storageManager } from "../storageManager.js";
 import { rewardEngine } from "../rewardEngine.js";
 import { showConfirm } from "../parentGate.js";
@@ -130,7 +130,10 @@ export function bindDashboardEvents(mainEl) {
       let charsToPrint = [];
       const gridLabel = this.printGridType === "tian" ? "田字格" : "米字格";
       let title = `凯茜识字 · 儿童专属${gridLabel}练字帖`;
-      if (this.printMode === "difficult") {
+      if (this.printMode === "quest") {
+        charsToPrint = getQuestWorksheetChars();
+        title = `凯茜识字 · 今日学练${gridLabel}字帖`;
+      } else if (this.printMode === "difficult") {
         charsToPrint = getDifficultWorksheetChars();
         title = `凯茜识字 · 难字突破${gridLabel}字帖`;
       } else if (this.printMode === "stage1") {
@@ -279,6 +282,96 @@ export function bindDashboardEvents(mainEl) {
     this._on(importSyncBtn, "click", () => {
       soundAndFX.playPop();
       this.showImportSyncModal();
+    });
+  }
+
+  // 本地 IndexedDB 全量灾备备份
+  const backupBtn = mainEl.querySelector("#btn-backup-idb");
+  if (backupBtn) {
+    this._on(backupBtn, "click", async () => {
+      soundAndFX.playPop();
+      const ok = await storageManager.backupToIndexedDB();
+      if (ok) {
+        soundAndFX.playParentCheer();
+        showGameToast(this.container, "本地 IndexedDB 全量双写灾备完成！", "success");
+      } else {
+        showGameToast(this.container, "当前环境不支持 IndexedDB 备份", "warn");
+      }
+    });
+  }
+
+  // 多儿童档案平滑切换
+  mainEl.querySelectorAll(".btn-switch-child").forEach((btn) => {
+    this._on(btn, "click", () => {
+      const pid = btn.dataset.profileId;
+      const pname = btn.dataset.profileName || "宝宝";
+      if (pid && pid !== storageManager.getActiveProfileId()) {
+        soundAndFX.playSuccessSound();
+        ebbinghausManager.switchProfile(pid);
+        showGameToast(this.container, `已切换到【${pname}】的学习档案`, "success");
+        this.render();
+      }
+    });
+  });
+
+  // 重命名宝宝小名
+  mainEl.querySelectorAll(".btn-rename-child").forEach((btn) => {
+    this._on(btn, "click", (e) => {
+      e.stopPropagation();
+      soundAndFX.playPop();
+      const pid = btn.dataset.profileId;
+      const oldName = btn.dataset.profileName || "宝宝";
+      const newName = typeof window !== "undefined" && window.prompt
+        ? window.prompt(`请输入【${oldName}】的新姓名或小名：`, oldName)
+        : null;
+      if (newName && newName.trim() && newName.trim() !== oldName) {
+        storageManager.renameProfile(pid, newName.trim());
+        soundAndFX.playSuccessSound();
+        showGameToast(this.container, `已将档案重命名为【${newName.trim()}】`, "success");
+        this.render();
+      }
+    });
+  });
+
+  // 删除冗余宝宝档案
+  mainEl.querySelectorAll(".btn-delete-child").forEach((btn) => {
+    this._on(btn, "click", (e) => {
+      e.stopPropagation();
+      soundAndFX.playPop();
+      const pid = btn.dataset.profileId;
+      const pname = btn.dataset.profileName || "宝宝";
+      const confirmed = typeof window !== "undefined" && window.confirm
+        ? window.confirm(`确定要删除【${pname}】的学习档案吗？此操作将清除该宝贝的独立学习记录。`)
+        : false;
+      if (confirmed) {
+        const ok = storageManager.deleteProfile(pid);
+        if (ok) {
+          ebbinghausManager.switchProfile(storageManager.getActiveProfileId());
+          soundAndFX.playPop();
+          showGameToast(this.container, `已删除【${pname}】的档案`, "info");
+          this.render();
+        } else {
+          showGameToast(this.container, "至少需要保留一个宝宝学习档案", "warn");
+        }
+      }
+    });
+  });
+
+  // 添加新宝宝档案
+  const addChildBtn = mainEl.querySelector("#btn-add-child-profile");
+  if (addChildBtn) {
+    this._on(addChildBtn, "click", () => {
+      soundAndFX.playPop();
+      const profiles = storageManager.listProfiles();
+      const nextIdx = profiles.length + 1;
+      const newId = `child_${Date.now()}`;
+      const newName = `宝贝 ${nextIdx}`;
+      profiles.push({ id: newId, name: newName });
+      storageManager.saveProfilesList(profiles);
+      ebbinghausManager.switchProfile(newId);
+      soundAndFX.playParentCheer();
+      showGameToast(this.container, `已创建并切换到【${newName}】`, "success");
+      this.render();
     });
   }
 }

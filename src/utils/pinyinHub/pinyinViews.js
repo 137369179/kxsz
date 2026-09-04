@@ -448,15 +448,21 @@ export function _renderCollisionView() {
 
         </div>
 
-        <div id="collision-result-box" class="flex flex-col items-center my-4 opacity-0 transition-all duration-500 transform scale-75">
+        <div id="collision-result-box" class="flex flex-col items-center my-3 opacity-0 transition-all duration-500 transform scale-75">
           <div class="flex items-baseline gap-3 mb-1">
             <span class="text-3xl font-black text-indigo-700 font-mono">${pair.syllable}</span>
             <span class="text-6xl font-black text-indigo-950 font-serif">${pair.char}</span>
           </div>
+          ${pair.image ? `
+            <div class="w-40 h-24 sm:w-48 sm:h-28 my-1.5 rounded-2xl overflow-hidden shadow-lg border-2 border-indigo-200">
+              <img src="${pair.image}" alt="${pair.word}" class="w-full h-full object-cover" />
+            </div>
+          ` : ""}
           <span class="text-sm font-black text-emerald-700 bg-emerald-100 px-4 py-1.5 rounded-full border border-emerald-300">
             组词: 【${pair.word}】 · ${pair.meaning}
           </span>
         </div>
+
 
         <div class="flex items-center gap-4 z-10">
           <button id="btn-fire-collision" class="btn-game-orange text-white text-xs sm:text-sm font-black px-8 py-3.5 rounded-full shadow-xl active:scale-95 flex items-center gap-2 cursor-pointer">
