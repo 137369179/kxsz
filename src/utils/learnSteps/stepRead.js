@@ -653,9 +653,9 @@ export function _showEvalResult(stage, res) {
       // 情境归因文案：低分归因于麦克风/音量等可控因素而非能力（班杜拉自我效能：保护幼儿胜任感）
       if (praiseTxt) {
         const gentle = this._readFailCount >= 2
-          ? `<div class="bg-sky-950/60 border border-sky-400/40 rounded-xl px-3 py-1.5 mb-1"><span class="text-sky-200 text-xs">已经试了 2 次啦，别着急——凯茜示范一遍，听清楚再跟读，你一定可以！</span></div>`
+          ? `<div class="bg-sky-950/60 border border-sky-400/40 rounded-xl px-3 py-1.5 mb-1"><span class="text-sky-200 text-sm font-bold">已经试了 2 次啦，别着急——凯茜示范一遍，听清楚再跟读，你一定可以！</span></div>`
           : "";
-        praiseTxt.innerHTML = `<div class="bg-rose-950/60 border border-rose-400/40 rounded-xl px-3 py-1.5 mb-1"><span class="text-yellow-300 font-bold">识别到读音：“${heard}”</span></div><span class="text-rose-200 text-xs">好像是麦克风没听清，点击【听示范】大声跟读「${char.char}」，一定可以的！</span>${gentle}`;
+        praiseTxt.innerHTML = `<div class="bg-rose-950/60 border border-rose-400/40 rounded-xl px-3 py-1.5 mb-1"><span class="text-yellow-300 text-sm font-bold">识别到读音：“${heard}”</span></div><span class="text-rose-200 text-sm font-semibold">好像是麦克风没听清，点击【听示范】大声跟读「${char.char}」，一定可以的！</span>${gentle}`;
       }
       soundAndFX.playSoftError();
       soundAndFX.speakPriority(`没关系，请听老师读“${char.char}”，再试一次吧！`, { kind: "sentence", emotion: "gentle" });
