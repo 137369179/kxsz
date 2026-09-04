@@ -9,6 +9,7 @@
 export const POEMS_DATABASE = [
   {
     id: "poem_001",
+    image: "assets/images/poem_yonge.webp",
     title: "咏鹅",
     dynasty: "唐",
     author: "骆宾王",
@@ -31,6 +32,7 @@ export const POEMS_DATABASE = [
   },
   {
     id: "poem_002",
+    image: "assets/images/poem_jingyesi.webp",
     title: "静夜思",
     dynasty: "唐",
     author: "李白",
@@ -53,6 +55,7 @@ export const POEMS_DATABASE = [
   },
   {
     id: "poem_003",
+    image: "assets/images/poem_chunxiao.webp",
     title: "春晓",
     dynasty: "唐",
     author: "孟浩然",
@@ -75,6 +78,7 @@ export const POEMS_DATABASE = [
   },
   {
     id: "poem_004",
+    image: "assets/images/poem_minnong.webp",
     title: "悯农",
     dynasty: "唐",
     author: "李绅",
@@ -97,6 +101,7 @@ export const POEMS_DATABASE = [
   },
   {
     id: "poem_005",
+    image: "assets/images/poem_dengguanquelou.webp",
     title: "登鹳雀楼",
     dynasty: "唐",
     author: "王之涣",
@@ -119,6 +124,7 @@ export const POEMS_DATABASE = [
   },
   {
     id: "poem_006",
+    image: "assets/images/poem_guyuan_cao.webp",
     title: "草",
     dynasty: "唐",
     author: "白居易",
@@ -141,6 +147,7 @@ export const POEMS_DATABASE = [
   },
   {
     id: "poem_007",
+    image: "assets/images/poem_jiangxue.webp",
     title: "江雪",
     dynasty: "唐",
     author: "柳宗元",
@@ -163,6 +170,7 @@ export const POEMS_DATABASE = [
   },
   {
     id: "poem_008",
+    image: "assets/images/poem_xunyingzhe.webp",
     title: "寻隐者不遇",
     dynasty: "唐",
     author: "贾岛",
@@ -185,6 +193,7 @@ export const POEMS_DATABASE = [
   },
   {
     id: "poem_009",
+    image: "assets/images/poem_xiaochi.webp",
     title: "小池",
     dynasty: "宋",
     author: "杨万里",
@@ -207,6 +216,7 @@ export const POEMS_DATABASE = [
   },
   {
     id: "poem_010",
+    image: "assets/images/poem_feng.webp",
     title: "风",
     dynasty: "唐",
     author: "李峤",
@@ -229,6 +239,7 @@ export const POEMS_DATABASE = [
   },
   {
     id: "poem_011",
+    image: "assets/images/poem_jiangnan.webp",
     title: "江南",
     dynasty: "汉",
     author: "汉乐府",
@@ -252,6 +263,7 @@ export const POEMS_DATABASE = [
   },
   {
     id: "poem_012",
+    image: "assets/images/poem_gulangyuexing.webp",
     title: "古朗月行",
     dynasty: "唐",
     author: "李白",
@@ -274,6 +286,7 @@ export const POEMS_DATABASE = [
   },
   {
     id: "poem_013",
+    image: "assets/images/poem_jueju.webp",
     title: "绝句",
     dynasty: "唐",
     author: "杜甫",
@@ -296,6 +309,7 @@ export const POEMS_DATABASE = [
   },
   {
     id: "poem_014",
+    image: "assets/images/poem_wanglushan.webp",
     title: "望庐山瀑布",
     dynasty: "唐",
     author: "李白",
@@ -318,6 +332,7 @@ export const POEMS_DATABASE = [
   },
   {
     id: "poem_015",
+    image: "assets/images/poem_meihua.webp",
     title: "梅花",
     dynasty: "宋",
     author: "王安石",
@@ -340,6 +355,7 @@ export const POEMS_DATABASE = [
   },
   {
     id: "poem_016",
+    image: "assets/images/poem_youziyin.webp",
     title: "游子吟",
     dynasty: "唐",
     author: "孟郊",
@@ -364,6 +380,7 @@ export const POEMS_DATABASE = [
   },
   {
     id: "poem_017",
+    image: "assets/images/poem_shanxing.webp",
     title: "山行",
     dynasty: "唐",
     author: "杜牧",
@@ -386,6 +403,7 @@ export const POEMS_DATABASE = [
   },
   {
     id: "poem_018",
+    image: "assets/images/poem_chishang.webp",
     title: "池上",
     dynasty: "唐",
     author: "白居易",
@@ -403,11 +421,12 @@ export const POEMS_DATABASE = [
       question: "小娃娃的小船在水面上留下了什么痕迹？",
       options: ["浮萍被划开了一条水道", "水底冒泡泡", "岸边有脚印"],
       correctIndex: 0,
-      explanation: "“浮萍一道开”，浮萍划开的痕迹暴露了小娃娃的行踪，真可爱！"
+      explanation: "“浮萍一道开”，浮萍划开的痕迹暴露了小娃娃行踪，真可爱！"
     }
   },
   {
     id: "poem_019",
+    image: "assets/images/poem_yuanri.webp",
     title: "元日",
     dynasty: "宋",
     author: "王安石",
@@ -430,6 +449,7 @@ export const POEMS_DATABASE = [
   },
   {
     id: "poem_020",
+    image: "assets/images/poem_qingming.webp",
     title: "清明",
     dynasty: "唐",
     author: "杜牧",

@@ -865,14 +865,14 @@ export class DrillEngine {
           </div>
         </div>
 
-        <button id="btn-goto-write-step" class="btn-game-orange text-white font-black text-base px-10 py-3.5 rounded-full shadow-2xl shimmer-badge flex items-center gap-2 cursor-pointer active:scale-95 transition-transform hover:brightness-105">
+        <button class="btn-goto-write-step btn-game-orange text-white font-black text-base px-10 py-3.5 rounded-full shadow-2xl shimmer-badge flex items-center gap-2 cursor-pointer active:scale-95 transition-transform hover:brightness-105">
           <span class="flex items-center">${GAME_ICONS.sparkle("w-5 h-5")}</span> 
           <span>继续下一关复习</span> 
         </button>
       </div>
     `;
 
-    const nextBtn = this.mount.querySelector("#btn-goto-write-step");
+    const nextBtn = this.mount.querySelector(".btn-goto-write-step");
     if (nextBtn) {
       nextBtn.addEventListener("click", () => {
         soundAndFX.playPop();

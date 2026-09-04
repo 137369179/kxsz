@@ -272,6 +272,13 @@ export function bindReaderEvents(mainEl, page, book) {
 
       if (isTarget) {
         this._timeout(() => this.openCharPopover(char), 250);
+      } else {
+        // 随文识字（以读促识）：非核心字点击弹出轻量 Mini 识字卡
+        this._timeout(() => {
+          if (typeof this.openMiniCharTooltip === "function") {
+            this.openMiniCharTooltip(char, span);
+          }
+        }, 250);
       }
     });
   });

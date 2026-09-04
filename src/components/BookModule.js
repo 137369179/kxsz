@@ -17,7 +17,7 @@ import { BaseModule } from "../utils/BaseModule.js";
 import { pronunciationEval } from "../utils/pronunciationEval.js";
 import { openUserVoiceModal } from "../utils/bookHub/bookVoiceModal.js";
 import { renderShelf } from "../utils/bookHub/bookShelf.js";
-import { openCharPopover, openCatalogDrawer } from "../utils/bookHub/bookOverlays.js";
+import { openCharPopover, openCatalogDrawer, openMiniCharTooltip } from "../utils/bookHub/bookOverlays.js";
 import { renderQuiz, renderCertificate, playKaraoke } from "../utils/bookHub/bookQuizFlow.js";
 import { renderReader, bindReaderEvents } from "../utils/bookHub/bookReader.js";
 import { storageManager } from "../utils/storageManager.js";
@@ -127,6 +127,7 @@ export class BookModule extends BaseModule {
   // 4-5. 生字全息卡 + 全书目录抽屉
   // ----------------------------------------------------
   openCharPopover(charStr) { return openCharPopover.call(this, charStr); }
+  openMiniCharTooltip(charStr, triggerEl) { return openMiniCharTooltip.call(this, charStr, triggerEl); }
   openCatalogDrawer(book) { return openCatalogDrawer.call(this, book); }
 
   // ----------------------------------------------------

@@ -255,7 +255,7 @@ export function bindDashboardEvents(mainEl) {
   }
 
   const ageSelect = mainEl.querySelector("#select-child-age");
-  const agePreviewEl = mainEl.querySelector("#age-step-preview");
+  const agePreviewEl = mainEl.querySelector(".age-step-preview");
   if (ageSelect && agePreviewEl) {
     this._on(ageSelect, "change", () => {
       const v = ageSelect.value;

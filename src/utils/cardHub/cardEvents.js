@@ -227,7 +227,7 @@ export function bindEvents(mainEl) {
   });
 
   // 弹窗背面例句点击发音
-  const sentenceBox = mainEl.querySelector("#card-modal-sentence");
+  const sentenceBox = mainEl.querySelector(".card-modal-sentence");
   if (sentenceBox) {
     this._on(sentenceBox, "click", (e) => {
       e.stopPropagation();
@@ -475,7 +475,7 @@ export function renderCardDetailModal() {
                 </div>
               </div>
 
-              <div id="card-modal-sentence" class="bg-white/95 hover:bg-white p-4 rounded-2xl border-2 border-amber-300 text-xs sm:text-sm text-amber-950 font-semibold leading-relaxed cursor-pointer transition-all active:scale-95 shadow-md" title="点击朗读例句">
+              <div class="card-modal-sentence bg-white/95 hover:bg-white p-4 rounded-2xl border-2 border-amber-300 text-xs sm:text-sm text-amber-950 font-semibold leading-relaxed cursor-pointer transition-all active:scale-95 shadow-md" title="点击朗读例句">
                 <span class="font-black text-orange-600">生活例句：</span>
                 ${c.sentence || `${c.char}字天天见，学好汉字乐趣多`}
               </div>

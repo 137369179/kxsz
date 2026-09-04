@@ -78,6 +78,13 @@ export function renderPoemHall() {
                     : ""
                 }
 
+                ${
+                  poem.image
+                    ? `<div class="w-full h-32 rounded-2xl overflow-hidden mb-3 shadow-md border border-amber-200/60 bg-amber-100/50">
+                         <img src="${poem.image}" alt="${poem.title}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" />
+                       </div>`
+                    : ""
+                }
                 <div>
                   <div class="flex items-center gap-2 mb-1.5">
                     <span class="text-[10px] font-black bg-amber-500/20 text-amber-800 px-2 py-0.5 rounded-md">${poem.dynasty} · ${poem.author}</span>
@@ -210,10 +217,17 @@ export function renderPoemReader(poem) {
         </div>
 
         <div class="bg-white/10 backdrop-blur-md rounded-3xl border border-white/15 p-6 shadow-xl text-white">
-          <h2 class="text-lg font-black text-amber-300 flex items-center gap-2 mb-2">
+          <h2 class="text-lg font-black text-amber-300 flex items-center gap-2 mb-3">
             <span class="flex items-center">${GAME_ICONS.sparkle("w-5 h-5")}</span>
             <span>诗意画卷与儿童意境赏析</span>
           </h2>
+          ${
+            poem.image
+              ? `<div class="w-full h-48 sm:h-64 rounded-2xl overflow-hidden mb-4 border-2 border-amber-300/40 shadow-2xl bg-black/30">
+                   <img src="${poem.image}" alt="${poem.title}" class="w-full h-full object-cover" />
+                 </div>`
+              : ""
+          }
           <p class="text-xs sm:text-sm text-white/90 leading-relaxed font-bold bg-black/20 p-4 rounded-2xl border border-white/10">
             ${poem.appreciation}
           </p>

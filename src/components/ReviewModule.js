@@ -7,7 +7,7 @@
  */
 
 import { CHARACTER_DATABASE } from "../data/characters.js";
-import { CHARACTER_DETAILS } from "../data/characterDetails.js";
+import { ensureDetails } from "../utils/charDetailLoader.js";
 import { ebbinghausManager } from "../utils/ebbinghaus.js";
 import { soundAndFX } from "../utils/soundEngine.js";
 import { BaseModule, escapeHtml } from "../utils/BaseModule.js";
@@ -76,6 +76,7 @@ export class ReviewModule extends BaseModule {
     this.consecutiveMistakes = {};
     this.forgottenChars = [];
     this.isBedtime = isBedtimeWindow();
+    try { ensureDetails(); } catch {}
 
     // 仅已学字；无已学 → 空队列（禁止字库前 N 字凑数）
     if (learnedIds.length === 0) {
@@ -407,13 +408,10 @@ export class ReviewModule extends BaseModule {
 
     const learnedIds = new Set(Object.keys(ebbinghausManager.progress.charRecords || {}));
     const preferIds = new Set((this.queue || []).map((c) => c.id).filter(Boolean));
-    // 仅合并已学字，避免整库 1489 次展开
+    try { ensureDetails(); } catch {}
+    // 仅提取已学字（CHARACTER_DATABASE 已由 charDetailLoader 原地补全详情字段）
     const mergedChars = [...learnedIds]
-      .map((id) => {
-        const base = CHARACTER_DATABASE.find((c) => c.id === id);
-        if (!base) return null;
-        return { ...base, ...(CHARACTER_DETAILS[id] || {}) };
-      })
+      .map((id) => CHARACTER_DATABASE.find((c) => c.id === id))
       .filter(Boolean);
 
     const pack = buildInterleavePack({

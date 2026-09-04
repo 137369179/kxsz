@@ -5,6 +5,7 @@
 export const IDIOMS_DATABASE = [
   {
     "id": "idiom_001",
+    "image": "assets/images/idiom_shouzhudaitu.webp",
     "name": "守株待兔",
     "pinyin": "shǒu zhū dài tù",
     "chars": [
@@ -28,6 +29,7 @@ export const IDIOMS_DATABASE = [
   },
   {
     "id": "idiom_002",
+    "image": "assets/images/idiom_bamiaozhuzhang.webp",
     "name": "拔苗助长",
     "pinyin": "bá miáo zhù zhǎng",
     "chars": [
@@ -51,6 +53,7 @@ export const IDIOMS_DATABASE = [
   },
   {
     "id": "idiom_003",
+    "image": "assets/images/idiom_wangyangbulao.webp",
     "name": "亡羊补牢",
     "pinyin": "wáng yáng bǔ láo",
     "chars": [
@@ -74,6 +77,7 @@ export const IDIOMS_DATABASE = [
   },
   {
     "id": "idiom_004",
+    "image": "assets/images/idiom_hualongdianjing.webp",
     "name": "画龙点睛",
     "pinyin": "huà lóng diǎn jīng",
     "chars": [
@@ -97,6 +101,7 @@ export const IDIOMS_DATABASE = [
   },
   {
     "id": "idiom_005",
+    "image": "assets/images/idiom_hujiahuwei.webp",
     "name": "狐假虎威",
     "pinyin": "hú jiǎ hǔ wēi",
     "chars": [
@@ -120,6 +125,7 @@ export const IDIOMS_DATABASE = [
   },
   {
     "id": "idiom_006",
+    "image": "assets/images/idiom_jingdizhiwa.webp",
     "name": "井底之蛙",
     "pinyin": "jǐng dǐ zhī wā",
     "chars": [
@@ -143,6 +149,7 @@ export const IDIOMS_DATABASE = [
   },
   {
     "id": "idiom_007",
+    "image": "assets/images/idiom_mangrenmoxiang.webp",
     "name": "盲人摸象",
     "pinyin": "máng rén mō xiàng",
     "chars": [
@@ -166,6 +173,7 @@ export const IDIOMS_DATABASE = [
   },
   {
     "id": "idiom_008",
+    "image": "assets/images/idiom_saiwengshima.webp",
     "name": "塞翁失马",
     "pinyin": "sài wēng shī mǎ",
     "chars": [
@@ -189,6 +197,7 @@ export const IDIOMS_DATABASE = [
   },
   {
     "id": "idiom_009",
+    "image": "assets/images/idiom_wenjiciwu.webp",
     "name": "闻鸡起舞",
     "pinyin": "wén jī qǐ wǔ",
     "chars": [
@@ -212,6 +221,7 @@ export const IDIOMS_DATABASE = [
   },
   {
     "id": "idiom_010",
+    "image": "assets/images/idiom_shuidishichuan.webp",
     "name": "水滴石穿",
     "pinyin": "shuǐ dī shí chuān",
     "chars": [
@@ -235,6 +245,7 @@ export const IDIOMS_DATABASE = [
   },
   {
     "id": "idiom_011",
+    "image": "assets/images/idiom_yanerdailing.webp",
     "name": "掩耳盗铃",
     "pinyin": "yǎn ěr dào líng",
     "chars": [
@@ -258,6 +269,7 @@ export const IDIOMS_DATABASE = [
   },
   {
     "id": "idiom_012",
+    "image": "assets/images/idiom_kezhouqiujian.webp",
     "name": "刻舟求剑",
     "pinyin": "kè zhōu qiú jiàn",
     "chars": [
@@ -281,6 +293,7 @@ export const IDIOMS_DATABASE = [
   },
   {
     "id": "idiom_013",
+    "image": "assets/images/idiom_huashetianzu.webp",
     "name": "画蛇添足",
     "pinyin": "huà shé tiān zú",
     "chars": [
@@ -304,6 +317,7 @@ export const IDIOMS_DATABASE = [
   },
   {
     "id": "idiom_014",
+    "image": "assets/images/idiom_yegonghaolong.webp",
     "name": "叶公好龙",
     "pinyin": "yè gōng hào lóng",
     "chars": [
@@ -327,6 +341,7 @@ export const IDIOMS_DATABASE = [
   },
   {
     "id": "idiom_015",
+    "image": "assets/images/idiom_beigongsheying.webp",
     "name": "杯弓蛇影",
     "pinyin": "bēi gōng shé yǐng",
     "chars": [
@@ -350,6 +365,7 @@ export const IDIOMS_DATABASE = [
   },
   {
     "id": "idiom_016",
+    "image": "assets/images/idiom_maidaihuanzhu.webp",
     "name": "买椟还珠",
     "pinyin": "mǎi dú huán zhū",
     "chars": [
@@ -373,6 +389,7 @@ export const IDIOMS_DATABASE = [
   },
   {
     "id": "idiom_017",
+    "image": "assets/images/idiom_yugongyishan.webp",
     "name": "愚公移山",
     "pinyin": "yú gōng yí shān",
     "chars": [
@@ -396,6 +413,7 @@ export const IDIOMS_DATABASE = [
   },
   {
     "id": "idiom_018",
+    "image": "assets/images/idiom_chengmenlixue.webp",
     "name": "程门立雪",
     "pinyin": "chéng mén lì xuě",
     "chars": [
@@ -419,6 +437,7 @@ export const IDIOMS_DATABASE = [
   },
   {
     "id": "idiom_019",
+    "image": "assets/images/idiom_shouboushijuan.webp",
     "name": "手不释卷",
     "pinyin": "shǒu bù shì juàn",
     "chars": [
@@ -442,6 +461,7 @@ export const IDIOMS_DATABASE = [
   },
   {
     "id": "idiom_020",
+    "image": "assets/images/idiom_xuanliangcigu.webp",
     "name": "悬梁刺股",
     "pinyin": "xuán liáng cì gǔ",
     "chars": [
@@ -466,6 +486,7 @@ export const IDIOMS_DATABASE = [
 ,
 {
   "id": "idiom_021",
+  "image": "assets/images/idiom_hualongdianjing.webp",
   "name": "画龙点睛",
   "pinyin": "huà lóng diǎn jīng",
   "chars": [
@@ -489,6 +510,7 @@ export const IDIOMS_DATABASE = [
 },
 {
   "id": "idiom_022",
+    "image": "assets/images/idiom_yanerdailing.webp",
   "name": "掩耳盗铃",
   "pinyin": "yǎn ěr dào líng",
   "chars": [
@@ -512,6 +534,7 @@ export const IDIOMS_DATABASE = [
 },
 {
   "id": "idiom_023",
+    "image": "assets/images/idiom_zixiangmaodun.webp",
   "name": "自相矛盾",
   "pinyin": "zì xiāng máo dùn",
   "chars": [
@@ -535,6 +558,7 @@ export const IDIOMS_DATABASE = [
 },
 {
   "id": "idiom_024",
+    "image": "assets/images/idiom_lanyuchongshu.webp",
   "name": "滥竽充数",
   "pinyin": "làn yú chōng shù",
   "chars": [
@@ -558,6 +582,7 @@ export const IDIOMS_DATABASE = [
 },
 {
   "id": "idiom_025",
+    "image": "assets/images/idiom_kezhouqiujian.webp",
   "name": "刻舟求剑",
   "pinyin": "kè zhōu qiú jiàn",
   "chars": [
@@ -581,6 +606,7 @@ export const IDIOMS_DATABASE = [
 },
 {
   "id": "idiom_026",
+  "image": "assets/images/idiom_hujiahuwei.webp",
   "name": "狐假虎威",
   "pinyin": "hú jiǎ hǔ wēi",
   "chars": [
@@ -604,6 +630,7 @@ export const IDIOMS_DATABASE = [
 },
 {
   "id": "idiom_027",
+  "image": "assets/images/idiom_saiwengshima.webp",
   "name": "塞翁失马",
   "pinyin": "sài wēng shī mǎ",
   "chars": [
@@ -627,6 +654,7 @@ export const IDIOMS_DATABASE = [
 },
 {
   "id": "idiom_028",
+    "image": "assets/images/idiom_yugongyishan.webp",
   "name": "愚公移山",
   "pinyin": "yú gōng yí shān",
   "chars": [
@@ -650,6 +678,7 @@ export const IDIOMS_DATABASE = [
 },
 {
   "id": "idiom_029",
+  "image": "assets/images/idiom_mangrenmoxiang.webp",
   "name": "盲人摸象",
   "pinyin": "máng rén mō xiàng",
   "chars": [
@@ -673,6 +702,7 @@ export const IDIOMS_DATABASE = [
 },
 {
   "id": "idiom_030",
+  "image": "assets/images/idiom_shuidishichuan.webp",
   "name": "水滴石穿",
   "pinyin": "shuǐ dī shí chuān",
   "chars": [

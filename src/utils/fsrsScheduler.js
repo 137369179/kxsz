@@ -148,13 +148,19 @@ const FSRS_PARAMS = {
 
 /**
  * 将稳定性(天)转换为近似间隔(毫秒)
- * 公式: I = sqrt(S) (天)  →  S=1→1d, S=9→3d, S=49→7d, S=225→15d, S=900→30d
+ * 默认公式: I = sqrt(S) (天)  →  S=1→1d, S=9→3d, S=49→7d, S=225→15d, S=900→30d（针对儿童高频复习校准）
+ * 支持切换 FSRS-6 闭式最优间隔计算 calculateIntervalFSRS6
  * @param {number} stabilityDays  稳定性（天）
- * @param {number} _retention   保留（签名兼容）
+ * @param {number} [_retention=0.9]   目标留存率 (0.7 ~ 0.98)
+ * @param {boolean} [useFSRS6=false] 是否使用 FSRS-6 闭式最优解
  * @returns {number} 毫秒
  */
-export function stabilityToInterval(stabilityDays, _retention = 0.9) {
+export function stabilityToInterval(stabilityDays, _retention = 0.9, useFSRS6 = false) {
   if (stabilityDays < 0) throw new Error('stabilityDays must be non-negative');
+  if (useFSRS6) {
+    const fsrsDays = calculateIntervalFSRS6(stabilityDays, _retention);
+    return Math.max(5 * 60 * 1000, Math.round(fsrsDays * 86400000));
+  }
   const days = Math.sqrt(Math.max(0.01, stabilityDays));
   return Math.round(days * 86400000);
 }

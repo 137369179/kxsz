@@ -40,18 +40,24 @@ export class BaseModule {
     };
     const focusCleanup = eventBus.on(EVENTS.FOCUS_MODE_CHANGED, focusHandler);
     this._addCleanup(focusCleanup);
-    // 初始化时同步当前状态
-    eventBus.once("app:init", () => {
-      const { ebbinghausManager } = window._modules || {};
+    // 初始化时同步当前状态（如已初始化则直接同步，未初始化则监听并在 destroy 时自动回收）
+    const initSync = () => {
+      const { ebbinghausManager } = (typeof window !== "undefined" && window._modules) || {};
       const focusOn = ebbinghausManager?.isFocusModeEnabled?.();
-      if (focusOn) {
+      if (focusOn && typeof document !== "undefined") {
         document.body.classList.add("focus-mode");
         document.documentElement.classList.add("focus-mode");
         document.body.dataset.focusMode = "true";
-        // 桥接 focusMode.js：完整应用 reduce-motion/大字/装饰屏蔽（替代手动 classList）
         import("./focusMode.js").then((fm) => fm.enableFocusMode({ autoReduceMotion: true, muteAchievements: true, enlargeText: true })).catch(() => {});
       }
-    });
+    };
+
+    if (typeof window !== "undefined" && window._modules?.ebbinghausManager) {
+      initSync();
+    } else {
+      const initCleanup = eventBus.once("app:init", initSync);
+      this._addCleanup(initCleanup);
+    }
   }
 
   /** destroy  */

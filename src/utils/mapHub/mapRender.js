@@ -4,12 +4,15 @@ import { ebbinghausManager } from "../ebbinghaus.js";
 import { mountGameShell } from "../../components/SharedShell.js";
 import { GAME_ICONS } from "../gameIcons.js";
 import { ISLAND_CONFIG } from "./islandConfig.js";
+import { getSessionConfig } from "../sessionPlanner.js";
 
 export function renderMap() {
   this.destroy();
   const progress = ebbinghausManager.progress;
   const targetDaily = Math.max(1, progress.settings?.dailyCharTarget || 5);
   const allChars = CHARACTER_DATABASE;
+  const age = ebbinghausManager.getAge();
+  const sessionCfg = getSessionConfig(age);
 
   // 智能定位当前正在学的主题岛屿（若用户未手动切换过岛屿）
   if (!this._userSelectedIsland) {
@@ -36,6 +39,14 @@ export function renderMap() {
     <div class="relative w-full h-full min-h-[640px] flex flex-col justify-between overflow-hidden select-none bg-slate-950">
       
       <div class="absolute top-20 left-6 z-20 flex items-center gap-2.5 bg-black/60 backdrop-blur-md p-2 rounded-full border border-white/30 shadow-2xl">
+        <button id="btn-daily-quest" class="px-4 py-2 rounded-full text-xs sm:text-sm font-black transition-all flex items-center gap-2 bg-gradient-to-r from-rose-500 via-pink-500 to-amber-500 text-white shadow-lg ring-2 ring-pink-300 hover:scale-105 active:scale-95 cursor-pointer" title="开始科学认知编排的今日学练探险">
+          <span class="flex items-center">${GAME_ICONS.sparkle('w-5 h-5')}</span>
+          <span>今日学练</span>
+          <span class="bg-white/25 px-2 py-0.5 rounded-full text-[10px] font-mono">${sessionCfg.newChars}新·${sessionCfg.reviews}复</span>
+        </button>
+
+        <div class="w-[1px] h-6 bg-white/30 mx-1"></div>
+
         <button id="btn-open-world-overview" class="px-4 py-2 rounded-full text-xs sm:text-sm font-black transition-all flex items-center gap-2 bg-gradient-to-r from-amber-400 to-orange-500 text-amber-950 shadow-md active:scale-95 cursor-pointer" title="查看三大岛屿世界全景图">
           <span class="flex items-center">${GAME_ICONS.compass('w-6 h-6')}</span>
           <span>世界全景</span>

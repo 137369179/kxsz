@@ -23,7 +23,7 @@ export const STORYBOOKS_DATABASE = [
       {
         "pageNumber": 1,
         "text": "八月十五月儿圆，天上的月亮像金盘",
-        "image": "assets/images/cover_midautumn.webp",
+        "image": "assets/images/story_midautumn_p1.webp",
         "interactions": [
           {
             "x": "75%",
@@ -123,7 +123,7 @@ export const STORYBOOKS_DATABASE = [
       {
         "pageNumber": 2,
         "text": "一家人坐在院子里，开开心心吃甜月饼",
-        "image": "assets/images/cover_midautumn.webp",
+        "image": "assets/images/story_midautumn_p2.webp",
         "interactions": [
           {
             "x": "50%",
@@ -226,7 +226,7 @@ export const STORYBOOKS_DATABASE = [
       {
         "pageNumber": 3,
         "text": "大月亮照在大地上，祝大家团团圆圆",
-        "image": "assets/images/cover_midautumn.webp",
+        "image": "assets/images/story_midautumn_p3.webp",
         "interactions": [
           {
             "x": "35%",
@@ -355,7 +355,7 @@ export const STORYBOOKS_DATABASE = [
       {
         "pageNumber": 1,
         "text": "五月五过端午，江水清清水流长",
-        "image": "assets/images/cover_dragonboat.webp",
+        "image": "assets/images/story_dragonboat_p1.webp",
         "interactions": [
           {
             "x": "45%",
@@ -443,7 +443,7 @@ export const STORYBOOKS_DATABASE = [
       {
         "pageNumber": 2,
         "text": "大龙舟两头翘，许多人在水上划得快",
-        "image": "assets/images/cover_dragonboat.webp",
+        "image": "assets/images/story_dragonboat_p2.webp",
         "interactions": [
           {
             "x": "60%",
@@ -544,7 +544,7 @@ export const STORYBOOKS_DATABASE = [
       {
         "pageNumber": 3,
         "text": "咚咚咚擂大鼓，龙舟冲过终点夺第一",
-        "image": "assets/images/cover_dragonboat.webp",
+        "image": "assets/images/story_dragonboat_p3.webp",
         "interactions": [
           {
             "x": "30%",
@@ -1341,7 +1341,7 @@ export const STORYBOOKS_DATABASE = [
     "id": "book_theme_share_honey",
     "level": 1,
     "title": "小熊学会了分享",
-    "coverImg": "assets/images/cathy_storybook_cover.webp",
+    "coverImg": "assets/images/cover_bear_share.webp",
     "stage": 1,
     "theme": "好习惯与情绪管理",
     "targetChars": [
@@ -1356,7 +1356,7 @@ export const STORYBOOKS_DATABASE = [
       {
         "pageNumber": 1,
         "text": "我有一罐甜蜂蜜，你好小兔请你吃",
-        "image": "assets/images/cathy_storybook_cover.webp",
+        "image": "assets/images/cover_bear_share.webp",
         "interactions": [
           {
             "x": "55%",
@@ -1451,7 +1451,7 @@ export const STORYBOOKS_DATABASE = [
       {
         "pageNumber": 2,
         "text": "小兔和小鸟都来了，大家都是好朋友",
-        "image": "assets/images/cathy_storybook_cover.webp",
+        "image": "assets/images/cover_bear_share.webp",
         "interactions": [
           {
             "x": "70%",
@@ -1550,7 +1550,7 @@ export const STORYBOOKS_DATABASE = [
       {
         "pageNumber": 3,
         "text": "懂得分享真正好，我们一起哈哈笑",
-        "image": "assets/images/cathy_storybook_cover.webp",
+        "image": "assets/images/cover_bear_share.webp",
         "interactions": [
           {
             "x": "45%",
@@ -1655,7 +1655,7 @@ export const STORYBOOKS_DATABASE = [
     "id": "book_theme_sleep_alone",
     "level": 2,
     "title": "自己睡觉我不怕",
-    "coverImg": "assets/images/cathy_storybook_cover.webp",
+    "coverImg": "assets/images/cover_sleep_alone.webp",
     "stage": 2,
     "theme": "好习惯与情绪管理",
     "targetChars": [
@@ -1670,7 +1670,7 @@ export const STORYBOOKS_DATABASE = [
       {
         "pageNumber": 1,
         "text": "夜深了月光照，小熊躺在小床上",
-        "image": "assets/images/cathy_storybook_cover.webp",
+        "image": "assets/images/cover_sleep_alone.webp",
         "interactions": [
           {
             "x": "75%",
@@ -1758,7 +1758,7 @@ export const STORYBOOKS_DATABASE = [
       {
         "pageNumber": 2,
         "text": "窗外星星眨眼睛，晚风送来平安夜",
-        "image": "assets/images/cathy_storybook_cover.webp",
+        "image": "assets/images/cover_sleep_alone.webp",
         "interactions": [
           {
             "x": "35%",
@@ -1853,7 +1853,7 @@ export const STORYBOOKS_DATABASE = [
       {
         "pageNumber": 3,
         "text": "闭上眼睛做好梦，勇敢孩子睡得香",
-        "image": "assets/images/cathy_storybook_cover.webp",
+        "image": "assets/images/cover_sleep_alone.webp",
         "interactions": [
           {
             "x": "50%",
@@ -1972,7 +1972,7 @@ export const STORYBOOKS_DATABASE = [
       {
         "pageNumber": 1,
         "text": "红红的日头升起来了，照在绿绿的大山上",
-        "image": "assets/images/cover_cat_fishing.webp",
+        "image": "assets/images/story_cat_fishing_p1.webp",
         "interactions": [
           {
             "x": "75%",
@@ -2092,7 +2092,7 @@ export const STORYBOOKS_DATABASE = [
       {
         "pageNumber": 2,
         "text": "清清的河水哗啦啦，水里有快活的小鱼",
-        "image": "assets/images/cover_cat_fishing.webp",
+        "image": "assets/images/story_cat_fishing_p2.webp",
         "interactions": [
           {
             "x": "48%",
@@ -2200,7 +2200,7 @@ export const STORYBOOKS_DATABASE = [
       {
         "pageNumber": 3,
         "text": "夜晚月亮出来了，小猫高高兴兴走在回家路上",
-        "image": "assets/images/cover_cat_fishing.webp",
+        "image": "assets/images/story_cat_fishing_p3.webp",
         "interactions": [
           {
             "x": "78%",
@@ -2347,7 +2347,7 @@ export const STORYBOOKS_DATABASE = [
     "id": "book_002",
     "level": 2,
     "title": "森林里的树木与小松鼠",
-    "coverImg": "assets/images/cathy_storybook_cover.webp",
+    "coverImg": "assets/images/cover_forest_squirrel.webp",
     "stage": 1,
     "theme": "奇幻森林岛",
     "targetChars": [
@@ -2362,7 +2362,7 @@ export const STORYBOOKS_DATABASE = [
       {
         "pageNumber": 1,
         "text": "大山里有高高的木头大树，树上结满了甜甜的果子",
-        "image": "assets/images/cathy_storybook_cover.webp",
+        "image": "assets/images/cover_forest_squirrel.webp",
         "interactions": [
           {
             "x": "25%",
@@ -2495,7 +2495,7 @@ export const STORYBOOKS_DATABASE = [
       {
         "pageNumber": 2,
         "text": "松鼠张开口吃果子，好心的人们走过来给它拍照片",
-        "image": "assets/images/cathy_storybook_cover.webp",
+        "image": "assets/images/cover_forest_squirrel.webp",
         "interactions": [
           {
             "x": "65%",
@@ -2653,7 +2653,7 @@ export const STORYBOOKS_DATABASE = [
     "id": "book_003",
     "level": 1,
     "title": "小水滴的大海梦",
-    "coverImg": "assets/images/cathy_storybook_cover.webp",
+    "coverImg": "assets/images/cover_water_drop.webp",
     "stage": 1,
     "theme": "奇幻森林岛",
     "targetChars": [
@@ -2668,7 +2668,7 @@ export const STORYBOOKS_DATABASE = [
       {
         "pageNumber": 1,
         "text": "雨水落在大地的泥土上，小水滴醒来了",
-        "image": "assets/images/cathy_storybook_cover.webp",
+        "image": "assets/images/cover_water_drop.webp",
         "interactions": [
           {
             "x": "50%",
@@ -2777,7 +2777,7 @@ export const STORYBOOKS_DATABASE = [
       {
         "pageNumber": 2,
         "text": "红日高照温暖如火，小水滴欢快地流向大海",
-        "image": "assets/images/cathy_storybook_cover.webp",
+        "image": "assets/images/cover_water_drop.webp",
         "interactions": [
           {
             "x": "75%",
@@ -2911,7 +2911,7 @@ export const STORYBOOKS_DATABASE = [
     "id": "book_004",
     "level": 2,
     "title": "神秘的森林集市",
-    "coverImg": "assets/images/cathy_storybook_cover.webp",
+    "coverImg": "assets/images/cover_forest_market.webp",
     "stage": 2,
     "theme": "缤纷生活岛",
     "targetChars": [
@@ -2926,7 +2926,7 @@ export const STORYBOOKS_DATABASE = [
       {
         "pageNumber": 1,
         "text": "金色的水田里，禾苗长得又高又壮",
-        "image": "assets/images/cathy_storybook_cover.webp",
+        "image": "assets/images/cover_forest_market.webp",
         "interactions": [
           {
             "x": "35%",
@@ -3024,7 +3024,7 @@ export const STORYBOOKS_DATABASE = [
       {
         "pageNumber": 2,
         "text": "集市上人来人往，大家开口大笑尝美食",
-        "image": "assets/images/cathy_storybook_cover.webp",
+        "image": "assets/images/cover_forest_market.webp",
         "interactions": [
           {
             "x": "70%",
@@ -3148,7 +3148,7 @@ export const STORYBOOKS_DATABASE = [
     "id": "book_005",
     "level": 2,
     "title": "小镇上的发明家",
-    "coverImg": "assets/images/cathy_storybook_cover.webp",
+    "coverImg": "assets/images/cover_town_inventor.webp",
     "stage": 2,
     "theme": "缤纷生活岛",
     "targetChars": [
@@ -3163,7 +3163,7 @@ export const STORYBOOKS_DATABASE = [
       {
         "pageNumber": 1,
         "text": "推开红色的大门，一辆木头小马车停在门前",
-        "image": "assets/images/cathy_storybook_cover.webp",
+        "image": "assets/images/cover_town_inventor.webp",
         "interactions": [
           {
             "x": "25%",
@@ -3290,7 +3290,7 @@ export const STORYBOOKS_DATABASE = [
       {
         "pageNumber": 2,
         "text": "天上飞过小鸟，水里游着小鱼，小车跑得飞快",
-        "image": "assets/images/cathy_storybook_cover.webp",
+        "image": "assets/images/cover_town_inventor.webp",
         "interactions": [
           {
             "x": "40%",
@@ -3436,7 +3436,7 @@ export const STORYBOOKS_DATABASE = [
     "id": "book_006",
     "level": 3,
     "title": "星空号太空飞船",
-    "coverImg": "assets/images/cathy_storybook_cover.webp",
+    "coverImg": "assets/images/cover_space_ship.webp",
     "stage": 3,
     "theme": "星际探索岛",
     "targetChars": [
@@ -3451,7 +3451,7 @@ export const STORYBOOKS_DATABASE = [
       {
         "pageNumber": 1,
         "text": "蓝蓝的天空上，洁白的白云随风飘动",
-        "image": "assets/images/cathy_storybook_cover.webp",
+        "image": "assets/images/cover_space_ship.webp",
         "interactions": [
           {
             "x": "35%",
@@ -3562,7 +3562,7 @@ export const STORYBOOKS_DATABASE = [
       {
         "pageNumber": 2,
         "text": "飞船穿过风雨和白雪，飞向美丽的银河星空",
-        "image": "assets/images/cathy_storybook_cover.webp",
+        "image": "assets/images/cover_space_ship.webp",
         "interactions": [
           {
             "x": "50%",
@@ -3703,7 +3703,7 @@ export const STORYBOOKS_DATABASE = [
     "id": "book_007",
     "level": 2,
     "title": "森林里的小动物",
-    "coverImg": "assets/images/cathy_storybook_cover.webp",
+    "coverImg": "assets/images/cover_forest_animals.webp",
     "stage": 1,
     "theme": "奇幻森林岛",
     "targetChars": [
@@ -3719,7 +3719,7 @@ export const STORYBOOKS_DATABASE = [
       {
         "pageNumber": 1,
         "text": "天上的小鸟欢快地唱歌，树下的小虫在草地里跳舞",
-        "image": "assets/images/cathy_storybook_cover.webp",
+        "image": "assets/images/cover_forest_animals.webp",
         "interactions": [
           {
             "x": "25%",
@@ -3854,7 +3854,7 @@ export const STORYBOOKS_DATABASE = [
       {
         "pageNumber": 2,
         "text": "小马在广阔的大地上奔跑，小牛和小羊在悠闲地吃草",
-        "image": "assets/images/cathy_storybook_cover.webp",
+        "image": "assets/images/cover_forest_animals.webp",
         "interactions": [
           {
             "x": "30%",
@@ -4010,7 +4010,7 @@ export const STORYBOOKS_DATABASE = [
     "id": "book_008",
     "level": 2,
     "title": "小猴子上山去",
-    "coverImg": "assets/images/cathy_storybook_cover.webp",
+    "coverImg": "assets/images/cover_monkey_mountain.webp",
     "stage": 1,
     "theme": "奇幻森林岛",
     "targetChars": [
@@ -4027,7 +4027,7 @@ export const STORYBOOKS_DATABASE = [
       {
         "pageNumber": 1,
         "text": "小猴子爬上高山，向上看是蓝天，向下看是大地",
-        "image": "assets/images/cathy_storybook_cover.webp",
+        "image": "assets/images/cover_monkey_mountain.webp",
         "interactions": [
           {
             "x": "50%",
@@ -4160,7 +4160,7 @@ export const STORYBOOKS_DATABASE = [
       {
         "pageNumber": 2,
         "text": "向左是一片大森林，向右是一条清清的小河，中间开满了鲜花",
-        "image": "assets/images/cathy_storybook_cover.webp",
+        "image": "assets/images/cover_monkey_mountain.webp",
         "interactions": [
           {
             "x": "20%",
@@ -4343,7 +4343,7 @@ export const STORYBOOKS_DATABASE = [
     "id": "book_009",
     "level": 2,
     "title": "美丽的大花园",
-    "coverImg": "assets/images/cathy_storybook_cover.webp",
+    "coverImg": "assets/images/cover_flower_garden.webp",
     "stage": 1,
     "theme": "奇幻森林岛",
     "targetChars": [
@@ -4358,7 +4358,7 @@ export const STORYBOOKS_DATABASE = [
       {
         "pageNumber": 1,
         "text": "春天来了，红红的花朵和绿绿的小草从泥土里钻出来",
-        "image": "assets/images/cathy_storybook_cover.webp",
+        "image": "assets/images/cover_flower_garden.webp",
         "interactions": [
           {
             "x": "35%",
@@ -4499,7 +4499,7 @@ export const STORYBOOKS_DATABASE = [
       {
         "pageNumber": 2,
         "text": "高大的树木喝饱了雨水，伸展出绿油油的树叶",
-        "image": "assets/images/cathy_storybook_cover.webp",
+        "image": "assets/images/cover_flower_garden.webp",
         "interactions": [
           {
             "x": "50%",
@@ -4632,7 +4632,7 @@ export const STORYBOOKS_DATABASE = [
     "id": "book_010",
     "level": 3,
     "title": "我的好朋友",
-    "coverImg": "assets/images/cathy_storybook_cover.webp",
+    "coverImg": "assets/images/cover_good_friends.webp",
     "stage": 1,
     "theme": "奇幻森林岛",
     "targetChars": [
@@ -4647,7 +4647,7 @@ export const STORYBOOKS_DATABASE = [
       {
         "pageNumber": 1,
         "text": "我和凯茜是最要好的好朋友，我们每天手拉手一起去上学",
-        "image": "assets/images/cathy_storybook_cover.webp",
+        "image": "assets/images/cover_good_friends.webp",
         "interactions": [
           {
             "x": "40%",
@@ -4792,7 +4792,7 @@ export const STORYBOOKS_DATABASE = [
       {
         "pageNumber": 2,
         "text": "我们在学校里认真学习写汉字，做一个爱读书的好孩子",
-        "image": "assets/images/cathy_storybook_cover.webp",
+        "image": "assets/images/cover_good_friends.webp",
         "interactions": [
           {
             "x": "50%",
@@ -4947,7 +4947,7 @@ export const STORYBOOKS_DATABASE = [
     "id": "book_011",
     "level": 3,
     "title": "开开心心去上学",
-    "coverImg": "assets/images/cathy_storybook_cover.webp",
+    "coverImg": "assets/images/cover_happy_school.webp",
     "stage": 1,
     "theme": "奇幻森林岛",
     "targetChars": [
@@ -4963,7 +4963,7 @@ export const STORYBOOKS_DATABASE = [
       {
         "pageNumber": 1,
         "text": "推开大门，小车开来了，我们挥动小手向家人说再见",
-        "image": "assets/images/cathy_storybook_cover.webp",
+        "image": "assets/images/cover_happy_school.webp",
         "interactions": [
           {
             "x": "25%",
@@ -5104,7 +5104,7 @@ export const STORYBOOKS_DATABASE = [
       {
         "pageNumber": 2,
         "text": "用明亮的双目看世界，用灵敏的双耳听鸟鸣，脚步轻快真高兴",
-        "image": "assets/images/cathy_storybook_cover.webp",
+        "image": "assets/images/cover_happy_school.webp",
         "interactions": [
           {
             "x": "35%",
@@ -5279,7 +5279,7 @@ export const STORYBOOKS_DATABASE = [
     "id": "book_012",
     "level": 3,
     "title": "我们都是好孩子",
-    "coverImg": "assets/images/cathy_storybook_cover.webp",
+    "coverImg": "assets/images/cover_good_children.webp",
     "stage": 1,
     "theme": "奇幻森林岛",
     "targetChars": [
@@ -5295,7 +5295,7 @@ export const STORYBOOKS_DATABASE = [
       {
         "pageNumber": 1,
         "text": "父母用心抚育我们长大，我们要用心孝敬爸爸和妈妈",
-        "image": "assets/images/cathy_storybook_cover.webp",
+        "image": "assets/images/cover_good_children.webp",
         "interactions": [
           {
             "x": "50%",
@@ -5430,7 +5430,7 @@ export const STORYBOOKS_DATABASE = [
       {
         "pageNumber": 2,
         "text": "昂起头来大步走，开开心心去迎接美好的新一天",
-        "image": "assets/images/cathy_storybook_cover.webp",
+        "image": "assets/images/cover_good_children.webp",
         "interactions": [
           {
             "x": "50%",
@@ -5569,7 +5569,7 @@ export const STORYBOOKS_DATABASE = [
     "id": "book_013",
     "level": 2,
     "title": "小猴采果子",
-    "coverImg": "assets/images/cathy_storybook_cover.webp",
+    "coverImg": "assets/images/cover_monkey_fruit.webp",
     "stage": 1,
     "theme": "奇幻森林岛",
     "targetChars": [
@@ -5584,7 +5584,7 @@ export const STORYBOOKS_DATABASE = [
       {
         "pageNumber": 1,
         "text": "青翠的大山里，有一片茂密的大树林",
-        "image": "assets/images/cathy_storybook_cover.webp",
+        "image": "assets/images/cover_monkey_fruit.webp",
         "interactions": [
           {
             "x": "60%",
@@ -5682,7 +5682,7 @@ export const STORYBOOKS_DATABASE = [
       {
         "pageNumber": 2,
         "text": "高高的苹果树上，结满了红红的大苹果",
-        "image": "assets/images/cathy_storybook_cover.webp",
+        "image": "assets/images/cover_monkey_fruit.webp",
         "interactions": [
           {
             "x": "45%",
@@ -5786,7 +5786,7 @@ export const STORYBOOKS_DATABASE = [
       {
         "pageNumber": 3,
         "text": "小猴爬上高树枝，把香甜的果子带回家",
-        "image": "assets/images/cathy_storybook_cover.webp",
+        "image": "assets/images/cover_monkey_fruit.webp",
         "interactions": [
           {
             "x": "55%",
@@ -5904,7 +5904,7 @@ export const STORYBOOKS_DATABASE = [
     "id": "book_014",
     "level": 2,
     "title": "四季的歌",
-    "coverImg": "assets/images/cathy_storybook_cover.webp",
+    "coverImg": "assets/images/cover_four_seasons.webp",
     "stage": 1,
     "theme": "奇幻森林岛",
     "targetChars": [
@@ -5919,7 +5919,7 @@ export const STORYBOOKS_DATABASE = [
       {
         "pageNumber": 1,
         "text": "春天花儿开，夏天绿树浓",
-        "image": "assets/images/cathy_storybook_cover.webp",
+        "image": "assets/images/cover_four_seasons.webp",
         "interactions": [
           {
             "x": "30%",
@@ -5993,7 +5993,7 @@ export const STORYBOOKS_DATABASE = [
       {
         "pageNumber": 2,
         "text": "秋天黄叶落，冬天白雪飘",
-        "image": "assets/images/cathy_storybook_cover.webp",
+        "image": "assets/images/cover_four_seasons.webp",
         "interactions": [
           {
             "x": "70%",
@@ -6082,7 +6082,7 @@ export const STORYBOOKS_DATABASE = [
     "id": "book_015",
     "level": 2,
     "title": "色彩魔法师",
-    "coverImg": "assets/images/cathy_storybook_cover.webp",
+    "coverImg": "assets/images/cover_color_magic.webp",
     "stage": 1,
     "theme": "奇幻森林岛",
     "targetChars": [
@@ -6097,7 +6097,7 @@ export const STORYBOOKS_DATABASE = [
       {
         "pageNumber": 1,
         "text": "画一朵红红的花，画一片绿绿的草",
-        "image": "assets/images/cathy_storybook_cover.webp",
+        "image": "assets/images/cover_color_magic.webp",
         "interactions": [
           {
             "x": "35%",
@@ -6191,7 +6191,7 @@ export const STORYBOOKS_DATABASE = [
       {
         "pageNumber": 2,
         "text": "蓝蓝的天空上，飘着雪白的小云朵",
-        "image": "assets/images/cathy_storybook_cover.webp",
+        "image": "assets/images/cover_color_magic.webp",
         "interactions": [
           {
             "x": "65%",
@@ -6299,7 +6299,7 @@ export const STORYBOOKS_DATABASE = [
     "id": "book_016",
     "level": 3,
     "title": "快乐的小镇",
-    "coverImg": "assets/images/cathy_storybook_cover.webp",
+    "coverImg": "assets/images/cover_happy_town.webp",
     "stage": 2,
     "theme": "缤纷生活岛",
     "targetChars": [
@@ -6314,7 +6314,7 @@ export const STORYBOOKS_DATABASE = [
       {
         "pageNumber": 1,
         "text": "早晨太阳升起，小镇打开了快乐的大门",
-        "image": "assets/images/cathy_storybook_cover.webp",
+        "image": "assets/images/cover_happy_town.webp",
         "interactions": [
           {
             "x": "50%",
@@ -6416,7 +6416,7 @@ export const STORYBOOKS_DATABASE = [
       {
         "pageNumber": 2,
         "text": "汽车开过马路，小朋友们高高兴兴上学校",
-        "image": "assets/images/cathy_storybook_cover.webp",
+        "image": "assets/images/cover_happy_town.webp",
         "interactions": [
           {
             "x": "30%",
@@ -6539,7 +6539,7 @@ export const STORYBOOKS_DATABASE = [
     "id": "book_017",
     "level": 3,
     "title": "爱劳动的小蜜蜂",
-    "coverImg": "assets/images/cathy_storybook_cover.webp",
+    "coverImg": "assets/images/cover_busy_bee.webp",
     "stage": 2,
     "theme": "缤纷生活岛",
     "targetChars": [
@@ -6554,7 +6554,7 @@ export const STORYBOOKS_DATABASE = [
       {
         "pageNumber": 1,
         "text": "小蜜蜂展翅飞，飞到花丛中采蜜忙",
-        "image": "assets/images/cathy_storybook_cover.webp",
+        "image": "assets/images/cover_busy_bee.webp",
         "interactions": [
           {
             "x": "40%",
@@ -6662,7 +6662,7 @@ export const STORYBOOKS_DATABASE = [
     "id": "book_018",
     "level": 3,
     "title": "小小宇航员",
-    "coverImg": "assets/images/cathy_storybook_cover.webp",
+    "coverImg": "assets/images/cover_little_astronaut.webp",
     "stage": 3,
     "theme": "星际智慧岛",
     "targetChars": [
@@ -6677,7 +6677,7 @@ export const STORYBOOKS_DATABASE = [
       {
         "pageNumber": 1,
         "text": "火箭飞上天空，看见弯弯的月亮和明亮的星星",
-        "image": "assets/images/cathy_storybook_cover.webp",
+        "image": "assets/images/cover_little_astronaut.webp",
         "interactions": [
           {
             "x": "60%",

@@ -397,7 +397,7 @@ export function renderActiveTabContent(progress, charCount, settings, diffCount)
                 <option value="${a}" ${Number(profileAge) === a ? "selected" : ""}>${a} 岁</option>
               `).join("")}
             </select>
-            <p id="age-step-preview" class="text-[11px] font-bold text-indigo-800 leading-relaxed">
+            <p class="age-step-preview text-[11px] font-bold text-indigo-800 leading-relaxed">
               当前预览：${agePreview.label}
             </p>
             <p class="text-[10px] text-indigo-600 font-semibold">3–4 岁 4 步 · 5–6 岁 6 步 · 7 岁及以上 8 步全流程。请按真实年龄设置，避免步骤被静默跳过。</p>

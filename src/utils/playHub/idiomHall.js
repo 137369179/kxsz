@@ -62,6 +62,11 @@ export function renderIdiomHall() {
               return `
               <div class="idiom-card bg-white/10 backdrop-blur-md rounded-3xl p-5 border-2 ${isLearned ? "border-emerald-400/70" : "border-emerald-300/40"} shadow-xl hover:border-yellow-300 cursor-pointer transition-all hover:scale-105 flex flex-col justify-between relative" data-idiom-idx="${db.indexOf(item)}">
                 ${isLearned ? `<span class="learned-stamp w-7 h-7 rounded-full bg-emerald-500 border-2 border-white text-white flex items-center justify-center text-sm shadow-lg">OK</span>` : ""}
+                ${item.image ? `
+                  <div class="w-full h-32 rounded-2xl overflow-hidden mb-3 shadow-md border border-emerald-300/30 bg-black/30">
+                    <img src="${item.image}" alt="${item.name}" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105" loading="lazy" />
+                  </div>
+                ` : ""}
                 <div>
                   <div class="flex items-center justify-between mb-2">
                     <span class="text-[11px] font-bold text-emerald-300 tracking-wider">${item.pinyin || ""}</span>
@@ -138,6 +143,12 @@ export function _renderIdiomStory(idiom, db) {
 
           <p class="text-lg text-amber-300 font-bold tracking-widest opacity-0 transition-opacity duration-700" id="story-pinyin" style="transition-delay:0.8s">${pinyin}</p>
 
+          ${idiom.image ? `
+          <div class="w-full max-w-2xl rounded-3xl overflow-hidden shadow-2xl border-2 border-amber-300/40 bg-black/30 opacity-0 transition-opacity duration-700" id="story-image" style="transition-delay:0.9s">
+            <img src="${idiom.image}" alt="${name}" class="w-full h-48 sm:h-64 object-cover" />
+          </div>
+          ` : ""}
+
           <div class="w-full max-w-2xl bg-white/10 backdrop-blur-md rounded-3xl border-2 border-amber-300/30 p-6 opacity-0 transition-opacity duration-700" id="story-desc" style="transition-delay:1.0s">
             <div class="flex items-center gap-2 mb-3">
               <span class="flex items-center">${GAME_ICONS.sparkle("w-4 h-4")}</span>
@@ -190,7 +201,7 @@ export function _renderIdiomStory(idiom, db) {
         el.style.opacity = "1";
         el.style.transform = "scale(1)";
       });
-      ["#story-pinyin","#story-desc","#story-body","#story-moral","#btn-to-quiz"].forEach(sel => {
+      ["#story-pinyin","#story-image","#story-desc","#story-body","#story-moral","#btn-to-quiz"].forEach(sel => {
         const el = this.container.querySelector(sel);
         if (el) el.style.opacity = "1";
       });

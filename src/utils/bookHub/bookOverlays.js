@@ -1,7 +1,8 @@
-/** BookModule — char holograph card + catalog drawer */
 import { CHARACTER_DATABASE } from "../../data/characters.js";
 import { soundAndFX } from "../soundEngine.js";
 import { GAME_ICONS } from "../gameIcons.js";
+import { escapeHtml } from "../BaseModule.js";
+import { EVENTS } from "../eventBus.js";
 
 export function openCharPopover(charStr) {
   if (this.isCharPopoverOpen) return;
@@ -98,6 +99,107 @@ export function openCharPopover(charStr) {
     soundAndFX.playPop();
     soundAndFX.speakPriority(charData.char, { kind: "char", priority: 1 });
   });
+}
+
+
+export function openMiniCharTooltip(charStr, triggerEl) {
+  const charData = CHARACTER_DATABASE.find((c) => c.char === charStr);
+  if (!charData) return null;
+
+  const existing = document.getElementById("book-mini-char-tooltip");
+  if (existing) existing.remove();
+
+  const tooltip = document.createElement("div");
+  tooltip.id = "book-mini-char-tooltip";
+  tooltip.className = "fixed z-[85] max-w-xs bg-slate-900/95 text-white rounded-2xl p-3.5 shadow-2xl border-2 border-amber-400 backdrop-blur-md animate-scale-up select-none";
+
+  const wordSample = (charData.words && charData.words[0]?.word) || charData.char;
+  const pinyin = charData.pinyin || "";
+  const meaning = (charData.words && charData.words[0]?.mean) || "随文拓展识字";
+
+  tooltip.innerHTML = `
+    <div class="flex items-start justify-between gap-2.5">
+      <div class="flex items-center gap-2.5">
+        <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 text-amber-950 flex flex-col items-center justify-center font-black shadow-md flex-shrink-0">
+          <span class="text-[9px] leading-tight font-sans text-amber-900">${escapeHtml(pinyin)}</span>
+          <span class="text-xl font-serif leading-none">${escapeHtml(charData.char)}</span>
+        </div>
+        <div class="text-left">
+          <div class="flex items-center gap-1.5">
+            <span class="text-xs font-black text-amber-300">词组：${escapeHtml(wordSample)}</span>
+            <span class="text-[9px] bg-amber-500/20 text-amber-300 border border-amber-400/40 px-1.5 py-0.2 rounded font-bold">随文发现</span>
+          </div>
+          <p class="text-[11px] text-slate-300 mt-0.5 line-clamp-1">${escapeHtml(meaning)}</p>
+        </div>
+      </div>
+      <button class="btn-close-mini text-slate-400 hover:text-white text-xs font-bold p-1 cursor-pointer">✕</button>
+    </div>
+    <div class="mt-2.5 pt-2 border-t border-slate-700/60 flex items-center justify-between gap-2">
+      <button class="btn-mini-speak px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-300 font-bold text-xs flex items-center gap-1 border border-white/10 cursor-pointer">
+        <span>🔊</span>
+        <span>听读音</span>
+      </button>
+      <button class="btn-mini-learn px-3 py-1 rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 text-amber-950 font-black text-xs shadow-md hover:brightness-110 active:scale-95 transition-all flex items-center gap-1 cursor-pointer">
+        <span>学这个字 ➔</span>
+      </button>
+    </div>
+  `;
+
+  document.body.appendChild(tooltip);
+
+  if (triggerEl && typeof triggerEl.getBoundingClientRect === "function") {
+    const rect = triggerEl.getBoundingClientRect();
+    const ttWidth = 260;
+    let left = rect.left + rect.width / 2 - ttWidth / 2;
+    left = Math.max(16, Math.min((window.innerWidth || 800) - ttWidth - 16, left));
+    let top = rect.top - 100;
+    if (top < 10) {
+      top = rect.bottom + 8;
+    }
+    tooltip.style.left = `${left}px`;
+    tooltip.style.top = `${top}px`;
+  } else {
+    tooltip.style.bottom = "24px";
+    tooltip.style.left = "50%";
+    tooltip.style.transform = "translateX(-50%)";
+  }
+
+  const close = () => {
+    tooltip.remove();
+    document.removeEventListener("click", outsideClickListener);
+  };
+
+  const outsideClickListener = (e) => {
+    if (!tooltip.contains(e.target) && e.target !== triggerEl) {
+      close();
+    }
+  };
+
+  setTimeout(() => {
+    document.addEventListener("click", outsideClickListener);
+  }, 50);
+
+  tooltip.querySelector(".btn-close-mini")?.addEventListener("click", (e) => {
+    e.stopPropagation();
+    close();
+  });
+
+  tooltip.querySelector(".btn-mini-speak")?.addEventListener("click", (e) => {
+    e.stopPropagation();
+    soundAndFX.playPop();
+    soundAndFX.speakPriority(charData.char, { kind: "char", priority: 1 });
+  });
+
+  tooltip.querySelector(".btn-mini-learn")?.addEventListener("click", (e) => {
+    e.stopPropagation();
+    soundAndFX.playSuccessSound();
+    close();
+    if (typeof this?._busEmit === "function") {
+      this._busEmit(EVENTS.START_LEARN, { charData });
+    }
+  });
+
+  return tooltip;
 }
 
 export function openCatalogDrawer(book) {

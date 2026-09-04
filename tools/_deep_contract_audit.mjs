@@ -128,12 +128,16 @@ for (const f of jsFiles) {
   const lines = readFileSync(f, "utf8").split("\n");
   let window_ = 0;
   lines.forEach((ln, i) => {
-    if (/\.map\(|\.forEach\(|Array\.from\(/.test(ln)) window_ = 8; // 模板通常紧跟在 map 之后若干行
+    if (/\.map\s*\(|\.forEach\s*\(/.test(ln)) window_ = 8;
     if (window_ > 0) {
       const m = ln.match(/id=["']([a-zA-Z0-9_-]+)["']/);
       if (m) loopIdIssues.push({ file: f, line: i + 1, id: m[1], code: ln.trim().slice(0, 80) });
     }
-    if (window_ > 0) window_--;
+    if (/\)\s*\.join\(|\}\s*\)\s*;/.test(ln)) {
+      window_ = 0;
+    } else if (window_ > 0) {
+      window_--;
+    }
   });
 }
 
