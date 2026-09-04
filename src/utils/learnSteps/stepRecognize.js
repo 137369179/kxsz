@@ -8,6 +8,7 @@ import { buildEtymologyCard } from "../etymologyEngine.js";
 import { getCognitiveStageData } from "../cognitiveStage.js";
 import { ebbinghausManager } from "../ebbinghaus.js";
 import { EVENTS } from "../eventBus.js";
+import { shouldUseSelfExplain, openSelfExplainPrompt } from "./selfExplainPrompt.js";
 
 export function renderStepRecognize(stage) {
     const char = this.charData;
@@ -169,7 +170,14 @@ export function renderStepRecognize(stage) {
     if (morphRecBtn) {
       this._on(morphRecBtn, "click", () => {
         soundAndFX.playPop();
-        openMorphTheater(char);
+        openMorphTheater(char, document.body, {
+          onClose: () => {
+            if (shouldUseSelfExplain(ebbinghausManager.getAge()) && !this._selfExplainDone) {
+              this._selfExplainDone = true;
+              openSelfExplainPrompt(char, () => {});
+            }
+          },
+        });
       });
     }
 
@@ -186,17 +194,24 @@ export function renderStepRecognize(stage) {
     if (finishBtn) {
       this._on(finishBtn, "click", () => {
         soundAndFX.playPop();
-        // T15: 认字后进入跟读评测前，进行启发式字理问答微交互
-        if (!this._etymologyQuizAnswered) {
-          this._etymologyQuizAnswered = true;
-          openEtymologyQuiz(char, () => {
-            this.currentStep = 3;
-            this.render();
-          });
+        const goNext = () => {
+          this.currentStep = 3;
+          this.render();
+        };
+        const age = ebbinghausManager.getAge();
+        if (shouldUseSelfExplain(age)) {
+          if (this._selfExplainDone) return goNext();
+          this._selfExplainDone = true;
+          openSelfExplainPrompt(char, goNext);
           return;
         }
-        this.currentStep = 3;
-        this.render();
+        // ≤4：保留有对错的字理问答一次
+        if (!this._etymologyQuizAnswered) {
+          this._etymologyQuizAnswered = true;
+          openEtymologyQuiz(char, goNext);
+          return;
+        }
+        goNext();
       });
     }
   }

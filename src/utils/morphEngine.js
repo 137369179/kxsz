@@ -122,9 +122,10 @@ export function renderMorphTheaterHTML(charItem) {
 /**
  * 挂载并启动动效微剧场
  */
-export function openMorphTheater(charItem, container = document.body) {
+export function openMorphTheater(charItem, container = document.body, opts = {}) {
   if (!charItem) return;
 
+  const { onClose } = opts || {};
   const evolution = charItem.evolution || {};
   const html = renderMorphTheaterHTML(charItem);
   const wrapper = document.createElement("div");
@@ -220,6 +221,9 @@ export function openMorphTheater(charItem, container = document.body) {
     try { soundAndFX.stopSpeaking(); } catch {}
     soundAndFX.playPop();
     wrapper.remove();
+    if (typeof onClose === "function") {
+      try { onClose(); } catch (_) { /* ignore */ }
+    }
   };
 
   if (closeBtn) closeBtn.addEventListener("click", close);

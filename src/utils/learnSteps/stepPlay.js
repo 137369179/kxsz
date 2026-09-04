@@ -6,6 +6,8 @@ import { openMorphTheater } from "../morphEngine.js";
 import { chantChar, CHANT_MODES } from "../chantEngine.js";
 import { forChar as mmForChar, SCENES as MM_SCENES } from "../multimodalEngine.js";
 import { buildEtymologyCard } from "../etymologyEngine.js";
+import { ebbinghausManager } from "../ebbinghaus.js";
+import { shouldUseSelfExplain, openSelfExplainPrompt } from "./selfExplainPrompt.js";
 
 export function renderStepPlay(stage) {
     const char = this.charData;
@@ -98,7 +100,14 @@ export function renderStepPlay(stage) {
     if (morphBtn) {
       this._on(morphBtn, "click", () => {
         soundAndFX.playPop();
-        openMorphTheater(char);
+        openMorphTheater(char, document.body, {
+          onClose: () => {
+            if (shouldUseSelfExplain(ebbinghausManager.getAge()) && !this._selfExplainDone) {
+              this._selfExplainDone = true;
+              openSelfExplainPrompt(char, () => {});
+            }
+          },
+        });
       });
     }
 
