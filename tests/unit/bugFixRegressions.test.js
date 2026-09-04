@@ -108,8 +108,14 @@ describe("Bug Fix Regression Audits", () => {
   });
 
   it("ReviewModule should safely reset queue and currentIndex when re-rendered after completion", () => {
+    // P0: queue is learned-only — seed at least one learned char so rebuild is non-empty
+    const seedId = CHARACTER_DATABASE[0]?.id || "char_001";
+    ebbinghausManager.progress.charRecords = {
+      [seedId]: { charId: seedId, masteryRate: 0.4, reviews: 1 },
+    };
+
     const mod = new ReviewModule(mockContainer);
-    mod.currentIndex = 5; // simulate completing all 5 characters
+    mod.currentIndex = 5; // simulate completing the queue
     expect(mod.currentIndex).toBe(5);
 
     // Re-render must not crash and should re-initialize queue
