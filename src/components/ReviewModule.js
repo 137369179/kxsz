@@ -1,8 +1,8 @@
 /**
  * 凯茜识字 (Cathy Literacy) - 艾宾浩斯智能复习与巩固中心
  * ------------------------------------------------------------
- * 1. 严格依据遗忘曲线提取待复习生字（优先薄弱字与到期字）
- * 2. 结合 DrillEngine 4 大微游戏进行趣味强化训练
+ * 1. 严格依据遗忘曲线提取待复习生字（仅已学字；优先薄弱字与到期字）
+ * 2. 主路径：自由提取 / 听音指认（freeRecallView），按单卡种诚实记账
  * 3. 统计全对率、生成结算奖励、颁发星币与荣誉徽章
  */
 
@@ -10,15 +10,11 @@ import { CHARACTER_DATABASE } from "../data/characters.js";
 import { ebbinghausManager } from "../utils/ebbinghaus.js";
 import { soundAndFX } from "../utils/soundEngine.js";
 import { BaseModule, escapeHtml } from "../utils/BaseModule.js";
-import { DrillEngine } from "../utils/drillEngine.js";
 import { EVENTS } from "../utils/eventBus.js";
 import { GAME_ICONS } from "../utils/gameIcons.js";
 import { printWorksheet } from "../utils/worksheetGenerator.js";
 import { getSessionConfig } from "../utils/sessionPlanner.js";
-// P4 引擎接入：B8 原子卡 + B3 FSRS 调度 + B19 多模态编排
 import {
-  buildAtomicCardsForChar,
-  expandCharsToAtomicQueue,
   recordAtomicAnswer,
   isCardMastered,
   ATOMIC_CARD_TYPES,
@@ -26,12 +22,13 @@ import {
 import {
   initFSRSRecord,
   migrateToFSRS,
-  FSRGRating,
-  isIntradayReview,
   fsrsPredict,
 } from "../utils/fsrsScheduler.js";
-import { forChar as mmForChar, SCENES as MM_SCENES } from "../utils/multimodalEngine.js";
 import { confusedTargetsForReview } from "../utils/reviewConfused.js";
+import {
+  mountFreeRecallRound,
+  mapSelfReportToRating,
+} from "../utils/reviewHub/index.js";
 
 function shuffle(arr) {
   const a = [...arr];
@@ -49,7 +46,7 @@ export class ReviewModule extends BaseModule {
     this.currentIndex = 0;
     this.correctCount = 0;
     this.wrongCount = 0;
-    this.drillEngine = null;
+    this._freeRecall = null;
     // SM-18 遗忘警报追踪
     this.consecutiveMistakes = {};  // { charId: number } 连续失误计数
     this.forgottenChars = [];       // 警报字列表（charId）
@@ -60,12 +57,31 @@ export class ReviewModule extends BaseModule {
     // E6 B4 米勒 7±2：按年龄决定复习块大小，不再硬编码 5
     const cfg = getSessionConfig(ebbinghausManager.getAge());
     const wantRev = cfg.reviews;
+    const records = ebbinghausManager.progress.charRecords || {};
+    const learnedIds = Object.keys(records);
+    const learnedSet = new Set(learnedIds);
 
-    const dueIds = ebbinghausManager.getDueReviewCharIds().slice(0, Math.max(wantRev, 3));
+    this.currentIndex = 0;
+    this.correctCount = 0;
+    this.wrongCount = 0;
+    this.consecutiveMistakes = {};
+    this.forgottenChars = [];
+
+    // 仅已学字；无已学 → 空队列（禁止字库前 N 字凑数）
+    if (learnedIds.length === 0) {
+      this.queue = [];
+      return;
+    }
+
+    const dueIds = ebbinghausManager
+      .getDueReviewCharIds()
+      .filter((id) => learnedSet.has(id))
+      .slice(0, Math.max(wantRev, 3));
+
     const confusedChars = confusedTargetsForReview(
       ebbinghausManager.progress.errorProfiles,
       Math.max(wantRev - dueIds.length, 2)
-    );
+    ).filter((c) => learnedSet.has(c.id));
     const confusedIds = confusedChars.map((c) => c.id);
 
     const allIds = [...new Set([...dueIds, ...confusedIds])].slice(0, wantRev);
@@ -75,12 +91,10 @@ export class ReviewModule extends BaseModule {
 
     // P4 B8: 跳过 flashcardEngine 判定所有原子卡已掌握的字
     // P4 B3: 用 FSRS predict 排序 — 先复习弱字，强字排后
-    const records = ebbinghausManager.progress.charRecords || {};
     this.queue = this.queue
       .filter((c) => {
         const rec = records[c.id];
-        if (!rec) return true;  // 未记录过的字保留
-        // 所有 5 张原子卡都已掌握 → 这个字暂时跳过
+        if (!rec) return true;
         const allMastered = Object.values(ATOMIC_CARD_TYPES).every((t) =>
           isCardMastered(rec, t)
         );
@@ -91,31 +105,22 @@ export class ReviewModule extends BaseModule {
         const recB = records[b.id];
         const predA = fsrsPredict(recA?._fsrsState || recA);
         const predB = fsrsPredict(recB?._fsrsState || recB);
-        // retention 低的排前面（先复习遗忘风险高的字）
         return (predA.retention ?? 1) - (predB.retention ?? 1);
       });
 
-    // 若无到期复习字，抽取已学字或基础字进行巩固
+    // 若无到期/混淆字，从已学字巩固（仍禁止未学字库切片）
     if (this.queue.length === 0) {
-      const learnedIds = Object.keys(ebbinghausManager.progress.charRecords || {});
-      if (learnedIds.length > 0) {
-        this.queue = learnedIds.slice(0, wantRev).map((id) => CHARACTER_DATABASE.find((c) => c.id === id)).filter(Boolean);
-      } else {
-        this.queue = CHARACTER_DATABASE.slice(0, wantRev);
-      }
+      this.queue = learnedIds
+        .slice(0, wantRev)
+        .map((id) => CHARACTER_DATABASE.find((c) => c.id === id))
+        .filter(Boolean);
     }
-
-    this.currentIndex = 0;
-    this.correctCount = 0;
-    this.wrongCount = 0;
-    this.consecutiveMistakes = {};
-    this.forgottenChars = [];
   }
 
   destroy() {
-    if (this.drillEngine?.destroy) {
-      this.drillEngine.destroy();
-      this.drillEngine = null;
+    if (this._freeRecall?.destroy) {
+      this._freeRecall.destroy();
+      this._freeRecall = null;
     }
     super.destroy();
   }
@@ -201,19 +206,47 @@ export class ReviewModule extends BaseModule {
     }
   }
 
+  _pickDistractors(charData, count = 3) {
+    const out = [];
+    const seen = new Set([charData.char]);
+    const pushChar = (ch) => {
+      if (!ch || seen.has(ch)) return;
+      seen.add(ch);
+      out.push(ch);
+    };
+
+    const confuse = charData.confusingChars || [];
+    for (const ref of confuse) {
+      if (out.length >= count) break;
+      const resolved =
+        typeof ref === "string"
+          ? CHARACTER_DATABASE.find((c) => c.char === ref || c.id === ref)
+          : null;
+      pushChar(resolved?.char || (typeof ref === "string" && ref.length <= 2 ? ref : null));
+    }
+
+    const learnedIds = Object.keys(ebbinghausManager.progress.charRecords || {});
+    for (const id of shuffle(learnedIds)) {
+      if (out.length >= count) break;
+      const c = CHARACTER_DATABASE.find((x) => x.id === id);
+      if (c) pushChar(c.char);
+    }
+
+    for (const c of CHARACTER_DATABASE) {
+      if (out.length >= count) break;
+      pushChar(c.char);
+    }
+
+    return out.slice(0, count);
+  }
+
   renderRound() {
     const __rvProgress = ebbinghausManager.progress;
     const __rvSpeakerIcon = soundAndFX.isMuted ? GAME_ICONS.speaker("w-5 h-5", true) : GAME_ICONS.speaker("w-5 h-5", false);
     const charData = this.queue[this.currentIndex];
     const progress = this.currentIndex + 1;
 
-    // P4 B19: 多模态编排器 — 为当前复习字生成模态包
-    const __mm = mmForChar(charData, MM_SCENES.REVIEW);
-    const __emoji    = __mm.modalities.visual_emoji?.emoji;
-    const __radical  = __mm.modalities.semantic_radical?.radical;
-    const __confuses = __mm.modalities.semantic_confuse?.confusables || [];
-    const __chant    = __mm.modalities.auditory_chant?.chant;
-
+    // Free-recall prompt：不渲染易混 / 口诀 / 部首剧透条
     this.container.innerHTML = `
       <div class="relative w-full h-full min-h-[640px] flex flex-col select-none overflow-hidden bg-gradient-to-b from-indigo-950 via-purple-950 to-slate-950 text-white animate-fade-in">
         
@@ -241,15 +274,7 @@ export class ReviewModule extends BaseModule {
           </div>
         </header>
 
-        <!-- P4 B19: 多模态预览条 — 由 multimodalEngine 编排 -->
-        <div class="relative z-20 w-full px-4 py-1.5 flex items-center gap-2 flex-wrap justify-center bg-black/30 backdrop-blur-sm border-b border-white/10 text-xs font-bold">
-          ${__emoji ? `<span class="bg-white/15 text-white px-2 py-0.5 rounded-full border border-white/20">形象提示</span>` : ''}
-          ${__radical ? `<span class="bg-amber-500/25 text-amber-200 px-2 py-0.5 rounded-full border border-amber-400/40">部首 ${__radical}</span>` : ''}
-          ${__confuses.length ? `<span class="bg-rose-500/25 text-rose-200 px-2 py-0.5 rounded-full border border-rose-400/40">⚠ 别搞混 ${__confuses.slice(0, 3).join(' ')}</span>` : ''}
-          ${__chant ? `<span class="bg-emerald-500/25 text-emerald-200 px-2 py-0.5 rounded-full border border-emerald-400/40">口诀：${__chant}</span>` : ''}
-        </div>
-
-        <main id="drill-container" class="relative z-10 flex-1 w-full flex items-center justify-center p-4 sm:p-6">
+        <main id="recall-container" class="relative z-10 flex-1 w-full flex items-center justify-center p-4 sm:p-6">
         </main>
       </div>
     `;
@@ -272,81 +297,82 @@ export class ReviewModule extends BaseModule {
       });
     }
 
-    const drillStage = this.container.querySelector("#drill-container");
-    this.drillEngine = new DrillEngine(drillStage, charData, () => {
-      // 完成单个字的强化训练
-      const perfect = (this.drillEngine.bestCombo || 0) >= 2;
-      const charId = charData.id;
-      const records = ebbinghausManager.progress.charRecords;
-      let charRec = records[charId];
+    const recallStage = this.container.querySelector("#recall-container");
+    const age = ebbinghausManager.getAge();
+    const distractorChars = this._pickDistractors(charData, 3);
 
-      // P4 B3: ensure FSRS state exists (lazy migrate)
-      if (charRec && !charRec._fsrsState) {
-        charRec._fsrsState = migrateToFSRS(charRec);
-      } else if (!charRec) {
-        charRec = records[charId] = {
-          charId,
-          learnedAt: Date.now(),
-          reviewCount: 0,
-          correctStreak: 0,
-          masteryRate: 60,
-          nextReviewDate: Date.now(),
-          isDifficult: false,
-          ...initFSRSRecord(charId),
-        };
-      }
+    if (this._freeRecall?.destroy) {
+      this._freeRecall.destroy();
+      this._freeRecall = null;
+    }
 
-      // P4 B3: 决定 FSRS rating（perfect → GOOD/EASY，否则 HARD/AGAIN）
-      let rating;
-      if (perfect) {
-        rating = (this.drillEngine.bestCombo || 0) >= 4 ? FSRGRating.EASY : FSRGRating.GOOD;
-      } else if ((this.consecutiveMistakes[charId] || 0) >= 2) {
-        rating = FSRGRating.AGAIN;
-      } else {
-        rating = FSRGRating.HARD;
-      }
-
-      // 单路径：只通过 completeReview 调度一次，避免 scheduleFSRS + completeReview 双写覆盖
-      for (const cardType of Object.values(ATOMIC_CARD_TYPES)) {
-        recordAtomicAnswer(charRec, cardType, perfect);
-      }
-
-      if (perfect) {
-        this.correctCount++;
-        this.consecutiveMistakes[charId] = 0;
-        ebbinghausManager.completeReview(charId, rating);
-        ebbinghausManager.addCoins(5);
-      } else {
-        this.wrongCount++;
-        this.consecutiveMistakes[charId] = (this.consecutiveMistakes[charId] || 0) + 1;
-        ebbinghausManager.completeReview(charId, rating);
-        ebbinghausManager.addCoins(1);
-
-        // SM-18 遗忘警报：连续错 2 次及以上触发
-        if (this.consecutiveMistakes[charId] >= 2 && !this.forgottenChars.includes(charId)) {
-          this.forgottenChars.push(charId);
-          // 在队列末尾追加巳固题（该字再别练一次）
-          if (!this.queue.slice(this.currentIndex + 1).some(c => c.id === charId)) {
-            this.queue.push(charData);
-          }
-          // 语音提示
-          soundAndFX.speakPriority('这个字小有困难，再练一次吧', { kind: 'tutorial', priority: 1 });
-          // 遗忘警报横幅
-          this._showForgottenAlert(charData);
-        }
-      }
-
-      this.currentIndex++;
-      if (this.currentIndex < this.queue.length) {
-        this.renderRound();
-      } else {
-        this.renderSummary();
-      }
+    this._freeRecall = mountFreeRecallRound({
+      containerEl: recallStage,
+      charData,
+      age,
+      distractorChars,
+      on: (el, evt, fn) => this._on(el, evt, fn),
+      onComplete: ({ knew, cardType }) => {
+        this._handleRecallComplete(charData, knew, cardType);
+      },
     });
   }
 
+  _handleRecallComplete(charData, knew, cardType) {
+    const charId = charData.id;
+    const records = ebbinghausManager.progress.charRecords;
+    let charRec = records[charId];
+
+    if (charRec && !charRec._fsrsState) {
+      charRec._fsrsState = migrateToFSRS(charRec);
+    } else if (!charRec) {
+      charRec = records[charId] = {
+        charId,
+        learnedAt: Date.now(),
+        reviewCount: 0,
+        correctStreak: 0,
+        masteryRate: 60,
+        nextReviewDate: Date.now(),
+        isDifficult: false,
+        ...initFSRSRecord(charId),
+      };
+    }
+
+    // 诚实性：只记本次卡种一次
+    recordAtomicAnswer(charRec, cardType, !!knew);
+
+    const rating = mapSelfReportToRating(!!knew);
+    ebbinghausManager.completeReview(charId, rating);
+
+    if (knew) {
+      this.correctCount++;
+      this.consecutiveMistakes[charId] = 0;
+      ebbinghausManager.addCoins(5);
+    } else {
+      this.wrongCount++;
+      this.consecutiveMistakes[charId] = (this.consecutiveMistakes[charId] || 0) + 1;
+      ebbinghausManager.addCoins(1);
+
+      if (this.consecutiveMistakes[charId] >= 2 && !this.forgottenChars.includes(charId)) {
+        this.forgottenChars.push(charId);
+        if (!this.queue.slice(this.currentIndex + 1).some((c) => c.id === charId)) {
+          this.queue.push(charData);
+        }
+        soundAndFX.speakPriority("这个字我们再练一次吧", { kind: "tutorial", priority: 1 });
+        this._showForgottenAlert(charData);
+      }
+    }
+
+    this.currentIndex++;
+    if (this.currentIndex < this.queue.length) {
+      this.renderRound();
+    } else {
+      this.renderSummary();
+    }
+  }
+
   /**
-   * 遗忘警报横幅（SM-18 遗忘警报）
+   * 再练提示横幅（中性文案，避免恐吓感）
    * @param {object} charData
    */
   _showForgottenAlert(charData) {
@@ -358,13 +384,13 @@ export class ReviewModule extends BaseModule {
       'left:50%',
       'transform:translateX(-50%)',
       'z-index:9999',
-      'background:linear-gradient(135deg,#dc2626,#b91c1c)',
+      'background:linear-gradient(135deg,#2563eb,#1d4ed8)',
       'color:#fff',
       'padding:12px 28px',
       'border-radius:999px',
       'font-weight:900',
       'font-size:15px',
-      'box-shadow:0 8px 32px rgba(220,38,38,0.4)',
+      'box-shadow:0 8px 32px rgba(37,99,235,0.35)',
       'display:flex',
       'align-items:center',
       'gap:10px',
@@ -374,7 +400,7 @@ export class ReviewModule extends BaseModule {
     ].join(';');
     banner.innerHTML = [
       GAME_ICONS.star('w-5 h-5', false),
-      `<span>「${escapeHtml(charData.char)}」需要加强巳固！已加入本轮末尾重练</span>`,
+      `<span>「${escapeHtml(charData.char)}」我们再练一次吧 · 已加入本轮末尾</span>`,
     ].join('');
     document.body.appendChild(banner);
     setTimeout(() => { banner.remove(); }, 3200);
@@ -383,6 +409,11 @@ export class ReviewModule extends BaseModule {
   renderSummary() {
     // 停止所有当前音频，防止音效重叠
     soundAndFX.stopSpeaking?.();
+
+    if (this._freeRecall?.destroy) {
+      this._freeRecall.destroy();
+      this._freeRecall = null;
+    }
 
     const __rvProgress = ebbinghausManager.progress;
     const __rvSpeakerIcon = soundAndFX.isMuted ? GAME_ICONS.speaker("w-5 h-5", true) : GAME_ICONS.speaker("w-5 h-5", false);
