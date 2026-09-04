@@ -59,7 +59,7 @@ export class HanziEngine {
       const age = mgr?.getAge?.() || 6;
       const prewriteDone = !!mgr?.getLastPrewriteResult?.();
       if (age < 5 && !prewriteDone) return "free";  // 3-4岁没练过控笔 → 自由
-      if (age < 6 || (age < 5 && prewriteDone)) return "soft";  // 5-6岁 或 3-4岁练过
+      if (age < 7 || (age < 5 && prewriteDone)) return "soft";  // 5-6岁 soft，7+ strong
       return "strong";  // 7岁+
     } catch { return "soft"; }
   }

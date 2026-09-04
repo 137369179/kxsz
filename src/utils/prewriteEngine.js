@@ -165,6 +165,10 @@ export class PrewriteEngine {
     } else {
       this.inputMode = "stylus";
       this.touchTargetScale = options.touchTargetScale ?? 1.0;
+
+    // T3: 连续低覆盖度降级
+    this._lowCoverageStreak = 0;
+    this._effectiveShapes = SHAPE_SETS_BY_AGE[this.age] || SHAPE_SETS_BY_AGE[6] || [];
       this.traceTolerance = 0.20;
     }
 
@@ -760,5 +764,24 @@ export class PrewriteEngine {
     const completed = this.shapeProgress.filter((p) => p > 0);
     if (completed.length === 0) return 0;
     return completed.reduce((a, b) => a + b, 0) / completed.length;
+  }
+
+  // T3: 根据年龄 + 连续低覆盖度 动态决定形状集合
+  _resolveShapeSet(age) {
+    const allByAge = SHAPE_SETS_BY_AGE[age] || SHAPE_SETS_BY_AGE[6] || [];
+    if (this._lowCoverageStreak >= 2) {
+      return allByAge.slice(0, Math.min(2, allByAge.length));
+    }
+    return allByAge;
+  }
+
+  // T3: 每次形状完成时检测是否连续低覆盖
+  _recordShapeCoverage(coverage) {
+    if (coverage < 0.6) {
+      this._lowCoverageStreak++;
+    } else {
+      this._lowCoverageStreak = 0;
+    }
+    this._effectiveShapes = this._resolveShapeSet(this.age);
   }
 }
