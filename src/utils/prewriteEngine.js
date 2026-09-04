@@ -153,14 +153,18 @@ export class PrewriteEngine {
     this.tolerance = this._toleranceForAge(this.age);
     this.targetProgressRatio = 0.6 + Math.min(0.2, this.age * 0.03); // 4岁 0.72, 7岁 0.81
 
-    // T10: 年龄自适应触屏策略 (<=6 岁 手指模式，触控区放大40%；>=7 岁 手写笔精细模式)
-    if (this.age <= 6) {
+    // T10 + P0-B1-3: 年龄自适应触屏策略 + 3岁额外放大（CCMS 标准：3岁触控目标≥56px）
+    if (this.age < 4) {
       this.inputMode = "finger";
-      this.touchTargetScale = 1.4;
+      this.touchTargetScale = options.touchTargetScale ?? 1.5;  // 3岁：1.5x
+      this.traceTolerance = 0.40;
+    } else if (this.age <= 6) {
+      this.inputMode = "finger";
+      this.touchTargetScale = options.touchTargetScale ?? 1.3;  // 4-6岁：1.3x（原有1.4略降）
       this.traceTolerance = 0.35;
     } else {
       this.inputMode = "stylus";
-      this.touchTargetScale = 1.0;
+      this.touchTargetScale = options.touchTargetScale ?? 1.0;
       this.traceTolerance = 0.20;
     }
 
@@ -733,5 +737,28 @@ export class PrewriteEngine {
   /** 返回当前形状序号（1-based） */
   getCurrentShapeNumber() {
     return Math.min(this.currentShapeIdx + 1, this.shapes.length);
+  }
+
+  /**
+   * P0-B1-3 返回已完成的形状名称数组（供 ebbinghaus.setLastPrewriteResult 用）
+   * @returns {string[]}
+   */
+  getCompletedShapes() {
+    const completed = [];
+    for (let i = 0; i < this.currentShapeIdx && i < this.shapes.length; i++) {
+      completed.push(this.shapes[i]);
+    }
+    return completed;
+  }
+
+  /**
+   * P0-B1-3 返回所有形状的平均覆盖度（0-1）
+   * 只计算已完成的形状，未完成的不算
+   * @returns {number}
+   */
+  getAverageCoverage() {
+    const completed = this.shapeProgress.filter((p) => p > 0);
+    if (completed.length === 0) return 0;
+    return completed.reduce((a, b) => a + b, 0) / completed.length;
   }
 }

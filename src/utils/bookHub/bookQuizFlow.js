@@ -3,23 +3,14 @@ import { soundAndFX } from "../soundEngine.js";
 import { ebbinghausManager } from "../ebbinghaus.js";
 import { mountGameShell } from "../../components/SharedShell.js";
 import { GAME_ICONS } from "../gameIcons.js";
+import { buildBookStage1Quiz } from "./bookStage1Quiz.js";
+import { CHARACTER_DATABASE } from "../../data/characters.js";
 
 export function renderQuiz() {
   const book = this.currentBook;
-  const targetChar = (book.targetChars || ["日"])[0];
 
-  // Stage 1: 生字眼力大考验
-  const stage1Question = {
-    title: "【第 1 关 · 生字眼力大考验】",
-    question: `在《${book.title}》的故事中，你认识这颗生字吗？`,
-    highlightChar: targetChar,
-    options: [
-      `认识！读作“${targetChar}”`,
-      `不认识`,
-      `好像在哪里见过`
-    ],
-    correctIndex: 0
-  };
+  // Stage 1: 真测评 — 形近/同阶干扰选字（禁止「我认识」自评）
+  const stage1Question = buildBookStage1Quiz(book);
 
   // Stage 2: 故事理解小问答
   const stage2Quiz = Array.isArray(book.quiz) ? book.quiz[0] : (book.quiz || {
@@ -41,7 +32,8 @@ export function renderQuiz() {
   });
   this._addCleanup(destroyShell);
 
-  soundAndFX.speakPriority(activeQuiz.question, { kind: "sentence" });
+  const speakText = activeQuiz.speakPrompt || activeQuiz.question;
+  soundAndFX.speakPriority(speakText, { kind: activeQuiz.speakPrompt ? "char" : "sentence" });
 
   mainEl.innerHTML = `
     <div class="relative w-full max-w-3xl mx-auto flex flex-col justify-between pt-16 sm:pt-20 pb-8 px-4 select-none animate-fade-in">
@@ -54,23 +46,23 @@ export function renderQuiz() {
           ${activeQuiz.title}
         </span>
         
-        ${this.currentQuizStage === 1 && activeQuiz.highlightChar ? `
-          <div class="w-20 h-20 bg-red-50 border-4 border-red-500 rounded-2xl flex items-center justify-center mb-3 shadow-md">
-            <span class="text-5xl font-black text-red-900 font-serif">${activeQuiz.highlightChar}</span>
-          </div>
+        ${this.currentQuizStage === 1 ? `
+          <button id="btn-quiz-replay-char" class="mb-3 btn-game-orange text-white font-black text-xs px-5 py-2 rounded-full shadow cursor-pointer">
+            再听一遍生字
+          </button>
         ` : ''}
 
         <h2 class="text-xl sm:text-2xl font-black text-amber-950 mb-6 leading-relaxed">
           ${activeQuiz.question}
         </h2>
 
-        <div class="flex flex-col gap-3.5 w-full max-w-lg">
+        <div class="flex ${this.currentQuizStage === 1 ? "flex-row flex-wrap justify-center" : "flex-col"} gap-3.5 w-full max-w-lg">
           ${activeQuiz.options
             .map(
               (opt, idx) => `
-            <button class="quiz-option-btn group p-4 rounded-2xl bg-white hover:bg-amber-50/80 border-2 border-amber-200 hover:border-orange-400 shadow-md hover:shadow-xl text-amber-950 font-black text-sm sm:text-base active:scale-95 hover:scale-[1.02] transition-all duration-300 text-left flex items-center justify-between cursor-pointer" data-index="${idx}">
+            <button class="quiz-option-btn group ${this.currentQuizStage === 1 ? "w-20 h-20 text-3xl font-serif justify-center" : "p-4 text-sm sm:text-base text-left justify-between"} rounded-2xl bg-white hover:bg-amber-50/80 border-2 border-amber-200 hover:border-orange-400 shadow-md hover:shadow-xl text-amber-950 font-black active:scale-95 hover:scale-[1.02] transition-all duration-300 flex items-center cursor-pointer" data-index="${idx}">
               <span class="group-hover:text-orange-700 transition-colors">${opt}</span>
-              <span class="w-8 h-8 rounded-full bg-gradient-to-b from-amber-200 to-amber-400 shadow-sm border border-amber-500 flex items-center justify-center text-xs text-amber-900 font-black shadow-[inset_0_-2px_4px_rgba(0,0,0,0.1)] group-hover:rotate-12 transition-transform">${String.fromCharCode(65 + idx)}</span>
+              ${this.currentQuizStage === 1 ? "" : `<span class="w-8 h-8 rounded-full bg-gradient-to-b from-amber-200 to-amber-400 shadow-sm border border-amber-500 flex items-center justify-center text-xs text-amber-900 font-black">${String.fromCharCode(65 + idx)}</span>`}
             </button>
           `
             )
@@ -80,6 +72,13 @@ export function renderQuiz() {
 
     </div>
   `;
+
+  const replayBtn = mainEl.querySelector("#btn-quiz-replay-char");
+  if (replayBtn && activeQuiz.speakPrompt) {
+    this._on(replayBtn, "click", () => {
+      soundAndFX.speakPriority(activeQuiz.speakPrompt, { kind: "char", priority: 1 });
+    });
+  }
 
   mainEl.querySelectorAll(".quiz-option-btn").forEach((btn) => {
     this._on(btn, "click", () => {
@@ -112,6 +111,17 @@ export function renderQuiz() {
       } else {
         soundAndFX.playSoftError();
         btn.classList.add("animate-shake", "ring-4", "ring-rose-500", "bg-rose-100");
+        if (this.currentQuizStage === 1) {
+          const targetChar = activeQuiz.speakPrompt || (book.targetChars || [])[0];
+          const picked = activeQuiz.options[pickedIdx];
+          const targetRec = CHARACTER_DATABASE.find((c) => c.char === targetChar);
+          if (targetRec) {
+            ebbinghausManager.recordMistake(targetRec.id, "similar_confuse", {
+              targetChar,
+              selectedChar: picked
+            });
+          }
+        }
         this._timeout(() => {
           btn.classList.remove("animate-shake");
           this.quizAnswered = false;

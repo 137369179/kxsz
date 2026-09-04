@@ -56,6 +56,7 @@ export class LearnModule extends BaseModule {
     this._isRecordingTransition = false;
     // P0-2 B9 铁律：存真实朗读评测分数，避免 completeCharacter 硬编码 3 星
     this._evalStars = 3;
+    this._evalFromManual = false;
 
     // T8: 3 分钟微课断点续学
     const saved = this.loadProgress();

@@ -3,37 +3,28 @@ import { CHARACTER_DATABASE } from "../../data/characters.js";
 import { GAME_ICONS } from "../gameIcons.js";
 import { buildFullReport } from "../reportEngine.js";
 import { getTodayWorksheetChars, getDifficultWorksheetChars } from "../worksheetGenerator.js";
-
-const TROPHY_LIST = [
-  { id: "first_char", name: "识字小萌新", desc: "学会第 1 个汉字", req: "1 个字", icon: "star" },
-  { id: "forest_master", name: "森林探险家", desc: "通关启蒙森林岛", req: "200 个字", icon: "islandForest" },
-  { id: "town_hero", name: "小镇达人", desc: "通关生活常用小镇", req: "600 个字", icon: "islandTown" },
-  { id: "space_conqueror", name: "太空小学者", desc: "通关星际探索岛", req: "1490 个字", icon: "islandSpace" },
-  { id: "book_worm_1", name: "绘本初读者", desc: "完整读完 1 本分级绘本", req: "1 本绘本", icon: "book" },
-  { id: "book_master", name: "故事大王", desc: "读完 10 本分级绘本", req: "10 本绘本", icon: "crown" },
-  { id: "calligrapher", name: "小小书法家", desc: "AI 描红笔画全满分 50 次", req: "50 次满分", icon: "brush" },
-  { id: "boss_killer", name: "难字克星", desc: "歼灭难字首领怪兽 5 次", req: "5 次首领", icon: "monster" },
-  { id: "match_pro", name: "消消乐大师", desc: "汉字消消乐通关 10 局", req: "10 局通关", icon: "gem" },
-  { id: "pk_champion", name: "竞技场之王", desc: "双人竞技场获胜 10 局", req: "10 局胜利", icon: "swords" },
-  { id: "ebbinghaus_star", name: "记忆大师", desc: "连续 7 天按时完成艾宾浩斯复习", req: "7 天全勤", icon: "reviewBell" },
-  { id: "golden_rich", name: "金币大富翁", desc: "累计赚取 200 枚凯茜星币", req: "200 星币", icon: "coin" }
-];
+import { TROPHY_LIST, resolveTrophyUnlocks, describeStepSequenceForAge } from "./parentTrophies.js";
+import { ebbinghausManager } from "../ebbinghaus.js";
 
 export function renderActiveTabContent(progress, charCount, settings, diffCount) {
   // E14: 预计算多维报告数据（一次算完，所有面板复用）
   const _report = buildFullReport(progress);
 
   if (this.currentTab === "dashboard") {
-    const history = progress.studyHistory || [
-      { date: "周一", count: 3 },
-      { date: "周二", count: 2 },
-      { date: "周三", count: 4 },
-      { date: "周四", count: 1 },
-      { date: "周五", count: 5 },
-      { date: "周六", count: 3 },
-      { date: "周日", count: 4 }
-    ];
+    const history = (progress.studyHistory && progress.studyHistory.length)
+      ? progress.studyHistory
+      : [
+        { date: "周一", count: 0 },
+        { date: "周二", count: 0 },
+        { date: "周三", count: 0 },
+        { date: "周四", count: 0 },
+        { date: "周五", count: 0 },
+        { date: "周六", count: 0 },
+        { date: "周日", count: 0 }
+      ];
     const maxCount = Math.max(5, ...history.map(h => h.count));
+    const health = _report.mastery.healthScore;
+    const healthLabel = health >= 80 ? "记忆保持良好" : health >= 50 ? "需要按时复习" : "建议优先巩固难字";
 
     return `
       <!-- 过程性反馈：引导家长关注过程而非全勤/分数（自我决定理论：胜任感来自尝试与坚持） -->
@@ -47,22 +38,22 @@ export function renderActiveTabContent(progress, charCount, settings, diffCount)
         <div class="bg-white/95 rounded-3xl p-6 shadow-xl border-2 border-orange-200 text-center">
           <span class="text-xs sm:text-sm text-gray-500 font-bold">已掌握总字数</span>
           <div class="text-4xl font-black text-orange-600 my-2">${charCount} / 1490</div>
-          <span class="text-xs text-emerald-600 font-bold bg-emerald-50 px-3 py-1 rounded-full">超越 96% 同龄小勇士</span>
+          <span class="text-xs text-emerald-700 font-bold bg-emerald-50 px-3 py-1 rounded-full">已掌握 ${_report.mastery.mastered} · 学习中 ${_report.mastery.learning}</span>
         </div>
 
         <div class="bg-white/95 rounded-3xl p-6 shadow-xl border-2 border-amber-200 text-center">
           <span class="text-xs sm:text-sm text-gray-500 font-bold">今日已学字数</span>
-          <div class="text-4xl font-black text-amber-600 my-2">${progress.todayLearnedCount || charCount}</div>
+          <div class="text-4xl font-black text-amber-600 my-2">${progress.todayLearnedCount || 0}</div>
           <span class="text-xs text-amber-700 font-bold bg-amber-50 px-3 py-1 rounded-full">每日目标: ${settings.dailyCharTarget || 5} 字</span>
         </div>
 
         <div class="bg-white/95 rounded-3xl p-6 shadow-xl border-2 border-emerald-200 text-center">
           <span class="text-xs sm:text-sm text-gray-500 font-bold">累计收集之星</span>
           <div class="text-4xl font-black text-emerald-600 my-2 flex items-center justify-center gap-1.5">
-            <span>${progress.stars || (charCount * 3)}</span>
+            <span>${progress.stars || 0}</span>
             <span class="flex items-center">${GAME_ICONS.star("w-7 h-7", false)}</span>
           </div>
-          <span class="text-xs text-emerald-700 font-bold bg-emerald-50 px-3 py-1 rounded-full">星币余额: ${progress.coins || 60}</span>
+          <span class="text-xs text-emerald-700 font-bold bg-emerald-50 px-3 py-1 rounded-full">星币余额: ${progress.coins || 0}</span>
         </div>
 
         <!-- E14: AI 多维诊断卡片 -->
@@ -94,7 +85,7 @@ export function renderActiveTabContent(progress, charCount, settings, diffCount)
         <div class="bg-white/95 rounded-3xl p-6 shadow-xl border-2 border-rose-200 text-center">
           <span class="text-xs sm:text-sm text-gray-500 font-bold">难字本重点巩固</span>
           <div class="text-4xl font-black text-rose-600 my-2">${diffCount} 个</div>
-          <span class="text-xs text-rose-700 font-bold bg-rose-50 px-3 py-1 rounded-full">已安排至艾宾浩斯复习流</span>
+          <span class="text-xs text-rose-700 font-bold bg-rose-50 px-3 py-1 rounded-full">已安排至智能复习流</span>
         </div>
       </div>
 
@@ -129,20 +120,21 @@ export function renderActiveTabContent(progress, charCount, settings, diffCount)
       <div class="bg-white/95 rounded-3xl p-6 shadow-xl border-2 border-amber-200">
         <div class="flex items-center gap-2 mb-2">
           <span class="flex items-center">${GAME_ICONS.sparkle("w-5 h-5")}</span>
-          <h3 class="text-base font-black text-amber-950">艾宾浩斯智能复习调度系统</h3>
+          <h3 class="text-base font-black text-amber-950">智能复习调度（FSRS）</h3>
         </div>
         <p class="text-xs sm:text-sm text-gray-600 leading-relaxed font-semibold">
-          系统严格按照 1天、2天、4天、7天、15天 艾宾浩斯黄金记忆周期自动规划复习任务。当前遗忘预防健康度达 <b class="text-emerald-600">98.4%</b>，处于极佳记忆保持状态！
+          根据每次复习表现动态安排下次复习时间。当前记忆健康度 <b class="text-emerald-600">${health}/100</b>，${healthLabel}。
         </p>
       </div>
     `;
   }
 
   if (this.currentTab === "trophies") {
+    const unlocks = resolveTrophyUnlocks(progress, charCount);
     return `
       <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5">
-        ${TROPHY_LIST.map((t, idx) => {
-          const isUnlocked = idx < Math.max(3, Math.floor(charCount / 2));
+        ${TROPHY_LIST.map((t) => {
+          const isUnlocked = !!unlocks[t.id];
           const iconSvg = GAME_ICONS[t.icon] || GAME_ICONS.trophy;
 
           return `
@@ -386,6 +378,8 @@ export function renderActiveTabContent(progress, charCount, settings, diffCount)
   }
 
   if (this.currentTab === "settings") {
+    const profileAge = progress.profile?.age ?? "";
+    const agePreview = describeStepSequenceForAge(profileAge || ebbinghausManager.getAge());
     return `
       <div class="bg-white/95 rounded-3xl p-6 shadow-xl border-2 border-amber-200">
         <h2 class="text-base font-black text-amber-950 mb-4 flex items-center gap-2">
@@ -394,6 +388,20 @@ export function renderActiveTabContent(progress, charCount, settings, diffCount)
         </h2>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+
+          <div class="flex flex-col gap-2 sm:col-span-2 bg-indigo-50/80 border-2 border-indigo-200 rounded-2xl p-4">
+            <label class="text-xs font-bold text-indigo-950">孩子年龄（决定学习步骤数量）：</label>
+            <select id="select-child-age" class="bg-white border-2 border-indigo-300 rounded-xl px-3 py-2 text-xs font-black text-indigo-900 focus:outline-none">
+              <option value="" ${profileAge === "" || profileAge == null ? "selected" : ""}>未设置（默认按 6 岁：6 步，跳过读拼音与独立写）</option>
+              ${[3,4,5,6,7,8,9,10].map((a) => `
+                <option value="${a}" ${Number(profileAge) === a ? "selected" : ""}>${a} 岁</option>
+              `).join("")}
+            </select>
+            <p id="age-step-preview" class="text-[11px] font-bold text-indigo-800 leading-relaxed">
+              当前预览：${agePreview.label}
+            </p>
+            <p class="text-[10px] text-indigo-600 font-semibold">3–4 岁 4 步 · 5–6 岁 6 步 · 7 岁及以上 8 步全流程。请按真实年龄设置，避免步骤被静默跳过。</p>
+          </div>
           
           <div class="flex flex-col gap-2">
             <label class="text-xs font-bold text-gray-700">每日学习目标字数：</label>

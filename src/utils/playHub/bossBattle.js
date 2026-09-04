@@ -279,6 +279,7 @@ export function renderBossBattle() {
               // 奖励：基础 20 币 + 最高连击加成（最多 +12）
               const bonus = Math.min(maxStreak * 3, 12);
               ebbinghausManager.addCoins(20 + bonus);
+              ebbinghausManager.bumpGameStat("bossWins");
               ebbinghausManager.markTodayActive();
               const rewardEl = this.container.querySelector("#boss-win-reward");
               const statsEl = this.container.querySelector("#boss-win-stats");

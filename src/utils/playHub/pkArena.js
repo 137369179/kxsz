@@ -219,6 +219,7 @@ export function renderPkArena() {
           else if (p1Score < p2Score) reward += 5;
           else reward += 8;
           ebbinghausManager.addCoins(reward);
+          if (p1Score > p2Score) ebbinghausManager.bumpGameStat("pkWins");
           if (rewardEl) rewardEl.innerHTML = `${GAME_ICONS.coin("w-5 h-5")}<span>获得 ${reward} 凯茜星币 · ${p1Label} ${p1Score} - ${p2Label} ${p2Score}</span>`;
           if (winModal) winModal.classList.remove("hidden");
         }

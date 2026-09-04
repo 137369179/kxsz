@@ -96,6 +96,23 @@
     }
     /* 相邻可点元素最小间距，防误触相邻项 */
     .h-touch-row > * + * { margin-left: 8px; }
+    /* 触控适龄实测补强（tools/_touch_audit 2026-09-04）：筛选/标签按钮 27-42px → 44px 基线 */
+    .filter-stage-btn, .filter-status-btn, .btn-pinyin-tab, .btn-cat-filter,
+    .reward-tab, .island-tab-btn, .radical-tag-btn {
+      min-height: 44px;
+      align-items: center;
+    }
+    /* 通用按钮/图标按钮：伪元素扩命中区 ~6px（40px→≈48px，不占布局不破坏排版） */
+    .w-10.h-10, .w-9.h-9, .btn-game-wood, .btn-game-orange, .btn-game-purple,
+    .btn-game-blue, .btn-game-green, .btn-game-red {
+      position: relative;
+    }
+    .w-10.h-10::before, .w-9.h-9::before, .btn-game-wood::before, .btn-game-orange::before,
+    .btn-game-purple::before, .btn-game-blue::before, .btn-game-green::before, .btn-game-red::before {
+      content: "";
+      position: absolute;
+      inset: -7px;
+    }
   </style>
 </head>
 <body class="bg-slate-950 text-amber-950 overflow-hidden select-none m-0 p-0 w-screen h-screen flex items-center justify-center">

@@ -78,8 +78,9 @@ export function renderStepTestAndChest(stage) {
         soundAndFX.triggerConfetti(this.container);
         soundAndFX.triggerCoinFly(this.container);
 
-        // P0-2 B9 铁律：用真实评测分数，不再硬编码 3 星
-        const earnedStars = Math.max(0, Math.min(3, this._evalStars ?? 3));
+        // P0-2 B9：真实评测分数；手动自评封顶 2 星防灌水
+        let earnedStars = Math.max(0, Math.min(3, this._evalStars ?? 3));
+        if (this._evalFromManual) earnedStars = Math.min(earnedStars, 2);
 
         // Duang! Duang! Duang! 依次点亮（按真实评测分数）
         this._timeout(() => {

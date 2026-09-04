@@ -18,6 +18,15 @@ export class HanziEngine {
     this.isPeeking = false;
     this._peekTimer = null;
 
+    // P0-B1-3 引导强度三档："strong" (7+岁) | "soft" (5-6岁) | "free" (3-4岁)
+    // strong: 强制方向+轨道，倒笔画拦截，60°容差
+    // soft:   方向提示+宽松容差(68°)，倒笔画只提示不拦截
+    // free:   只显示笔顺，不验证方向，最大容差(75°)
+    this.guideMode = this.options.guideMode || this._ageBasedGuideMode();
+    this.strictReverseCheck = this.options.strictReverseCheck !== false && this.guideMode === "strong";
+    this.age = this._getAge();
+    this.touchTargetScale = this.age < 4 ? 1.4 : this.age < 6 ? 1.2 : 1.0;
+
     this.gridType = "mi"; // "mi" | "tian"
     this.drawSealStamp = false;
 
@@ -41,6 +50,22 @@ export class HanziEngine {
     this._initResizeObserver();
     this.startGuideAnimation();
     this.render();
+  }
+
+  /** P0-B1-3 年龄+prewrite 完成度 → guideMode 自动判定 */
+  _ageBasedGuideMode() {
+    try {
+      const mgr = window.ebbinghausManager;
+      const age = mgr?.getAge?.() || 6;
+      const prewriteDone = !!mgr?.getLastPrewriteResult?.();
+      if (age < 5 && !prewriteDone) return "free";  // 3-4岁没练过控笔 → 自由
+      if (age < 6 || (age < 5 && prewriteDone)) return "soft";  // 5-6岁 或 3-4岁练过
+      return "strong";  // 7岁+
+    } catch { return "soft"; }
+  }
+
+  _getAge() {
+    try { return window.ebbinghausManager?.getAge?.() || 6; } catch { return 6; }
   }
 
   /** 监听容器尺寸变化，自动重建 canvas 分辨率 */
@@ -219,16 +244,40 @@ export class HanziEngine {
   }
 
   getTolerance() {
+    // 家长显式覆盖 → 最高优先级（不做年龄调权）
     try {
-      if (typeof window !== "undefined" && window.ebbinghausManager?.progress?.settings?.strokeTolerance === "strict") {
-        return { start: 16, end: 18, reverse: -20 };
-      }
-      if (typeof window !== "undefined" && window.ebbinghausManager?.progress?.settings?.strokeTolerance === "standard") {
-        return { start: 22, end: 24, reverse: -25 };
-      }
+      const tol = window.ebbinghausManager?.progress?.settings?.strokeTolerance;
+      if (tol === "strict") return { start: 16, end: 18, reverse: -20 };
+      if (tol === "standard") return { start: 22, end: 24, reverse: -25 };
     } catch {}
-    // 默认幼童友好宽容模式 (防止幼儿手抖挫败)
-    return { start: 28, end: 30, reverse: -35 };
+
+    // P0-B1-3 默认：年龄 + prewrite 完成度双重调权
+    let baseStart = 28, baseEnd = 30, baseReverse = -35;
+
+    const mgr = window.ebbinghausManager;
+    const age = mgr?.getAge?.() || 6;
+    const prewriteResult = mgr?.getLastPrewriteResult?.();
+
+    // 年龄宽松度：3岁 +10px, 4岁 +6px, 5岁 +3px, 6岁 +0px
+    const ageBonus = age < 5 ? (5 - age) * 3 : 0;
+
+    // prewrite 完成度奖励：控笔好可以收紧，控笔差再放宽
+    if (prewriteResult?.avgCoverage) {
+      const cov = prewriteResult.avgCoverage;
+      if (cov >= 0.85) {
+        // 控笔很好 → 收紧 4px
+        baseStart -= 4; baseEnd -= 4; baseReverse += 4;
+      } else if (cov < 0.7) {
+        // 控笔还不稳 → 再放宽 5px
+        baseStart += 5; baseEnd += 5; baseReverse -= 5;
+      }
+    }
+
+    return {
+      start: baseStart + ageBonus,
+      end: baseEnd + ageBonus,
+      reverse: baseReverse - ageBonus
+    };
   }
 
   onPointerDown(e) {
@@ -321,13 +370,27 @@ export class HanziEngine {
         hasReverseStroke = true;
       }
 
-      // T4: 笔顺方向角严格验证（直线/弧线/折笔全部覆盖）
-      // corner 笔画的分段验证已内置于 strokeDirectionValidator 内部
+      // T4 + P0-B1-3: 笔顺方向角验证（按年龄 + prewrite 精细分档）
+      //   free 模式: 75° 不拦截（3-4岁 默认）
+      //   soft 模式: 68° 只提示不拦截（5-6岁 或 3-4岁+prewrite）
+      //   strong 模式: 60° (6岁) / 45° (7+岁) 强制拦截
       if (!hasReverseStroke) {
         const age = (typeof window !== "undefined" && window.ebbinghausManager?.getAge?.()) || 6;
-        const degTol = age <= 6 ? 60 : 45;
-        if (!this.strokeDirectionValidator(this.userCurrentPath, targetStroke, degTol)) {
-          hasReverseStroke = true;
+        const prewriteResult = window.ebbinghausManager?.getLastPrewriteResult?.();
+        let degTol;
+        if (this.guideMode === "free") degTol = 75;
+        else if (this.guideMode === "soft") degTol = age < 6 ? 68 : 60;
+        else if (this.guideMode === "strong") degTol = age <= 6 ? 60 : 45;
+        else degTol = age <= 6 ? 60 : 45;
+        // prewrite 高完成度 → 收紧 10°（控笔好可以更严格）
+        if (prewriteResult?.avgCoverage >= 0.85 && degTol > 50) degTol -= 10;
+
+        const dirOk = this.strokeDirectionValidator(this.userCurrentPath, targetStroke, degTol);
+        if (!dirOk) {
+          if (this.guideMode === "strong") {
+            hasReverseStroke = true;  // strong 模式拦截
+          }
+          // soft/free 模式不拦截，只给 gentle 提示（由下面的 errorWarning 展示）
         }
       }
 

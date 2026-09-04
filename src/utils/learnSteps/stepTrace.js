@@ -6,7 +6,33 @@ import { ebbinghausManager } from "../ebbinghaus.js";
 
 export function renderStepTrace(stage) {
     const char = this.charData;
-    soundAndFX.speakPriority(`魔法毛笔描红！请从发光起点开始，按照笔顺书写“${char.char}”字！`, { kind: "sentence", priority: 1 });
+
+    // ✅ P0-B1-3 计算 guideMode 并据此渲染不同 UI
+    const age = ebbinghausManager.getAge();
+    const prewriteResult = ebbinghausManager.getLastPrewriteResult();
+    let guideMode;
+    if (age < 5 && !prewriteResult) guideMode = "free";
+    else if (age < 6 || prewriteResult) guideMode = "soft";
+    else guideMode = "strong";
+
+    const phaseLabel = guideMode === "free"
+      ? "阶段 · 自由涂鸦"
+      : guideMode === "soft"
+      ? "阶段一 · 趣味描红"
+      : "阶段一 · 有轨描红";
+
+    const hintText = guideMode === "free"
+      ? "随便画一画这个字的样子就好～画错了也没关系！"
+      : guideMode === "soft"
+      ? "跟着发光的小光球画，感受一下笔顺的方向～"
+      : "沿黄色魔法光球滑行，遇到倒笔画系统会自动提示并拦截哦！";
+
+    const voiceIntro = guideMode === "free"
+      ? `${age}岁宝贝，今天先随便画一画"${char.char}"字的样子吧！画错了也没关系～`
+      : guideMode === "soft"
+      ? `魔法毛笔趣味描红！跟着发光的小光球画"${char.char}"字吧～`
+      : `魔法毛笔描红！请从发光起点开始，按照笔顺书写"${char.char}"字！`;
+    soundAndFX.speakPriority(voiceIntro, { kind: "sentence", priority: 1 });
 
     stage.innerHTML = `
       <div class="relative w-full max-w-5xl h-[520px] sm:h-[560px] bg-gradient-to-b from-amber-50 via-orange-50 to-amber-100 rounded-3xl overflow-hidden shadow-2xl border-4 border-amber-300 flex items-center justify-between p-8 animate-fade-in select-none">
@@ -31,11 +57,11 @@ export function renderStepTrace(stage) {
         <div class="w-72 flex flex-col justify-between h-full bg-white/80 backdrop-blur-md rounded-3xl p-6 border-2 border-amber-200 shadow-xl text-center">
           <div>
             <span class="bg-amber-100 text-amber-800 text-xs font-black px-4 py-1 rounded-full mb-3 inline-block flex items-center justify-center gap-1">
-              ${GAME_ICONS.brush("w-3.5 h-3.5 inline-block")} 阶段一 · 有轨描红
+              ${GAME_ICONS.brush("w-3.5 h-3.5 inline-block")} ${phaseLabel}
             </span>
-            <h3 class="text-lg font-black text-amber-950 mb-2">规范笔顺描红</h3>
+            <h3 class="text-lg font-black text-amber-950 mb-2">${guideMode === "free" ? `开心画「${char.char}」` : "规范笔顺描红"}</h3>
             <p class="text-xs text-gray-600 leading-relaxed font-semibold">
-              ${GAME_ICONS.sparkle("w-4 h-4 inline-block")} 沿黄色魔法光球滑行，遇到倒笔画系统会自动提示并拦截哦！
+              ${GAME_ICONS.sparkle("w-4 h-4 inline-block")} ${hintText}
             </p>
           </div>
 
@@ -94,6 +120,12 @@ export function renderStepTrace(stage) {
       },
       (strokeIdx) => {
         updateBeads(strokeIdx + 1);
+      },
+      // ✅ P0-B1-3 传 guideMode + strictReverseCheck 给 HanziEngine
+      {
+        guideMode: guideMode,
+        strictReverseCheck: guideMode === "strong",  // free/soft 不拦截倒笔画
+        freeWrite: guideMode === "free"
       }
     );
 

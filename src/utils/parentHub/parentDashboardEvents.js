@@ -7,6 +7,7 @@ import { printWorksheet, getTodayWorksheetChars, getDifficultWorksheetChars } fr
 import { storageManager } from "../storageManager.js";
 import { rewardEngine } from "../rewardEngine.js";
 import { showConfirm } from "../parentGate.js";
+import { describeStepSequenceForAge } from "./parentTrophies.js";
 
 export function bindDashboardEvents(mainEl) {
   // 标签切换
@@ -225,6 +226,15 @@ export function bindDashboardEvents(mainEl) {
       const tolerance = mainEl.querySelector("#select-stroke-tolerance")?.value || "toddler";
       const enablePlay = mainEl.querySelector("#check-enable-play")?.checked ?? true;
       const enableWrite = mainEl.querySelector("#check-enable-write")?.checked ?? true;
+      const ageRaw = mainEl.querySelector("#select-child-age")?.value;
+      if (ageRaw === "" || ageRaw == null) {
+        ebbinghausManager.progress.profile = ebbinghausManager.progress.profile || {};
+        ebbinghausManager.progress.profile.age = null;
+      } else {
+        const ageNum = Math.min(10, Math.max(3, parseInt(ageRaw, 10) || 6));
+        ebbinghausManager.progress.profile = ebbinghausManager.progress.profile || {};
+        ebbinghausManager.progress.profile.age = ageNum;
+      }
 
       ebbinghausManager.progress.settings.dailyCharTarget = dailyTarget;
       ebbinghausManager.progress.settings.eyeProtectionMinutes = eyeTime;
@@ -240,7 +250,17 @@ export function bindDashboardEvents(mainEl) {
       ebbinghausManager.setFocusMode(focusModeChecked);
 
       soundAndFX.playSuccessSound();
-      showGameToast(this.container, "学习、描红容差与护眼设置已成功保存！", "success");
+      showGameToast(this.container, "年龄、学习与护眼设置已保存！", "success");
+    });
+  }
+
+  const ageSelect = mainEl.querySelector("#select-child-age");
+  const agePreviewEl = mainEl.querySelector("#age-step-preview");
+  if (ageSelect && agePreviewEl) {
+    this._on(ageSelect, "change", () => {
+      const v = ageSelect.value;
+      const preview = describeStepSequenceForAge(v === "" ? 6 : v);
+      agePreviewEl.textContent = `当前预览：${preview.label}`;
     });
   }
 

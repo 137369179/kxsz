@@ -277,13 +277,20 @@ export function _bindManualRating(stage) {
 
     starsRow.querySelectorAll(".manual-star-btn").forEach((btn) => {
       this._on(btn, "click", () => {
-        const stars = parseInt(btn.dataset.stars, 10);
+        // ASR 降级防灌水：手动自评最高记 2 星，并标记来源
+        const rawStars = parseInt(btn.dataset.stars, 10);
+        const stars = Math.min(2, Math.max(0, rawStars));
+        this._evalFromManual = true;
         soundAndFX.playPop();
         starsRow.querySelectorAll(".manual-star-btn").forEach((b, idx) => {
           b.classList.toggle("grayscale", idx + 1 > stars);
           b.classList.toggle("opacity-50", idx + 1 > stars);
         });
-        if (status) status.textContent = `${stars} 颗星！`;
+        if (status) {
+          status.textContent = stars < rawStars
+            ? `手动评分最高 2 星（防灌水），已记 ${stars} 星`
+            : `${stars} 颗星！`;
+        }
 
         const char = this.charData;
         const res = pe.manualEvaluate({ text: char.char, stars });
@@ -325,6 +332,7 @@ export async function executeRecordToggle(stage) {
       audioCue?.classList.add("hidden");
       try {
         const res = await pe.stopAndEvaluate();
+        this._evalFromManual = false;
         if (res) this._showEvalResult(stage, res);
       } catch (e) {}
       this._isRecordingTransition = false;
@@ -459,6 +467,7 @@ export async function executeRecordToggle(stage) {
         }
         try {
           const res = await pe.stopAndEvaluate();
+          this._evalFromManual = false;
           if (res) this._showEvalResult(stage, res);
         } catch (e) {}
       }
@@ -595,8 +604,9 @@ export function _showEvalResult(stage, res) {
 
     const score = typeof res.totalScore === "number" ? res.totalScore : (typeof res.score === "number" ? res.score : 0);
     const stars = typeof res.stars === "number" ? res.stars : (score >= 85 ? 3 : (score >= 60 ? 2 : (score >= 35 ? 1 : 0)));
-    // P0-2: 存真实评测结果，让宝箱 → completeCharacter 不再硬编码 3
-    this._evalStars = stars;
+    // P0-2: 存真实评测结果；非手动路径清除灌水标记
+    if (!this._evalFromManual) this._evalFromManual = false;
+    this._evalStars = this._evalFromManual ? Math.min(stars, 2) : stars;
 
     if (micZone) micZone.classList.add("hidden");
     if (resultBox) resultBox.classList.remove("hidden");

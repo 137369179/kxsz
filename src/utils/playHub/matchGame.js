@@ -246,6 +246,7 @@ export function renderMatchGame() {
                 const remainSec = timerValEl ? parseInt(timerValEl.textContent, 10) || 0 : 0;
                 const bonus = Math.min(maxCombo * 2, 8) + Math.min(Math.floor(remainSec / 5), 4);
                 ebbinghausManager.addCoins(10 + bonus);
+                ebbinghausManager.bumpGameStat("matchClears");
                 const rewardEl = this.container.querySelector("#match-win-reward");
                 if (rewardEl) rewardEl.innerHTML = `${GAME_ICONS.coin("w-5 h-5")}<span>获得 ${10 + bonus} 凯茜星币 (连击 x${maxCombo} + 剩余时间奖励)</span>`;
                 if (winModal) winModal.classList.remove("hidden");

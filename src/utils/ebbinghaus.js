@@ -87,6 +87,10 @@ export class EbbinghausManager {
       todayStudyDate: "",    // 累计所属日期 YYYY-MM-DD
       dailyLimitTriggered: false, // 今日已完成/触发过上限收尾（跨日重置）
       dailyLimitDate: "",         // 上限触发标记所属日期 YYYY-MM-DD（跨日自动清）
+      // P0-B1-3 会话级临时状态（不跨日持久化，跨日 reset 清零）
+      _session: {
+        lastPrewriteResult: null   // prewriteEngine 完成度 → 供 hanziEngine 调权用
+      },
       studyHistory: [
         { date: "周一", count: 0 },
         { date: "周二", count: 0 },
@@ -124,6 +128,8 @@ export class EbbinghausManager {
         merged.dailyStudyMinutes = 0;
         merged.dailyStudyStartedAt = null;
         if (typeof merged.todayStudyMs === "number") merged.todayStudyMs = 0;
+        // P0-B1-3 跨日清零会话状态
+        merged._session = { lastPrewriteResult: null };
       }
       // 旧存档补齐：用真实日期列表重算连胜（比历史字段可靠）
       merged.attendance.streakDays = this._calcStreak(merged.attendance.dates);
@@ -323,6 +329,36 @@ export class EbbinghausManager {
     return true;
   }
 
+  // ================================================================
+  // P0-B1-3 prewrite ↔ hanzi 会话状态桥
+  // ================================================================
+
+  /** PrewriteEngine 完成后写入完成度（控笔能力信号），供 HanziEngine 调容差 */
+  setLastPrewriteResult(result) {
+    if (!this.progress._session) this.progress._session = {};
+    this.progress._session.lastPrewriteResult = {
+      age: result?.age ?? this.getAge(),
+      shapesPracticed: Array.isArray(result?.shapesPracticed) ? result.shapesPracticed : [],
+      avgCoverage: typeof result?.avgCoverage === "number" ? result.avgCoverage : 0,
+      completedAt: result?.completedAt || Date.now()
+    };
+    // 只写内存 + 轻量 save，不触发 PROGRESS_CHANGED（避免 UI 重渲染）
+    try { this.save(); } catch {}
+  }
+
+  /** HanziEngine 读取上次 prewrite 完成度（可能为 null = 没练过控笔） */
+  getLastPrewriteResult() {
+    return this.progress?._session?.lastPrewriteResult || null;
+  }
+
+  /** 清空调笔信号（学完一个字后调用，下一字重新练） */
+  clearPrewriteResult() {
+    if (this.progress?._session) {
+      this.progress._session.lastPrewriteResult = null;
+      try { this.save(); } catch {}
+    }
+  }
+
   /**
    * P0-4 创建会话计时器。模块进入时 start，退出时 stop，跨 document.hidden 暂停。
    * 返回 { stop: () => void } — 调用 stop() 时自动 addStudyMinutes 累加
@@ -442,6 +478,9 @@ export class EbbinghausManager {
 
   addCoins(amount = 10) {
     const validAmount = Number(amount) || 0;
+    if (validAmount > 0) {
+      this.progress.lifetimeCoinsEarned = (this.progress.lifetimeCoinsEarned || 0) + Math.floor(validAmount);
+    }
     this.progress.coins = Math.max(0, Math.floor((this.progress.coins || 0) + validAmount));
     this.save();
     eventBus.emit(EVENTS.PROGRESS_CHANGED, { progress: this.progress });
@@ -533,12 +572,20 @@ export class EbbinghausManager {
     const updated = fsrsCompleteCharacter(existing, starsEarned);
     this.progress.charRecords[charId] = updated;
     this.progress.coins = (this.progress.coins || 0) + 10;
+    this.progress.lifetimeCoinsEarned = (this.progress.lifetimeCoinsEarned || 0) + 10;
     this.progress.stars = (this.progress.stars || 0) + starsEarned;
     this.progress.todayLearnedCount = (this.progress.todayLearnedCount || 0) + 1;
     this.progress.currentLevelIndex = Math.min(1490, Math.max(this.progress.currentLevelIndex, Object.keys(this.progress.charRecords).length + 1));
     this.save();
     eventBus.emit(EVENTS.PROGRESS_CHANGED, { progress: this.progress });
     return updated;
+  }
+
+  /** Increment honest game achievement counters for trophy gates */
+  bumpGameStat(key, by = 1) {
+    if (!this.progress.gameStats) this.progress.gameStats = {};
+    this.progress.gameStats[key] = (this.progress.gameStats[key] || 0) + by;
+    this.save();
   }
 
   // 完成一次复习（E2: 委托 FSRS 调度；可传 boolean 或显式 FSRGRating）

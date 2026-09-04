@@ -31,6 +31,7 @@ import {
   fsrsPredict,
 } from "../utils/fsrsScheduler.js";
 import { forChar as mmForChar, SCENES as MM_SCENES } from "../utils/multimodalEngine.js";
+import { confusedTargetsForReview } from "../utils/reviewConfused.js";
 
 function shuffle(arr) {
   const a = [...arr];
@@ -61,16 +62,11 @@ export class ReviewModule extends BaseModule {
     const wantRev = cfg.reviews;
 
     const dueIds = ebbinghausManager.getDueReviewCharIds().slice(0, Math.max(wantRev, 3));
-    const errorProfile = ebbinghausManager.progress.errorProfiles || {};
-    const confusedPairs = errorProfile.confusedPairs || {};
-    const confusedIds = Object.entries(confusedPairs)
-      .sort((a, b) => {
-        const countA = typeof a[1] === "object" ? Object.values(a[1]).reduce((s, v) => s + v, 0) : Number(a[1]) || 0;
-        const countB = typeof b[1] === "object" ? Object.values(b[1]).reduce((s, v) => s + v, 0) : Number(b[1]) || 0;
-        return countB - countA;
-      })
-      .slice(0, Math.max(wantRev - dueIds.length, 2))
-      .map(([charId]) => charId);
+    const confusedChars = confusedTargetsForReview(
+      ebbinghausManager.progress.errorProfiles,
+      Math.max(wantRev - dueIds.length, 2)
+    );
+    const confusedIds = confusedChars.map((c) => c.id);
 
     const allIds = [...new Set([...dueIds, ...confusedIds])].slice(0, wantRev);
     this.queue = allIds

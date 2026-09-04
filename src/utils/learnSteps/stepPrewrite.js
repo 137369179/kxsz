@@ -136,6 +136,22 @@ export function renderStepPrewrite(stage) {
         ebbinghausManager.addCoins?.(blockedByAge ? 5 : 3);
         soundAndFX.triggerCoinFly?.(finishBtn, blockedByAge ? 5 : 3);
 
+        // ✅ P0-B1-3：写入 prewrite 完成度 → 让后续 hanziEngine 知道控笔能力
+        try {
+          ebbinghausManager.setLastPrewriteResult({
+            age: age,
+            shapesPracticed: this.prewriteEngine?.getCompletedShapes?.() || [],
+            avgCoverage: this.prewriteEngine?.getAverageCoverage?.() || 0,
+            completedAt: Date.now()
+          });
+        } catch (e) { console.warn("[stepPrewrite] setLastPrewriteResult failed:", e); }
+
+        // ✅ P0-B1-3：用 stepSequence 算下一个，不再硬编码 blockedByAge ? 8 : 6
+        const nextStep = typeof this.getNextStepInSequence === "function"
+          ? this.getNextStepInSequence(5)
+          : (blockedByAge ? 8 : 6);
+        const stepAfterPrewrite = nextStep > 0 ? nextStep : (blockedByAge ? 8 : 6);
+
         // B1 铁律：年龄分流
         if (blockedByAge) {
           soundAndFX.speakPriority(
@@ -152,7 +168,7 @@ export function renderStepPrewrite(stage) {
         if (finishBtn) {
           finishBtn.classList.remove("opacity-40", "pointer-events-none");
           finishBtn.classList.add("animate-bounce-cathy");
-          if (nextStepAfterPrewrite === 8) {
+          if (stepAfterPrewrite === 8) {
             finishBtn.innerHTML = `<span>${GAME_ICONS.chest("w-5 h-5")}</span><span>领宝箱！</span>`;
           }
         }
