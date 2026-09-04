@@ -58,8 +58,8 @@ export class HanziEngine {
       const mgr = window.ebbinghausManager;
       const age = mgr?.getAge?.() || 6;
       const prewriteDone = !!mgr?.getLastPrewriteResult?.();
-      if (age < 5 && !prewriteDone) return "free";  // 3-4岁没练过控笔 → 自由
-      if (age < 7 || (age < 5 && prewriteDone)) return "soft";  // 5-6岁 soft，7+ strong
+      if (age < 6 && !prewriteDone) return "free";  // 3-5岁没练过控笔 → 自由画（放宽到5岁）
+      if (age < 7 || (age < 6 && prewriteDone)) return "soft";  // 5-6岁 soft，7+ strong
       return "strong";  // 7岁+
     } catch { return "soft"; }
   }

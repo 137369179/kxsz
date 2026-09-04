@@ -22,8 +22,11 @@ describe('P0-B1-3 guideMode 三档自动判定', () => {
   };
   it('3岁 + 无prewrite → free', () => { expect(judge(3)).toBe('free'); });
   it('3岁 + prewrite完成 → soft', () => { expect(judge(3, { prewriteResult: { avgCoverage: 0.78 } })).toBe('soft'); });
-  it('5岁 + 无prewrite → soft', () => { expect(judge(5)).toBe('soft'); });
-  it('4岁 → free', () => { expect(judge(4)).toBe('free'); });
+  it('4岁 + 无prewrite → free', () => { expect(judge(4)).toBe('free'); });
+  it('4岁 + prewrite完成 → soft', () => { expect(judge(4, { prewriteResult: { avgCoverage: 0.78 } })).toBe('soft'); });
+  it('5岁 + 无prewrite → free（放宽到5岁）', () => { expect(judge(5)).toBe('free'); });
+  it('5岁 + prewrite完成 → soft', () => { expect(judge(5, { prewriteResult: { avgCoverage: 0.78 } })).toBe('soft'); });
+  it('6岁 → soft', () => { expect(judge(6)).toBe('soft'); });
   it('7岁 → strong', () => { expect(judge(7)).toBe('strong'); });
   it('8岁 → strong', () => { expect(judge(8)).toBe('strong'); });
 });
