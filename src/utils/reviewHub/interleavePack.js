@@ -97,20 +97,27 @@ export function buildInterleavePack({
     const { target, distractors, fillers } = candidates[idx];
     lastTargetId = target.id;
 
-    const optionChars = new Set([target.char]);
-    for (const d of distractors) optionChars.add(d.char);
-    for (const f of fillers) {
-      if (optionChars.size >= 4) break;
-      optionChars.add(f.char);
+    // Cap to ≤4 while always keeping target.char (avoid drop after shuffle)
+    const others = [];
+    const seenOther = new Set();
+    for (const d of distractors) {
+      if (d.char === target.char || seenOther.has(d.char)) continue;
+      seenOther.add(d.char);
+      others.push(d.char);
     }
-    // Prefer 3–4 options; if only target+1 distractor, keep ≥2
-    const options = shuffle([...optionChars]);
+    for (const f of fillers) {
+      if (f.char === target.char || seenOther.has(f.char)) continue;
+      seenOther.add(f.char);
+      others.push(f.char);
+    }
+    const cappedOthers = shuffle(others).slice(0, 3);
+    const options = shuffle([target.char, ...cappedOthers]);
     if (options.length < 2) continue;
 
     pack.push({
       targetId: target.id,
       targetChar: target.char,
-      options: options.slice(0, 4),
+      options,
       hint: target.confusingHint || "",
     });
   }
