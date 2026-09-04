@@ -267,6 +267,12 @@ export class HanziEngine {
       if (cov >= 0.85) {
         // 控笔很好 → 收紧 4px
         baseStart -= 4; baseEnd -= 4; baseReverse += 4;
+        // 5-6岁 floor 保护：比 7岁默认(28)严一点但不能严太多
+        // 低龄精细运动稳定性不足，偶发手抖不应被算错
+        if (age < 7) {
+          baseStart = Math.max(baseStart, 26);
+          baseEnd = Math.max(baseEnd, 28);
+        }
       } else if (cov < 0.7) {
         // 控笔还不稳 → 再放宽 5px
         baseStart += 5; baseEnd += 5; baseReverse -= 5;
