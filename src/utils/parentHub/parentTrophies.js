@@ -29,10 +29,8 @@ function stageLearnedCount(progress, stage) {
  * @param {number} [charCount]
  * @returns {Record<string, boolean>}
  */
-export function resolveTrophyUnlocks(progress = {}, charCount) {
-  const count = typeof charCount === "number"
-    ? charCount
-    : Object.keys(progress.charRecords || {}).length;
+export function resolveTrophyUnlocks(progress = {}) {
+  const count = Object.keys(progress.charRecords || {}).length;
   const readBooks = progress.readBooks || [];
   const gs = progress.gameStats || {};
   const coinsEarned = progress.lifetimeCoinsEarned ?? progress.coins ?? 0;
@@ -42,7 +40,7 @@ export function resolveTrophyUnlocks(progress = {}, charCount) {
   return {
     first_char: count >= 1,
     forest_master: stageLearnedCount(progress, 1) >= 200 || count >= 200,
-    town_hero: stageLearnedCount(progress, 2) + stageLearnedCount(progress, 1) >= 600 || count >= 600,
+    town_hero: (stageLearnedCount(progress, 1) + stageLearnedCount(progress, 2)) >= 600 || count >= 600,
     space_conqueror: count >= 1489,
     book_worm_1: readBooks.length >= 1,
     book_master: readBooks.length >= 10,
@@ -55,8 +53,8 @@ export function resolveTrophyUnlocks(progress = {}, charCount) {
   };
 }
 
-export function isTrophyUnlocked(trophyId, progress, charCount) {
-  return !!resolveTrophyUnlocks(progress, charCount)[trophyId];
+export function isTrophyUnlocked(trophyId, progress) {
+  return !!resolveTrophyUnlocks(progress)[trophyId];
 }
 
 /** Human-readable step sequence preview for a given age */

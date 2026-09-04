@@ -5,7 +5,7 @@ import { confusedTargetsForReview } from "../../src/utils/reviewConfused.js";
 
 describe("parent trophy honesty", () => {
   it("does not unlock by fake charCount/2 index", () => {
-    const unlocks = resolveTrophyUnlocks({ charRecords: {}, readBooks: [], coins: 0, gameStats: {} }, 20);
+    const unlocks = resolveTrophyUnlocks({ charRecords: {}, readBooks: [], coins: 0, gameStats: {} });
     expect(unlocks.first_char).toBe(false);
     expect(unlocks.book_worm_1).toBe(false);
     expect(unlocks.golden_rich).toBe(false);
@@ -17,7 +17,7 @@ describe("parent trophy honesty", () => {
       readBooks: ["b1"],
       lifetimeCoinsEarned: 200,
       gameStats: { bossWins: 5 }
-    }, 1);
+    });
     expect(unlocks.first_char).toBe(true);
     expect(unlocks.book_worm_1).toBe(true);
     expect(unlocks.golden_rich).toBe(true);

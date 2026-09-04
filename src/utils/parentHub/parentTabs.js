@@ -130,7 +130,7 @@ export function renderActiveTabContent(progress, charCount, settings, diffCount)
   }
 
   if (this.currentTab === "trophies") {
-    const unlocks = resolveTrophyUnlocks(progress, charCount);
+    const unlocks = resolveTrophyUnlocks(progress);
     return `
       <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5">
         ${TROPHY_LIST.map((t) => {
