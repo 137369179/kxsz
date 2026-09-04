@@ -115,24 +115,17 @@ export function mountFreeRecallRound(ctx) {
     bind(containerEl.querySelector("#btn-recall-notyet"), "click", () => {
       soundAndFX.playPop?.();
       soundAndFX.speakPriority?.(charData.char, { kind: "char", priority: 1 });
-      finish(false);
+      // 稍延后结算，避免立刻切页掐断示范音
+      setTimeout(() => finish(false), 450);
     });
   }
 
   function renderPointMode() {
-    const options = shuffle([
-      charData.char,
-      ...distractorChars.filter((ch) => ch && ch !== charData.char),
-    ]).slice(0, 4);
-
-    while (options.length < 3 && distractorChars.length) {
-      const next = distractorChars.find((ch) => ch && !options.includes(ch));
-      if (!next) break;
-      options.push(next);
-    }
-    if (!options.includes(charData.char)) {
-      options[0] = charData.char;
-    }
+    const others = distractorChars.filter((ch) => ch && ch !== charData.char);
+    const cappedOthers = shuffle(others).slice(0, 3);
+    const options = shuffle([charData.char, ...cappedOthers]);
+    // Ensure at least 2 options if we somehow have no distractors
+    if (options.length < 2 && others[0]) options.push(others[0]);
 
     const card = {
       type: cardType,

@@ -48,6 +48,7 @@ function collectConfuseRefs(target, errorProfiles) {
  * @param {Set<string>|string[]} opts.learnedIds
  * @param {object} [opts.errorProfiles]
  * @param {number} [opts.limit]
+ * @param {Set<string>|string[]} [opts.preferIds] — 本轮复习队列优先作为目标
  * @returns {Array<{targetId:string,targetChar:string,options:string[],hint:string}>}
  */
 export function buildInterleavePack({
@@ -55,8 +56,10 @@ export function buildInterleavePack({
   learnedIds,
   errorProfiles = {},
   limit = 6,
+  preferIds,
 } = {}) {
   const learned = learnedIds instanceof Set ? learnedIds : new Set(learnedIds || []);
+  const prefer = preferIds instanceof Set ? preferIds : new Set(preferIds || []);
   if (!chars.length || learned.size === 0 || limit <= 0) return [];
 
   /** @type {Array<{target:object, distractors:object[], fillers:object[]}>} */
@@ -83,6 +86,13 @@ export function buildInterleavePack({
   }
 
   if (candidates.length === 0) return [];
+
+  // 本轮队列目标排前，其余在后（仍参与交错）
+  candidates.sort((a, b) => {
+    const ap = prefer.has(a.target.id) ? 0 : 1;
+    const bp = prefer.has(b.target.id) ? 0 : 1;
+    return ap - bp;
+  });
 
   const pack = [];
   const n = candidates.length;

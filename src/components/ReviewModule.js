@@ -125,6 +125,10 @@ export class ReviewModule extends BaseModule {
       this._freeRecall.destroy();
       this._freeRecall = null;
     }
+    if (this._interleave?.destroy) {
+      this._interleave.destroy();
+      this._interleave = null;
+    }
     super.destroy();
   }
 
@@ -383,39 +387,63 @@ export class ReviewModule extends BaseModule {
       this._freeRecall.destroy();
       this._freeRecall = null;
     }
+    if (this._interleave?.destroy) {
+      this._interleave.destroy();
+      this._interleave = null;
+    }
 
-    const mergedChars = CHARACTER_DATABASE.map((c) => ({
-      ...c,
-      ...(CHARACTER_DETAILS[c.id] || {}),
-    }));
+    const learnedIds = new Set(Object.keys(ebbinghausManager.progress.charRecords || {}));
+    const preferIds = new Set((this.queue || []).map((c) => c.id).filter(Boolean));
+    // 仅合并已学字，避免整库 1489 次展开
+    const mergedChars = [...learnedIds]
+      .map((id) => {
+        const base = CHARACTER_DATABASE.find((c) => c.id === id);
+        if (!base) return null;
+        return { ...base, ...(CHARACTER_DETAILS[id] || {}) };
+      })
+      .filter(Boolean);
+
     const pack = buildInterleavePack({
       chars: mergedChars,
-      learnedIds: new Set(Object.keys(ebbinghausManager.progress.charRecords || {})),
+      learnedIds,
+      preferIds,
       errorProfiles: ebbinghausManager.progress.errorProfiles || {},
       limit: 6,
     });
 
+    const goSummary = () => {
+      if (this._interleave?.destroy) {
+        this._interleave.destroy();
+        this._interleave = null;
+      }
+      this.renderSummary();
+    };
+
     if (pack.length >= 2) {
-      runInterleaveSession({
+      this._interleave = runInterleaveSession({
         containerEl: this.container,
         pack,
         on: (el, evt, fn) => this._on(el, evt, fn),
-        onAnswer: ({ correct, question }) => {
+        onAnswer: ({ correct, question, selectedChar }) => {
           const id = question?.targetId;
           if (!id) return;
           ebbinghausManager.completeReview(id, correct);
           if (!correct && typeof ebbinghausManager.recordMistake === "function") {
             try {
-              ebbinghausManager.recordMistake(id, "similar_confuse");
+              ebbinghausManager.recordMistake(id, "similar_confuse", {
+                targetChar: question.targetChar,
+                selectedChar: selectedChar || "",
+              });
             } catch (_) {
               /* ignore */
             }
           }
         },
-        onFinished: () => this.renderSummary(),
+        onFinished: goSummary,
+        onQuit: goSummary,
       });
     } else {
-      this.renderSummary();
+      goSummary();
     }
   }
 
@@ -499,21 +527,21 @@ export class ReviewModule extends BaseModule {
             ${this.queue.map(c => `
               <div class="reviewed-char-chip w-12 h-12 rounded-2xl
                 ${forgottenSet.has(c.id)
-                  ? 'bg-red-500/30 border-2 border-red-400'
+                  ? 'bg-sky-500/25 border-2 border-sky-300/60'
                   : 'bg-white/20 border-2 border-yellow-300/50'}
                 hover:bg-white/30 flex flex-col items-center justify-center cursor-pointer active:scale-90 transition-transform font-serif shadow" data-char="${escapeHtml(c.char)}">
                 <span class="text-xl font-black text-white leading-none">${escapeHtml(c.char)}</span>
-                <span class="text-[9px] ${forgottenSet.has(c.id) ? 'text-red-300' : 'text-yellow-300'} font-sans mt-0.5">
-                  ${forgottenSet.has(c.id) ? '加强' : escapeHtml(c.pinyin)}
+                <span class="text-[9px] ${forgottenSet.has(c.id) ? 'text-sky-200' : 'text-yellow-300'} font-sans mt-0.5">
+                  ${forgottenSet.has(c.id) ? '再练' : escapeHtml(c.pinyin)}
                 </span>
               </div>
             `).join("")}
           </div>
 
           ${this.forgottenChars.length > 0 ? `
-          <div class="w-full bg-red-900/30 border border-red-500/40 rounded-2xl px-4 py-2.5 mb-4 text-xs text-red-300 font-bold flex items-center gap-2">
+          <div class="w-full bg-sky-900/30 border border-sky-400/40 rounded-2xl px-4 py-2.5 mb-4 text-xs text-sky-100 font-bold flex items-center gap-2">
             ${GAME_ICONS.star('w-4 h-4', false)}
-            <span>需加强：${this.forgottenChars.map(id => { const c = this.queue.find(q => q.id === id); return c ? c.char : id; }).join('、')}（明日优先安排复习）</span>
+            <span>明天优先再看看：${this.forgottenChars.map(id => { const c = this.queue.find(q => q.id === id); return c ? c.char : id; }).join('、')}</span>
           </div>` : ''}
 
           <div class="candy-pill rounded-2xl px-6 py-2.5 mb-6 text-sm text-yellow-300 font-black flex items-center gap-2 border border-yellow-300/40">

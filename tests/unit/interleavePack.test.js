@@ -68,4 +68,16 @@ describe("buildInterleavePack", () => {
       expect(new Set(q.options).size).toBe(q.options.length);
     }
   });
+
+  it("preferIds surfaces preferred targets earlier in the pack", () => {
+    const pack = buildInterleavePack({
+      chars: DB,
+      learnedIds: new Set(["a", "b", "c"]),
+      preferIds: new Set(["c"]),
+      errorProfiles: {},
+      limit: 3,
+    });
+    expect(pack.length).toBeGreaterThan(0);
+    expect(pack[0].targetId).toBe("c");
+  });
 });
