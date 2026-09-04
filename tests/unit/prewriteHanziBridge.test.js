@@ -82,6 +82,14 @@ describe('P0-B1-3 getTolerance 年龄+prewrite 双重调权', () => {
     const t = tol(3, { prewriteResult: { avgCoverage: 0.95 } });
     expect(t.start).toBe(32); expect(t.end).toBe(34); // floor 26 + age bonus +6
   });
+  it('4岁 + prewrite cov=0.88 → 收紧4px但floor+age bonus→start=29', () => {
+    const t = tol(4, { prewriteResult: { avgCoverage: 0.88 } });
+    expect(t.start).toBe(29); expect(t.end).toBe(31); // floor 26 + age bonus +3
+  });
+  it('6岁 + prewrite cov=0.88 → 收紧4px但floor保护→start=26', () => {
+    const t = tol(6, { prewriteResult: { avgCoverage: 0.88 } });
+    expect(t.start).toBe(26); expect(t.end).toBe(28); // floor 26 + age bonus 0
+  });
   it('3岁 + prewrite cov=0.55 → 再放宽+5px start=39', () => {
     expect(tol(3, { prewriteResult: { avgCoverage: 0.55 } }).start).toBe(39);
   });
