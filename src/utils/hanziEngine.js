@@ -258,7 +258,8 @@ export class HanziEngine {
     const age = mgr?.getAge?.() || 6;
     const prewriteResult = mgr?.getLastPrewriteResult?.();
 
-    // 年龄宽松度：3岁 +10px, 4岁 +6px, 5岁 +3px, 6岁 +0px
+    // 年龄宽松度：3岁 +6px, 4岁 +3px, 5岁+ 0px, 6岁+ 0px
+    // 公式：age<5 时 (5-age)*3，否则 0
     const ageBonus = age < 5 ? (5 - age) * 3 : 0;
 
     // prewrite 完成度奖励：控笔好可以收紧，控笔差再放宽
