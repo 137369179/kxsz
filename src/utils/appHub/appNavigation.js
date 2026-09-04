@@ -10,6 +10,7 @@ import {
   stopMicroScheduler,
   resetMicroTimer,
 } from "../microReviewScheduler.js";
+import { withAnticipatoryFeedback } from "../anticipatoryLoader.js";
 
 export async function ensureModule(modeName) {
   const key = MODE_TO_MODULE[modeName];
@@ -19,15 +20,24 @@ export async function ensureModule(modeName) {
   const loader = MODULE_LOADERS[key];
   if (!loader) return null;
   try {
-    await ensureDetails();
-    let cls = this._moduleClasses.get(key);
-    if (!cls) {
-      cls = await loader();
-      this._moduleClasses.set(key, cls);
+    const run = async () => {
+      await ensureDetails();
+      let cls = this._moduleClasses.get(key);
+      if (!cls) {
+        cls = await loader();
+        this._moduleClasses.set(key, cls);
+      }
+      const inst = new cls(this.container);
+      this._moduleInstances.set(key, inst);
+      return inst;
+    };
+    if (this.container) {
+      return await withAnticipatoryFeedback(this.container, run, {
+        loadingText: "正在打开…",
+        anticipatoryThreshold: 180,
+      });
     }
-    const inst = new cls(this.container);
-    this._moduleInstances.set(key, inst);
-    return inst;
+    return await run();
   } catch (err) {
     console.error(`[App] 模块 "${key}" 动态加载失败:`, err);
     return null;
@@ -229,28 +239,39 @@ export async function startLearnFlow(charData) {
     return;
   }
 
-  await ensureDetails();
-  let LearnModuleCls = this._moduleClasses.get("learn");
-  if (!LearnModuleCls) {
-    const mod = await import("../../components/LearnModule.js");
-    LearnModuleCls = mod.LearnModule;
-    this._moduleClasses.set("learn", LearnModuleCls);
-  }
-  this.currentMode = "learn";
-  if (this.learnModule) {
-    this.learnModule.destroy();
-  }
-  try { resetMicroTimer(); } catch {}
-  this._beginStudySession();
-  this.learnModule = new LearnModuleCls(
-    this.container,
-    charData,
-    () => {
-      this.transitionToMode("map");
-    },
-    () => {
-      this.transitionToMode("map");
+  const boot = async () => {
+    await ensureDetails();
+    let LearnModuleCls = this._moduleClasses.get("learn");
+    if (!LearnModuleCls) {
+      const mod = await import("../../components/LearnModule.js");
+      LearnModuleCls = mod.LearnModule;
+      this._moduleClasses.set("learn", LearnModuleCls);
     }
-  );
-  this.learnModule.render();
+    this.currentMode = "learn";
+    if (this.learnModule) {
+      this.learnModule.destroy();
+    }
+    try { resetMicroTimer(); } catch {}
+    this._beginStudySession();
+    this.learnModule = new LearnModuleCls(
+      this.container,
+      charData,
+      () => {
+        this.transitionToMode("map");
+      },
+      () => {
+        this.transitionToMode("map");
+      }
+    );
+    this.learnModule.render();
+  };
+
+  if (this.container) {
+    await withAnticipatoryFeedback(this.container, boot, {
+      loadingText: "正在打开课本…",
+      anticipatoryThreshold: 180,
+    });
+  } else {
+    await boot();
+  }
 }
