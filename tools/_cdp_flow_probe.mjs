@@ -208,13 +208,21 @@ for (const f of STEP_FLOW) {
     return { clicked: false, why: "导航按钮缺失" };` : `return { clicked: false, why: "末步无导航" };`}
   `);
   await sleep(600);
+  // T15 字理问答等模态：导航后若出现弹窗（未推进），点击跳过/关闭让其走完 callback
+  const modalHandled = await evalJS(`
+    const skip = document.querySelector('#btn-quiz-skip, .etymology-quiz-modal [data-skip], .quiz-modal .btn-close, #btn-skip-quiz');
+    if (skip) { skip.click(); return true; }
+    return false;
+  `);
+  await sleep(500);
   const dom = await evalJS(`
     const vp = document.querySelector('#game-app-viewport');
     const txt = (vp && vp.innerText) || "";
-    return { htmlLen: vp ? vp.innerHTML.length : 0, bad: (txt.match(/undefined|NaN|\\[object/g) || []).slice(0, 3) };
+    const cur = (window.cathyApp.learnModule && window.cathyApp.learnModule.currentStep) || 0;
+    return { step: cur, htmlLen: vp ? vp.innerHTML.length : 0, bad: (txt.match(/undefined|NaN|\\[object/g) || []).slice(0, 3) };
   `);
   const newErrors = exceptions.length + consoleErrors.length - before;
-  report.push(`  步骤${f.step}(${f.name}): 当前步=${stepInfo.currentStep} 交互元素=${stepInfo.targetFound} 交互=${stepInfo.interacted} 导航=${JSON.stringify(navRes)} html=${dom.htmlLen} 可疑=${JSON.stringify(dom.bad)} 新增错误=${newErrors}`);
+  report.push(`  步骤${f.step}(${f.name}): 当前步=${stepInfo.currentStep} 交互元素=${stepInfo.targetFound} 交互=${stepInfo.interacted} 导航=${JSON.stringify(navRes)}${modalHandled ? " [T15弹窗已跳过]" : ""} → 步=${dom.step} html=${dom.htmlLen} 可疑=${JSON.stringify(dom.bad)} 新增错误=${newErrors}`);
 }
 
 // ---------- 关键交互点突击 ----------
