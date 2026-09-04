@@ -7,6 +7,7 @@
  */
 
 import { CHARACTER_DATABASE } from "../data/characters.js";
+import { CHARACTER_DETAILS } from "../data/characterDetails.js";
 import { ebbinghausManager } from "../utils/ebbinghaus.js";
 import { soundAndFX } from "../utils/soundEngine.js";
 import { BaseModule, escapeHtml } from "../utils/BaseModule.js";
@@ -28,6 +29,8 @@ import { confusedTargetsForReview } from "../utils/reviewConfused.js";
 import {
   mountFreeRecallRound,
   mapSelfReportToRating,
+  buildInterleavePack,
+  runInterleaveSession,
 } from "../utils/reviewHub/index.js";
 
 function shuffle(arr) {
@@ -366,6 +369,51 @@ export class ReviewModule extends BaseModule {
     this.currentIndex++;
     if (this.currentIndex < this.queue.length) {
       this.renderRound();
+    } else {
+      this._maybeRunInterleaveThenSummary();
+    }
+  }
+
+  /**
+   * After free-recall queue ends, optionally run a confuse interleave pack
+   * before the session summary.
+   */
+  _maybeRunInterleaveThenSummary() {
+    if (this._freeRecall?.destroy) {
+      this._freeRecall.destroy();
+      this._freeRecall = null;
+    }
+
+    const mergedChars = CHARACTER_DATABASE.map((c) => ({
+      ...c,
+      ...(CHARACTER_DETAILS[c.id] || {}),
+    }));
+    const pack = buildInterleavePack({
+      chars: mergedChars,
+      learnedIds: new Set(Object.keys(ebbinghausManager.progress.charRecords || {})),
+      errorProfiles: ebbinghausManager.progress.errorProfiles || {},
+      limit: 6,
+    });
+
+    if (pack.length >= 2) {
+      runInterleaveSession({
+        containerEl: this.container,
+        pack,
+        on: (el, evt, fn) => this._on(el, evt, fn),
+        onAnswer: ({ correct, question }) => {
+          const id = question?.targetId;
+          if (!id) return;
+          ebbinghausManager.completeReview(id, correct);
+          if (!correct && typeof ebbinghausManager.recordMistake === "function") {
+            try {
+              ebbinghausManager.recordMistake(id, "similar_confuse");
+            } catch (_) {
+              /* ignore */
+            }
+          }
+        },
+        onFinished: () => this.renderSummary(),
+      });
     } else {
       this.renderSummary();
     }
