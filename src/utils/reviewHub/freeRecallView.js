@@ -55,10 +55,11 @@ export function mountFreeRecallRound(ctx) {
     localCleanups.push(() => el.removeEventListener(evt, fn));
   };
 
-  const finish = (knew) => {
+  let currentJol = null;
+  const finish = (knew, jol = currentJol) => {
     if (destroyed || completed) return;
     completed = true;
-    onComplete?.({ knew: !!knew, cardType });
+    onComplete?.({ knew: !!knew, cardType, jol });
   };
 
   if (mode === "point") {
@@ -71,19 +72,43 @@ export function mountFreeRecallRound(ctx) {
     containerEl.innerHTML = `
       <div class="free-recall-round flex flex-col items-center justify-center gap-6 w-full max-w-md mx-auto text-center px-4">
         <div class="text-8xl sm:text-9xl font-black font-serif text-white drop-shadow-lg leading-none select-none">${escapeHtml(charData.char)}</div>
-        <p class="text-sm sm:text-base text-white/85 font-bold">先自己读出来</p>
-        <button type="button" id="btn-recall-ready" class="btn-game-orange text-white font-black text-base px-10 py-3.5 rounded-full shadow-xl active:scale-95 cursor-pointer">
-          我会了
-        </button>
+        <p class="text-sm sm:text-base text-white/85 font-bold">先自己读出来，你对它熟悉吗？</p>
+        <div class="flex flex-wrap items-center justify-center gap-3">
+          <button type="button" id="btn-recall-easy" class="btn-game-orange text-white font-black text-sm sm:text-base px-6 py-3 rounded-full shadow-xl active:scale-95 cursor-pointer flex items-center gap-1.5">
+            <span>🌟</span><span>很熟</span>
+          </button>
+          <button type="button" id="btn-recall-fuzzy" class="bg-amber-500/80 hover:bg-amber-500 text-white font-black text-sm sm:text-base px-6 py-3 rounded-full border border-amber-300/40 shadow-xl active:scale-95 cursor-pointer flex items-center gap-1.5">
+            <span>🤔</span><span>想想</span>
+          </button>
+          <button type="button" id="btn-recall-hard" class="bg-slate-600/80 hover:bg-slate-500 text-white font-black text-sm sm:text-base px-6 py-3 rounded-full border border-white/20 shadow-xl active:scale-95 cursor-pointer flex items-center gap-1.5">
+            <span>❓</span><span>直接听</span>
+          </button>
+        </div>
       </div>
     `;
-    bind(containerEl.querySelector("#btn-recall-ready"), "click", () => {
+
+    bind(containerEl.querySelector("#btn-recall-easy"), "click", () => {
+      currentJol = "easy";
       soundAndFX.playPop?.();
       renderFreeReveal();
     });
+
+    bind(containerEl.querySelector("#btn-recall-fuzzy"), "click", () => {
+      currentJol = "fuzzy";
+      soundAndFX.playPop?.();
+      renderFreeReveal();
+    });
+
+    bind(containerEl.querySelector("#btn-recall-hard"), "click", () => {
+      currentJol = "hard";
+      soundAndFX.playPop?.();
+      renderFreeReveal({ directListen: true });
+    });
   }
 
-  function renderFreeReveal() {
+  function renderFreeReveal(options = {}) {
+    const isDirectListen = !!options.directListen;
+
     containerEl.innerHTML = `
       <div class="free-recall-round flex flex-col items-center justify-center gap-5 w-full max-w-md mx-auto text-center px-4">
         <div class="text-8xl sm:text-9xl font-black font-serif text-white drop-shadow-lg leading-none select-none">${escapeHtml(charData.char)}</div>
@@ -92,32 +117,53 @@ export function mountFreeRecallRound(ctx) {
           听示范
         </button>
         <div class="flex flex-wrap items-center justify-center gap-3 mt-2">
-          <button type="button" id="btn-recall-knew" class="btn-game-orange text-white font-black text-sm sm:text-base px-8 py-3 rounded-full shadow-xl active:scale-95 cursor-pointer">
-            对了
-          </button>
-          <button type="button" id="btn-recall-notyet" class="bg-slate-600/80 hover:bg-slate-500 text-white font-black text-sm sm:text-base px-8 py-3 rounded-full border border-white/20 shadow-xl active:scale-95 cursor-pointer">
-            还不会
-          </button>
+          ${isDirectListen ? `
+            <button type="button" id="btn-recall-ack" class="btn-game-orange text-white font-black text-sm sm:text-base px-8 py-3 rounded-full shadow-xl active:scale-95 cursor-pointer">
+              记住了，继续
+            </button>
+          ` : `
+            <button type="button" id="btn-recall-knew" class="btn-game-orange text-white font-black text-sm sm:text-base px-8 py-3 rounded-full shadow-xl active:scale-95 cursor-pointer">
+              对了
+            </button>
+            <button type="button" id="btn-recall-notyet" class="bg-slate-600/80 hover:bg-slate-500 text-white font-black text-sm sm:text-base px-8 py-3 rounded-full border border-white/20 shadow-xl active:scale-95 cursor-pointer">
+              还不会
+            </button>
+          `}
         </div>
       </div>
     `;
+
+    // 若为直接听示范，自动播放发音
+    if (isDirectListen) {
+      soundAndFX.speakPriority?.(charData.char, { kind: "char", priority: 1 });
+      bind(containerEl.querySelector("#btn-recall-ack"), "click", () => {
+        soundAndFX.playPop?.();
+        finish(false, "hard");
+      });
+    }
 
     bind(containerEl.querySelector("#btn-recall-speak"), "click", () => {
       soundAndFX.playPop?.();
       soundAndFX.speakPriority?.(charData.char, { kind: "char", priority: 1 });
     });
 
-    bind(containerEl.querySelector("#btn-recall-knew"), "click", () => {
-      soundAndFX.playPop?.();
-      finish(true);
-    });
+    const knewBtn = containerEl.querySelector("#btn-recall-knew");
+    if (knewBtn) {
+      bind(knewBtn, "click", () => {
+        soundAndFX.playPop?.();
+        finish(true, currentJol);
+      });
+    }
 
-    bind(containerEl.querySelector("#btn-recall-notyet"), "click", () => {
-      soundAndFX.playPop?.();
-      soundAndFX.speakPriority?.(charData.char, { kind: "char", priority: 1 });
-      // 稍延后结算，避免立刻切页掐断示范音
-      setTimeout(() => finish(false), 450);
-    });
+    const notyetBtn = containerEl.querySelector("#btn-recall-notyet");
+    if (notyetBtn) {
+      bind(notyetBtn, "click", () => {
+        soundAndFX.playPop?.();
+        soundAndFX.speakPriority?.(charData.char, { kind: "char", priority: 1 });
+        // 稍延后结算，避免立刻切页掐断示范音
+        setTimeout(() => finish(false, currentJol), 450);
+      });
+    }
   }
 
   function renderPointMode() {

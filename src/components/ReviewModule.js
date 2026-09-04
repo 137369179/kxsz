@@ -32,6 +32,10 @@ import {
   buildInterleavePack,
   runInterleaveSession,
 } from "../utils/reviewHub/index.js";
+import {
+  getOvernightChars,
+  isBedtimeWindow,
+} from "../utils/sleepConsolidation.js";
 
 function shuffle(arr) {
   const a = [...arr];
@@ -50,6 +54,8 @@ export class ReviewModule extends BaseModule {
     this.correctCount = 0;
     this.wrongCount = 0;
     this._freeRecall = null;
+    this.hasOvernightChars = false;
+    this.isBedtime = false;
     // SM-18 遗忘警报追踪
     this.consecutiveMistakes = {};  // { charId: number } 连续失误计数
     this.forgottenChars = [];       // 警报字列表（charId）
@@ -69,12 +75,18 @@ export class ReviewModule extends BaseModule {
     this.wrongCount = 0;
     this.consecutiveMistakes = {};
     this.forgottenChars = [];
+    this.isBedtime = isBedtimeWindow();
 
     // 仅已学字；无已学 → 空队列（禁止字库前 N 字凑数）
     if (learnedIds.length === 0) {
       this.queue = [];
+      this.hasOvernightChars = false;
       return;
     }
+
+    // 睡眠巩固机制：优先提取隔夜待巩固字 (Walker 2006)
+    const overnightIds = getOvernightChars(records).filter((id) => learnedSet.has(id));
+    this.hasOvernightChars = overnightIds.length > 0;
 
     const dueIds = ebbinghausManager
       .getDueReviewCharIds()
@@ -87,7 +99,8 @@ export class ReviewModule extends BaseModule {
     ).filter((c) => learnedSet.has(c.id));
     const confusedIds = confusedChars.map((c) => c.id);
 
-    const allIds = [...new Set([...dueIds, ...confusedIds])].slice(0, wantRev);
+    // 优先排隔夜字，再排到期字与混淆字
+    const allIds = [...new Set([...overnightIds, ...dueIds, ...confusedIds])].slice(0, wantRev);
     this.queue = allIds
       .map((id) => CHARACTER_DATABASE.find((c) => c.id === id))
       .filter(Boolean);
@@ -264,7 +277,7 @@ export class ReviewModule extends BaseModule {
           </button>
 
           <div class="candy-pill flex items-center gap-2 px-5 py-1.5 rounded-full border border-yellow-300/40">
-            <span class="text-xs text-amber-200 font-bold">艾宾浩斯复习:</span>
+            <span class="text-xs text-amber-200 font-bold">${this.hasOvernightChars ? "🌙 隔夜巩固:" : (this.isBedtime ? "🌙 睡前轻复习:" : "艾宾浩斯复习:")}</span>
             <span class="text-yellow-300 font-black text-sm font-mono">${progress} / ${this.queue.length}</span>
           </div>
 
@@ -319,13 +332,13 @@ export class ReviewModule extends BaseModule {
       age,
       distractorChars,
       on: (el, evt, fn) => this._on(el, evt, fn),
-      onComplete: ({ knew, cardType }) => {
-        this._handleRecallComplete(charData, knew, cardType);
+      onComplete: ({ knew, cardType, jol }) => {
+        this._handleRecallComplete(charData, knew, cardType, jol);
       },
     });
   }
 
-  _handleRecallComplete(charData, knew, cardType) {
+  _handleRecallComplete(charData, knew, cardType, jol) {
     const charId = charData.id;
     const records = ebbinghausManager.progress.charRecords;
     let charRec = records[charId];
@@ -348,7 +361,7 @@ export class ReviewModule extends BaseModule {
     // 诚实性：只记本次卡种一次
     recordAtomicAnswer(charRec, cardType, !!knew);
 
-    const rating = mapSelfReportToRating(!!knew);
+    const rating = mapSelfReportToRating(!!knew, jol);
     ebbinghausManager.completeReview(charId, rating);
 
     if (knew) {

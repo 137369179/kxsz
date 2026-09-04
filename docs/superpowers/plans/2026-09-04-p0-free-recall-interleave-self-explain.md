@@ -38,7 +38,7 @@
 - Create: `src/utils/reviewHub/freeRecallLogic.js`
 - Create: `tests/unit/freeRecallLogic.test.js`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```js
 import { describe, it, expect } from "vitest";
@@ -70,12 +70,12 @@ describe("mapSelfReportToRating", () => {
 });
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `npm test -- tests/unit/freeRecallLogic.test.js`  
 Expected: FAIL (module not found)
 
-- [ ] **Step 3: Write minimal implementation**
+- [x] **Step 3: Write minimal implementation**
 
 ```js
 // src/utils/reviewHub/freeRecallLogic.js
@@ -98,12 +98,12 @@ export function mapSelfReportToRating(knew) {
 }
 ```
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 Run: `npm test -- tests/unit/freeRecallLogic.test.js`  
 Expected: PASS
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/utils/reviewHub/freeRecallLogic.js tests/unit/freeRecallLogic.test.js
@@ -122,7 +122,7 @@ EOF
 - Create: `src/utils/reviewHub/interleavePack.js`
 - Create: `tests/unit/interleavePack.test.js`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```js
 import { describe, it, expect } from "vitest";
@@ -174,11 +174,11 @@ describe("buildInterleavePack", () => {
 });
 ```
 
-- [ ] **Step 2: Run test — expect FAIL**
+- [x] **Step 2: Run test — expect FAIL**
 
 Run: `npm test -- tests/unit/interleavePack.test.js`
 
-- [ ] **Step 3: Implement `buildInterleavePack`**
+- [x] **Step 3: Implement `buildInterleavePack`**
 
 Requirements in code comments:
 - Merge sources: `errorProfiles.confusedPairs` first, then each learned char’s `confusingChars`
@@ -194,9 +194,9 @@ export function buildInterleavePack({ chars, learnedIds, errorProfiles, limit = 
 }
 ```
 
-- [ ] **Step 4: Run test — expect PASS**
+- [x] **Step 4: Run test — expect PASS**
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/utils/reviewHub/interleavePack.js tests/unit/interleavePack.test.js
@@ -217,7 +217,7 @@ EOF
 - Modify: `src/components/ReviewModule.js`
 - Create: `tests/unit/reviewAtomicHonesty.test.js`
 
-- [ ] **Step 1: Honesty test (static)**
+- [x] **Step 1: Honesty test (static)**
 
 ```js
 import { describe, it, expect } from "vitest";
@@ -240,7 +240,7 @@ describe("ReviewModule atomic honesty", () => {
 
 Run before fix: may PASS already if pattern exact — if current code matches, expect FAIL after we assert; current ReviewModule HAS this loop → test should FAIL until removed.
 
-- [ ] **Step 2: Implement `mountFreeRecallRound(ctx)`**
+- [x] **Step 2: Implement `mountFreeRecallRound(ctx)`**
 
 `freeRecallView.js` exports `mountFreeRecallRound` where `ctx` has:
 `{ containerEl, charData, age, onComplete({ knew, cardType }) }`
@@ -251,7 +251,7 @@ Behavior:
 - mode `point`: speak pinyin, show 3–4 char buttons (target + distractors from `confusingChars` or random learned-looking chars from a passed `distractorChars` array); on click call `checkCardAnswer` then `onComplete`
 - Do **not** render multimodal spoilers in the view itself
 
-- [ ] **Step 3: Wire `ReviewModule`**
+- [x] **Step 3: Wire `ReviewModule`**
 
 Changes:
 1. `initQueue`: remove `CHARACTER_DATABASE.slice(0, wantRev)` fallback; if no learned ids → empty queue → `renderEmpty`
@@ -265,13 +265,13 @@ Changes:
    - SM-18 append-to-end on consecutive notYet ≥2 with **neutral** speak text: `这个字我们再练一次吧`
 5. Export hub from `reviewHub/index.js`
 
-- [ ] **Step 4: Run tests**
+- [x] **Step 4: Run tests**
 
 Run: `npm test -- tests/unit/freeRecallLogic.test.js tests/unit/reviewAtomicHonesty.test.js`  
 Plus full suite smoke: `npm test`  
 Expected: PASS
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/utils/reviewHub/ src/components/ReviewModule.js tests/unit/reviewAtomicHonesty.test.js
@@ -291,7 +291,7 @@ EOF
 - Modify: `src/components/ReviewModule.js`
 - Modify: `src/utils/reviewHub/index.js`
 
-- [ ] **Step 1: Implement `mountInterleaveRound` / `runInterleaveSession`**
+- [x] **Step 1: Implement `mountInterleaveRound` / `runInterleaveSession`**
 
 API:
 ```js
@@ -303,7 +303,7 @@ export function runInterleaveSession({
 ```
 Each question: show target prompt + option buttons; on answer show hint if wrong; advance; at end `onFinished`.
 
-- [ ] **Step 2: In ReviewModule after last free-recall card**
+- [x] **Step 2: In ReviewModule after last free-recall card**
 
 Instead of always `renderSummary()`:
 ```js
@@ -335,9 +335,9 @@ Import `CHARACTER_DETAILS` from `../data/characterDetails.js` (or use existing d
 
 On each interleave answer: `completeReview` + optional `recordMistake` on wrong (use existing ebbinghaus API if available — `recordMistake` / errorProfiles helper used elsewhere).
 
-- [ ] **Step 3: Run `npm test -- tests/unit/interleavePack.test.js` and full `npm test`**
+- [x] **Step 3: Run `npm test -- tests/unit/interleavePack.test.js` and full `npm test`**
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add src/utils/reviewHub/ src/components/ReviewModule.js
@@ -358,7 +358,7 @@ EOF
 - Create: `tests/unit/selfExplainGate.test.js`
 - Modify: `src/utils/learnSteps/stepRecognize.js`
 
-- [ ] **Step 1: Test gate helper**
+- [x] **Step 1: Test gate helper**
 
 ```js
 import { describe, it, expect } from "vitest";
@@ -372,7 +372,7 @@ describe("shouldUseSelfExplain", () => {
 });
 ```
 
-- [ ] **Step 2: Implement selfExplainPrompt**
+- [x] **Step 2: Implement selfExplainPrompt**
 
 ```js
 export function shouldUseSelfExplain(age) {
@@ -386,7 +386,7 @@ export function openSelfExplainPrompt(charItem, onDone) {
 }
 ```
 
-- [ ] **Step 3: morphEngine `onClose`**
+- [x] **Step 3: morphEngine `onClose`**
 
 Change signature:
 ```js
@@ -403,7 +403,7 @@ export function openMorphTheater(charItem, container = document.body, opts = {})
 }
 ```
 
-- [ ] **Step 4: stepRecognize finish button**
+- [x] **Step 4: stepRecognize finish button**
 
 ```js
 if (finishBtn) {
@@ -446,11 +446,11 @@ openMorphTheater(char, document.body, {
 
 Ensure `ebbinghausManager` imported in `stepRecognize.js` if not already.
 
-- [ ] **Step 5: Run tests**
+- [x] **Step 5: Run tests**
 
 `npm test -- tests/unit/selfExplainGate.test.js` then `npm test`
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add src/utils/morphEngine.js src/utils/learnSteps/selfExplainPrompt.js src/utils/learnSteps/stepRecognize.js tests/unit/selfExplainGate.test.js
@@ -469,9 +469,9 @@ EOF
 - Modify: `docs/现状对照表.md`
 - Modify: `docs/P0学习提取练习设计规格.md` status line → 实现中/已落地
 
-- [ ] Update 对照表 row for P0 提取练习 → **已实现**（列要点）
-- [ ] `npm test` full green
-- [ ] Commit docs
+- [x] Update 对照表 row for P0 提取练习 → **已实现**（列要点）
+- [x] `npm test` full green
+- [x] Commit docs
 
 ```bash
 git add docs/

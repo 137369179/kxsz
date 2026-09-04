@@ -2,6 +2,7 @@ export {
   pickRecallMode,
   mapSelfReportToRating,
   FSRGRating,
+  JOL_LEVELS,
 } from "./freeRecallLogic.js";
 
 export { buildInterleavePack } from "./interleavePack.js";

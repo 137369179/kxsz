@@ -5,6 +5,11 @@ import { eventBus, EVENTS } from "../eventBus.js";
 import { ebbinghausManager } from "../ebbinghaus.js";
 import { showParentGate, showToast } from "../parentGate.js";
 import { MODULE_LOADERS, MODE_TO_MODULE } from "./moduleRegistry.js";
+import {
+  startMicroScheduler,
+  stopMicroScheduler,
+  resetMicroTimer,
+} from "../microReviewScheduler.js";
 
 export async function ensureModule(modeName) {
   const key = MODE_TO_MODULE[modeName];
@@ -111,12 +116,14 @@ export function endStudySession() {
   if (!this._studySession) return;
   try { this._studySession.stop(); } catch {}
   this._studySession = null;
+  try { stopMicroScheduler(); } catch {}
   try { eventBus.emit(EVENTS.STUDY_SESSION_END, {}); } catch {}
 }
 
 export function beginStudySession() {
   this._endStudySession();
   this._studySession = ebbinghausManager.createStudySession();
+  try { startMicroScheduler({ enabled: true }); } catch {}
   try { eventBus.emit(EVENTS.STUDY_SESSION_START, {}); } catch {}
 }
 
@@ -230,6 +237,7 @@ export async function startLearnFlow(charData) {
   if (this.learnModule) {
     this.learnModule.destroy();
   }
+  try { resetMicroTimer(); } catch {}
   this._beginStudySession();
   this.learnModule = new LearnModuleCls(
     this.container,

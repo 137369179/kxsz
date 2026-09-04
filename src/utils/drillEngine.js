@@ -18,7 +18,7 @@
 import { soundAndFX } from "./soundEngine.js";
 import { ebbinghausManager } from "./ebbinghaus.js";
 import { GAME_ICONS } from "./gameIcons.js";
-import { getQuestionWeights, computeAdaptiveProfile } from "./difficultyEngine.js";
+import { getQuestionWeights, computeAdaptiveProfile, realtimeAdjust } from "./difficultyEngine.js";
 
 const ROUNDS_PER_CHAR = 3;
 
@@ -130,6 +130,9 @@ export class DrillEngine {
     this.hitsInBalloonRound = 0;
     this.finished = false;
     this._timeouts = [];
+
+    // P1: 实时动态难度 — 滑动窗口结果追踪 (realtimeAdjust)
+    this.recentResults = [];
 
     // 
     this.typePool = this.buildTypePool();
@@ -538,6 +541,7 @@ export class DrillEngine {
           ebbinghausManager.markDifficult(this.char.id);
           this.afterQuestionAnswer(this.char, type, 0, false);
           this.combo = 0;
+          this._applyRealtimeDifficulty(false);
           btn.classList.add("animate-shake");
           this._timeout(() => btn.classList.remove("animate-shake"), 420);
           return;
@@ -601,6 +605,7 @@ export class DrillEngine {
           soundAndFX.playSoftError();
           ebbinghausManager.markDifficult(c.id);
           this.combo = 0;
+          this._applyRealtimeDifficulty(false);
           btn.classList.add("animate-shake", "opacity-50");
           this._timeout(() => btn.classList.remove("animate-shake", "opacity-50"), 420);
           return;
@@ -625,6 +630,7 @@ export class DrillEngine {
           soundAndFX.playSoftError();
           ebbinghausManager.markDifficult(c.id);
           this.combo = 0;
+          this._applyRealtimeDifficulty(false);
           btn.classList.add("animate-shake", "opacity-50");
           this._timeout(() => btn.classList.remove("animate-shake", "opacity-50"), 420);
           return;
@@ -647,6 +653,7 @@ export class DrillEngine {
     const canvas = this.mount.querySelector("#stroke-trace-canvas");
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
+    if (!ctx) return;
     const W = canvas.width;
     const H = canvas.height;
 
@@ -741,6 +748,9 @@ export class DrillEngine {
     this.bestCombo = Math.max(this.bestCombo, this.combo);
     soundAndFX.playCombo(this.combo);
 
+    // P1: 实时动态难度更新
+    this._applyRealtimeDifficulty(true);
+
     const anchor = this.mount.querySelector("#combo-badge-anchor");
     if (anchor) {
       const labels = ["Good! ", "Great! ", "Perfect! "];
@@ -757,6 +767,42 @@ export class DrillEngine {
       this.roundIndex += 1;
       this.render();
     }, 720);
+  }
+
+  /**
+   * P1: 实时难度调节 (ZPD / realtimeAdjust 接线)
+   * 每题作答后调用；维护滑动窗口并按规则升降 difficultyLevel。
+   * @param {boolean} isCorrect
+   */
+  _applyRealtimeDifficulty(isCorrect) {
+    // 维护最近 8 题滑动窗口
+    this.recentResults = [...(this.recentResults || []), isCorrect].slice(-8);
+
+    const adj = realtimeAdjust(this.recentResults, this.difficultyLevel, this.combo);
+    if (adj.nextLevel !== this.difficultyLevel) {
+      const prev = this.difficultyLevel;
+      this.difficultyLevel = adj.nextLevel;
+      // 降级时给出示范脚手架（文案中性：不归因于孩子）
+      if (adj.action === "decrease") {
+        this._triggerScaffoldDemonstration(prev);
+      }
+    }
+  }
+
+  /**
+   * P1: 难度降级后的示范脚手架 — 中性文案，不评判孩子
+   * 测试可 stub 此方法观察调用时机。
+   * @param {string} prevLevel  降级前的难度
+   */
+  _triggerScaffoldDemonstration(prevLevel) {
+    try {
+      soundAndFX.speakPriority?.(
+        `来，我们再看一看「${this.char?.char || ""}」怎么读。`,
+        { kind: "tutorial", priority: 1 }
+      );
+    } catch (_) {
+      /* 测试环境无 soundAndFX — 静默忽略 */
+    }
   }
 
   /**

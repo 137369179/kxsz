@@ -69,7 +69,7 @@ const eventIssues = [];
 for (const f of allFiles) {
   if (f.endsWith("eventBus.js") || isSelfTool(f)) continue;
   const src = readFileSync(f, "utf8");
-  for (const m of src.matchAll(/EVENTS\.([A-Z0-9_]+)/g)) {
+  for (const m of src.matchAll(/\bEVENTS\.([A-Z0-9_]+)/g)) {
     if (!definedEvents.has(m[1])) eventIssues.push({ file: f, event: m[1] });
   }
 }

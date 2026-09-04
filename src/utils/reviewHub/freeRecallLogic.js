@@ -11,7 +11,19 @@ export function pickRecallMode(age) {
   return { mode: "free", cardType: ATOMIC_CARD_TYPES.CHAR_TO_PINYIN };
 }
 
-/** @param {boolean} knew 用户自评「对了」 */
-export function mapSelfReportToRating(knew) {
-  return knew ? FSRGRating.GOOD : FSRGRating.AGAIN;
+export const JOL_LEVELS = Object.freeze({
+  EASY: "easy",
+  FUZZY: "fuzzy",
+  HARD: "hard",
+});
+
+/**
+ * @param {boolean} knew 用户自评「对了」
+ * @param {string} [jolLevel] 用户在 prompt 阶段的 JOL 预判 ('easy' | 'fuzzy' | 'hard')
+ */
+export function mapSelfReportToRating(knew, jolLevel = null) {
+  if (!knew) return FSRGRating.AGAIN;
+  if (jolLevel === JOL_LEVELS.EASY) return FSRGRating.EASY;
+  if (jolLevel === JOL_LEVELS.HARD) return FSRGRating.HARD;
+  return FSRGRating.GOOD;
 }
