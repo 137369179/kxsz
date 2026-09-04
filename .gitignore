@@ -38,3 +38,9 @@ dist/
 
 # Vitest runtime temp config files
 vitest.config.js.timestamp-*.mjs
+
+# AI agent / IDE 本地配置（不应入库）
+.agents/
+.claude/skills/
+.trae/skills/
+skills-lock.json
