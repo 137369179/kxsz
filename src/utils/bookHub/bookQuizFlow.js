@@ -91,6 +91,12 @@ export function renderQuiz() {
         btn.classList.add("ring-4", "ring-emerald-500", "bg-emerald-100");
         mainEl.querySelectorAll(".quiz-option-btn").forEach((b) => { b.style.pointerEvents = "none"; });
 
+        if (this.currentQuizStage === 1) {
+          const targetChar = activeQuiz.speakPrompt || (book.targetChars || [])[0];
+          const targetRec = CHARACTER_DATABASE.find((c) => c.char === targetChar);
+          if (targetRec) ebbinghausManager.completeReview(targetRec.id, true);
+        }
+
         this._timeout(() => {
           if (this.currentQuizStage === 1) {
             this.currentQuizStage = 2;
@@ -116,6 +122,7 @@ export function renderQuiz() {
           const picked = activeQuiz.options[pickedIdx];
           const targetRec = CHARACTER_DATABASE.find((c) => c.char === targetChar);
           if (targetRec) {
+            ebbinghausManager.completeReview(targetRec.id, false);
             ebbinghausManager.recordMistake(targetRec.id, "similar_confuse", {
               targetChar,
               selectedChar: picked
@@ -167,10 +174,9 @@ export function renderCertificate() {
           凯茜识字分级阅读 · 顺利掌握全书精髓与核心生字
         </p>
 
-        <div class="flex items-center gap-2 mb-6">
-          <span class="flex items-center transform hover:scale-125 transition-transform">${GAME_ICONS.star("w-8 h-8", false)}</span>
-          <span class="flex items-center transform hover:scale-125 transition-transform scale-125">${GAME_ICONS.star("w-8 h-8", false)}</span>
-          <span class="flex items-center transform hover:scale-125 transition-transform">${GAME_ICONS.star("w-8 h-8", false)}</span>
+        <div class="flex items-center gap-2 mb-6" aria-label="双关通关">
+          <span class="bg-amber-500 text-white text-xs font-black px-4 py-1.5 rounded-full border-2 border-white shadow-md">双关通关</span>
+          <span class="flex items-center transform hover:scale-125 transition-transform">${GAME_ICONS.crown("w-8 h-8")}</span>
         </div>
 
         <div class="w-full bg-white/90 p-4 rounded-2xl border-2 border-amber-200/90 mb-6 text-center">
@@ -244,7 +250,8 @@ export function playKaraoke(page, mainEl) {
   // 清空旧高亮
   spans.forEach((s) => s.classList.remove("bg-amber-300", "text-amber-950", "scale-110", "ring-4", "ring-amber-200/90", "shadow-md"));
 
-  // 播放伴读音频并同步字界高亮
+  // 播放伴读音频前停止前次音频并同步字界高亮
+  soundAndFX.stopSpeaking();
   soundAndFX.speakPriority(page.text, {
     kind: "sentence",
     emotion: "gentle",
@@ -258,7 +265,8 @@ export function playKaraoke(page, mainEl) {
         }
       });
     },
-    onEnd: () => {
+    onEnd: (result) => {
+      if (result?.interrupted) return;
       if (this.karaokeSessionId !== sessionId || !this.currentBook) return;
       spans.forEach((s) => s.classList.remove("bg-amber-300", "text-amber-950", "scale-110", "ring-4", "ring-amber-200/90", "shadow-md"));
 

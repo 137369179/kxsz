@@ -59,6 +59,24 @@ export function buildMatchPairs(count = 4) {
   return chars.map((c) => ({ char: c.char, pinyin: c.pinyin || "" }));
 }
 
+/**
+ * 对「已在 charRecords 中」的汉字写回复习结果。
+ * 跳过从未学过的字，避免成语/古诗把进度灌进未接触字。
+ */
+export function writeKnownCharsReview(chars, success) {
+  const records = ebbinghausManager.progress?.charRecords || {};
+  const seen = new Set();
+  for (const ch of chars || []) {
+    if (!ch || seen.has(ch)) continue;
+    seen.add(ch);
+    const rec = CHARACTER_DATABASE.find((c) => c.char === ch);
+    if (!rec || !records[rec.id]) continue;
+    try {
+      ebbinghausManager.completeReview(rec.id, !!success);
+    } catch {}
+  }
+}
+
 /** 在容器内生成「飘字」反馈（+伤害 / 连击 / 提示） */
 export function spawnFloatingText(container, text, cls = "", opts = {}) {
   if (typeof document === "undefined" || !container) return null;

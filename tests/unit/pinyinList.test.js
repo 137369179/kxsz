@@ -19,6 +19,7 @@ describe("National Curriculum Pinyin Database", () => {
       expect(pair.syllable).toBeTruthy();
       expect(pair.char).toBeTruthy();
       expect(pair.word).toBeTruthy();
+      expect(fs.existsSync(path.resolve(__dirname, "../../", pair.image))).toBe(true);
     }
   });
 

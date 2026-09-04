@@ -219,9 +219,3 @@ export function showToast(message, opts = {}) {
     setTimeout(() => toast.remove(), 220);
   }, duration);
 }
-
-if (typeof window !== "undefined") {
-  window.showParentGate = showParentGate;
-  window.showConfirm = showConfirm;
-  window.showToast = showToast;
-}

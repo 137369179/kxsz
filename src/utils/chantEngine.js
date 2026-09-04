@@ -189,6 +189,7 @@ export function execute(plan, charItem, callbacks = {}, soundEngine = null) {
       cancelled = true;
       for (const t of timers) clearTimeout(t);
       try { window.speechSynthesis?.cancel(); } catch (_) {}
+      try { _sound?.stopSpeaking?.(); } catch (_) {}
     },
   };
 }

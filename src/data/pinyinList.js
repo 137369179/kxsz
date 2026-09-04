@@ -90,6 +90,10 @@ export const PINYIN_COLLISION_PAIRS = [
   { initial: "sh", final: "ui", tone: 3, syllable: "shuǐ", char: "水", meaning: "清澈流淌的河水", word: "清水", image: "assets/images/pinyin_pair_shui.webp" },
   { initial: "h", final: "uo", tone: 3, syllable: "huǒ", char: "火", meaning: "燃烧温暖的红火", word: "火车", image: "assets/images/pinyin_pair_huo.webp" },
   { initial: "sh", final: "an", tone: 1, syllable: "shān", char: "山", meaning: "高大巍峨的群山", word: "大山", image: "assets/images/pinyin_pair_shan.webp" },
-  { initial: "f", final: "eng", tone: 1, syllable: "fēng", char: "风", meaning: "轻柔吹拂的微风", word: "风筝", image: "assets/images/pinyin_pair_feng.webp" }
+  { initial: "f", final: "eng", tone: 1, syllable: "fēng", char: "风", meaning: "轻柔吹拂的微风", word: "风筝", image: "assets/images/pinyin_pair_feng.webp" },
+  { initial: "y", final: "u", tone: 3, syllable: "yǔ", char: "雨", meaning: "淅淅沥沥的春雨", word: "下雨", image: "assets/images/pinyin_pair_yu.webp" },
+  { initial: "h", final: "ua", tone: 1, syllable: "huā", char: "花", meaning: "盛开绚烂的花朵", word: "红花", image: "assets/images/pinyin_pair_hua.webp" },
+  { initial: "n", final: "iao", tone: 3, syllable: "niǎo", char: "鸟", meaning: "枝头欢唱的小鸟", word: "小鸟", image: "assets/images/pinyin_pair_niao.webp" },
+  { initial: "b", final: "ai", tone: 2, syllable: "bái", char: "白", meaning: "洁白如雪的白云", word: "白云", image: "assets/images/pinyin_pair_bai.webp" }
 ];
 

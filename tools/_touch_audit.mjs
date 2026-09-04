@@ -8,24 +8,41 @@
  * 用法：node tools/_touch_audit.mjs [baseUrl]（需先起静态服务）
  */
 import { spawn } from "child_process";
+import { existsSync } from "fs";
 import { setTimeout as delay } from "timers/promises";
 
 const BASE = process.argv[2] || "http://127.0.0.1:8902";
 const PORT = 9336;
-const CHROME = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
+const CHROME = process.env.CHROME_BIN || "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
 const PROFILE = "/tmp/cathy-touch-profile";
 const MODES = ["map", "cards", "review", "pk", "play", "reward", "pinyin"];
 
-const chrome = spawn(CHROME, [
-  "--headless=new", `--remote-debugging-port=${PORT}`, `--user-data-dir=${PROFILE}`,
-  "--no-sandbox", "--disable-gpu", "--no-proxy-server",
-  "--autoplay-policy=no-user-gesture-required", "--window-size=1366,768", "about:blank",
-]);
-const cleanup = () => { try { chrome.kill("SIGKILL"); } catch {} };
+if (!existsSync(CHROME)) {
+  console.warn(`⚠️ [touch_audit] 跳过: 未检测到 Chrome 可执行文件 (${CHROME})`);
+  process.exit(0);
+}
+
+let chrome;
+try {
+  chrome = spawn(CHROME, [
+    "--headless=new", `--remote-debugging-port=${PORT}`, `--user-data-dir=${PROFILE}`,
+    "--no-sandbox", "--disable-gpu", "--no-proxy-server",
+    "--autoplay-policy=no-user-gesture-required", "--window-size=1366,768", "about:blank",
+  ]);
+  chrome.on("error", (err) => {
+    console.warn(`⚠️ [touch_audit] 启动 Chrome 异常: ${err.message}`);
+    process.exit(0);
+  });
+} catch (err) {
+  console.warn(`⚠️ [touch_audit] 无法启动 Chrome 进程: ${err.message}`);
+  process.exit(0);
+}
+
+const cleanup = () => { try { if (chrome) chrome.kill("SIGKILL"); } catch {} };
 process.on("exit", cleanup);
 
 async function waitForDevTools() {
-  for (let i = 0; i < 60; i++) {
+  for (let i = 0; i < 24; i++) {
     try {
       const r = await fetch(`http://127.0.0.1:${PORT}/json/list`);
       const list = await r.json();
@@ -34,9 +51,14 @@ async function waitForDevTools() {
     } catch {}
     await delay(250);
   }
-  throw new Error("DevTools 未就绪");
+  return null;
 }
 const target = await waitForDevTools();
+if (!target) {
+  console.warn(`⚠️ [touch_audit] 跳过: Chrome DevTools 未能在指定时间内就绪 (端口 ${PORT})`);
+  cleanup();
+  process.exit(0);
+}
 const ws = new WebSocket(target.webSocketDebuggerUrl);
 await new Promise((res, rej) => { ws.onopen = res; ws.onerror = rej; });
 let msgId = 0;

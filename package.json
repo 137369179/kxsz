@@ -10,14 +10,16 @@
     "test:coverage": "vitest run --coverage",
     "smoke": "node tools/_boot_smoke.mjs && node tools/_p4_smoke.mjs",
     "smoke:boot": "node tools/_boot_smoke.mjs",
-    "smoke:engines": "node tools/_p4_smoke.mjs"
+    "smoke:engines": "node tools/_p4_smoke.mjs",
+    "audit:security": "node tools/_security_audit.mjs",
+    "audit:contracts": "node tools/_deep_contract_audit.mjs",
+    "audit:characters": "node tools/validate_characters.mjs",
+    "audit": "node tools/_deep_contract_audit.mjs && node tools/_security_audit.mjs && node tools/validate_characters.mjs"
   },
   "devDependencies": {
+    "jsdom": "^30.0.1",
+    "tough-cookie": "^6.0.2",
     "vite": "^5.4.21",
     "vitest": "^1.6.0"
-  },
-  "dependencies": {
-    "jsdom": "^30.0.1",
-    "tough-cookie": "^6.0.2"
   }
 }

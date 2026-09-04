@@ -75,7 +75,6 @@ export function bindEvents(mainEl) {
   const speakRadBtn = mainEl.querySelector("#btn-speak-radical-origin");
   if (speakRadBtn) {
     this._on(speakRadBtn, "click", () => {
-      soundAndFX.playPop();
       if (RADICAL_ORIGINS[this.selectedRadical]) {
         soundAndFX.speakPriority(RADICAL_ORIGINS[this.selectedRadical] || "", { kind: "sentence", priority: 1 });
       }
@@ -124,6 +123,7 @@ export function bindEvents(mainEl) {
 
   if (closeBtn) {
     this._on(closeBtn, "click", () => {
+      soundAndFX.stopSpeaking();
       soundAndFX.playPop();
       this.selectedCard = null;
       this.render();
@@ -133,6 +133,7 @@ export function bindEvents(mainEl) {
   if (modalBackdrop) {
     this._on(modalBackdrop, "click", (e) => {
       if (e.target === modalBackdrop) {
+        soundAndFX.stopSpeaking();
         this.selectedCard = null;
         this.render();
       }
@@ -172,7 +173,6 @@ export function bindEvents(mainEl) {
     this._on(speakCharBtn, "click", (e) => {
       e.stopPropagation();
       if (this.selectedCard) {
-        soundAndFX.playPop();
         soundAndFX.speakPriority(`${this.selectedCard.char}，${this.selectedCard.pinyin}`, { kind: "char", priority: 1 });
       }
     });
@@ -219,7 +219,6 @@ export function bindEvents(mainEl) {
     this._on(btn, "click", (e) => {
       e.stopPropagation();
       const word = btn.dataset.word;
-      soundAndFX.playPop();
       soundAndFX.speakPriority(word, { kind: "word", priority: 1 });
       btn.classList.add("ring-2", "ring-orange-400");
       this._timeout(() => btn.classList.remove("ring-2", "ring-orange-400"), 400);
@@ -232,7 +231,6 @@ export function bindEvents(mainEl) {
     this._on(sentenceBox, "click", (e) => {
       e.stopPropagation();
       if (this.selectedCard && this.selectedCard.sentence) {
-        soundAndFX.playPop();
         soundAndFX.speakPriority(this.selectedCard.sentence, { kind: "sentence", emotion: "gentle" });
         sentenceBox.classList.add("ring-2", "ring-orange-400");
         this._timeout(() => sentenceBox.classList.remove("ring-2", "ring-orange-400"), 600);
@@ -390,10 +388,12 @@ export function openStrokeDemoModal(c) {
 
   this._on(closeBtn, "click", () => {
     cancelCurrentAnim = true;
+    soundAndFX.stopSpeaking();
     overlay.remove();
   });
   this._on(replayBtn, "click", () => {
     cancelCurrentAnim = true;
+    soundAndFX.stopSpeaking();
     setTimeout(playDemo, 100);
   });
 
@@ -641,6 +641,7 @@ export function openFlashcardSlideshowModal(chars) {
     if (closeBtn) {
       this._on(closeBtn, "click", () => {
         if (autoPlayTimer) clearInterval(autoPlayTimer);
+        soundAndFX.stopSpeaking();
         soundAndFX.playPop();
         overlay.remove();
       });
@@ -688,7 +689,6 @@ export function openFlashcardSlideshowModal(chars) {
     if (speakBtn) {
       this._on(speakBtn, "click", (e) => {
         e.stopPropagation();
-        soundAndFX.playPop();
         soundAndFX.speakPriority(`${c.char}，${c.pinyin}`, { kind: "char", priority: 1 });
       });
     }
@@ -711,7 +711,6 @@ export function openFlashcardSlideshowModal(chars) {
     this._onDom(overlay.querySelectorAll(".slideshow-word-btn"), "click", (e) => {
       e.stopPropagation();
       const word = e.currentTarget.dataset.word;
-      soundAndFX.playPop();
       soundAndFX.speakPriority(word, { kind: "word", priority: 1 });
     });
 

@@ -237,6 +237,7 @@ export function openAirTracePrompt(charItem, onDone) {
     stopped = true;
     if (rafId) cancelAnimationFrame(rafId);
     rafId = null;
+    try { soundAndFX.stopSpeaking?.(); } catch (_) { /* ignore */ }
   };
 
   let done = false;
@@ -244,6 +245,7 @@ export function openAirTracePrompt(charItem, onDone) {
     if (done) return;
     done = true;
     _cancel();
+    try { soundAndFX.stopSpeaking?.(); } catch (_) { /* ignore */ }
     try { soundAndFX.playPop?.(); } catch (_) { /* ignore */ }
     wrapper.remove();
     onDone?.(payload || {});

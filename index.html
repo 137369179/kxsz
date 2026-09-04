@@ -18,7 +18,7 @@
   <meta name="twitter:description" content="专业儿童汉字启蒙与分级阅读应用" />
   <meta name="twitter:image" content="assets/images/cathy_mascot.webp" />
   <!-- CSP：限制资源加载来源，防止 XSS，允许本地 AI 语音服务与本地开发连接 -->
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' blob:; connect-src 'self' http://127.0.0.1:8766 http://localhost:8766 ws://127.0.0.1:8766 ws://localhost:8766; worker-src 'self' blob:; frame-src 'self' data: blob:; object-src 'none'; base-uri 'self'; form-action 'none';">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' data: blob: http://127.0.0.1:8766 http://localhost:8766; connect-src 'self' http://127.0.0.1:8766 http://localhost:8766 ws://127.0.0.1:8766 ws://localhost:8766; worker-src 'self' blob:; frame-src 'self' data: blob:; object-src 'none'; base-uri 'self'; form-action 'none'; frame-ancestors 'none';">
   <link rel="icon" type="image/jpeg" href="assets/images/cathy_mascot.webp" />
   <link rel="manifest" href="manifest.json" />
   <link rel="apple-touch-icon" href="assets/images/cathy_mascot.webp" />

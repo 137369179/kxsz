@@ -53,7 +53,8 @@ export function classifyMastery(charRecords) {
   const difficultList = [];
 
   for (const r of records) {
-    const rate = r.masteryRate ?? 0;
+    let rate = r.masteryRate ?? r.correctRate ?? 0;
+    if (rate > 0 && rate <= 1) rate = Math.round(rate * 100);
     const lastReview = r.nextReviewDate ?? r.learnedAt ?? now;
     const daysSince = (now - lastReview) / 86_400_000;
 
@@ -283,8 +284,13 @@ export function generateParentDiagnosis({ coverage, mastery, trend, books, focus
 
 export function getDifficultCharsWithInfo(charRecords) {
   const records = Object.values(charRecords || {});
-  const difficult = records.filter((r) => (r.masteryRate ?? 0) < DIFFICULT_RATE && (r.masteryRate ?? 0) > 0);
-  difficult.sort((a, b) => (a.masteryRate ?? 0) - (b.masteryRate ?? 0));
+  const getRate = (r) => {
+    let rate = r.masteryRate ?? r.correctRate ?? 0;
+    if (rate > 0 && rate <= 1) rate = Math.round(rate * 100);
+    return rate;
+  };
+  const difficult = records.filter((r) => getRate(r) < DIFFICULT_RATE && getRate(r) > 0);
+  difficult.sort((a, b) => getRate(a) - getRate(b));
 
   return difficult.map((r) => {
     const charData = CHARACTER_DATABASE.find((c) => c.id === r.charId) || {};

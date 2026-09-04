@@ -17,6 +17,7 @@ import {
   buildMatchPairs,
   spawnFloatingText,
   startCountdown,
+  writeKnownCharsReview,
 } from "./playHelpers.js";
 
 export function renderIdiomHall() {
@@ -56,6 +57,20 @@ export function renderIdiomHall() {
         </header>
 
         <main class="relative z-10 flex-1 p-6 overflow-y-auto no-scrollbar">
+          <div class="max-w-5xl mx-auto mb-6">
+            <div class="relative w-full h-36 sm:h-40 rounded-3xl overflow-hidden shadow-2xl border-4 border-emerald-400/60 flex flex-col justify-end p-6 bg-gradient-to-r from-emerald-800 via-teal-800 to-cyan-900">
+              <div class="relative z-10 text-white">
+                <div class="flex items-center gap-3 mb-1">
+                  <span class="flex items-center">${GAME_ICONS.book()}</span>
+                  <h1 class="text-2xl font-black drop-shadow-md text-yellow-300 font-serif">经典成语国学微课堂</h1>
+                </div>
+                <p class="text-xs text-emerald-100 font-bold drop-shadow">
+                  20 部经典成语寓言启蒙 · 沉浸式图文故事赏析 · 理解寓意趣味闯关 · 筑牢国学基石
+                </p>
+              </div>
+            </div>
+          </div>
+
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 max-w-5xl mx-auto">
             ${db.map(item => {
               const isLearned = learned.has(item.id || item.name);
@@ -435,6 +450,8 @@ export function _renderIdiomQuiz(idiom, db) {
 
     const endQuiz = (won) => {
       if (stopTimer) { stopTimer(); stopTimer = null; }
+      const relatedChars = idiom.chars || Array.from(idiom.name || "");
+      writeKnownCharsReview(relatedChars, won);
       if (won) {
         soundAndFX.playVictoryFanfare();
         soundAndFX.triggerConfetti(this.container);
@@ -475,9 +492,11 @@ export function _renderIdiomQuiz(idiom, db) {
         if (idx === quiz.correctIndex) {
           btn.classList.add("ring-4", "ring-emerald-400", "bg-emerald-500/30");
           soundAndFX.playSuccessSound();
-          soundAndFX.speakPriority("完全正确！理解力超群！", { kind: "sentence", emotion: "excited" });
+          this._timeout(() => {
+            soundAndFX.speakPriority("完全正确！理解力超群！", { kind: "sentence", emotion: "excited" });
+          }, 200);
           if (feedback) feedback.innerHTML = '<span class="text-emerald-300 text-base">完全正确！理解力超群！</span>';
-          this._timeout(() => endQuiz(true), 800);
+          this._timeout(() => endQuiz(true), 1600);
         } else {
           wrongSet.add(idx);
           triesLeft--;
@@ -489,7 +508,9 @@ export function _renderIdiomQuiz(idiom, db) {
             if (feedback) feedback.innerHTML = `<span class="text-rose-300">次数用完！正确答案是 ${String.fromCharCode(65 + quiz.correctIndex)}</span>`;
             this._timeout(() => endQuiz(false), 1200);
           } else {
-            soundAndFX.speakPriority("再仔细想想哦，别灰心！", { kind: "sentence", emotion: "correction" });
+            this._timeout(() => {
+              soundAndFX.speakPriority("再仔细想想哦，别灰心！", { kind: "sentence", emotion: "correction" });
+            }, 180);
             if (feedback) feedback.innerHTML = `<span class="text-rose-300">再想想吧，还剩 ${triesLeft} 次机会</span>`;
             this._timeout(() => btn.classList.remove("animate-shake"), 600);
           }

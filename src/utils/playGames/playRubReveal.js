@@ -216,13 +216,17 @@ export class PlayRubReveal {
     }
 
     const char = this.charData;
-    soundAndFX.speakPriority(`太棒啦！云雾散开，露出了“${char.char}”字！`, { kind: "sentence", priority: 1 });
+    this._timeout(() => {
+      if (!this.isDestroyed) {
+        soundAndFX.speakPriority(`太棒啦！云雾散开，露出了“${char.char}”字！`, { kind: "sentence", priority: 1 });
+      }
+    }, 250);
 
     this._timeout(() => {
       if (!this.isDestroyed && typeof this.onComplete === "function") {
         this.onComplete();
       }
-    }, 1200);
+    }, 1500);
   }
 
   destroy() {

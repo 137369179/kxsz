@@ -435,11 +435,6 @@ export class HanziEngine {
       this.currentStrokeIndex++;
       this.userCurrentPath = [];
       this.errorWarning = "";
-      soundEngine.playSuccessSound();
-
-      if (targetStroke.name) {
-        soundEngine.speakPriority(targetStroke.name, { kind: "char", priority: 1 });
-      }
 
       if (this.onStrokeComplete) {
         try { this.onStrokeComplete(this.currentStrokeIndex - 1, targetStroke); } catch {}
@@ -450,7 +445,12 @@ export class HanziEngine {
         soundEngine.playVictoryFanfare();
         soundEngine.speakPriority(`“${this.charData.char}”字写得真规范！太棒啦！`, { kind: "sentence", emotion: "excited" });
         if (this.onComplete) {
-          this.completeTimer = setTimeout(() => this.onComplete(), 600);
+          this.completeTimer = setTimeout(() => this.onComplete(), 800);
+        }
+      } else {
+        soundEngine.playSuccessSound();
+        if (targetStroke.name) {
+          soundEngine.speakPriority(targetStroke.name, { kind: "char", priority: 1 });
         }
       }
     } else {

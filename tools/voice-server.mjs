@@ -35,7 +35,8 @@ const CACHE_DIR = path.join(ROOT, "tools", "cache", "tts");
 fs.mkdirSync(CACHE_DIR, { recursive: true });
 
 const PORT = parseInt(process.env.PORT || "8766", 10);
-const HOST = "127.0.0.1";
+const HOST = process.env.HOST || "127.0.0.1";
+const AUTH_TOKEN = process.env.VOICE_SERVER_TOKEN || "";
 
 // ---------------- Edge TTS 常量 (对齐 edge-tts 7.2.8) ----------------
 const TRUSTED_CLIENT_TOKEN = "6A5AA1D4EAFF4E9FB37E23D68491D6F4";
@@ -80,19 +81,38 @@ function rid() {
   return crypto.randomUUID().replace(/-/g, "");
 }
 
-// ---------------- SSML 构造 ----------------
+// ---------------- SSML 构造与安全校验 ----------------
 function esc(s) {
-  return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  return String(s)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&apos;");
 }
+
+const SAFE_VOICE_RE = /^[a-zA-Z0-9_\-]+$/;
+const SAFE_RATE_PITCH_RE = /^[+\-]?[0-9]{1,3}%$/;
+
+function sanitizeParam(val, pattern, fallback) {
+  if (typeof val !== "string") return fallback;
+  const trimmed = val.trim();
+  return pattern.test(trimmed) ? trimmed : fallback;
+}
+
 function buildSSML(text, voice, rate, pitch) {
+  const safeVoice = sanitizeParam(voice, SAFE_VOICE_RE, DEFAULT_VOICE);
+  const safeRate = sanitizeParam(rate, SAFE_RATE_PITCH_RE, "+8%");
+  const safePitch = sanitizeParam(pitch, SAFE_RATE_PITCH_RE, "+6%");
+
   const pros = [];
-  if (rate) pros.push(`rate='${rate}'`);
-  if (pitch) pros.push(`pitch='${pitch}'`);
+  if (safeRate && safeRate !== "+0%") pros.push(`rate='${esc(safeRate)}'`);
+  if (safePitch && safePitch !== "+0%") pros.push(`pitch='${esc(safePitch)}'`);
   const pOpen = pros.length ? `<prosody ${pros.join(" ")}>` : "";
   const pClose = pros.length ? "</prosody>" : "";
   return (
     "<speak version='1.0' xmlns='http://www.w3.org/2001/10/synthesis' xml:lang='zh-CN'>" +
-    `<voice name='${voice}'>${pOpen}${esc(text)}${pClose}</voice></speak>`
+    `<voice name='${esc(safeVoice)}'>${pOpen}${esc(text)}${pClose}</voice></speak>`
   );
 }
 
@@ -271,23 +291,47 @@ function splitSentences(text, maxLen = 24) {
   return out;
 }
 
-// ---------------- HTTP 服务 ----------------
-function cors(res) {
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "GET,OPTIONS");
+// ---------------- HTTP 服务与 CORS 安全白名单 ----------------
+export { isAllowedOrigin } from "./_cors_guard.mjs";
+import { isAllowedOrigin } from "./_cors_guard.mjs";
+
+
+function cors(res, req) {
+  const currentReq = req || res.__req;
+  const origin = currentReq?.headers?.origin;
+  if (isAllowedOrigin(origin)) {
+    res.setHeader("Access-Control-Allow-Origin", origin || "*");
+  } else {
+    // 拦截来自非本地（如公网恶意网站）的跨域请求
+    res.setHeader("Access-Control-Allow-Origin", "http://127.0.0.1");
+  }
+  res.setHeader("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "*");
+  res.setHeader("X-Content-Type-Options", "nosniff");
+  res.setHeader("X-Frame-Options", "DENY");
 }
-function json(res, code, obj) {
-  cors(res);
+function json(res, code, obj, req) {
+  cors(res, req);
   res.writeHead(code, { "Content-Type": "application/json; charset=utf-8" });
   res.end(JSON.stringify(obj));
 }
 
 const server = http.createServer(async (req, res) => {
+  res.__req = req;
   const u = new URL(req.url, `http://${req.headers.host || "localhost"}`);
   const route = u.pathname;
 
-  if (req.method === "OPTIONS") { cors(res); res.writeHead(204); res.end(); return; }
+  if (req.method === "OPTIONS") { cors(res, req); res.writeHead(204); res.end(); return; }
+  cors(res, req);
+
+  if (AUTH_TOKEN) {
+    const authHeader = req.headers["authorization"] || "";
+    const bearerToken = authHeader.startsWith("Bearer ") ? authHeader.slice(7).trim() : "";
+    const queryToken = u.searchParams.get("token") || "";
+    if (bearerToken !== AUTH_TOKEN && queryToken !== AUTH_TOKEN) {
+      return json(res, 401, { error: "Unauthorized: Invalid or missing token" }, req);
+    }
+  }
 
   if (route === "/health") {
     let cachedFiles = 0;
@@ -303,9 +347,9 @@ const server = http.createServer(async (req, res) => {
 
   if (route === "/tts") {
     const text = (u.searchParams.get("text") || "").trim();
-    const voice = u.searchParams.get("voice") || DEFAULT_VOICE;
-    const rate = u.searchParams.get("rate") || "+8%";
-    const pitch = u.searchParams.get("pitch") || "+6%";
+    const voice = sanitizeParam(u.searchParams.get("voice"), SAFE_VOICE_RE, DEFAULT_VOICE);
+    const rate = sanitizeParam(u.searchParams.get("rate"), SAFE_RATE_PITCH_RE, "+8%");
+    const pitch = sanitizeParam(u.searchParams.get("pitch"), SAFE_RATE_PITCH_RE, "+6%");
     if (!text) return json(res, 400, { error: "missing text" });
     if (text.length > 600) return json(res, 400, { error: "text too long (max 600)" });
     try {
@@ -332,9 +376,9 @@ const server = http.createServer(async (req, res) => {
     // 响应: { ok, parts: [{text, audio: base64}], totalMs }
     // 用途: 前端把 parts 依次无缝播放, 总等待 ≈ max(子句) 而非 sum(子句)
     const text = (u.searchParams.get("text") || "").trim();
-    const voice = u.searchParams.get("voice") || DEFAULT_VOICE;
-    const rate = u.searchParams.get("rate") || "+8%";
-    const pitch = u.searchParams.get("pitch") || "+6%";
+    const voice = sanitizeParam(u.searchParams.get("voice"), SAFE_VOICE_RE, DEFAULT_VOICE);
+    const rate = sanitizeParam(u.searchParams.get("rate"), SAFE_RATE_PITCH_RE, "+8%");
+    const pitch = sanitizeParam(u.searchParams.get("pitch"), SAFE_RATE_PITCH_RE, "+6%");
     if (!text) return json(res, 400, { error: "missing text" });
     if (text.length > 1200) return json(res, 400, { error: "text too long (max 1200)" });
     const parts = splitSentences(text, 24);
@@ -365,18 +409,32 @@ const server = http.createServer(async (req, res) => {
   }
 
   if (route === "/warmup") {
-    const voice = u.searchParams.get("voice") || DEFAULT_VOICE;
+    const voice = sanitizeParam(u.searchParams.get("voice"), SAFE_VOICE_RE, DEFAULT_VOICE);
     let items = [];
     if (req.method === "POST") {
       let body = "";
-      req.on("data", chunk => { body += chunk; });
+      let tooLarge = false;
+      const MAX_BODY_SIZE = 1024 * 1024; // 1MB 内存上限防护
+
+      req.on("data", chunk => {
+        body += chunk;
+        if (body.length > MAX_BODY_SIZE) {
+          tooLarge = true;
+          req.destroy();
+        }
+      });
       req.on("end", () => {
+        if (tooLarge) {
+          return json(res, 413, { error: "payload-too-large", maxBytes: MAX_BODY_SIZE });
+        }
         try {
           const parsed = JSON.parse(body || "{}");
           items = Array.isArray(parsed.items) ? parsed.items : [];
         } catch {
           items = body.split("|").filter(Boolean);
         }
+        // 限制预热条目上限为 500，每条限制 100 字符，防范内存/并发耗尽
+        items = items.slice(0, 500).map((s) => String(s).slice(0, 100)).filter(Boolean);
         json(res, 202, { started: true, count: items.length, voice });
         if (items.length > 0) {
           warmup(voice, items).then((r) =>
@@ -387,8 +445,9 @@ const server = http.createServer(async (req, res) => {
       return;
     }
 
-    items = u.searchParams.get("items")
-      ? decodeURIComponent(u.searchParams.get("items")).split("|").filter(Boolean)
+    const rawItems = u.searchParams.get("items");
+    items = rawItems
+      ? decodeURIComponent(rawItems).split("|").filter(Boolean).slice(0, 500).map((s) => s.slice(0, 100))
       : defaultWarmupList();
     // 后台执行, 立即返回
     json(res, 202, { started: true, count: items.length, voice });

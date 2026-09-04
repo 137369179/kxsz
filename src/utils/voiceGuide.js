@@ -64,19 +64,30 @@ export class VoiceGuideService {
   }
 
   /**
-   * 为指定容器下的可交互按钮附加轻量级语音提示
+   * 取消当前处于防抖排队中的引导语音
+   */
+  cancelGuidance() {
+    clearTimeout(this._debounceTimer);
+    this._debounceTimer = null;
+  }
+
+  /**
+   * 为指定容器下的显式语音提示元素附加轻量级语音提示
+   * 仅绑定显式标记 [data-voice-hint] 的教学交互节点，避免广泛拦截普通 button[title] 造成点击冲突
    * @param {HTMLElement} root
    */
   attach(root) {
     if (!root || typeof root.querySelectorAll !== "function") return;
-    const targets = root.querySelectorAll("[data-voice-hint], button[title], [role='button'][title]");
+    const targets = root.querySelectorAll("[data-voice-hint]");
     targets.forEach((el) => {
-      const hint = el.getAttribute("data-voice-hint") || el.getAttribute("title") || el.getAttribute("aria-label");
+      const hint = el.getAttribute("data-voice-hint");
       if (!hint) return;
 
       const trigger = () => this.speakGuidance(hint);
       el.addEventListener("mouseenter", trigger, { passive: true });
-      el.addEventListener("focus", trigger, { passive: true });
+      // 点击或按下时立即取消待播放的悬浮引导，避免与点击动作的发音/音效产生重叠冲突
+      el.addEventListener("click", () => this.cancelGuidance(), { passive: true });
+      el.addEventListener("pointerdown", () => this.cancelGuidance(), { passive: true });
     });
   }
 }

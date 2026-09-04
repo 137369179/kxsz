@@ -99,9 +99,7 @@ export function renderStepFreeWrite(stage) {
       char,
       () => {
         soundAndFX.triggerConfetti(this.container);
-        soundAndFX.playVictoryFanfare();
         ebbinghausManager.addCoins(3);
-        soundAndFX.speakPriority(`太厉害了！小书法家独立写出了“${char.char}”字！`, { kind: "sentence", emotion: "excited" });
         if (nextBtn) nextBtn.classList.remove("hidden");
       },
       (strokeIdx) => {
@@ -124,8 +122,7 @@ export function renderStepFreeWrite(stage) {
     }
 
     if (peekBtn) {
-      this._on(peekBtn, "click", () => {
-        soundAndFX.playPop();
+      this._on(peekBtn, () => {
         soundAndFX.speakPriority(`小精灵给你提示一眼，看清楚笔顺马上写哦！`, { kind: "sentence", emotion: "gentle" });
         if (this.hanziEngine) {
           this.hanziEngine.peekGuide(HAZARD_PEEK_DURATION_MS);
@@ -135,6 +132,7 @@ export function renderStepFreeWrite(stage) {
 
     if (resetBtn) {
       this._on(resetBtn, "click", () => {
+        soundAndFX.stopSpeaking();
         soundAndFX.playPop();
         if (this.hanziEngine) this.hanziEngine.reset();
         updateBeads(0);
@@ -144,6 +142,7 @@ export function renderStepFreeWrite(stage) {
 
     if (nextBtn) {
       this._on(nextBtn, "click", () => {
+        soundAndFX.stopSpeaking();
         soundAndFX.playPop();
         if (typeof this.nextStep === "function") this.nextStep();
       });

@@ -77,7 +77,19 @@ class NeuralVoiceEngine {
     this.jitterEnabled = true;
     // 子句并行合成 + Web Audio 无缝级联 (voice-server /tts-batch)
     this.batchEnabled = true;
+    this._activeSources = new Set(); // 正在播放的 Web Audio 音频源节点
   }
+
+  /**
+   * 立即停止并切断所有正在播放的神经音频节点（防止切页、打断时声音重叠）
+   */
+  stopAll() {
+    for (const s of this._activeSources) {
+      try { s.stop(); s.disconnect(); } catch {}
+    }
+    this._activeSources.clear();
+  }
+
 
   /** 记录失败并判定是否触发熔断保护 */
   _recordFailure() {
@@ -315,9 +327,9 @@ class NeuralVoiceEngine {
 
   /** 播放单句音频 (带 Web Audio 润色与抖动) */
   async _playSingle({ text, ctx, dest, emotion, pitchOffset, rateMul, volume = 1, onEnd, signal }) {
-    if (!ctx || !dest) return null;
+    if (!ctx || !dest || (signal && signal.aborted)) return null;
     const ok = await this.probe();
-    if (!ok) { this.stats.fallbacks++; return null; }
+    if (!ok || (signal && signal.aborted)) { this.stats.fallbacks++; return null; }
 
     const pros = emotionToProsody(emotion, pitchOffset, rateMul);
     let buffer;
@@ -331,7 +343,7 @@ class NeuralVoiceEngine {
 
     const src = ctx.createBufferSource();
     src.buffer = buffer;
-    // jitter: ±1.5%  ()
+    // jitter: ±1.5% 模拟真人微变
     const jitter = this.jitterEnabled ? 1 + (Math.random() - 0.5) * 0.03 : 1;
     src.playbackRate.value = jitter;
 
@@ -341,7 +353,7 @@ class NeuralVoiceEngine {
     if (outGain) outGain.gain.value = Math.max(0.0001, volume);
     src.connect(head);
 
-    //  90ms 
+    // 尾部 90ms 淡出
     const dur = buffer.duration / jitter;
     const fadeAt = Math.max(0, dur - 0.09);
     if (outGain) {
@@ -349,16 +361,33 @@ class NeuralVoiceEngine {
       outGain.gain.linearRampToValueAtTime(0.0001, ctx.currentTime + dur);
     }
 
-    //  (MEM-1 , )
+    // 内存泄漏防护注册
     try {
       const reg = (typeof window !== "undefined") && window.__audioNodeRegistry;
       if (reg && reg.register) reg.register(src, "neural_voice", null);
     } catch {}
 
+    this._activeSources.add(src);
     let cancelled = false;
+    let cleaned = false;
+    const cleanupSrc = () => {
+      if (cleaned) return;
+      cleaned = true;
+      this._activeSources.delete(src);
+      try { src.disconnect(); outGain && outGain.disconnect(); } catch {}
+    };
+
+    if (signal) {
+      signal.addEventListener("abort", () => {
+        cancelled = true;
+        try { src.stop(); } catch {}
+        cleanupSrc();
+      }, { once: true });
+    }
+
     const onEndPromise = new Promise((res) => {
       src.onended = () => {
-        try { src.disconnect(); outGain && outGain.disconnect(); } catch {}
+        cleanupSrc();
         res({ interrupted: cancelled });
       };
     });
@@ -371,6 +400,7 @@ class NeuralVoiceEngine {
       cancel() {
         cancelled = true;
         try { src.stop(); } catch {}
+        cleanupSrc();
       },
       onEndPromise,
       durationMs: Math.round(dur * 1000),
@@ -428,9 +458,9 @@ class NeuralVoiceEngine {
    * @returns  play()  handle;  null ( _playSingle/TTS)
    */
   async playSentence({ text, ctx, dest, emotion, pitchOffset, rateMul, volume = 1, onEnd, signal }) {
-    if (!ctx || !dest) return null;
+    if (!ctx || !dest || (signal && signal.aborted)) return null;
     const ok = await this.probe();
-    if (!ok) { this.stats.fallbacks++; return null; }
+    if (!ok || (signal && signal.aborted)) { this.stats.fallbacks++; return null; }
 
     const pros = emotionToProsody(emotion, pitchOffset, rateMul);
 
@@ -456,10 +486,11 @@ class NeuralVoiceEngine {
     }
     if (signal && signal.aborted) return null;
 
-    // 2)  decode  ( LRU)
+    // 2) 分片 decode 与内存缓存 (带 LRU)
     const buffers = [];
     try {
       for (const p of data.parts) {
+        if (signal && signal.aborted) return null;
         if (!p || !p.audio) throw new Error("part-missing-audio");
         const key = this._key(p.text, pros.rate, pros.pitch, this.voice);
         const hit = this._mem.get(key);
@@ -473,9 +504,9 @@ class NeuralVoiceEngine {
     } catch (e) {
       return null;
     }
-    if (buffers.length === 0) return null;
+    if (buffers.length === 0 || (signal && signal.aborted)) return null;
 
-    // 3) :  DSP ,  startTime 
+    // 3) 播放链路: 经由 Web Audio 润色链，精密调度 startTime 级联
     const chain = this._buildPolishChain(ctx, dest);
     const head = chain ? chain.head : dest;
     const outGain = chain ? chain.out : null;
@@ -492,6 +523,7 @@ class NeuralVoiceEngine {
       src.playbackRate.value = jitter;
       src.connect(head);
       src.start(cursor);
+      this._activeSources.add(src);
       const dur = buf.duration / jitter;
       sources.push({ src, start: cursor, dur });
       cursor += dur;
@@ -501,18 +533,36 @@ class NeuralVoiceEngine {
         if (reg && reg.register) reg.register(src, "neural_voice_part", null);
       } catch {}
     }
-    //  90ms 
+    // 尾部 90ms 淡出
     if (outGain) {
       outGain.gain.setValueAtTime(Math.max(0.0001, volume), t0 + Math.max(0, totalDur - 0.09));
       outGain.gain.linearRampToValueAtTime(0.0001, t0 + totalDur);
     }
 
     let cancelled = false;
+    let cleaned = false;
+    const cleanupAll = () => {
+      if (cleaned) return;
+      cleaned = true;
+      for (const s of sources) {
+        this._activeSources.delete(s.src);
+        try { s.src.disconnect(); } catch {}
+      }
+      if (outGain) { try { outGain.disconnect(); } catch {} }
+    };
+
+    if (signal) {
+      signal.addEventListener("abort", () => {
+        cancelled = true;
+        for (const s of sources) { try { s.src.stop(); } catch {} }
+        cleanupAll();
+      }, { once: true });
+    }
+
     const last = sources[sources.length - 1];
     const onEndPromise = new Promise((res) => {
       last.src.onended = () => {
-        for (const s of sources) { try { s.src.disconnect(); } catch {} }
-        outGain && (() => { try { outGain.disconnect(); } catch {} })();
+        cleanupAll();
         res({ interrupted: cancelled });
       };
     });
@@ -525,6 +575,7 @@ class NeuralVoiceEngine {
       cancel() {
         cancelled = true;
         for (const s of sources) { try { s.src.stop(); } catch {} }
+        cleanupAll();
       },
       onEndPromise,
       durationMs: Math.round(totalDur * 1000),

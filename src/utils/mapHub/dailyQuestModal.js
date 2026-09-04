@@ -32,15 +32,29 @@ export function buildDailyQuestTasks(session) {
       });
     } else if (type === "review" && revIdx < (session.reviews || []).length) {
       const item = session.reviews[revIdx++];
+      let badge = "艾宾浩斯复习";
+      let badgeClass = "bg-teal-600 text-white";
+      let subtitle = "自由提取闪卡与形近字交错";
+
+      if (item.source === "overnight") {
+        badge = "隔夜巩固";
+        badgeClass = "bg-purple-600 text-white";
+        subtitle = "昨夜生字突触强化与再激活";
+      } else if (item.source === "mistake") {
+        badge = "易错攻坚";
+        badgeClass = "bg-rose-600 text-white";
+        subtitle = "薄弱难字交错专项攻坚";
+      }
+
       tasks.push({
         type: "review",
         stepNum: i + 1,
         title: `复习巩固 “${item.char}”`,
-        subtitle: "自由提取闪卡与形近字交错",
+        subtitle,
         char: item.char,
         charData: item.charData,
-        badge: "艾宾浩斯复习",
-        badgeClass: "bg-teal-600 text-white",
+        badge,
+        badgeClass,
       });
     }
   });
@@ -139,6 +153,7 @@ export function openDailyQuestModal(container = document.body, { onStartLearn, o
   container.appendChild(overlay);
 
   const close = () => {
+    soundAndFX.stopSpeaking();
     soundAndFX.playPop();
     overlay.remove();
   };
@@ -149,6 +164,7 @@ export function openDailyQuestModal(container = document.body, { onStartLearn, o
   const startBtn = overlay.querySelector("#btn-start-quest-flow");
   if (startBtn && hasTasks) {
     startBtn.addEventListener("click", () => {
+      soundAndFX.stopSpeaking();
       soundAndFX.playParentCheer();
       overlay.remove();
       const first = tasks[0];
@@ -165,6 +181,7 @@ export function openDailyQuestModal(container = document.body, { onStartLearn, o
       const idx = parseInt(item.dataset.index, 10);
       const t = tasks[idx];
       if (!t) return;
+      soundAndFX.stopSpeaking();
       soundAndFX.playPop();
       overlay.remove();
       if (t.type === "new" && typeof onStartLearn === "function") {

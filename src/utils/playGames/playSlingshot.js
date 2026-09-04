@@ -222,7 +222,6 @@ export class PlaySlingshot {
 
         this._timeout(() => {
           // 击中城堡，巨石瓦解散开
-          soundAndFX.playSuccess();
           soundAndFX.playVictoryFanfare();
           soundAndFX.triggerConfetti(this.container);
 
@@ -242,13 +241,17 @@ export class PlaySlingshot {
           }
 
           const char = this.charData;
-          soundAndFX.speakPriority(`轰隆！城堡破开，升起了“${char.char}”字！`, { kind: "sentence", priority: 1 });
+          this._timeout(() => {
+            if (!this.isDestroyed) {
+              soundAndFX.speakPriority(`轰隆！城堡破开，升起了“${char.char}”字！`, { kind: "sentence", priority: 1 });
+            }
+          }, 250);
 
           this._timeout(() => {
             if (!this.isDestroyed && typeof this.onComplete === "function") {
               this.onComplete();
             }
-          }, 1300);
+          }, 1500);
         }, 380);
       } else {
         // 回弹复位

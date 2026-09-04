@@ -161,7 +161,6 @@ export function renderStepRead(stage) {
 
     if (charCircle) {
       this._on(charCircle, "click", () => {
-        soundAndFX.playPop();
         soundAndFX.speakPriority(`${char.char}，${char.pinyin}`, { kind: "char", priority: 1 });
       });
     }
@@ -169,7 +168,7 @@ export function renderStepRead(stage) {
     // 录音触发与逻辑绑定
     if (btnRecord) {
       this._on(btnRecord, "click", () => {
-        if (soundAndFX.synth) soundAndFX.synth.cancel();
+        try { soundAndFX.stopSpeaking(); } catch {}
         this.executeRecordToggle(stage);
       });
     }
@@ -177,14 +176,23 @@ export function renderStepRead(stage) {
     // 听我的声音回放
     if (replayVoiceBtn) {
       this._on(replayVoiceBtn, "click", () => {
-        soundAndFX.playPop();
+        try { soundAndFX.stopSpeaking(); } catch {}
+        if (this._currentReplayAudio) {
+          try {
+            this._currentReplayAudio.pause();
+            this._currentReplayAudio.currentTime = 0;
+          } catch {}
+          this._currentReplayAudio = null;
+        }
         const pe = pronunciationEval || window.pronunciationEval;
         if (pe && pe._lastResult && pe._lastResult.audioUrl) {
           const audio = new Audio(pe._lastResult.audioUrl);
+          this._currentReplayAudio = audio;
           replayVoiceBtn.classList.add("ring-4", "ring-yellow-300", "scale-105");
           if (replayVoiceText) replayVoiceText.textContent = "正在播放原声...";
           
           const resetReplayBtn = () => {
+            if (this._currentReplayAudio === audio) this._currentReplayAudio = null;
             replayVoiceBtn.classList.remove("ring-4", "ring-yellow-300", "scale-105");
             if (replayVoiceText) replayVoiceText.textContent = "听我的声音";
           };
@@ -206,7 +214,6 @@ export function renderStepRead(stage) {
     // 听示范发音
     if (standardVoiceBtn) {
       this._on(standardVoiceBtn, "click", () => {
-        soundAndFX.playPop();
         soundAndFX.speakPriority(`${char.char}，${char.pinyin}`, { kind: "char", priority: 1 });
       });
     }
@@ -244,8 +251,7 @@ export function renderStepRead(stage) {
         ebbinghausManager.save();
         soundAndFX.triggerCoinFly(finishBtn, 5);
         this._timeout(() => {
-          this.currentStep = 4;
-          this.render();
+          if (typeof this.nextStep === "function") this.nextStep();
         }, 500);
       });
     }
@@ -634,7 +640,9 @@ export function _showEvalResult(stage, res) {
       }
       soundAndFX.playVictoryFanfare();
       soundAndFX.triggerConfetti(stage);
-      soundAndFX.speakPriority(`太棒啦！“${char.char}”字读得真准，得到${score}分！`, { kind: "sentence", emotion: "excited" });
+      this._timeout(() => {
+        soundAndFX.speakPriority(`太棒啦！“${char.char}”字读得真准，得到${score}分！`, { kind: "sentence", emotion: "excited" });
+      }, 250);
       if (finishBtn) {
         finishBtn.innerHTML = `<span>${GAME_ICONS.sparkle("w-4 h-4 inline-block")} 开启特训练字 (+5 金币)</span>`;
         finishBtn.classList.remove("opacity-50", "pointer-events-none");
@@ -648,7 +656,9 @@ export function _showEvalResult(stage, res) {
         praiseTxt.innerHTML = `<span class="text-amber-300 font-bold">读得很棒！声音再清晰一点就满分啦！</span><br/><span class="text-white/80 text-[11px]">获得 2 颗星，再练一次可拿满分哦！</span>`;
       }
       soundAndFX.playSuccessSound();
-      soundAndFX.speakPriority(`读得不错！得到${score}分，再练一次拿3颗星吧！`, { kind: "sentence", emotion: "happy" });
+      this._timeout(() => {
+        soundAndFX.speakPriority(`读得不错！得到${score}分，再练一次拿3颗星吧！`, { kind: "sentence", emotion: "happy" });
+      }, 200);
       if (finishBtn) {
         finishBtn.innerHTML = `<span>${GAME_ICONS.sparkle("w-4 h-4 inline-block")} 开启特训练字 (+3 金币)</span>`;
         finishBtn.classList.remove("opacity-50", "pointer-events-none");
@@ -668,15 +678,20 @@ export function _showEvalResult(stage, res) {
         praiseTxt.innerHTML = `<div class="bg-rose-950/60 border border-rose-400/40 rounded-xl px-3 py-1.5 mb-1"><span class="text-yellow-300 text-sm font-bold">识别到读音：“${heard}”</span></div><span class="text-rose-200 text-sm font-semibold">好像是麦克风没听清，点击【听示范】大声跟读「${char.char}」，一定可以的！</span>${gentle}`;
       }
       soundAndFX.playSoftError();
-      soundAndFX.speakPriority(`没关系，请听老师读“${char.char}”，再试一次吧！`, { kind: "sentence", emotion: "gentle" });
-      // 连续 2 次低分：自动播放标准音示范（脚手架式降级，非无限重试）
-      if (this._readFailCount >= 2) {
-        setTimeout(() => {
-          try {
-            soundAndFX.speakPriority(`${char.char}，${char.pinyin}`, { kind: "char", priority: 1 });
-          } catch (e) {}
-        }, 700);
-      }
+      this._timeout(() => {
+        soundAndFX.speakPriority(`没关系，请听老师读“${char.char}”，再试一次吧！`, {
+          kind: "sentence",
+          emotion: "gentle",
+          onEnd: () => {
+            // 连续 2 次低分：在提示语自然播完后自动播放标准音示范（消除定时器打断导致的掐断吞音）
+            if (this._readFailCount >= 2 && this.currentStep === 3) {
+              try {
+                soundAndFX.speakPriority(`${char.char}，${char.pinyin}`, { kind: "char", priority: 1 });
+              } catch (e) {}
+            }
+          },
+        });
+      }, 180);
       if (retryBtn) {
         retryBtn.className = "bg-gradient-to-r from-amber-400 to-yellow-400 text-amber-950 text-xs font-black px-3.5 py-1.5 rounded-full shadow-lg border border-white active:scale-95 transition-all cursor-pointer ring-4 ring-yellow-400 animate-pulse";
         retryBtn.textContent = this._readFailCount >= 2 ? "跟读示范后再试一次" : "再试一次";

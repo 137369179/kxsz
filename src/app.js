@@ -6,6 +6,7 @@
 import { MapModule } from "./components/MapModule.js";
 import { BaseModule } from "./utils/BaseModule.js";
 import { installBrowserShims } from "./utils/appHub/browserShims.js";
+import { installImageErrorFallback } from "./utils/imageFallback.js";
 import {
   init,
   removeLoader,
@@ -27,6 +28,7 @@ import {
 } from "./utils/appHub/index.js";
 
 installBrowserShims();
+installImageErrorFallback();
 
 class CathyAppManager extends BaseModule {
   constructor() {

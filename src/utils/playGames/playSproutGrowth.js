@@ -145,7 +145,6 @@ export class PlaySproutGrowth {
   }
 
   _triggerVictory() {
-    soundAndFX.playSuccess();
     soundAndFX.playVictoryFanfare();
     soundAndFX.triggerConfetti(this.container);
 
@@ -155,13 +154,17 @@ export class PlaySproutGrowth {
     }
 
     const char = this.charData;
-    soundAndFX.speakPriority(`太神奇啦！大树枝繁叶茂，结出了“${char.char}”字！`, { kind: "sentence", priority: 1 });
+    this._timeout(() => {
+      if (!this.isDestroyed) {
+        soundAndFX.speakPriority(`太神奇啦！大树枝繁叶茂，结出了“${char.char}”字！`, { kind: "sentence", priority: 1 });
+      }
+    }, 250);
 
     this._timeout(() => {
       if (!this.isDestroyed && typeof this.onComplete === "function") {
         this.onComplete();
       }
-    }, 1300);
+    }, 1500);
   }
 
   destroy() {

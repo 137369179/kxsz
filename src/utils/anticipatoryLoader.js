@@ -1,4 +1,5 @@
 /**
+ * @deprecated 业务侧尚未接线；保留供调研原型与单测。请勿在新功能中默认依赖。
  * src/utils/anticipatoryLoader.js
  * ================================================================
  * 凯茜识字 —— 触屏 UX 预测性动效引擎 (Anticipatory Animation Loader)

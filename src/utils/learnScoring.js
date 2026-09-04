@@ -18,9 +18,9 @@ export function isValidCharData(charData) {
   return !!(charData && charData.id && charData.char);
 }
 
-export function calculateStepProgress(currentStep, completedSteps = []) {
-  const total = 8;
-  const completed = completedSteps.length;
+export function calculateStepProgress(currentStep, completedSteps = [], totalSteps = 8) {
+  const total = Math.max(1, Number(totalSteps) || 8);
+  const completed = Array.isArray(completedSteps) ? completedSteps.length : 0;
   return Math.round((completed / total) * 100);
 }
 

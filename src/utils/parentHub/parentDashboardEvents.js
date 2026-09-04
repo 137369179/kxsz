@@ -4,7 +4,7 @@ import { ebbinghausManager } from "../ebbinghaus.js";
 import { soundAndFX } from "../soundEngine.js";
 import { showGameToast } from "../../components/SharedShell.js";
 import { printWorksheet, getTodayWorksheetChars, getDifficultWorksheetChars, getQuestWorksheetChars } from "../worksheetGenerator.js";
-import { storageManager } from "../storageManager.js";
+import { storageManager, sanitizeProfileName } from "../storageManager.js";
 import { rewardEngine } from "../rewardEngine.js";
 import { showConfirm } from "../parentGate.js";
 import { describeStepSequenceForAge } from "./parentTrophies.js";
@@ -88,7 +88,6 @@ export function bindDashboardEvents(mainEl) {
   const speakAiBtn = mainEl.querySelector("#btn-speak-ai-log");
   if (speakAiBtn) {
     this._on(speakAiBtn, "click", () => {
-      soundAndFX.playPop();
       const advice = mainEl.querySelector("#ai-tutor-advice-text")?.textContent || "宝宝学习非常棒！";
       soundAndFX.speakPriority(`家长朋友你好！${advice}`, { kind: "tutor", priority: 1, emotion: "gentle" });
     });
@@ -100,6 +99,15 @@ export function bindDashboardEvents(mainEl) {
     this._on(posterBtn, "click", () => {
       soundAndFX.playPop();
       this.generateWeeklyReportPoster();
+    });
+  }
+
+  // 生成金榜题名小状元荣誉证书
+  const certBtn = mainEl.querySelector("#btn-gen-champion-cert");
+  if (certBtn) {
+    this._on(certBtn, "click", () => {
+      soundAndFX.playPop();
+      this.generateChampionCertificate();
     });
   }
 
@@ -324,11 +332,14 @@ export function bindDashboardEvents(mainEl) {
       const newName = typeof window !== "undefined" && window.prompt
         ? window.prompt(`请输入【${oldName}】的新姓名或小名：`, oldName)
         : null;
-      if (newName && newName.trim() && newName.trim() !== oldName) {
-        storageManager.renameProfile(pid, newName.trim());
-        soundAndFX.playSuccessSound();
-        showGameToast(this.container, `已将档案重命名为【${newName.trim()}】`, "success");
-        this.render();
+      if (newName && newName.trim()) {
+        const cleanName = sanitizeProfileName(newName);
+        if (cleanName && cleanName !== oldName) {
+          storageManager.renameProfile(pid, cleanName);
+          soundAndFX.playSuccessSound();
+          showGameToast(this.container, `已将档案重命名为【${cleanName}】`, "success");
+          this.render();
+        }
       }
     });
   });

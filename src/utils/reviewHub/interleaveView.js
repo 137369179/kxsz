@@ -144,7 +144,6 @@ export function runInterleaveSession({
       bind(btn, "click", () => {
         if (locked || destroyed) return;
         locked = true;
-        soundAndFX.playPop?.();
 
         const selected = btn.dataset.char;
         const isCorrect = selected === question.targetChar;
@@ -155,6 +154,7 @@ export function runInterleaveSession({
           btn.classList.add("ring-4", "ring-emerald-400", "scale-105");
           if (feedbackEl) feedbackEl.textContent = "答对了！";
         } else {
+          soundAndFX.playSoftError?.();
           btn.classList.add("ring-4", "ring-rose-400/80", "opacity-80");
           containerEl.querySelectorAll(".btn-interleave-option").forEach((b) => {
             if (b.dataset.char === question.targetChar) {
@@ -185,6 +185,7 @@ export function runInterleaveSession({
     destroy() {
       if (destroyed) return;
       destroyed = true;
+      try { soundAndFX.stopSpeaking?.(); } catch {}
       cleanup();
     },
   };

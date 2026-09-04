@@ -17,6 +17,7 @@ import {
   buildMatchPairs,
   spawnFloatingText,
   startCountdown,
+  writeKnownCharsReview,
 } from "./playHelpers.js";
 
 export function renderFamilyWorkshop() {
@@ -174,6 +175,7 @@ export function renderFamilyWorkshop() {
     const backBtn = mainEl.querySelector("#btn-family-back");
     if (backBtn) {
       this._on(backBtn, "click", () => {
+        soundAndFX.stopSpeaking();
         soundAndFX.playPop();
         this.currentMode = null;
         this._busEmit(EVENTS.SWITCH_MODE, { mode: "map" });
@@ -200,6 +202,7 @@ export function renderFamilyWorkshop() {
         this.unlockedFamilyMembers.add(member.char);
         ebbinghausManager.addCoins(5);
         ebbinghausManager.addStars(1);
+        writeKnownCharsReview([member.char], true);
 
         // 动画触发
         const stageBlock = mainEl.querySelector("#family-stage-block");
@@ -227,8 +230,10 @@ export function renderFamilyWorkshop() {
           setTimeout(() => mnemonicBubble.classList.remove("scale-105"), 300);
         }
 
-        // 语音朗读口诀
-        soundAndFX.speakPriority(member.mnemonic, { kind: "char", priority: 1 });
+        // 语音朗读口诀（错开 200ms 避免与成功音效并发重叠）
+        this._timeout(() => {
+          soundAndFX.speakPriority(member.mnemonic, { kind: "char", priority: 1 });
+        }, 200);
 
         // 更新右侧图鉴卡片状态与统计
         const targetCard = mainEl.querySelector(`.family-member-card[data-char="${member.char}"]`);
@@ -255,6 +260,7 @@ export function renderFamilyWorkshop() {
         // 全家福大团圆通关庆祝
         if (count === currentFamily.members.length) {
           this._timeout(() => {
+            soundAndFX.stopSpeaking();
             soundAndFX.playVictoryFanfare();
             soundAndFX.triggerConfetti(this.container);
             ebbinghausManager.addCoins(15);
@@ -263,7 +269,9 @@ export function renderFamilyWorkshop() {
               mnemonicBubble.textContent = `大圆满！【${currentFamily.name}】全部成员集齐！奖励 15 星币 + 2 颗星星！`;
               mnemonicBubble.className = "mt-4 bg-amber-100 border-2 border-amber-400 px-6 py-3 rounded-2xl shadow-xl text-xs sm:text-sm font-black text-amber-950 text-center max-w-md animate-bounce-slow";
             }
-            soundAndFX.speakPriority(`\u592a\u68d2\u5566\uff01\u4f60\u5df2\u7ecf\u96c6\u9f50\u4e86${currentFamily.name}\u7684\u5168\u90e8\u6210\u5458\uff01`, { kind: "sentence", emotion: "excited" });
+            this._timeout(() => {
+              soundAndFX.speakPriority(`太棒啦！你已经集齐了${currentFamily.name}的全部成员！`, { kind: "sentence", emotion: "excited" });
+            }, 250);
           }, 800);
         }
       });
@@ -276,7 +284,6 @@ export function renderFamilyWorkshop() {
         if (!this.unlockedFamilyMembers.has(ch)) return;
         const m = currentFamily.members.find(x => x.char === ch);
         if (!m) return;
-        soundAndFX.playPop();
         const stageBlock = mainEl.querySelector("#family-stage-block");
         const charEl = mainEl.querySelector("#family-current-char");
         const pinyinEl = mainEl.querySelector("#family-current-pinyin");

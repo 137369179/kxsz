@@ -10,6 +10,7 @@
  * - this.destroy() : 清理所有资源
  */
 import { eventBus, EVENTS } from "./eventBus.js";
+import { soundAndFX } from "./soundEngine.js";
 
 /**
  * HTML 转义 — 防止 XSS 注入
@@ -156,9 +157,11 @@ export class BaseModule {
    */
   navigateToMap(options = {}) {
     const { playSound = true, target = "map", onBack } = options;
-    // 动态导入 soundAndFX 避免循环依赖
-    if (playSound && typeof window !== "undefined" && window.soundAndFX?.playPop) {
-      window.soundAndFX.playPop();
+    try {
+      soundAndFX?.stopSpeaking();
+    } catch {}
+    if (playSound) {
+      soundAndFX?.playPop();
     }
     if (typeof onBack === "function") {
       const result = onBack();
@@ -187,6 +190,9 @@ export class BaseModule {
    * 翻转清理队列确保子组件先于父组件被清理（FILO 顺序）
    */
   destroy() {
+    try {
+      soundAndFX?.stopSpeaking();
+    } catch {}
     // 翻转确保子组件/后添加的资源先于父组件/先添加的资源被清理
     const cleanups = this._cleanups.reverse();
     for (const fn of cleanups) {

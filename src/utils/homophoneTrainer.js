@@ -185,12 +185,12 @@ export function openHomophoneTrainerModal(charData, allChars = [], onClose) {
   `;
 
   document.body.appendChild(modal);
-  soundAndFX.playPop();
   soundAndFX.speakPriority(`同音字大辨析！请仔细听：哪个字填入句子里最合适？`, { kind: "sentence", emotion: "gentle" });
 
   let isLocked = false;
 
   const close = () => {
+    soundAndFX.stopSpeaking();
     modal.remove();
     if (typeof onClose === "function") onClose();
   };
@@ -217,9 +217,11 @@ export function openHomophoneTrainerModal(charData, allChars = [], onClose) {
           fb.className = "w-full p-3.5 rounded-2xl bg-emerald-950/80 border border-emerald-400 text-emerald-200 text-xs font-bold block animate-fade-in";
           fb.innerHTML = `<div>答对啦！太聪明了！</div><div class="mt-1 font-normal">${exercise.explanation}</div>`;
         }
-        soundAndFX.speakPriority(`答对啦！选“${chosen}”字完全正确！`, { kind: "sentence", emotion: "excited" });
+        setTimeout(() => {
+          soundAndFX.speakPriority(`答对啦！选“${chosen}”字完全正确！`, { kind: "sentence", emotion: "excited" });
+        }, 250);
 
-        setTimeout(() => close(), 2200);
+        setTimeout(() => close(), 2400);
       } else {
         btn.classList.add("ring-4", "ring-rose-400", "bg-rose-900/80", "border-rose-400", "animate-shake");
         soundAndFX.playSoftError();
@@ -228,7 +230,9 @@ export function openHomophoneTrainerModal(charData, allChars = [], onClose) {
           fb.className = "w-full p-3.5 rounded-2xl bg-rose-950/80 border border-rose-400 text-rose-200 text-xs font-bold block animate-fade-in";
           fb.innerHTML = `<div>选错了哦！</div><div class="mt-1 font-normal">${exercise.explanation}</div>`;
         }
-        soundAndFX.speakPriority(`不对哦，再想一想偏旁意符吧！`, { kind: "sentence", emotion: "gentle" });
+        setTimeout(() => {
+          soundAndFX.speakPriority(`不对哦，再想一想偏旁意符吧！`, { kind: "sentence", emotion: "gentle" });
+        }, 180);
 
         setTimeout(() => {
           isLocked = false;

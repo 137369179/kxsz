@@ -56,15 +56,15 @@ export const GAME_ICONS = {
   // -------------------------------------------------------------------------
   islandForest: (...args) => {
     const { cls } = GAME_ICONS._parseIconParams(args, "badge", "object-cover");
-    return `<img src="assets/images/cathy_island_forest.webp" class="${cls} shadow-md" alt="forest" onerror="this.src='assets/images/icon_home.webp'" />`;
+    return `<img src="assets/images/cathy_island_forest.webp" class="${cls} shadow-md" alt="forest" data-fallback="assets/images/icon_home.webp" />`;
   },
   islandTown: (...args) => {
     const { cls } = GAME_ICONS._parseIconParams(args, "badge", "object-cover");
-    return `<img src="assets/images/cathy_island_life.webp" class="${cls} shadow-md" alt="town" onerror="this.src='assets/images/icon_star.webp'" />`;
+    return `<img src="assets/images/cathy_island_life.webp" class="${cls} shadow-md" alt="town" data-fallback="assets/images/icon_star.webp" />`;
   },
   islandSpace: (...args) => {
     const { cls } = GAME_ICONS._parseIconParams(args, "badge", "object-cover");
-    return `<img src="assets/images/cathy_island_space.webp" class="${cls} shadow-md" alt="space" onerror="this.src='assets/images/icon_sparkle.webp'" />`;
+    return `<img src="assets/images/cathy_island_space.webp" class="${cls} shadow-md" alt="space" data-fallback="assets/images/icon_sparkle.webp" />`;
   },
 
   // -------------------------------------------------------------------------
@@ -72,7 +72,7 @@ export const GAME_ICONS = {
   // -------------------------------------------------------------------------
   check: (...args) => {
     const { cls } = GAME_ICONS._parseIconParams(args, "badge", "object-contain");
-    return `<img src="assets/images/icon_check.webp" class="${cls} shadow-md" alt="check" onerror="this.src='assets/images/icon_star.webp'" />`;
+    return `<img src="assets/images/icon_check.webp" class="${cls} shadow-md" alt="check" data-fallback="assets/images/icon_star.webp" />`;
   },
   star: (...args) => {
     const { cls, extra } = GAME_ICONS._parseIconParams(args, "badge", "object-contain");
@@ -90,11 +90,11 @@ export const GAME_ICONS = {
   },
   crown: (...args) => {
     const { cls } = GAME_ICONS._parseIconParams(args, "badge", "object-contain");
-    return `<img src="assets/images/icon_crown.gif" class="${cls}" alt="crown" onerror="this.src='assets/images/icon_crown.png'" />`;
+    return `<img src="assets/images/icon_crown.gif" class="${cls}" alt="crown" data-fallback="assets/images/icon_crown.png" />`;
   },
   gem: (...args) => {
     const { cls } = GAME_ICONS._parseIconParams(args, "badge", "object-contain");
-    return `<img src="assets/images/icon_gem.webp" class="${cls} shadow-md" alt="gem" onerror="this.src='assets/images/icon_sparkle.webp'" />`;
+    return `<img src="assets/images/icon_gem.webp" class="${cls} shadow-md" alt="gem" data-fallback="assets/images/icon_sparkle.webp" />`;
   },
   sparkle: (...args) => {
     const { cls } = GAME_ICONS._parseIconParams(args, "badge", "object-contain");
@@ -110,7 +110,7 @@ export const GAME_ICONS = {
   },
   scroll: (...args) => {
     const { cls } = GAME_ICONS._parseIconParams(args, "item", "object-contain");
-    return `<img src="assets/images/icon_scroll.webp" class="${cls} shadow-md" alt="scroll" onerror="this.src='assets/images/icon_book.webp'" />`;
+    return `<img src="assets/images/icon_scroll.webp" class="${cls} shadow-md" alt="scroll" data-fallback="assets/images/icon_book.webp" />`;
   },
   cards: (...args) => {
     const { cls } = GAME_ICONS._parseIconParams(args, "item", "object-contain");
@@ -126,15 +126,15 @@ export const GAME_ICONS = {
   },
   brush: (...args) => {
     const { cls } = GAME_ICONS._parseIconParams(args, "item", "object-contain");
-    return `<img src="assets/images/icon_brush.webp" class="${cls} shadow-md" alt="brush" onerror="this.src='assets/images/icon_pen.webp'" />`;
+    return `<img src="assets/images/icon_brush.webp" class="${cls} shadow-md" alt="brush" data-fallback="assets/images/icon_pen.webp" />`;
   },
   hand: (...args) => {
     const { cls } = GAME_ICONS._parseIconParams(args, "badge", "object-contain");
-    return `<img src="assets/images/icon_hand.webp" class="${cls} shadow-md" alt="hand" onerror="this.src='assets/images/icon_brush.webp'" />`;
+    return `<img src="assets/images/icon_hand.webp" class="${cls} shadow-md" alt="hand" data-fallback="assets/images/icon_brush.webp" />`;
   },
   swords: (...args) => {
     const { cls } = GAME_ICONS._parseIconParams(args, "item", "object-contain");
-    return `<img src="assets/images/icon_swords.webp" class="${cls} shadow-md" alt="swords" onerror="this.src='assets/images/icon_chest.webp'" />`;
+    return `<img src="assets/images/icon_swords.webp" class="${cls} shadow-md" alt="swords" data-fallback="assets/images/icon_chest.webp" />`;
   },
   calendar: (...args) => {
     const { cls } = GAME_ICONS._parseIconParams(args, "item", "object-contain");
@@ -142,7 +142,7 @@ export const GAME_ICONS = {
   },
   arcade: (...args) => {
     const { cls } = GAME_ICONS._parseIconParams(args, "item", "object-cover");
-    return `<img src="assets/images/cathy_arcade_cover.webp" class="${cls} shadow-md" alt="arcade" onerror="this.src='assets/images/icon_cards.webp'" />`;
+    return `<img src="assets/images/cathy_arcade_cover.webp" class="${cls} shadow-md" alt="arcade" data-fallback="assets/images/icon_cards.webp" />`;
   },
 
   // -------------------------------------------------------------------------
@@ -152,15 +152,15 @@ export const GAME_ICONS = {
     const { cls, extra } = GAME_ICONS._parseIconParams(args, "badge", "object-contain");
     const isMuted = extra.firstBool || false;
     const src = isMuted ? "icon_speaker_muted.webp" : "icon_speaker.webp";
-    return `<img src="assets/images/${src}" class="${cls} shadow-md" alt="speaker" onerror="this.src='assets/images/icon_speaker.webp'" />`;
+    return `<img src="assets/images/${src}" class="${cls} shadow-md" alt="speaker" data-fallback="assets/images/icon_speaker.webp" />`;
   },
   audio: (...args) => {
     const { cls } = GAME_ICONS._parseIconParams(args, "badge", "object-contain");
-    return `<img src="assets/images/icon_mic.webp" class="${cls} shadow-md" alt="audio" onerror="this.src='assets/images/icon_speaker.webp'" />`;
+    return `<img src="assets/images/icon_mic.webp" class="${cls} shadow-md" alt="audio" data-fallback="assets/images/icon_speaker.webp" />`;
   },
   mic: (...args) => {
     const { cls } = GAME_ICONS._parseIconParams(args, "badge", "object-contain");
-    return `<img src="assets/images/icon_mic.webp" class="${cls} shadow-md" alt="mic" onerror="this.src='assets/images/icon_speaker.webp'" />`;
+    return `<img src="assets/images/icon_mic.webp" class="${cls} shadow-md" alt="mic" data-fallback="assets/images/icon_speaker.webp" />`;
   },
 
   // -------------------------------------------------------------------------
@@ -176,11 +176,11 @@ export const GAME_ICONS = {
   },
   compass: (...args) => {
     const { cls } = GAME_ICONS._parseIconParams(args, "badge", "object-contain");
-    return `<img src="assets/images/icon_compass.webp" class="${cls} shadow-md" alt="compass" onerror="this.src='assets/images/icon_home.webp'" />`;
+    return `<img src="assets/images/icon_compass.webp" class="${cls} shadow-md" alt="compass" data-fallback="assets/images/icon_home.webp" />`;
   },
   gear: (...args) => {
     const { cls } = GAME_ICONS._parseIconParams(args, "badge", "object-contain");
-    return `<img src="assets/images/icon_gear.webp" class="${cls} shadow-md" alt="gear" onerror="this.src='assets/images/icon_lock.webp'" />`;
+    return `<img src="assets/images/icon_gear.webp" class="${cls} shadow-md" alt="gear" data-fallback="assets/images/icon_lock.webp" />`;
   },
   lock: (...args) => {
     const { cls } = GAME_ICONS._parseIconParams(args, "badge", "object-contain");
@@ -188,7 +188,7 @@ export const GAME_ICONS = {
   },
   shieldLock: (...args) => {
     const { cls } = GAME_ICONS._parseIconParams(args, "badge", "object-contain");
-    return `<img src="assets/images/icon_shield_lock.webp" class="${cls} shadow-md" alt="shieldLock" onerror="this.src='assets/images/icon_parent.webp'" />`;
+    return `<img src="assets/images/icon_shield_lock.webp" class="${cls} shadow-md" alt="shieldLock" data-fallback="assets/images/icon_parent.webp" />`;
   },
   parent: (...args) => {
     const { cls } = GAME_ICONS._parseIconParams(args, "badge", "object-contain");
@@ -196,19 +196,19 @@ export const GAME_ICONS = {
   },
   bell: (...args) => {
     const { cls } = GAME_ICONS._parseIconParams(args, "badge", "object-contain");
-    return `<img src="assets/images/icon_bell.webp" class="${cls} shadow-md" alt="bell" onerror="this.src='assets/images/icon_book.webp'" />`;
+    return `<img src="assets/images/icon_bell.webp" class="${cls} shadow-md" alt="bell" data-fallback="assets/images/icon_book.webp" />`;
   },
   reviewBell: (...args) => {
     const { cls } = GAME_ICONS._parseIconParams(args, "badge", "object-contain");
-    return `<img src="assets/images/icon_bell.webp" class="${cls} shadow-md" alt="review" onerror="this.src='assets/images/icon_book.webp'" />`;
+    return `<img src="assets/images/icon_bell.webp" class="${cls} shadow-md" alt="review" data-fallback="assets/images/icon_book.webp" />`;
   },
   print: (...args) => {
     const { cls } = GAME_ICONS._parseIconParams(args, "item", "object-contain");
-    return `<img src="assets/images/icon_print.webp" class="${cls} shadow-md" alt="print" onerror="this.src='assets/images/icon_book.webp'" />`;
+    return `<img src="assets/images/icon_print.webp" class="${cls} shadow-md" alt="print" data-fallback="assets/images/icon_book.webp" />`;
   },
   monster: (...args) => {
     const { cls } = GAME_ICONS._parseIconParams(args, "badge", "object-cover");
-    return `<img src="assets/images/cathy_boss_monster.webp" class="${cls} shadow-md" alt="monster" onerror="this.src='assets/images/icon_parent.webp'" />`;
+    return `<img src="assets/images/cathy_boss_monster.webp" class="${cls} shadow-md" alt="monster" data-fallback="assets/images/icon_parent.webp" />`;
   }
 };
 

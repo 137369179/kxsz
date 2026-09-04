@@ -120,7 +120,6 @@ export function renderStepPractice(stage) {
           hitCount++;
           fireLaser(btn);
           soundAndFX.playLaserShoot();
-          soundAndFX.speakPriority(char.char, { kind: "char", priority: 1 });
           soundAndFX.triggerConfetti(this.container);
 
           btn.classList.add("scale-125", "opacity-0");
@@ -137,17 +136,21 @@ export function renderStepPractice(stage) {
           if (progressText) progressText.textContent = `${hitCount} / ${targetHits}`;
 
           if (hitCount >= targetHits) {
-            soundAndFX.playVictoryFanfare();
             this._timeout(() => {
+              soundAndFX.playVictoryFanfare();
               if (winModal) winModal.classList.remove("hidden");
-            }, 600);
+            }, 250);
+          } else {
+            soundAndFX.speakPriority(char.char, { kind: "char", priority: 1 });
           }
         } else {
           try {
             ebbinghausManager.recordMistake(char.id, "similar_confuse", { targetChar: char.char, selectedChar: val });
           } catch {}
           soundAndFX.playSoftError();
-          soundAndFX.speakPriority(`这是“${val}”字，要找的是“${char.char}”字哦！`, { kind: "sentence", emotion: "correction" });
+          this._timeout(() => {
+            soundAndFX.speakPriority(`这是“${val}”字，要找的是“${char.char}”字哦！`, { kind: "sentence", emotion: "correction" });
+          }, 180);
           btn.classList.add("animate-shake");
           this._timeout(() => btn.classList.remove("animate-shake"), 600);
         }

@@ -253,11 +253,20 @@ export function renderMatchGame() {
               }
             }, 500);
           } else {
-            // 配对失败 → 连击清零
+            // 配对失败 → 连击清零 + 字音复习失败写回
             soundAndFX.playSoftError();
             mistakes++;
             combo = 0;
             updateComboUI();
+            const keys = [...new Set([b1.dataset.match, b2.dataset.match].filter(Boolean))];
+            keys.forEach((key) => {
+              const rec = CHARACTER_DATABASE.find((x) => x.char === key);
+              if (!rec) return;
+              ebbinghausManager.completeReview(rec.id, false);
+              try {
+                ebbinghausManager.recordMistake(rec.id, "pronunciation");
+              } catch {}
+            });
             this._timeout(() => {
               b1.classList.remove("flipped");
               b2.classList.remove("flipped");

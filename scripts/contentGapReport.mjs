@@ -27,6 +27,10 @@ console.log(JSON.stringify({
   totalChars: rows.length,
   weakWords: weakWords.length,
   noOracle: noOracle.length,
+  stage1Total: rows.filter((r) => r.stage === 1).length,
+  stage1HasOracle: rows.filter((r) => r.stage === 1 && r.hasOracle).length,
+  stage1NoOracle: rows.filter((r) => r.stage === 1 && !r.hasOracle).length,
   stage1WeakWords: stage1Weak.length,
   stage1WeakSample: stage1Weak.slice(0, 30).map((r) => `${r.id}:${r.char}(w${r.words})`),
+  stage1NoOracleSample: noOracle.filter((r) => r.stage === 1).slice(0, 20).map((r) => `${r.id}:${r.char}`),
 }, null, 2));

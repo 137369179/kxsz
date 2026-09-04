@@ -111,9 +111,9 @@ export function renderBossBattle() {
               <div id="boss-hp-bar" class="bg-gradient-to-r from-red-600 via-rose-500 to-yellow-400 h-full rounded-full transition-all duration-500 shadow-[0_0_15px_rgba(244,63,94,0.8)]" style="width: ${bossHp}%"></div>
             </div>
 
-            <div id="boss-avatar" class="relative w-32 h-32 rounded-full bg-gradient-to-tr from-rose-600 via-red-500 to-orange-500 border-4 border-white shadow-[0_0_60px_rgba(244,63,94,0.8)] flex items-center justify-center mb-4 animate-bounce-slow transition-all">
-              <span class="flex items-center text-white">${GAME_ICONS.monster("w-16 h-16")}</span>
-              <div id="boss-lv" class="absolute -top-3 bg-red-600 text-white font-black text-[10px] px-3 py-0.5 rounded-full border border-white">
+            <div id="boss-avatar" class="relative w-32 h-32 rounded-full bg-slate-900 border-4 border-white shadow-[0_0_60px_rgba(244,63,94,0.8)] flex items-center justify-center mb-4 animate-bounce-slow transition-all">
+              <img src="assets/images/boss_nian_beast.webp" alt="难字年兽" class="w-full h-full rounded-full object-cover pointer-events-none"/>
+              <div id="boss-lv" class="absolute -top-3 bg-red-600 text-white font-black text-[10px] px-3 py-0.5 rounded-full border border-white z-10 shadow">
                 难字首领 Lv.9
               </div>
             </div>
@@ -169,6 +169,7 @@ export function renderBossBattle() {
       if (backBtn) {
         this._on(backBtn, "click", () => {
           if (stopTimer) stopTimer();
+          soundAndFX.stopSpeaking();
           soundAndFX.playPop();
           this.currentMode = null;
           this.render();
@@ -225,7 +226,6 @@ export function renderBossBattle() {
           const selected = btn.dataset.char;
           if (selected === curChar.char) {
             soundAndFX.playLaserShoot();
-            soundAndFX.speakPriority(curChar.char, { kind: "char", priority: 1 });
             soundAndFX.triggerConfetti(this.container);
 
             // ===== 艾宾浩斯复习闭环：答对 → 复习成功 =====
@@ -274,8 +274,11 @@ export function renderBossBattle() {
             applyRage();
 
             if (bossDead()) {
-              soundAndFX.playVictoryFanfare();
-              soundAndFX.triggerCoinFly(this.container);
+              soundAndFX.stopSpeaking();
+              this._timeout(() => {
+                soundAndFX.playVictoryFanfare();
+                soundAndFX.triggerCoinFly(this.container);
+              }, 250);
               // 奖励：基础 20 币 + 最高连击加成（最多 +12）
               const bonus = Math.min(maxStreak * 3, 12);
               ebbinghausManager.addCoins(20 + bonus);
@@ -289,16 +292,25 @@ export function renderBossBattle() {
                 if (winModal) winModal.classList.remove("hidden");
               }, 800);
             } else {
+              soundAndFX.speakPriority(curChar.char, { kind: "char", priority: 1 });
               targetIndex++;
               this._timeout(() => { answered = false; renderRound(); }, 800);
             }
           } else {
             soundAndFX.playSoftError();
-            soundAndFX.speakPriority(`这是“${selected}”字，请释放“${curChar.char}”法术！`, { kind: "sentence", emotion: "correction" });
+            this._timeout(() => {
+              soundAndFX.speakPriority(`这是“${selected}”字，请释放“${curChar.char}”法术！`, { kind: "sentence", emotion: "correction" });
+            }, 180);
             btn.classList.add("animate-shake");
-            // ===== 艾宾浩斯闭环：答错 → 标记难字，Boss 回血 =====
+            // ===== 艾宾浩斯闭环：答错 → 标记难字 + 形近混淆画像，Boss 回血 =====
             roundCorrect = 0;
             ebbinghausManager.completeReview(curChar.id, false);
+            try {
+              ebbinghausManager.recordMistake(curChar.id, "similar_confuse", {
+                targetChar: curChar.char,
+                selectedChar: selected,
+              });
+            } catch {}
             bossHp = Math.min(100, bossHp + 5);
             if (bossBar) { bossBar.style.width = `${bossHp}%`; bossBar.classList.add("hp-heal"); setTimeout(() => bossBar.classList.remove("hp-heal"), 500); }
             spawnFloatingText(arena, "答错了 +5% 回血", "miss", { color: "#34d399", top: 42, size: 20 });
@@ -316,6 +328,7 @@ export function renderBossBattle() {
       if (claimBtn) {
         this._on(claimBtn, "click", () => {
           if (stopTimer) stopTimer();
+          soundAndFX.stopSpeaking();
           soundAndFX.playPop();
           this.currentMode = null;
           this.render();

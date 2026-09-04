@@ -96,7 +96,6 @@ export function openCharPopover(charStr) {
 
   const speakBtn = overlay.querySelector("#btn-popover-speak");
   this._on(speakBtn, "click", () => {
-    soundAndFX.playPop();
     soundAndFX.speakPriority(charData.char, { kind: "char", priority: 1 });
   });
 }
@@ -186,7 +185,6 @@ export function openMiniCharTooltip(charStr, triggerEl) {
 
   tooltip.querySelector(".btn-mini-speak")?.addEventListener("click", (e) => {
     e.stopPropagation();
-    soundAndFX.playPop();
     soundAndFX.speakPriority(charData.char, { kind: "char", priority: 1 });
   });
 

@@ -133,12 +133,12 @@ export function openEtymologyQuiz(charData, onClose) {
   `;
 
   document.body.appendChild(modal);
-  soundAndFX.playPop();
   soundAndFX.speakPriority(quiz.question, { kind: "sentence", emotion: "gentle" });
 
   let isLocked = false;
 
   const close = () => {
+    soundAndFX.stopSpeaking();
     modal.remove();
     if (typeof onClose === "function") onClose();
   };
@@ -160,7 +160,9 @@ export function openEtymologyQuiz(charData, onClose) {
         btn.classList.add("bg-emerald-600/80", "border-emerald-300", "ring-4", "ring-emerald-400");
         soundAndFX.playVictoryFanfare();
         soundAndFX.triggerConfetti(modal);
-        soundAndFX.speakPriority(`答对啦！${exp}`, { kind: "sentence", emotion: "excited" });
+        setTimeout(() => {
+          soundAndFX.speakPriority(`答对啦！${exp}`, { kind: "sentence", emotion: "excited" });
+        }, 250);
         mascotProgress.onCorrectPronunciation();
 
         if (feedbackBox) {
@@ -168,12 +170,14 @@ export function openEtymologyQuiz(charData, onClose) {
           feedbackBox.textContent = exp;
         }
 
-        setTimeout(() => close(), 2000);
+        setTimeout(() => close(), 2200);
       } else {
         btn.classList.remove("bg-white/10", "border-white/20");
         btn.classList.add("bg-rose-900/80", "border-rose-400", "animate-shake");
         soundAndFX.playSoftError();
-        soundAndFX.speakPriority(`不对哦。${exp}`, { kind: "sentence", emotion: "gentle" });
+        setTimeout(() => {
+          soundAndFX.speakPriority(`不对哦。${exp}`, { kind: "sentence", emotion: "gentle" });
+        }, 180);
 
         if (feedbackBox) {
           feedbackBox.className = "mt-4 w-full p-3.5 rounded-2xl bg-rose-950/80 border border-rose-400 text-rose-200 text-xs font-bold block animate-fade-in";

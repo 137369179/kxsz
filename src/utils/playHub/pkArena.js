@@ -1,20 +1,11 @@
 /** PlayModule mode — extracted */
 import { CHARACTER_DATABASE } from "../../data/characters.js";
-import { IDIOMS_DATABASE } from "../../data/idioms.js";
-import { POEMS_DATABASE } from "../../data/poems.js";
 import { ebbinghausManager } from "../ebbinghaus.js";
 import { soundAndFX } from "../soundEngine.js";
-import { mountGameShell, showGameToast } from "../../components/SharedShell.js";
-import { escapeHtml } from "../BaseModule.js";
 import { GAME_ICONS } from "../gameIcons.js";
-import { EVENTS } from "../eventBus.js";
-import { RADICAL_FAMILIES } from "../../data/radicalFamilies.js";
-import { forChar as mmForChar, SCENES as MM_SCENES } from "../multimodalEngine.js";
 import {
-  shuffle,
   pickReviewChars,
   buildOptions,
-  buildMatchPairs,
   spawnFloatingText,
   startCountdown,
 } from "./playHelpers.js";
@@ -59,6 +50,8 @@ export function renderPkArena() {
 
       this.container.innerHTML = `
         <div id="pk-arena" class="relative w-full h-full min-h-[640px] flex flex-col justify-between select-none overflow-hidden bg-gradient-to-b from-slate-950 via-indigo-950 to-slate-950 text-white">
+          <img src="assets/images/cathy_pk_arena_stage.webp" alt="演武大擂台" class="absolute inset-0 w-full h-full object-cover opacity-25 pointer-events-none" />
+          <div id="pk-projectile-layer" class="absolute inset-0 pointer-events-none z-20 overflow-hidden"></div>
           
           <header class="relative z-30 w-full px-6 py-3 flex items-center justify-between bg-black/50 backdrop-blur-md border-b border-white/20 flex-wrap gap-2">
             <div class="flex items-center gap-2">
@@ -139,6 +132,7 @@ export function renderPkArena() {
       if (backBtn) {
         this._on(backBtn, "click", () => {
           if (stopTimer) stopTimer();
+          soundAndFX.stopSpeaking();
           soundAndFX.playPop();
           this.currentMode = null;
           this.render();
@@ -149,6 +143,7 @@ export function renderPkArena() {
       if (toggleModeBtn) {
         this._on(toggleModeBtn, "click", () => {
           if (stopTimer) stopTimer();
+          soundAndFX.stopSpeaking();
           isFamilyMode = !isFamilyMode;
           soundAndFX.playPop();
           renderRound();
@@ -196,6 +191,7 @@ export function renderPkArena() {
           currentRound++;
           renderRound();
         } else {
+          soundAndFX.stopSpeaking();
           if (isFamilyMode) {
             soundAndFX.playParentCheer();
           } else {
@@ -250,9 +246,17 @@ export function renderPkArena() {
             soundAndFX.playSoftError();
             btn.classList.add("ring-8", "ring-rose-400");
             spawnFloatingText(arena, `${p2Label} +10`, "pk-miss", { color: "#22d3ee", top: 34, size: 20 });
-            // ===== 闭环：抢拍错误 = 标记难字 =====
+            // ===== 闭环：抢拍错误 = 复习失败 + 形近混淆画像 =====
             const c = CHARACTER_DATABASE.find((x) => x.char === r.char);
-            if (c) ebbinghausManager.completeReview(c.id, false);
+            if (c) {
+              ebbinghausManager.completeReview(c.id, false);
+              try {
+                ebbinghausManager.recordMistake(c.id, "similar_confuse", {
+                  targetChar: r.char,
+                  selectedChar: val,
+                });
+              } catch {}
+            }
           }
 
           this._timeout(() => { answered = false; nextRound(); }, 800);
@@ -262,6 +266,7 @@ export function renderPkArena() {
       if (againBtn) {
         this._on(againBtn, "click", () => {
           if (stopTimer) stopTimer();
+          soundAndFX.stopSpeaking();
           soundAndFX.playPop();
           this.renderPkArena();
         });
@@ -270,6 +275,7 @@ export function renderPkArena() {
       if (claimBtn) {
         this._on(claimBtn, "click", () => {
           if (stopTimer) stopTimer();
+          soundAndFX.stopSpeaking();
           soundAndFX.playPop();
           this.currentMode = null;
           this.render();

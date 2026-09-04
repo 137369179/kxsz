@@ -4,6 +4,7 @@ import { ebbinghausManager } from "../ebbinghaus.js";
 import { GAME_ICONS } from "../gameIcons.js";
 import { pronunciationEval } from "../pronunciationEval.js";
 import { resolveBookVoiceReward } from "../bookVoiceReward.js";
+import { escapeHtml } from "../BaseModule.js";
 
 export function openUserVoiceModal(page) {
     if (this.isVoiceModalOpen) return;
@@ -134,7 +135,7 @@ export function openUserVoiceModal(page) {
         soundAndFX.triggerConfetti(this.container);
         ebbinghausManager.addCoins(reward.coins);
         ebbinghausManager.save();
-        statusText.innerHTML = `<span class="text-emerald-600 font-black text-sm">${roleName} 朗读得分：${reward.score} 分！获得 ${reward.coins} 凯茜星币！</span>`;
+        statusText.innerHTML = `<span class="text-emerald-600 font-black text-sm">${escapeHtml(roleName)} 朗读得分：${Number(reward.score) || 0} 分！获得 ${Number(reward.coins) || 0} 凯茜星币！</span>`;
       } else {
         if (typeof soundAndFX.playEncouragement === "function") soundAndFX.playEncouragement();
         else if (typeof soundAndFX.playPop === "function") soundAndFX.playPop();
@@ -152,7 +153,6 @@ export function openUserVoiceModal(page) {
     });
 
     this._on(playbackBtn, "click", () => {
-      soundAndFX.playPop();
       soundAndFX.speakPriority(page.text, { kind: "sentence", emotion: "gentle" });
     });
   }

@@ -79,6 +79,39 @@ function idbGetAll() {
   });
 }
 
+/** 安全校验与清洗小名（过滤 HTML 标签、内联脚本、控制字符，截断安全长度） */
+export function sanitizeProfileName(name) {
+  if (typeof name !== "string") return "宝宝";
+  let clean = name
+    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "")
+    .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, "")
+    .replace(/<[^>]*>/g, "")
+    .replace(/[\x00-\x1F\x7F]/g, "")
+    .trim();
+  return clean.slice(0, 20) || "宝宝";
+}
+
+/** 安全校验 ID（仅允许字母数字下划线与连字符） */
+export function sanitizeProfileId(id, fallback = "child_1") {
+  if (typeof id !== "string") return fallback;
+  const clean = id.replace(/[^a-zA-Z0-9_\-]/g, "").slice(0, 48);
+  return clean || fallback;
+}
+
+/** 深度防范原型链污染 (Prototype Pollution Guard) */
+export function deepSanitizeObject(obj, depth = 0) {
+  if (depth > 20 || !obj || typeof obj !== "object") return obj;
+  if (Array.isArray(obj)) {
+    return obj.map((item) => deepSanitizeObject(item, depth + 1));
+  }
+  const clean = Object.create(null);
+  for (const [k, v] of Object.entries(obj)) {
+    if (k === "__proto__" || k === "constructor" || k === "prototype") continue;
+    clean[k] = deepSanitizeObject(v, depth + 1);
+  }
+  return clean;
+}
+
 export class StorageManager {
   constructor() {}
 
@@ -212,15 +245,22 @@ export class StorageManager {
   }
 
   saveProfilesList(list) {
-    this.putJSON("CATHY_PROFILES_LIST", list);
+    if (!Array.isArray(list)) return;
+    const cleanList = list.map((p, idx) => ({
+      id: sanitizeProfileId(p.id, `child_${idx + 1}`),
+      name: sanitizeProfileName(p.name || `宝贝 ${idx + 1}`)
+    }));
+    this.putJSON("CATHY_PROFILES_LIST", cleanList);
   }
 
   renameProfile(profileId, newName) {
     if (!profileId || !newName || !newName.trim()) return false;
+    const cleanName = sanitizeProfileName(newName);
+    if (!cleanName) return false;
     const list = this.listProfiles();
     const item = list.find((p) => p.id === profileId);
     if (!item) return false;
-    item.name = newName.trim();
+    item.name = cleanName;
     this.saveProfilesList(list);
     return true;
   }
@@ -255,18 +295,20 @@ export class StorageManager {
 
   importProgressJSON(jsonString) {
     try {
-      const data = JSON.parse(jsonString);
-      if (!data || typeof data !== "object") return false;
+      if (typeof jsonString !== "string" || jsonString.length > 5 * 1024 * 1024) return false;
+      const raw = JSON.parse(jsonString);
+      if (!raw || typeof raw !== "object") return false;
+      const data = deepSanitizeObject(raw);
 
-      if (data.activeProfileId) this.setActiveProfileId(data.activeProfileId);
+      if (data.activeProfileId) this.setActiveProfileId(sanitizeProfileId(data.activeProfileId));
       if (Array.isArray(data.profiles)) this.saveProfilesList(data.profiles);
 
       const activeId = this.getActiveProfileId();
-      if (data.progress && Object.keys(data.progress).length > 0) {
+      if (data.progress && typeof data.progress === "object" && Object.keys(data.progress).length > 0) {
         this.putJSON(`CATHY_LITERACY_PROGRESS_${activeId}`, data.progress);
         this.putJSON("CATHY_LITERACY_USER_PROGRESS_V1", data.progress);
       }
-      if (data.bookRecordings) {
+      if (data.bookRecordings && typeof data.bookRecordings === "object") {
         this.putJSON("cathy_book_recordings_v2", data.bookRecordings);
       }
       return true;
@@ -306,6 +348,7 @@ export class StorageManager {
    */
   importSyncToken(tokenStr) {
     if (!tokenStr || typeof tokenStr !== "string") return { ok: false, msg: "迁移码为空" };
+    if (tokenStr.length > 5 * 1024 * 1024) return { ok: false, msg: "数据过大，无法导入" };
     const trimmed = tokenStr.trim();
     try {
       let progressObj = null;
@@ -313,10 +356,12 @@ export class StorageManager {
         const rawBase64 = trimmed.slice("CATHY_SYNC_V1:".length);
         // 安全修复：使用 decodeURIComponent/unescape 正确处理 Unicode 字符
         const decodedJson = decodeURIComponent(escape(atob(rawBase64)));
-        const payload = JSON.parse(decodedJson);
+        const rawPayload = JSON.parse(decodedJson);
+        const payload = deepSanitizeObject(rawPayload);
         progressObj = payload.p || payload;
       } else if (trimmed.startsWith("{")) {
-        const data = JSON.parse(trimmed);
+        const rawData = JSON.parse(trimmed);
+        const data = deepSanitizeObject(rawData);
         progressObj = data.progress || data;
       }
 
@@ -329,7 +374,7 @@ export class StorageManager {
       this.putJSON("CATHY_LITERACY_USER_PROGRESS_V1", progressObj);
 
       const charCount = Object.keys(progressObj.charRecords || {}).length;
-      const coins = progressObj.coins || 0;
+      const coins = Number(progressObj.coins) || 0;
       return { ok: true, charCount, coins };
     } catch (e) {
       console.error("解析换机迁移码失败", e);

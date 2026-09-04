@@ -17,6 +17,13 @@ export function createMockElement(tag = "div", id = "", classes = []) {
     style: {},
     children: [],
     parentElement: null,
+    get className() { return Array.from(classSet).join(" "); },
+    set className(val) {
+      classSet.clear();
+      if (typeof val === "string") {
+        val.split(/\s+/).filter(Boolean).forEach((c) => classSet.add(c));
+      }
+    },
     get innerHTML() {
       let html = _innerHTML;
       for (const child of el.children) {
@@ -168,6 +175,12 @@ export function createMockElement(tag = "div", id = "", classes = []) {
         if (sel && sel.startsWith(".")) {
           const cls = sel.slice(1);
           if (node.classList && typeof node.classList.contains === "function" && node.classList.contains(cls)) {
+            results.push(node);
+          }
+        } else if (sel && sel.startsWith("[") && sel.endsWith("]")) {
+          const attr = sel.slice(1, -1).split("=")[0].trim();
+          const camel = attr.replace(/^data-/, "").replace(/-([a-z])/g, (_, c) => c.toUpperCase());
+          if ((node.attributes && attr in node.attributes) || (node.dataset && (camel in node.dataset || attr in node.dataset))) {
             results.push(node);
           }
         }

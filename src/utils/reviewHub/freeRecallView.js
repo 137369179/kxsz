@@ -143,7 +143,6 @@ export function mountFreeRecallRound(ctx) {
     }
 
     bind(containerEl.querySelector("#btn-recall-speak"), "click", () => {
-      soundAndFX.playPop?.();
       soundAndFX.speakPriority?.(charData.char, { kind: "char", priority: 1 });
     });
 
@@ -158,10 +157,9 @@ export function mountFreeRecallRound(ctx) {
     const notyetBtn = containerEl.querySelector("#btn-recall-notyet");
     if (notyetBtn) {
       bind(notyetBtn, "click", () => {
-        soundAndFX.playPop?.();
         soundAndFX.speakPriority?.(charData.char, { kind: "char", priority: 1 });
-        // 稍延后结算，避免立刻切页掐断示范音
-        setTimeout(() => finish(false, currentJol), 450);
+        // 稍延后结算，保证示范音完整发音完毕，避免切页掐断
+        setTimeout(() => finish(false, currentJol), 750);
       });
     }
   }
@@ -205,7 +203,6 @@ export function mountFreeRecallRound(ctx) {
     speakPrompt();
 
     bind(containerEl.querySelector("#btn-recall-replay"), "click", () => {
-      soundAndFX.playPop?.();
       speakPrompt();
     });
 
@@ -222,6 +219,7 @@ export function mountFreeRecallRound(ctx) {
   return {
     destroy() {
       destroyed = true;
+      try { soundAndFX.stopSpeaking?.(); } catch {}
       for (const fn of localCleanups) {
         try {
           fn();

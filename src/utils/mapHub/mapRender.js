@@ -121,7 +121,7 @@ export function renderMap() {
         
         <div class="relative h-full flex items-center bg-gradient-to-r ${islandCfg.themeGrad} overflow-hidden" style="min-width: ${Math.max(2800, displayChars.length * 208 + 400)}px;">
           
-          <img src="${islandCfg.bgImg}" alt="${islandCfg.name}" fetchpriority="high" decoding="async" class="absolute inset-0 w-full h-full object-cover opacity-85 pointer-events-none filter contrast-110" onerror="this.src='${islandCfg.bgFallback}'" />
+          <img src="${islandCfg.bgImg}" alt="${islandCfg.name}" fetchpriority="high" decoding="async" class="absolute inset-0 w-full h-full object-cover opacity-85 pointer-events-none filter contrast-110" data-fallback="${islandCfg.bgFallback}" />
 
           <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/30 pointer-events-none"></div>
 
@@ -152,7 +152,7 @@ export function renderMap() {
                             <span class="flex items-center">${GAME_ICONS.sparkle("w-4 h-4")}</span>
                             <span class="leading-none">学“${charItem.char}”字！</span>
                           </div>
-                          <img src="assets/images/cathy_mascot.webp" class="w-20 h-20 sm:w-24 sm:h-24 rounded-full border-4 border-white shadow-2xl object-cover ring-4 ring-orange-400/80 aspect-square shrink-0" alt="凯茜" onerror="this.src='assets/images/icon_star.webp'" />
+                          <img src="assets/images/cathy_mascot.webp" class="w-20 h-20 sm:w-24 sm:h-24 rounded-full border-4 border-white shadow-2xl object-cover ring-4 ring-orange-400/80 aspect-square shrink-0" alt="凯茜" data-fallback="assets/images/icon_star.webp" />
                         </div>
                       </div>
                     `
@@ -163,7 +163,7 @@ export function renderMap() {
                     isCompleted
                       ? `
                     <div class="absolute z-20 flex items-center justify-center pointer-events-none drop-shadow-[0_16px_32px_rgba(255,215,0,0.95)]" style="bottom: calc(100% + 10px); left: 50%; transform: translateX(-50%); width: 176px; height: 116px;">
-                      <img src="assets/images/icon_crown.gif" class="w-full h-full object-contain" alt="crown" onerror="this.src='assets/images/icon_crown.png'" />
+                      <img src="assets/images/icon_crown.gif" class="w-full h-full object-contain" alt="crown" data-fallback="assets/images/icon_crown.png" />
                     </div>
                   `
                       : ""

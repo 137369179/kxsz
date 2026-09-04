@@ -236,11 +236,13 @@ export function renderSpotterGame() {
               speedBadge.textContent = elapsed <= 5 ? `闪电反应！+${bonus} 星币！` : elapsed <= 10 ? `快速答对！+${bonus} 星币！` : `+${bonus} 星币`;
               speedBadge.className = "mt-2 text-sm font-black " + (elapsed <= 5 ? "text-yellow-300" : "text-emerald-300");
             }
-            soundAndFX.speakPriority(`太准啦！这是"${q.target}"字！${q.diffDesc}！`, { kind: "sentence", emotion: "excited" });
+            this._timeout(() => {
+              soundAndFX.speakPriority(`太准啦！这是"${q.target}"字！${q.diffDesc}！`, { kind: "sentence", emotion: "excited" });
+            }, 250);
             const matchedChar = CHARACTER_DATABASE.find((c) => c.char === q.target);
             if (matchedChar) ebbinghausManager.completeReview(matchedChar.id, true);
             roundIndex++;
-            this._timeout(renderRound, 1200);
+            this._timeout(renderRound, 2200);
           } else {
             soundAndFX.playSoftError();
             btn.classList.add("animate-shake", "border-red-500", "ring-4", "ring-red-400");
@@ -248,7 +250,13 @@ export function renderSpotterGame() {
             if (hintBox) hintBox.textContent = `小贴士：这是"${ch}"字哦！${q.diffDesc}才是"${q.target}"字！`;
             soundAndFX.speakPriority(`这是"${ch}"字哦！${q.diffDesc}才是"${q.target}"字！`, { kind: "sentence", emotion: "correction" });
             const matchedTarget = CHARACTER_DATABASE.find((c) => c.char === q.target);
-            if (matchedTarget) ebbinghausManager.recordMistake(matchedTarget.id, "similar_confuse", { targetChar: q.target, selectedChar: ch });
+            if (matchedTarget) {
+              ebbinghausManager.completeReview(matchedTarget.id, false);
+              ebbinghausManager.recordMistake(matchedTarget.id, "similar_confuse", {
+                targetChar: q.target,
+                selectedChar: ch,
+              });
+            }
             this._timeout(() => btn.classList.remove("animate-shake", "border-red-500", "ring-4", "ring-red-400"), 600);
           }
         });

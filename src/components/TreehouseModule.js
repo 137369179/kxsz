@@ -23,15 +23,15 @@ export class TreehouseModule extends BaseModule {
 
   getTreeStage(learnedCount) {
     if (learnedCount >= 601) {
-      return { level: 4, name: "参天智慧神木", desc: "枝繁叶茂，挂满了 600+ 识字硕果！", scale: "scale-110" };
+      return { level: 4, name: "参天智慧神木", desc: "枝繁叶茂，挂满了 600+ 识字硕果！", scale: "scale-105", image: "assets/images/tree_stage_4.webp" };
     }
     if (learnedCount >= 201) {
-      return { level: 3, name: "茂盛繁花树", desc: "绿意盎然，已经掌握了 200+ 常用汉字！", scale: "scale-100" };
+      return { level: 3, name: "茂盛繁花树", desc: "绿意盎然，已经掌握了 200+ 常用汉字！", scale: "scale-100", image: "assets/images/tree_stage_3.webp" };
     }
     if (learnedCount >= 51) {
-      return { level: 2, name: "蓬勃生机树", desc: "生机勃勃，正在大步迈向更高阶！", scale: "scale-90" };
+      return { level: 2, name: "蓬勃生机树", desc: "生机勃勃，正在大步迈向更高阶！", scale: "scale-95", image: "assets/images/tree_stage_2.webp" };
     }
-    return { level: 1, name: "幼嫩识字苗", desc: "刚刚破土而出，每天识字浇水快快长大！", scale: "scale-75" };
+    return { level: 1, name: "幼嫩识字苗", desc: "刚刚破土而出，每天识字浇水快快长大！", scale: "scale-90", image: "assets/images/tree_stage_1.webp" };
   }
 
   render() {
@@ -93,23 +93,26 @@ export class TreehouseModule extends BaseModule {
           <div class="relative w-full flex-1 flex flex-col items-center justify-center my-6">
             
             <div id="tree-graphic-block" class="relative flex flex-col items-center justify-center transition-all duration-700 ${stage.scale}">
-              <div class="w-48 h-48 sm:w-56 sm:h-56 rounded-full bg-gradient-to-tr from-emerald-600 to-teal-400 border-4 border-white shadow-[0_16px_48px_rgba(16,185,129,0.4)] flex flex-col items-center justify-center text-white relative">
-                <span class="text-4xl sm:text-5xl font-black font-serif">智</span>
-                <span class="text-xs font-bold text-emerald-100 mt-1">识字神木</span>
+              <div class="relative w-52 h-52 sm:w-60 sm:h-60 rounded-3xl overflow-hidden border-4 border-emerald-300 shadow-[0_20px_50px_rgba(16,185,129,0.45)] ring-4 ring-white/80 group">
+                <img src="${stage.image}" alt="${stage.name}" class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700" data-fallback="assets/images/cathy_island_forest.webp" />
+                <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none"></div>
+                <div class="absolute bottom-2.5 inset-x-0 flex flex-col items-center text-white drop-shadow-md">
+                  <span class="text-xs font-black bg-emerald-700/85 px-3 py-1 rounded-full border border-emerald-300/80 shadow-md backdrop-blur-sm">
+                    ${stage.name} · 第 ${stage.level} 阶
+                  </span>
+                </div>
                 
-                <div class="absolute -top-3 left-4 w-9 h-9 rounded-full bg-amber-400 border-2 border-white shadow-lg flex items-center justify-center text-amber-950 font-black text-xs animate-bounce-cathy">
+                <div class="absolute top-2.5 left-2.5 w-7 h-7 rounded-full bg-amber-400 border-2 border-white shadow-lg flex items-center justify-center text-amber-950 font-black text-xs animate-bounce-cathy">
                   +1
                 </div>
-                <div class="absolute top-8 -right-3 w-9 h-9 rounded-full bg-amber-400 border-2 border-white shadow-lg flex items-center justify-center text-amber-950 font-black text-xs animate-bounce-cathy">
+                <div class="absolute top-2.5 right-2.5 w-7 h-7 rounded-full bg-emerald-400 border-2 border-white shadow-lg flex items-center justify-center text-emerald-950 font-black text-xs animate-bounce-cathy">
                   +1
                 </div>
               </div>
-
-              <div class="w-14 h-16 bg-amber-800 rounded-b-xl border-x-2 border-amber-950 shadow-md"></div>
             </div>
 
             <div id="cathy-companion-actor" class="mt-4 bg-white/95 backdrop-blur-md px-6 py-3.5 rounded-3xl border-2 border-emerald-300 shadow-xl flex items-center gap-4 cursor-pointer hover:scale-105 active:scale-95 transition-all">
-              <img src="assets/images/cathy_mascot.webp" class="w-14 h-14 rounded-full border-2 border-white shadow-lg object-cover ring-2 ring-orange-400/80 aspect-square shrink-0 animate-bounce-slow" alt="凯茜" onerror="this.src='assets/images/icon_crown.png'" />
+              <img src="assets/images/cathy_mascot.webp" class="w-14 h-14 rounded-full border-2 border-white shadow-lg object-cover ring-2 ring-orange-400/80 aspect-square shrink-0 animate-bounce-slow" alt="凯茜" data-fallback="assets/images/icon_crown.png" />
               <div class="flex flex-col">
                 <span class="text-xs font-black text-emerald-950 flex items-center gap-1">
                   <span>伴学小精灵 · 凯茜</span>
@@ -187,7 +190,9 @@ export class TreehouseModule extends BaseModule {
         if (speechBubble) {
           speechBubble.textContent = "“哗啦啦！大树喝到了甘甜泉水，长得更快啦！谢谢你！”";
         }
-        soundAndFX.speakPriority("大树喝到了甘甜泉水，长得更快啦！", { kind: "sentence", priority: 1 });
+        this._timeout(() => {
+          soundAndFX.speakPriority("大树喝到了甘甜泉水，长得更快啦！", { kind: "sentence", priority: 1 });
+        }, 280);
 
         const coinDisplay = mainEl.querySelector("#tree-coin-display");
         if (coinDisplay) {
@@ -213,7 +218,9 @@ export class TreehouseModule extends BaseModule {
         if (speechBubble) {
           speechBubble.textContent = "“哇！美味的小点心！凯茜充满活力啦，送你 2 枚小金币！”";
         }
-        soundAndFX.speakPriority("哇！美味的小点心！凯茜充满活力啦！", { kind: "sentence", priority: 1 });
+        this._timeout(() => {
+          soundAndFX.speakPriority("哇！美味的小点心！凯茜充满活力啦！", { kind: "sentence", priority: 1 });
+        }, 280);
 
         const coinDisplay = mainEl.querySelector("#tree-coin-display");
         if (coinDisplay) {
@@ -232,7 +239,6 @@ export class TreehouseModule extends BaseModule {
         "字谜：一棵树是木，两棵树是林，三棵树是什么呀？是‘森’字哦！"
       ];
       this._on(riddleBtn, "click", () => {
-        soundAndFX.playPop();
         const r = riddles[Math.floor(Math.random() * riddles.length)];
         const speechBubble = mainEl.querySelector("#cathy-speech-bubble");
         if (speechBubble) {

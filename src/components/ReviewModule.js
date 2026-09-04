@@ -164,6 +164,11 @@ export class ReviewModule extends BaseModule {
     
     this.container.innerHTML = `
       <div class="relative w-full h-full min-h-[640px] flex flex-col select-none overflow-hidden bg-gradient-to-b from-indigo-900 via-purple-900 to-indigo-950 text-white animate-fade-in">
+        <!-- 背景复习水榭古典画境 -->
+        <div class="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+          <img src="assets/images/cathy_review_pavilion.webp" alt="复习水榭" class="w-full h-full object-cover opacity-25 filter blur-[1px] transform scale-105" />
+          <div class="absolute inset-0 bg-gradient-to-b from-indigo-950/80 via-purple-950/70 to-slate-950/90"></div>
+        </div>
         
         <header class="relative z-30 w-full px-6 py-3 flex items-center justify-between bg-black/40 backdrop-blur-md border-b border-white/20">
           <div class="flex items-center gap-2">
@@ -270,6 +275,11 @@ export class ReviewModule extends BaseModule {
     // Free-recall prompt：不渲染易混 / 口诀 / 部首剧透条
     this.container.innerHTML = `
       <div class="relative w-full h-full min-h-[640px] flex flex-col select-none overflow-hidden bg-gradient-to-b from-indigo-950 via-purple-950 to-slate-950 text-white animate-fade-in">
+        <!-- 背景复习水榭古典画境 -->
+        <div class="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+          <img src="assets/images/cathy_review_pavilion.webp" alt="复习水榭" class="w-full h-full object-cover opacity-25 filter blur-[1px] transform scale-105" />
+          <div class="absolute inset-0 bg-gradient-to-b from-indigo-950/80 via-purple-950/70 to-slate-950/90"></div>
+        </div>
         
         <header class="relative z-30 w-full px-6 py-3 flex items-center justify-between bg-black/40 backdrop-blur-md border-b border-white/20">
           <button id="btn-review-quit" class="btn-game-wood text-white font-black text-xs px-4 py-2 rounded-full flex items-center gap-1.5 cursor-pointer active:scale-95">
@@ -577,7 +587,6 @@ export class ReviewModule extends BaseModule {
     // 绑定生字发音
     this.container.querySelectorAll(".reviewed-char-chip").forEach(chip => {
       this._on(chip, "click", () => {
-        soundAndFX.playPop();
         soundAndFX.speakPriority(chip.dataset.char, { kind: "char", priority: 1 });
       });
     });

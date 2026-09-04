@@ -33,5 +33,11 @@ jobs:
       - name: Unit tests
         run: npm test
 
+      - name: Contract & Security Audit
+        run: npm run audit
+
+      - name: Smoke tests
+        run: npm run smoke
+
       - name: Build check
         run: npm run build

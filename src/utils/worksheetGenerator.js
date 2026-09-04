@@ -9,6 +9,17 @@
 
 import { ebbinghausManager } from "./ebbinghaus.js";
 import { CHARACTER_DATABASE } from "../data/characters.js";
+import { planDailySession } from "./sessionPlanner.js";
+
+/** HTML 实体安全转义，防范打印与富文本注入 */
+export function escapeHtml(str) {
+  return String(str ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
 
 /**
  * 生成单个汉字的标准练字帖卡片 HTML
@@ -131,7 +142,7 @@ export function buildWorksheetFullHTML(chars, title = "凯茜识字 · 专属田
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <title>${title}</title>
+  <title>${escapeHtml(title)}</title>
   <style>
     @page {
       size: A4 portrait;
@@ -479,7 +490,7 @@ export function buildWorksheetFullHTML(chars, title = "凯茜识字 · 专属田
   <div class="worksheet-page">
     <div class="worksheet-header">
       <div>
-        <h1 class="header-title">${title}</h1>
+        <h1 class="header-title">${escapeHtml(title)}</h1>
       </div>
       <div class="header-info">
         <span>日期: <strong>${todayStr}</strong></span>
@@ -570,4 +581,29 @@ export function getDifficultWorksheetChars() {
 
   const matched = CHARACTER_DATABASE.filter(c => hardIds.includes(c.id));
   return matched.length > 0 ? matched.slice(0, 6) : CHARACTER_DATABASE.slice(0, 4);
+}
+
+/**
+ * 获取今日学练探险 (Daily Quest) 配套任务字集
+ */
+export function getQuestWorksheetChars() {
+  try {
+    const session = planDailySession();
+    const chars = [];
+    const seen = new Set();
+    for (const item of (session.newChars || [])) {
+      if (item.charData && !seen.has(item.charData.id)) {
+        seen.add(item.charData.id);
+        chars.push(item.charData);
+      }
+    }
+    for (const item of (session.reviews || [])) {
+      if (item.charData && !seen.has(item.charData.id)) {
+        seen.add(item.charData.id);
+        chars.push(item.charData);
+      }
+    }
+    if (chars.length > 0) return chars;
+  } catch {}
+  return getTodayWorksheetChars();
 }

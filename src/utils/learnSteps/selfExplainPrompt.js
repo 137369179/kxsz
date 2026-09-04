@@ -79,7 +79,6 @@ export function openSelfExplainPrompt(charItem, onDone) {
     } catch (_) {
       /* ignore */
     }
-    soundAndFX.playPop?.();
     wrapper.remove();
     onDone?.(payload);
   };

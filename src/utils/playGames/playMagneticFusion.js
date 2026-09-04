@@ -147,8 +147,6 @@ export class PlayMagneticFusion {
         // 触发磁吸咔哒吸附合体！
         this.isCompleted = true;
         isDragging = false;
-        soundAndFX.playPop();
-        soundAndFX.playSuccess();
         soundAndFX.playVictoryFanfare();
         soundAndFX.triggerConfetti(this.container);
 
@@ -166,13 +164,17 @@ export class PlayMagneticFusion {
         }
 
         const char = this.charData;
-        soundAndFX.speakPriority(`咔哒！积木合体成功，诞生了“${char.char}”字！`, { kind: "sentence", priority: 1 });
+        this._timeout(() => {
+          if (!this.isDestroyed) {
+            soundAndFX.speakPriority(`咔哒！积木合体成功，诞生了“${char.char}”字！`, { kind: "sentence", priority: 1 });
+          }
+        }, 250);
 
         this._timeout(() => {
           if (!this.isDestroyed && typeof this.onComplete === "function") {
             this.onComplete();
           }
-        }, 1300);
+        }, 1500);
       }
     };
 

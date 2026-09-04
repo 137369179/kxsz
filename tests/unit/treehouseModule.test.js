@@ -29,6 +29,13 @@ describe("TreehouseModule (凯茜伴学小树屋养成家园)", () => {
     // Level 4: 601 - 1490
     expect(mod.getTreeStage(601).level).toBe(4);
     expect(mod.getTreeStage(1490).level).toBe(4);
+
+    // Each stage has a valid artwork image
+    for (const count of [10, 80, 300, 800]) {
+      const stage = mod.getTreeStage(count);
+      expect(stage.image).toMatch(/^assets\/images\/tree_stage_\d\.webp$/);
+      expect(fs.existsSync(path.resolve(__dirname, "../../", stage.image))).toBe(true);
+    }
   });
 
   it("should be 100% free of Unicode emojis in TreehouseModule.js", () => {

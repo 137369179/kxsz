@@ -17,6 +17,7 @@ import {
   buildMatchPairs,
   spawnFloatingText,
   startCountdown,
+  writeKnownCharsReview,
 } from "./playHelpers.js";
 
 export function renderPoemHall() {
@@ -128,7 +129,6 @@ export function renderPoemHall() {
         const poem = POEMS_DATABASE.find((p) => p.id === id);
         if (poem) {
           soundAndFX.playPop();
-          soundAndFX.playSuccessSound();
           this.renderPoemReader(poem);
         }
       });
@@ -250,7 +250,6 @@ export function renderPoemReader(poem) {
       this._on(box, "click", () => {
         const text = box.dataset.text;
         box.classList.add("bg-amber-300/60", "scale-105");
-        soundAndFX.playPop();
         soundAndFX.speakPriority(text, { kind: "sentence", priority: 1 });
         this._timeout(() => box.classList.remove("bg-amber-300/60", "scale-105"), 1200);
       });
@@ -261,7 +260,6 @@ export function renderPoemReader(poem) {
       this._on(btn, "click", (e) => {
         e.stopPropagation();
         const ch = btn.dataset.char;
-        soundAndFX.playPop();
         soundAndFX.speakPriority(ch, { kind: "char", priority: 1 });
       });
     });
@@ -270,7 +268,6 @@ export function renderPoemReader(poem) {
     const karaokeBtn = mainEl.querySelector("#btn-karaoke-recite");
     if (karaokeBtn) {
       this._on(karaokeBtn, "click", () => {
-        soundAndFX.playPop();
         const lineBoxes = mainEl.querySelectorAll(".poem-line-box");
         let idx = 0;
 
@@ -319,7 +316,9 @@ export function renderPoemReader(poem) {
         e.stopPropagation();
         const ch = span.dataset.char;
         soundAndFX.playCoinClink();
-        soundAndFX.speakPriority(ch, { kind: "char", priority: 1 });
+        this._timeout(() => {
+          soundAndFX.speakPriority(ch, { kind: "char", priority: 1 });
+        }, 150);
         showGameToast(this.container, `点亮已学生字【${ch}】！`, "success");
       });
     });
@@ -389,6 +388,7 @@ export function _renderPoemQuiz(poem) {
           soundAndFX.triggerConfetti(this.container);
           soundAndFX.triggerCoinFly(this.container);
           ebbinghausManager.addCoins(15);
+          writeKnownCharsReview(poem.targetChars || [], true);
 
           // 记录古诗掌握
           if (!ebbinghausManager.progress.learnedPoems) ebbinghausManager.progress.learnedPoems = [];
@@ -404,7 +404,10 @@ export function _renderPoemQuiz(poem) {
         } else {
           btn.classList.add("animate-shake", "ring-4", "ring-rose-400");
           soundAndFX.playSoftError();
-          soundAndFX.speakPriority("再仔细想想诗句的意思哦！", { kind: "sentence", emotion: "correction" });
+          this._timeout(() => {
+            soundAndFX.speakPriority("再仔细想想诗句的意思哦！", { kind: "sentence", emotion: "correction" });
+          }, 180);
+          writeKnownCharsReview(poem.targetChars || [], false);
           if (feedback) feedback.innerHTML = `<span class="text-rose-300">再想想哦，正确答案是 ${String.fromCharCode(65 + quiz.correctIndex)}</span>`;
           this._timeout(() => {
             btn.classList.remove("animate-shake");

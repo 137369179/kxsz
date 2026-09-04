@@ -99,6 +99,11 @@ export function renderStepPlay(stage) {
 
     if (morphBtn) {
       this._on(morphBtn, "click", () => {
+        if (_chantHandle) {
+          _chantHandle.cancel();
+          _chantHandle = null;
+        }
+        soundAndFX.stopSpeaking();
         soundAndFX.playPop();
         openMorphTheater(char, document.body, {
           onClose: () => {
@@ -124,7 +129,6 @@ export function renderStepPlay(stage) {
           return;
         }
 
-        soundAndFX.playPop();
         chantBtn.classList.add("ring-4", "ring-yellow-300");
 
         const { plan, handle } = chantChar(char, {
@@ -156,6 +160,11 @@ export function renderStepPlay(stage) {
 
     if (nextBtn) {
       this._on(nextBtn, "click", () => {
+        if (_chantHandle) {
+          _chantHandle.cancel();
+          _chantHandle = null;
+        }
+        soundAndFX.stopSpeaking();
         soundAndFX.playPop();
         if (typeof this.nextStep === "function") this.nextStep();
       });

@@ -17,6 +17,8 @@
  * 不依赖 DOM，纯数据函数——方便单元测试。
  */
 
+import { getOvernightChars } from "./sleepConsolidation.js";
+
 // ──────────────────────────────────────────────────────────
 // B4 铁律：按年龄分配会话块大小
 // ──────────────────────────────────────────────────────────
@@ -157,6 +159,14 @@ function _collectReviewPool(want) {
 
   const pool = [];
   const seen = new Set();
+
+  // P0: 隔夜新生字巩固 (Walker 2006: 12~36h 关键记忆再激活期)
+  try {
+    const overnightIds = getOvernightChars(records);
+    for (const id of overnightIds) {
+      if (!seen.has(id)) { seen.add(id); pool.push({ id, source: "overnight" }); }
+    }
+  } catch {}
 
   // P1: FSRS 到期
   const dueIds = _ebbinghaus?.getDueReviewCharIds?.() || [];

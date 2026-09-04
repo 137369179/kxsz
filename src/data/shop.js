@@ -7,12 +7,18 @@
  */
 
 export const SHOP_AVATARS = [
-  { id: "av_cathy",   type: "avatar", name: "凯茜",     icon: "assets/images/cathy_mascot.webp",   value: "assets/images/cathy_mascot.webp",   price: 0 },
-  { id: "av_fairy",   type: "avatar", name: "森林仙子", icon: "assets/images/avatar_fairy.webp",  value: "assets/images/avatar_fairy.webp",  price: 0 },
-  { id: "av_hero",    type: "avatar", name: "冒险勇士", icon: "assets/images/avatar_hero.webp",   value: "assets/images/avatar_hero.webp",   price: 0 },
-  { id: "av_unicorn", type: "avatar", name: "幻彩之星", icon: "assets/images/avatar_unicorn.webp",value: "assets/images/avatar_unicorn.webp",price: 200 },
-  { id: "av_panda",   type: "avatar", name: "星空先锋", icon: "assets/images/avatar_panda.webp",  value: "assets/images/avatar_panda.webp",  price: 260 },
-  { id: "av_dragon",  type: "avatar", name: "喷火霸王", icon: "assets/images/cathy_boss_monster.webp", value: "assets/images/cathy_boss_monster.webp", price: 500 }
+  { id: "av_cathy",          type: "avatar", name: "凯茜",     icon: "assets/images/cathy_mascot.webp",          value: "assets/images/cathy_mascot.webp",          price: 0 },
+  { id: "av_scholar",        type: "avatar", name: "博学书童", icon: "assets/images/avatar_scholar.webp",        value: "assets/images/avatar_scholar.webp",        price: 0 },
+  { id: "av_nezha",          type: "avatar", name: "乾坤小将", icon: "assets/images/avatar_nezha.webp",          value: "assets/images/avatar_nezha.webp",          price: 120 },
+  { id: "av_mulan",          type: "avatar", name: "巾帼英豪", icon: "assets/images/avatar_mulan.webp",          value: "assets/images/avatar_mulan.webp",          price: 150 },
+  { id: "av_chang_e",        type: "avatar", name: "霓裳仙子", icon: "assets/images/avatar_chang_e.webp",        value: "assets/images/avatar_chang_e.webp",        price: 180 },
+  { id: "av_wukong",         type: "avatar", name: "齐天小圣", icon: "assets/images/avatar_wukong.webp",         value: "assets/images/avatar_wukong.webp",         price: 220 },
+  { id: "av_guofeng_cathy",  type: "avatar", name: "吉祥小鹿", icon: "assets/images/avatar_guofeng_cathy.webp", value: "assets/images/avatar_guofeng_cathy.webp", price: 280 },
+  { id: "av_fairy",          type: "avatar", name: "森林仙子", icon: "assets/images/avatar_fairy.webp",         value: "assets/images/avatar_fairy.webp",         price: 0 },
+  { id: "av_hero",           type: "avatar", name: "冒险勇士", icon: "assets/images/avatar_hero.webp",          value: "assets/images/avatar_hero.webp",          price: 0 },
+  { id: "av_unicorn",        type: "avatar", name: "幻彩之星", icon: "assets/images/avatar_unicorn.webp",       value: "assets/images/avatar_unicorn.webp",       price: 200 },
+  { id: "av_panda",          type: "avatar", name: "星空先锋", icon: "assets/images/avatar_panda.webp",         value: "assets/images/avatar_panda.webp",         price: 260 },
+  { id: "av_dragon",         type: "avatar", name: "喷火霸王", icon: "assets/images/avatar_dragon.webp",       value: "assets/images/avatar_dragon.webp",       price: 500 }
 ];
 
 export const SHOP_FRAMES = [

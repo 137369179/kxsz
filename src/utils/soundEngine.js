@@ -30,7 +30,7 @@ const COIN_FLY_THROTTLE_MS = 800;      // 金币飞行节流（毫秒）
 const EST_CHAR_MS_MIN = 160;           // 最小预估字符时长（毫秒）
 
 /** 语音队列项 */
-class SpeechQueueItem {
+export class SpeechQueueItem {
   constructor({ kind, priority, text, opts = {}, utteranceFactory, onEnd = null }) {
     this.kind = kind;                         // tutor | eval | char | word | sentence
     this.priority = priority;                 // 1 (highest) ~ 5 (lowest)
@@ -48,12 +48,11 @@ class SpeechQueueItem {
 }
 
 /**
- * 
- * - enqueue  priority  (1 ) 
- * -  resumeStack
- * -  resumeStack unshift 
+ * 优先级语音队列调度器
+ * - enqueue 按 priority 升序插入 (1 最高)
+ * - 抢占时不将过时打断语音重新入栈，避免打断后重复朗读
  */
-class PrioritySpeechQueue {
+export class PrioritySpeechQueue {
   constructor(onBusChange) {
     this.queue = [];        // 
     this.current = null;    // 
@@ -77,20 +76,24 @@ class PrioritySpeechQueue {
       return;
     }
 
-    // /0 
-    const isInteractiveClick = next.kind === "char" || next.kind === "word";
+    // 判断是否应该抢占：
+    // 1. 更高优先级 (priority 数值更小)
+    // 2. 用户主动点击字词 (char/word) 抢占所有长句、导语，或相同优先级的单字
+    // 3. 任何新的同等或更高优先级单字/句子交互，避免新场景被旧场景的低/同级句子长期阻塞
+    const isInteractiveClick = next.kind === "char" || next.kind === "word" || next.kind === "pinyin";
+    const isVoiceNarrative = next.kind === "sentence" || next.kind === "tutorial" || next.kind === "tutor";
+    const currentIsNarrative = this.current.kind === "sentence" || this.current.kind === "tutorial" || this.current.kind === "tutor";
+
     const shouldPreempt = (next.priority < this.current.priority) ||
-      (isInteractiveClick && (next.priority <= this.current.priority || this.current.kind === "tutor" || this.current.kind === "sentence"));
+      (isInteractiveClick && (next.priority <= this.current.priority || currentIsNarrative)) ||
+      (isVoiceNarrative && currentIsNarrative && next.priority <= this.current.priority);
 
     if (shouldPreempt) {
       const low = this.current;
       low.wasInterrupted = true;
       if (low.startedAt) low.resumeOffsetMs = performance.now() - low.startedAt;
       this._cancelCurrent(low);
-      //  resumeStack
-      if (!isInteractiveClick && low.kind === "tutor") {
-        this.resumeStack.push(low);
-      }
+      // 用户主动交互点击，不将过时的旧导语塞回 resumeStack 造成打断后重复朗读
       eventBus.emit(EVENTS.AUDIO_QUEUE_INTERRUPT, {
         high_priority_kind: next.kind,
         interrupted_kind: low.kind,
@@ -119,16 +122,16 @@ class PrioritySpeechQueue {
         item.handle = result;
         if (result.onEndPromise) {
           result.onEndPromise.then(({ interrupted }) => {
-            this._finishCurrent(interrupted);
+            this._finishItem(item, interrupted);
           }).catch((err) => {
             console.warn("[PSQ] onEndPromise rejected:", err);
-            this._finishCurrent(false);
+            this._finishItem(item, false);
           });
         }
       }
     } catch (e) {
       console.warn("[PSQ] play failed", e);
-      this._finishCurrent(false);
+      this._finishItem(item, false);
     }
   }
 
@@ -140,42 +143,39 @@ class PrioritySpeechQueue {
     if (item === this.current) this.current = null;
   }
 
-  _finishCurrent(interrupted) {
-    const item = this.current;
+  _finishItem(item, interrupted) {
     if (!item) return;
-    this.current = null;
+    const isCurrent = this.current === item;
+    if (isCurrent) {
+      this.current = null;
+    }
     eventBus.emit(EVENTS.AUDIO_SPEAK_END, {
       kind: item.kind,
       text: item.text,
-      interrupted,
+      interrupted: Boolean(interrupted),
     });
     if (typeof item.onEnd === "function") {
-      try { item.onEnd({ interrupted }); } catch {}
+      try { item.onEnd({ interrupted: Boolean(interrupted) }); } catch {}
     }
     this.onBusChange(`speak-end:${item.kind}`);
 
-    //  ->  resumeStack
-    if (interrupted) return;
+    // 如果该项已被抢占中断或已非当前项，绝不触发续播或调度新音频（防止状态污染与重复并发）
+    if (interrupted || !isCurrent) return;
 
-    //  -> 
-    if (this.resumeStack.length > 0) {
-      const resume = this.resumeStack.pop();
-      eventBus.emit(EVENTS.AUDIO_QUEUE_RESUME, {
-        kind: resume.kind,
-        resumeOffsetMs: resume.resumeOffsetMs,
-      });
-      // resume: 
-      this.queue.unshift(resume);
-      this.queue.sort((a, b) => a.priority - b.priority || a.createdAt - b.createdAt);
-    }
     this._maybePreemptOrPlay();
   }
 
   cancelAll() {
+    for (const item of this.queue) {
+      if (item && item.handle && typeof item.handle.cancel === "function") {
+        try { item.handle.cancel(); } catch {}
+      }
+    }
     this.queue.length = 0;
     this.resumeStack.length = 0;
     if (this.current) this._cancelCurrent();
   }
+
 
   get depth() { return this.queue.length + (this.current ? 1 : 0); }
   get resumeDepth() { return this.resumeStack.length; }
@@ -242,6 +242,12 @@ class DuckStack {
     if (idx > -1) this.stack.splice(idx, 1);
     this._applyEffective();
     eventBus.emit(EVENTS.AUDIO_BUS_STATE_CHANGE, { cause: `duck-pop:${name}`, snapshot: null });
+  }
+
+  clear() {
+    this.stack.length = 0;
+    this._applyEffective();
+    eventBus.emit(EVENTS.AUDIO_BUS_STATE_CHANGE, { cause: "duck-clear", snapshot: null });
   }
 
   get depth() { return this.stack.length; }
@@ -364,6 +370,9 @@ class CathyAudioEngine {
     if (!AudioCtx) return;
 
     this.audioCtx = new AudioCtx();
+    if (this.audioCtx.state === "suspended") {
+      this.audioCtx.resume().catch(() => {});
+    }
     const ctx = this.audioCtx;
 
     /* 
@@ -452,12 +461,15 @@ class CathyAudioEngine {
       window.addEventListener("focus", resumeAudio);
       window.addEventListener("pageshow", resumeAudio);
 
-      // 一次性用户手势解锁 Web Audio API（iOS / Safari / Chrome 标配）
+      // 一次性/按需手势解锁 Web Audio API（iOS / Safari / Chrome 标配）
       const unlockGesture = () => {
+        this.init();
         resumeAudio();
-        window.removeEventListener("pointerdown", unlockGesture, true);
-        window.removeEventListener("touchstart", unlockGesture, true);
-        window.removeEventListener("keydown", unlockGesture, true);
+        if (this.audioCtx && this.audioCtx.state === "running") {
+          window.removeEventListener("pointerdown", unlockGesture, true);
+          window.removeEventListener("touchstart", unlockGesture, true);
+          window.removeEventListener("keydown", unlockGesture, true);
+        }
       };
       window.addEventListener("pointerdown", unlockGesture, true);
       window.addEventListener("touchstart", unlockGesture, true);
@@ -488,9 +500,13 @@ class CathyAudioEngine {
   // ----------------------------------------------------
   _voiceGainForKind(kind) {
     switch (kind) {
-      case "tutor": return this.voiceTutorGain;
+      case "tutor":
+      case "tutorial":
+        return this.voiceTutorGain;
       case "eval": return this.voiceEvalGain;
-      case "char": return this.voiceCharGain;
+      case "char":
+      case "pinyin":
+        return this.voiceCharGain;
       case "word": return this.voiceWordGain;
       case "sentence": return this.voiceSentenceGain;
       default: return this.voiceCharGain;
@@ -498,13 +514,13 @@ class CathyAudioEngine {
   }
 
   _priorityForKind(kind) {
-    return { tutor: 1, eval: 2, char: 3, word: 4, sentence: 5 }[kind] || 3;
+    return { tutor: 1, tutorial: 1, eval: 2, char: 3, pinyin: 3, word: 4, sentence: 5 }[kind] || 3;
   }
 
   /**
-   *  speak 
+   * 播放语音
    * @param {string} text
-   * @param {{kind?:string, emotion?:string, pitchOffset?:number, rateMul?:number, duckStrategy?:string|null, onEnd?:Function, useNeural?:boolean}} opts
+   * @param {{kind?:string, priority?:number, emotion?:string, pitchOffset?:number, rateMul?:number, duckStrategy?:string|null, onEnd?:Function, useNeural?:boolean}} opts
    */
   speakPriority(text, opts = {}) {
     if (this.isMuted) {
@@ -515,8 +531,8 @@ class CathyAudioEngine {
     }
     this.init();
     const kind = opts.kind || "char";
-    const priority = this._priorityForKind(kind);
-    const duck = opts.duckStrategy != null ? opts.duckStrategy : ({ tutor: "tutor_duck", eval: "eval_duck", char: "char_duck" })[kind] || null;
+    const priority = opts.priority != null ? opts.priority : this._priorityForKind(kind);
+    const duck = opts.duckStrategy != null ? opts.duckStrategy : ({ tutor: "tutor_duck", tutorial: "tutor_duck", eval: "eval_duck", char: "char_duck", pinyin: "char_duck" })[kind] || null;
 
     if (duck) this.duckStack.push(duck);
 
@@ -596,15 +612,20 @@ class CathyAudioEngine {
           char_index: charIdx,
           char: chars[charIdx] || "",
           elapsed_time_ms: event.elapsedTime || 0,
-          total: chars.length
+          total: chars.length,
         });
         if (typeof opts.onProgress === "function") {
           opts.onProgress({ char_index: charIdx, char: chars[charIdx] || "" });
         }
       };
 
+      let endPromiseResolve = null;
+      const onEndPromise = new Promise((res) => {
+        endPromiseResolve = res;
+      });
+
       let resolved = false;
-      const resolve = (interrupted) => {
+      const finish = (interrupted) => {
         if (resolved) return;
         resolved = true;
         if (queueItem && queueItem._progressTimer) {
@@ -612,19 +633,26 @@ class CathyAudioEngine {
           queueItem._progressTimer = null;
         }
         if (duck) this.duckStack.pop(duck);
+        if (endPromiseResolve) {
+          endPromiseResolve({ interrupted: Boolean(interrupted) });
+          endPromiseResolve = null;
+        }
       };
-      utter.onend = () => resolve(false);
-      utter.onerror = () => resolve(false);
+      utter.onend = () => finish(false);
+      utter.onerror = (e) => {
+        const isInterrupted = e?.error === "interrupted" || e?.error === "canceled";
+        finish(isInterrupted);
+      };
 
       this.synth.speak(utter);
 
-      //  ( onboundary)
+      // 兜底字符级进度上报 (若浏览器不支持 onboundary)
       // 最小预估字符时长 160ms
       const estCharMs = Math.max(EST_CHAR_MS_MIN, Math.round(280 / (utter.rate || 1)));
       let idx = 0;
       const total = chars.length * estCharMs;
       queueItem._progressTimer = setInterval(() => {
-        if (boundaryFired) return; // onboundary 
+        if (boundaryFired) return; // onboundary 优先
         idx += 1;
         if (idx >= chars.length) { clearInterval(queueItem._progressTimer); return; }
         eventBus.emit(EVENTS.AUDIO_SPEAK_PROGRESS, {
@@ -642,21 +670,17 @@ class CathyAudioEngine {
         cancel: () => {
           if (queueItem && queueItem._progressTimer) clearInterval(queueItem._progressTimer);
           try { this.synth.cancel(); } catch {}
-          resolve(true);
+          finish(true);
         },
-        onEndPromise: new Promise(res => {
-          const origOnEnd = utter.onend;
-          const origOnErr = utter.onerror;
-          utter.onend = (e) => { origOnEnd && origOnEnd(e); res({ interrupted: false }); };
-          utter.onerror = (e) => { origOnErr && origOnErr(e); res({ interrupted: false }); };
-        }),
+        onEndPromise,
       };
     };
 
-    // ----  handle: ,  speechSynthesis ----
-    let activeHandle = null;      // neural handle  legacy handle
+    // ---- 统一 handle: 优先神经语音，降级走 speechSynthesis ----
+    let activeHandle = null;      // neural handle 或 legacy handle
     let cancelledEarly = false;
-    let queueItem = null;         // _play 
+    let queueItem = null;         // 由 _play 传入
+    const abortController = typeof AbortController !== "undefined" ? new AbortController() : null;
 
     const factory = (qi) => {
       queueItem = qi;
@@ -664,7 +688,7 @@ class CathyAudioEngine {
         if (useNeural && this.audioCtx) {
           const isCached = neuralVoice.hasCached(text, opts.emotion || "neutral", pitchBias, rateMul);
           if (isCached) {
-            // 0ms  Web Audio 
+            // 0ms 零延迟极速走 Web Audio
             try {
               const dest = this._voiceGainForKind(kind);
               const h = await neuralVoice.play({
@@ -675,6 +699,7 @@ class CathyAudioEngine {
                 pitchOffset: pitchBias,
                 rateMul,
                 volume: 1,
+                signal: abortController ? abortController.signal : null,
               });
               if (h) {
                 if (cancelledEarly) { h.cancel(); return { interrupted: true }; }
@@ -683,27 +708,22 @@ class CathyAudioEngine {
                 return await h.onEndPromise;
               }
             } catch (e) {
-              // 
+              // 失败优雅降级
             }
-          } else if (kind === "char" || kind === "word") {
-            // /(500~1500ms)0ms  TTS 
-            // 
+          } else if (kind === "char" || kind === "word" || kind === "pinyin") {
+            // 单字/词汇/拼音要求极速响应(500~1500ms网络等待不可接受)，0ms 降级为系统 TTS
+            // 同时触发神经语音后台预热
             neuralVoice.prefetch(text, this.audioCtx, opts.emotion || "neutral", pitchBias, rateMul);
             if (cancelledEarly) return { interrupted: true };
             const lh = runLegacySynth();
             activeHandle = lh;
             return await lh.onEndPromise;
           } else {
-            // 长句 / 导语（优先 150ms 竞速判定 neural 缓存，未命中优雅降级）
+            // 长句 / 导语
             try {
               if (neuralVoice.available !== false) {
                 const dest = this._voiceGainForKind(kind);
-                const abortController = typeof AbortController !== "undefined" ? new AbortController() : null;
-                const timeoutPromise = new Promise((resolve) => setTimeout(() => {
-                  if (abortController) abortController.abort();
-                  resolve(null);
-                }, 150));
-                const neuralPromise = neuralVoice.play({
+                const h = await neuralVoice.play({
                   text,
                   ctx: this.audioCtx,
                   dest,
@@ -713,7 +733,6 @@ class CathyAudioEngine {
                   volume: 1,
                   signal: abortController ? abortController.signal : null,
                 });
-                const h = await Promise.race([neuralPromise, timeoutPromise]);
                 if (h) {
                   if (cancelledEarly) { h.cancel(); return { interrupted: true }; }
                   activeHandle = h;
@@ -722,7 +741,7 @@ class CathyAudioEngine {
                 }
               }
             } catch (e) {
-              // 
+              // 失败降级
             }
           }
         }
@@ -737,6 +756,9 @@ class CathyAudioEngine {
       return {
         cancel: () => {
           cancelledEarly = true;
+          if (abortController) {
+            try { abortController.abort(); } catch {}
+          }
           if (queueItem?._progressTimer) clearInterval(queueItem._progressTimer);
           if (activeHandle) { try { activeHandle.cancel(); } catch {} }
           ensureDuckPopped();
@@ -815,6 +837,12 @@ class CathyAudioEngine {
   /** 立即停止并清空所有当前及排队的语音播放 */
   stopSpeaking() {
     this.speechQueue.cancelAll();
+    try {
+      this.duckStack.clear();
+    } catch {}
+    try {
+      neuralVoice.stopAll();
+    } catch {}
     try {
       if (typeof window !== "undefined" && window.speechSynthesis) {
         window.speechSynthesis.cancel();
@@ -1050,6 +1078,9 @@ class CathyAudioEngine {
     if (this.isMuted) return;
     this.init();
     if (!this.audioCtx) return;
+    if (this.audioCtx.state === "suspended") {
+      this.audioCtx.resume().catch(() => {});
+    }
     const ctx = this.audioCtx;
     const now = ctx.currentTime + delay;
 
@@ -1086,6 +1117,9 @@ class CathyAudioEngine {
     if (this.isMuted) return;
     this.init();
     if (!this.audioCtx) return;
+    if (this.audioCtx.state === "suspended") {
+      this.audioCtx.resume().catch(() => {});
+    }
     const ctx = this.audioCtx;
     const now = ctx.currentTime;
 
@@ -1133,13 +1167,19 @@ class CathyAudioEngine {
     this._tone({ type: "sine", from: 450, to: 320, dur: 0.14, vol: 0.18, delay: 0.08 });
   }
 
-  // 2. / (Pop)
+  // 2. 气泡破裂/轻触 (Pop) - 带 40ms 极短防抖防重复
   playPop() {
+    const now = typeof performance !== "undefined" ? performance.now() : Date.now();
+    if (this._lastPopTime && now - this._lastPopTime < 40) return;
+    this._lastPopTime = now;
     this._tone({ type: "sine", from: 600, to: 1200, dur: 0.08, vol: 0.25 });
   }
 
-  // 谁 (Whoosh/Swoosh)
+  // 谁 (Whoosh/Swoosh) - 带 60ms 防抖
   playWhoosh() {
+    const now = typeof performance !== "undefined" ? performance.now() : Date.now();
+    if (this._lastWhooshTime && now - this._lastWhooshTime < 60) return;
+    this._lastWhooshTime = now;
     this._tone({ type: "sine", from: 240, to: 880, dur: 0.15, vol: 0.22 });
   }
 
@@ -1182,9 +1222,13 @@ class CathyAudioEngine {
     }
   }
 
-  // 8. /
+  // 8. 错误音/提示音
   playSoftError() {
     this._tone({ type: "sine", from: 280, to: 180, dur: 0.3, vol: 0.2 });
+  }
+
+  playWrong() {
+    this.playSoftError();
   }
 
   // 9.  ()
@@ -1338,8 +1382,11 @@ class CathyAudioEngine {
     }
   }
 
-  // 17. 星币叮当声 (Coin Clink)
+  // 17. 星币叮当声 (Coin Clink) - 带 80ms 防抖节流防连环金属爆音
   playCoinClink() {
+    const now = typeof performance !== "undefined" ? performance.now() : Date.now();
+    if (this._lastCoinClinkTime && now - this._lastCoinClinkTime < 80) return;
+    this._lastCoinClinkTime = now;
     this._tone({ type: "sine", from: 1318.5, dur: 0.15, vol: 0.2 });
     this._tone({ type: "sine", from: 1975.5, dur: 0.25, vol: 0.15, delay: 0.05 });
   }
@@ -1542,7 +1589,7 @@ export const soundAndFX = new CathyAudioEngine();
 export const soundEngine = soundAndFX;
 export default soundAndFX;
 
-// 
 if (typeof window !== "undefined") {
   window.__soundEngine = soundAndFX;
+  window.soundAndFX = soundAndFX;
 }

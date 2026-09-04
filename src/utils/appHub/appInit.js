@@ -4,6 +4,8 @@ import { ensureDetails } from "../charDetailLoader.js";
 import { eventBus, EVENTS } from "../eventBus.js";
 import { storageManager } from "../storageManager.js";
 import { eyeCareManager } from "../eyeCareManager.js";
+import { mascotProgress } from "../mascotProgress.js";
+import { bindMicroReviewUI } from "../microReviewUI.js";
 
 export function init() {
   this.storage = storageManager;
@@ -12,9 +14,11 @@ export function init() {
     this._warmupNeuralVoice();
     window.removeEventListener("click", unlockAudio);
     window.removeEventListener("touchstart", unlockAudio);
+    window.removeEventListener("pointerdown", unlockAudio);
   };
   window.addEventListener("click", unlockAudio, { once: true });
   window.addEventListener("touchstart", unlockAudio, { once: true });
+  window.addEventListener("pointerdown", unlockAudio, { once: true });
 
   eventBus.on(EVENTS.SWITCH_MODE, ({ mode, highlightPinyin }) => {
     if (mode === "pinyin" && highlightPinyin && this.pinyinModule?.locatePinyin) {
@@ -30,6 +34,17 @@ export function init() {
   eventBus.on(EVENTS.START_LEARN, ({ charData }) => {
     this.startLearnFlow(charData);
   });
+
+  // LEARN_FINISH 消费者：≥2 星记一次凯茜好感递进（内在动机，非金币）
+  eventBus.on(EVENTS.LEARN_FINISH, ({ stars } = {}) => {
+    try {
+      if ((stars ?? 0) >= 2 && typeof mascotProgress?.onCorrectPronunciation === "function") {
+        mascotProgress.onCorrectPronunciation();
+      }
+    } catch {}
+  });
+
+  try { bindMicroReviewUI(); } catch {}
 
   this._initClickSparkles();
   this._initKeyboardShortcuts();

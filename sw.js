@@ -7,6 +7,22 @@ const DEFAULT_CORE_ASSETS = [
   "./index.html",
   `./assets/css/prod.css?v=${_ver}`,
   `./src/app.js?v=${_ver}`,
+  // Hub 化后的首屏/编排入口（源码直出离线兜底；其余 JS 仍靠 Cache-First 运行时回填）
+  "./src/utils/BaseModule.js",
+  "./src/utils/appHub/index.js",
+  "./src/utils/appHub/moduleRegistry.js",
+  "./src/utils/appHub/appInit.js",
+  "./src/utils/appHub/appNavigation.js",
+  "./src/utils/appHub/appFx.js",
+  "./src/utils/appHub/browserShims.js",
+  "./src/components/MapModule.js",
+  "./src/utils/mapHub/index.js",
+  "./src/utils/charDetailLoader.js",
+  "./src/utils/learnProgressStore.js",
+  "./src/utils/learnScoring.js",
+  "./src/utils/bookVoiceReward.js",
+  "./src/utils/microReviewScheduler.js",
+  "./src/utils/microReviewUI.js",
   "./src/utils/eventBus.js",
   "./src/utils/storageManager.js",
   "./src/utils/version.js",
@@ -18,7 +34,6 @@ const DEFAULT_CORE_ASSETS = [
   "./src/utils/pronunciationEval.js",
   "./src/utils/readingModes.js",
   "./src/utils/strokeVoiceSync.js",
-  "./src/utils/drillEngine.js",
   "./src/utils/rewardEngine.js",
   "./src/utils/bgmAndChant.js",
   "./src/utils/dspChain.js",
@@ -83,6 +98,19 @@ const DEFAULT_CORE_ASSETS = [
   "./assets/images/avatar_hero.webp",
   "./assets/images/avatar_unicorn.webp",
   "./assets/images/avatar_panda.webp",
+  "./assets/images/avatar_dragon.webp",
+  "./assets/images/tree_stage_1.webp",
+  "./assets/images/tree_stage_2.webp",
+  "./assets/images/tree_stage_3.webp",
+  "./assets/images/tree_stage_4.webp",
+  "./assets/images/pinyin_pair_yu.webp",
+  "./assets/images/pinyin_pair_hua.webp",
+  "./assets/images/pinyin_pair_niao.webp",
+  "./assets/images/pinyin_pair_bai.webp",
+  "./assets/images/cathy_pk_arena_stage.webp",
+  "./assets/images/cathy_review_pavilion.webp",
+  "./assets/images/fusion_alchemy_furnace.webp",
+  "./assets/images/cert_literacy_champion.webp",
   "./assets/images/cover_cat_fishing.webp",
   "./assets/images/cover_midautumn.webp",
   "./assets/images/cover_space_rocket.webp",
@@ -278,6 +306,9 @@ async function resolvePrecacheList() {
   return DEFAULT_CORE_ASSETS;
 }
 
+  // 源码直出：预缓存关键壳 + 图片；动态 import 的 Hub chunk 依赖运行时 Cache-First 回填。
+  // 生产 dist/ 优先读 sw-manifest.json（含全部 hashed 产物）。
+  // Network：8766 TTS 不拦截（见下方 fetch）。
 self.addEventListener("install", (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then(async (cache) => {

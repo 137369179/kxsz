@@ -295,10 +295,10 @@ export function startToneQuiz() {
   this.toneQuizIndex = 0;
   this.toneQuizScore = 0;
   this.toneQuizLastResult = null;
+  this.render();
   if (this.toneQuizSession?.questions?.[0]?.speakText) {
     soundAndFX.speakPriority(this.toneQuizSession.questions[0].speakText, { kind: "pinyin", priority: 1 });
   }
-  this.render();
 }
 
 export function _renderToneQuizView() {
@@ -515,7 +515,6 @@ export function _bindEvents(mainEl) {
       const pool = [...PINYIN_INITIALS, ...PINYIN_FINALS, ...PINYIN_WHOLE_SYLLABLES];
       const found = pool.find(p => p.id === pid);
       if (found) {
-        soundAndFX.playPop();
         this.selectedPinyin = found;
         soundAndFX.speakPriority(found.pinyin, { kind: "char", priority: 1 });
         this.render();
@@ -527,7 +526,6 @@ export function _bindEvents(mainEl) {
   const speakCurrentBtn = mainEl.querySelector("#btn-speak-current-pinyin");
   if (speakCurrentBtn && this.selectedPinyin) {
     this._on(speakCurrentBtn, "click", () => {
-      soundAndFX.playPop();
       soundAndFX.speakPriority(`${this.selectedPinyin.pinyin}，${this.selectedPinyin.mnemonic}`, { kind: "sentence", priority: 1 });
     });
   }
@@ -536,7 +534,6 @@ export function _bindEvents(mainEl) {
   mainEl.querySelectorAll(".btn-play-tone").forEach(btn => {
     this._on(btn, "click", () => {
       const toneText = btn.dataset.tone;
-      soundAndFX.playPop();
       soundAndFX.speakPriority(toneText, { kind: "char", priority: 1 });
     });
   });
@@ -547,6 +544,65 @@ export function _bindEvents(mainEl) {
       soundAndFX.playPop();
       this.currentTone = parseInt(btn.dataset.tone, 10);
       this.render();
+    });
+  });
+
+  // 7b. 声调大挑战入口与控制
+  mainEl.querySelectorAll("#btn-start-tone-quiz, #btn-start-tone-quiz-bottom, #btn-restart-tone-quiz").forEach(btn => {
+    this._on(btn, "click", () => {
+      soundAndFX.playPop();
+      this.startToneQuiz();
+    });
+  });
+
+  mainEl.querySelectorAll("#btn-back-track, #btn-subtab-track").forEach(btn => {
+    this._on(btn, "click", () => {
+      soundAndFX.playPop();
+      this.toneQuizActive = false;
+      this.toneQuizSession = null;
+      this.render();
+    });
+  });
+
+  // 重听声调题目读音
+  const playToneSoundBtn = mainEl.querySelector("#btn-play-tone-sound");
+  if (playToneSoundBtn) {
+    this._on(playToneSoundBtn, "click", () => {
+      const s = playToneSoundBtn.dataset?.sound || playToneSoundBtn.getAttribute?.("data-sound");
+      if (s) {
+        soundAndFX.speakPriority(s, { kind: "pinyin", priority: 1 });
+      }
+    });
+  }
+
+  // 声调挑战答题选项
+  mainEl.querySelectorAll(".btn-tone-quiz-opt").forEach(btn => {
+    this._on(btn, "click", () => {
+      if (this.toneQuizLastResult !== null) return;
+      const rawVal = btn.dataset?.val || btn.getAttribute?.("data-val");
+      const questions = this.toneQuizSession?.questions;
+      if (!questions || !questions[this.toneQuizIndex]) return;
+      const q = questions[this.toneQuizIndex];
+      const optVal = isNaN(Number(rawVal)) ? rawVal : Number(rawVal);
+      const isCorrect = optVal === q.correctAnswer;
+
+      this.toneQuizLastResult = { correct: isCorrect, selected: optVal };
+      if (isCorrect) {
+        this.toneQuizScore++;
+        soundAndFX.playSuccess();
+      } else {
+        soundAndFX.playWrong();
+      }
+      this.render();
+
+      this._timeout(() => {
+        this.toneQuizIndex++;
+        this.toneQuizLastResult = null;
+        this.render();
+        if (this.toneQuizSession?.questions?.[this.toneQuizIndex]?.speakText) {
+          soundAndFX.speakPriority(this.toneQuizSession.questions[this.toneQuizIndex].speakText, { kind: "pinyin", priority: 1 });
+        }
+      }, 1200);
     });
   });
 
@@ -616,7 +672,6 @@ export function _bindEvents(mainEl) {
     if (triggerCoasterBtn) {
       this._on(triggerCoasterBtn, "click", () => {
         soundAndFX.playWhoosh();
-        soundAndFX.playPop();
 
         const w = coasterCanvas.offsetWidth || 560;
         const h = coasterCanvas.offsetHeight || 130;
@@ -678,7 +733,6 @@ export function _bindEvents(mainEl) {
   if (fireCollisionBtn) {
     this._on(fireCollisionBtn, "click", () => {
       soundAndFX.playWhoosh();
-      soundAndFX.playPop();
       const leftCart = mainEl.querySelector("#cart-left");
       const rightCart = mainEl.querySelector("#cart-right");
       const resultBox = mainEl.querySelector("#collision-result-box");
@@ -702,7 +756,9 @@ export function _bindEvents(mainEl) {
           resultBox.classList.add("opacity-100", "scale-100");
         }
         const pair = PINYIN_COLLISION_PAIRS[this.collisionIndex % PINYIN_COLLISION_PAIRS.length];
-        soundAndFX.speakPriority(`${pair.initial}，${pair.final}，${pair.syllable}！${pair.char}，${pair.word}`, { kind: "sentence", priority: 1 });
+        this._timeout(() => {
+          soundAndFX.speakPriority(`${pair.initial}，${pair.final}，${pair.syllable}！${pair.char}，${pair.word}`, { kind: "sentence", priority: 1 });
+        }, 200);
       }, 380);
     });
   }

@@ -237,7 +237,6 @@ export function openMorphTheater(charItem, container = document.body, opts = {})
   if (autoPlayBtn) {
     autoPlayBtn.addEventListener("click", () => {
       clearTimers();
-      soundAndFX.playPop();
       if (slider) slider.value = 0;
       updateStage(0);
 
@@ -246,7 +245,6 @@ export function openMorphTheater(charItem, container = document.body, opts = {})
       const t1 = setTimeout(() => {
         if (slider) slider.value = 33;
         updateStage(33);
-        soundAndFX.playPop();
         soundAndFX.speakPriority(`第二幕：线条化成了殷商甲骨文。`, { kind: "sentence", priority: 1 });
       }, 1500);
       timers.push(t1);
@@ -254,7 +252,6 @@ export function openMorphTheater(charItem, container = document.body, opts = {})
       const t2 = setTimeout(() => {
         if (slider) slider.value = 66;
         updateStage(66);
-        soundAndFX.playPop();
         soundAndFX.speakPriority(`第三幕：演化为规整的金文与小篆。`, { kind: "sentence", priority: 1 });
       }, 3000);
       timers.push(t2);
@@ -269,7 +266,10 @@ export function openMorphTheater(charItem, container = document.body, opts = {})
           const tSparkle = setTimeout(() => { if (sparkleLayer) sparkleLayer.style.opacity = 0; }, 800);
           timers.push(tSparkle);
         }
-        soundAndFX.speakPriority(`第四幕：看！这就是我们今天写的“${charItem.char}”字！`, { kind: "char", priority: 1 });
+        const tVoice = setTimeout(() => {
+          soundAndFX.speakPriority(`第四幕：看！这就是我们今天写的“${charItem.char}”字！`, { kind: "char", priority: 1 });
+        }, 250);
+        timers.push(tVoice);
       }, 4500);
       timers.push(t3);
     });

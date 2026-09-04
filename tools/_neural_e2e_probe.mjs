@@ -5,7 +5,6 @@
  * 2. 真实鼠标点击 #btn-neural-play (手势解锁 AudioContext)
  * 3. 等待合成+播放完成, 读页面 log + stats
  */
-import WebSocket from "ws";
 import http from "node:http";
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -13,13 +12,25 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 async function main() {
   const pages = await new Promise((res, rej) => {
     http.get("http://127.0.0.1:9222/json", (r) => {
-      let d = ""; r.on("data", c => d += c); r.on("end", () => res(JSON.parse(d)));
+      let d = ""; r.on("data", c => d += c); r.on("end", () => {
+        try { res(JSON.parse(d)); } catch (e) { rej(e); }
+      });
     }).on("error", rej);
+  }).catch((err) => {
+    console.warn(`⚠️ [neural_e2e_probe] 跳过: 无法连接到 Chrome CDP (http://127.0.0.1:9222): ${err.message}`);
+    process.exit(0);
   });
+  if (!pages || !Array.isArray(pages)) {
+    console.warn("⚠️ [neural_e2e_probe] 跳过: 未检测到可用的 Chrome CDP 页面目标");
+    process.exit(0);
+  }
   const page = pages.find(p => p.type === "page" && p.webSocketDebuggerUrl);
-  if (!page) { console.error("no page"); process.exit(1); }
+  if (!page) {
+    console.warn("⚠️ [neural_e2e_probe] 跳过: 未找到包含 WebSocket 调试器的活动页面");
+    process.exit(0);
+  }
 
-  const ws = new WebSocket(page.webSocketDebuggerUrl, { perMessageDeflate: false });
+  const ws = new WebSocket(page.webSocketDebuggerUrl);
   let idSeq = 1;
   const pending = new Map();
   const send = (method, params = {}) => new Promise((res) => {

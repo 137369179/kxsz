@@ -114,9 +114,8 @@ export function renderStepRecognize(stage) {
 
     const jellyBtn = stage.querySelector("#btn-jelly-char");
     if (jellyBtn) {
-      this._on(jellyBtn, "click", async () => {
+      this._on(jellyBtn, async () => {
         soundAndFX.playJellyBoing();
-        soundAndFX.speakPriority(`${char.char}，${char.pinyin}`, { kind: "char", priority: 1 });
         soundAndFX.triggerConfetti(this.container);
         jellyBtn.classList.remove("animate-bounce-cathy");
         
@@ -124,7 +123,8 @@ export function renderStepRecognize(stage) {
         jellyBtn.classList.add("scale-x-125", "scale-y-75");
         await this._wait(120);
         
-        // 阶段 2：拉伸动画
+        // 阶段 2：拉伸回弹时发音，音画完美合拍
+        soundAndFX.speakPriority(`${char.char}，${char.pinyin}`, { kind: "char", priority: 1 });
         jellyBtn.classList.remove("scale-x-125", "scale-y-75");
         jellyBtn.classList.add("scale-x-85", "scale-y-115");
         await this._wait(150);
@@ -138,7 +138,6 @@ export function renderStepRecognize(stage) {
     stage.querySelectorAll(".word-balloon-btn").forEach((btn) => {
       this._on(btn, "click", () => {
         const word = btn.dataset.word;
-        soundAndFX.playPop();
         soundAndFX.speakPriority(word, { kind: "word", priority: 1 });
         btn.classList.add("ring-2", "ring-yellow-400");
         this._timeout(() => btn.classList.remove("ring-2", "ring-yellow-400"), 400);
@@ -148,7 +147,6 @@ export function renderStepRecognize(stage) {
     const cogCard = stage.querySelector("#cognitive-stage-card");
     if (cogCard && cog) {
       this._on(cogCard, "click", () => {
-        soundAndFX.playPop();
         const spoken = cog.actionPrompt ? `${cog.text}。凯茜邀请你：${cog.actionPrompt}` : cog.text;
         soundAndFX.speakPriority(spoken, { kind: "sentence", emotion: "gentle" });
         cogCard.classList.add("ring-2", "ring-amber-400", "bg-amber-500/30");
@@ -159,7 +157,6 @@ export function renderStepRecognize(stage) {
     const sentenceCard = stage.querySelector("#sentence-card");
     if (sentenceCard) {
       this._on(sentenceCard, "click", () => {
-        soundAndFX.playPop();
         soundAndFX.speakPriority(char.sentence, { kind: "sentence", emotion: "gentle" });
         sentenceCard.classList.add("ring-2", "ring-yellow-400", "bg-black/60");
         this._timeout(() => sentenceCard.classList.remove("ring-2", "ring-yellow-400", "bg-black/60"), 800);
@@ -195,8 +192,8 @@ export function renderStepRecognize(stage) {
       this._on(finishBtn, "click", () => {
         soundAndFX.playPop();
         const goNext = () => {
-          this.currentStep = 3;
-          this.render();
+          // P0：必须走 stepSequence，禁止硬编码 3（5–6 岁会错误进入「读」）
+          if (typeof this.nextStep === "function") this.nextStep();
         };
         const age = ebbinghausManager.getAge();
         if (shouldUseSelfExplain(age)) {

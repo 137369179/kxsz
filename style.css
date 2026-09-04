@@ -11,6 +11,11 @@
     overflow: hidden;
     user-select: none;
     -webkit-user-select: none;
+    touch-action: manipulation;
+  }
+  button, [role="button"], a, input, canvas, .cursor-pointer {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
   }
 }
 

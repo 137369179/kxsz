@@ -49,6 +49,7 @@ class EyeCareManager {
     if (typeof document !== "undefined") {
       document.getElementById("eye-care-rest-modal")?.remove();
     }
+    soundAndFX.stopSpeaking();
     this.isRestModalOpen = false;
   }
 
@@ -163,6 +164,7 @@ class EyeCareManager {
       this.isRestModalOpen = false;
       this.reset();
       overlay.remove();
+      soundAndFX.stopSpeaking();
 
       if (reward) {
         rewardEngine.addCoins(20);

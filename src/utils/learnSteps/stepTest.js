@@ -43,9 +43,9 @@ export function renderStepTestAndChest(stage) {
           </div>
 
           <h2 class="text-2xl sm:text-3xl font-black text-yellow-300 mb-1">获得全新专属字卡：${char.char}</h2>
-          <p class="text-xs sm:text-sm text-gray-300 mb-4 flex items-center gap-3">
+          <p id="chest-reward-summary" class="text-xs sm:text-sm text-gray-300 mb-4 flex items-center gap-3">
             <span class="flex items-center gap-1">${GAME_ICONS.coin("w-5 h-5")} 获得 10 凯茜星币</span>
-            <span class="flex items-center gap-1">${GAME_ICONS.star("w-5 h-5", false)} 3 颗凯茜之星</span>
+            <span id="chest-reward-stars" class="flex items-center gap-1">${GAME_ICONS.star("w-5 h-5", false)} 凯茜之星结算中…</span>
           </p>
 
           <button id="btn-confirm-return-map" class="bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 hover:from-yellow-300 hover:to-red-400 text-white font-black text-base sm:text-lg px-12 py-3.5 rounded-full shadow-[0_0_40px_rgba(255,107,0,0.9)] border-2 border-white active:scale-95 transition-transform flex items-center justify-center gap-2 cursor-pointer">
@@ -74,13 +74,21 @@ export function renderStepTestAndChest(stage) {
         chestBtn.classList.add("pointer-events-none", "opacity-80");
 
         soundAndFX.playChestOpen();
-        soundAndFX.playVictoryFanfare();
         soundAndFX.triggerConfetti(this.container);
         soundAndFX.triggerCoinFly(this.container);
 
-        // P0-2 B9：真实评测分数；手动自评封顶 2 星防灌水
-        let earnedStars = Math.max(0, Math.min(3, this._evalStars ?? 3));
+        // P0-2 B9：真实评测分数；未评测（含年龄跳过「读」）保守默认 2 星，禁止 ?? 3 灌水
+        // 手动自评封顶 2 星防灌水
+        const rawStars = this._evalStars;
+        let earnedStars = (typeof rawStars === "number" && !Number.isNaN(rawStars))
+          ? Math.max(0, Math.min(3, rawStars))
+          : 2;
         if (this._evalFromManual) earnedStars = Math.min(earnedStars, 2);
+
+        const starsLabel = stage.querySelector("#chest-reward-stars");
+        if (starsLabel) {
+          starsLabel.innerHTML = `${GAME_ICONS.star("w-5 h-5", false)} ${earnedStars} 颗凯茜之星`;
+        }
 
         // Duang! Duang! Duang! 依次点亮（按真实评测分数）
         this._timeout(() => {
@@ -115,6 +123,7 @@ export function renderStepTestAndChest(stage) {
 
         this._timeout(() => {
           if (rewardCard) rewardCard.classList.remove("hidden");
+          soundAndFX.playVictoryFanfare();
           this.clearProgress();
           ebbinghausManager.completeCharacter(char.id, earnedStars);
           this._busEmit(EVENTS.LEARN_FINISH, { charId: char.id, stars: earnedStars });
@@ -124,6 +133,7 @@ export function renderStepTestAndChest(stage) {
 
     if (returnBtn) {
       this._on(returnBtn, "click", () => {
+        soundAndFX.stopSpeaking();
         soundAndFX.playPop();
         if (this.onFinish) this.onFinish();
         else this._busEmit(EVENTS.SWITCH_MODE, { mode: "map" });

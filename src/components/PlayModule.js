@@ -7,7 +7,6 @@ import { soundAndFX } from "../utils/soundEngine.js";
 import { mountGameShell } from "./SharedShell.js";
 import { BaseModule } from "../utils/BaseModule.js";
 import { GAME_ICONS } from "../utils/gameIcons.js";
-import { EVENTS } from "../utils/eventBus.js";
 import { ensurePlayStyles } from "../utils/playHub/playStyles.js";
 import { renderBossBattle } from "../utils/playHub/bossBattle.js";
 import { renderMatchGame } from "../utils/playHub/matchGame.js";
@@ -215,7 +214,9 @@ export class PlayModule extends BaseModule {
         const mode = card.dataset.mode;
         soundAndFX.playSuccessSound();
         if (mode === "pk") {
-          this._busEmit(EVENTS.SWITCH_MODE, { mode: "pk" });
+          // 统一走 playHub/pkArena（含 completeReview），不再切换到独立 PKModule
+          this.currentMode = "pk";
+          this.render();
         } else {
           this.currentMode = mode;
           this.render();

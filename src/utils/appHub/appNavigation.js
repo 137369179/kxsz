@@ -64,10 +64,6 @@ export function transitionToMode(modeName) {
   overlay.appendChild(centerIcon);
   document.body.appendChild(overlay);
 
-  if (soundAndFX && soundAndFX.playPop) {
-    soundAndFX.playPop();
-  }
-
   const FADE_TIMEOUT_MS = 3000;
   let _settled = false;
   const safetyTimeout = setTimeout(() => {
@@ -162,6 +158,7 @@ export async function ensureDailyLimitAllowsStudy() {
 }
 
 export async function switchMode(modeName) {
+  try { soundAndFX.stopSpeaking(); } catch {}
   const prev = this.currentMode;
   this.currentMode = modeName;
 
@@ -191,6 +188,12 @@ export async function switchMode(modeName) {
     }
     if (modeName === "family") {
       this.playModule.currentMode = "family";
+      this.playModule.render();
+      return;
+    }
+    if (modeName === "pk") {
+      // 与游乐场大厅统一：走 playHub/pkArena（含 FSRS completeReview）
+      this.playModule.currentMode = "pk";
       this.playModule.render();
       return;
     }

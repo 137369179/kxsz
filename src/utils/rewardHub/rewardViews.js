@@ -12,6 +12,7 @@ import {
   rewardEngine
 } from "../rewardEngine.js";
 import { storageManager } from "../storageManager.js";
+import { escapeHtml } from "../BaseModule.js";
 
 export const WEEKDAY_LABELS = ["日", "一", "二", "三", "四", "五", "六"];
 export const TIER_STYLE = {
@@ -41,7 +42,7 @@ export function render() {
           <div>
             <h1 class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-b from-yellow-200 to-orange-400 drop-shadow flex items-center gap-2">
               <span class="flex items-center">${GAME_ICONS.trophy('w-7 h-7')}</span>
-              <span>${profile.name}</span>
+              <span>${escapeHtml(profile.name)}</span>
             </h1>
             <p class="text-[11px] text-yellow-200/80 font-bold mt-1">凯茜冒险家</p>
           </div>
@@ -128,6 +129,9 @@ export function _renderStickerWall(panel) {
 
           <div class="flex items-center gap-2 flex-wrap">
             <div class="flex items-center gap-1 bg-black/40 p-1 rounded-full border border-white/10 text-xs">
+              <button class="bg-choice-btn px-2.5 py-1 rounded-full text-[11px] font-bold ${currentBg.includes("guofeng") ? "bg-amber-400 text-amber-950 font-black" : "text-white/70"}" data-bg="assets/images/cathy_island_guofeng.webp">
+                水乡
+              </button>
               <button class="bg-choice-btn px-2.5 py-1 rounded-full text-[11px] font-bold ${currentBg.includes("forest") ? "bg-amber-400 text-amber-950 font-black" : "text-white/70"}" data-bg="assets/images/cathy_island_forest.webp">
                 森林
               </button>
@@ -586,7 +590,7 @@ export function _celebrateNewMedals() {
     try {
       soundAndFX.playVictoryFanfare();
       soundAndFX.triggerConfetti(this.container);
-      showGameToast(this.container, `<div class="w-5 h-5 inline-block align-middle">${__trophyIcon}</div> ${names.join("")}`, "success");
+      showGameToast(this.container, `🏆 ${names.join("、")} 获得新勋章！`, "success");
     } catch (e) {
       // 缓存或实现细节导致的非致命错误，静默忽略
     }

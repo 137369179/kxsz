@@ -6,6 +6,7 @@ import { getTodayWorksheetChars, getDifficultWorksheetChars, getQuestWorksheetCh
 import { TROPHY_LIST, resolveTrophyUnlocks, describeStepSequenceForAge } from "./parentTrophies.js";
 import { ebbinghausManager } from "../ebbinghaus.js";
 import { storageManager } from "../storageManager.js";
+import { escapeHtml } from "../BaseModule.js";
 
 export function renderActiveTabContent(progress, charCount, settings, diffCount) {
   // E14: 预计算多维报告数据（一次算完，所有面板复用）
@@ -98,8 +99,12 @@ export function renderActiveTabContent(progress, charCount, settings, diffCount)
           </div>
           <div class="flex items-center gap-3">
             <span class="text-xs sm:text-sm text-amber-700 font-bold">本周总计: ${history.reduce((a,b) => a + b.count, 0)} 字</span>
-            <button id="btn-gen-report-poster" class="btn-game-orange text-white font-black text-xs px-4 py-1.5 rounded-full shadow-md active:scale-95 flex items-center gap-1.5 cursor-pointer">
+            <button id="btn-gen-report-poster" class="btn-game-orange text-white font-black text-xs px-3.5 py-1.5 rounded-full shadow-md active:scale-95 flex items-center gap-1.5 cursor-pointer">
               <span>生成成长周报海报</span>
+            </button>
+            <button id="btn-gen-champion-cert" class="bg-gradient-to-r from-amber-500 to-rose-500 hover:from-amber-600 hover:to-rose-600 text-white font-black text-xs px-3.5 py-1.5 rounded-full shadow-md active:scale-95 flex items-center gap-1.5 cursor-pointer">
+              <span class="flex items-center">${GAME_ICONS.crown("w-3.5 h-3.5")}</span>
+              <span>小状元金榜奖状</span>
             </button>
           </div>
         </div>
@@ -511,7 +516,7 @@ export function renderActiveTabContent(progress, charCount, settings, diffCount)
             <span>多儿童学习档案管理</span>
           </h2>
           <span class="text-xs font-bold text-indigo-700 bg-indigo-50 border border-indigo-200 px-3 py-1 rounded-full">
-            当前档案：${activeProfile.name}
+            当前档案：${escapeHtml(activeProfile.name)}
           </span>
         </div>
         <p class="text-xs text-gray-500 mb-4 font-semibold leading-relaxed">
@@ -519,27 +524,30 @@ export function renderActiveTabContent(progress, charCount, settings, diffCount)
         </p>
 
         <div class="flex flex-wrap items-center gap-3" id="child-profiles-list">
-          ${profiles.map((p) => `
+          ${profiles.map((p) => {
+            const safeName = escapeHtml(p.name);
+            return `
             <div class="child-profile-card flex items-center gap-1 p-1 rounded-2xl border transition-all ${
               p.id === activeProfileId
                 ? "bg-indigo-600 text-white shadow-md ring-2 ring-indigo-300 scale-105 border-indigo-700"
                 : "bg-indigo-50 text-indigo-900 hover:bg-indigo-100 border-indigo-200"
             }">
-              <button class="btn-switch-child px-3 py-1.5 font-black text-xs flex items-center gap-1.5 cursor-pointer" data-profile-id="${p.id}" data-profile-name="${p.name}">
+              <button class="btn-switch-child px-3 py-1.5 font-black text-xs flex items-center gap-1.5 cursor-pointer" data-profile-id="${escapeHtml(p.id)}" data-profile-name="${safeName}">
                 <span class="flex items-center">${GAME_ICONS.parent("w-3.5 h-3.5")}</span>
-                <span>${p.name}</span>
+                <span>${safeName}</span>
                 ${p.id === activeProfileId ? '<span class="text-[9px] bg-white/25 px-1.5 py-0.2 rounded-full">使用中</span>' : ''}
               </button>
-              <button class="btn-rename-child p-1 rounded-lg hover:bg-black/10 active:scale-90 transition-transform cursor-pointer" title="重命名小名" data-profile-id="${p.id}" data-profile-name="${p.name}">
+              <button class="btn-rename-child p-1 rounded-lg hover:bg-black/10 active:scale-90 transition-transform cursor-pointer" title="重命名小名" data-profile-id="${escapeHtml(p.id)}" data-profile-name="${safeName}">
                 <span class="flex items-center">${GAME_ICONS.pen("w-3 h-3")}</span>
               </button>
               ${profiles.length > 1 ? `
-                <button class="btn-delete-child p-1 rounded-lg hover:bg-red-500/20 active:scale-90 transition-transform cursor-pointer" title="删除此档案" data-profile-id="${p.id}" data-profile-name="${p.name}">
+                <button class="btn-delete-child p-1 rounded-lg hover:bg-red-500/20 active:scale-90 transition-transform cursor-pointer" title="删除此档案" data-profile-id="${escapeHtml(p.id)}" data-profile-name="${safeName}">
                   <span class="text-xs font-bold leading-none">&times;</span>
                 </button>
               ` : ''}
             </div>
-          `).join("")}
+          `;
+          }).join("")}
           <button id="btn-add-child-profile" class="px-3.5 py-2.5 rounded-2xl bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 font-black text-xs flex items-center gap-1.5 transition-all cursor-pointer">
             <span class="text-sm font-black leading-none">+</span>
             <span>添加宝宝档案</span>
@@ -571,7 +579,7 @@ export function renderActiveTabContent(progress, charCount, settings, diffCount)
             <span>本设备存储的数据</span>
           </h2>
           <ul class="text-xs text-gray-600 font-semibold space-y-1.5 list-disc pl-5 leading-relaxed">
-            <li>学习进度主存档（${profileId}）：已学汉字 / 艾宾浩斯复习调度 / 星币与勋章 / 打卡日历</li>
+            <li>学习进度主存档（${escapeHtml(profileId)}）：已学汉字 / 艾宾浩斯复习调度 / 星币与勋章 / 打卡日历</li>
             <li>绘本阅读进度（cathy_book_progress_v2）与家长语音模板（家长中心录制，本机 IndexedDB）</li>
             <li>偏好设置：专注模式 / 护眼间隔 / 描红容差 / 今日目标</li>
           </ul>

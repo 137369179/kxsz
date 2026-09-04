@@ -156,7 +156,6 @@ export function renderStepTrace(stage) {
 
     if (demoBtn) {
       this._on(demoBtn, "click", () => {
-        soundAndFX.playPop();
         soundAndFX.speakPriority(`看小精灵示范“${char.char}”字的笔顺！`, { kind: "sentence", emotion: "gentle" });
         if (this.hanziEngine) {
           demoBtn.classList.add("opacity-50", "pointer-events-none");
@@ -171,6 +170,7 @@ export function renderStepTrace(stage) {
 
     if (resetBtn) {
       this._on(resetBtn, "click", () => {
+        soundAndFX.stopSpeaking();
         soundAndFX.playPop();
         if (this.hanziEngine) this.hanziEngine.reset();
         updateBeads(0);
@@ -180,6 +180,7 @@ export function renderStepTrace(stage) {
 
     if (nextBtn) {
       this._on(nextBtn, "click", () => {
+        soundAndFX.stopSpeaking();
         soundAndFX.playPop();
         // P0：5–6 岁序列为 […,6,8]，禁止硬编码跳进独立写(7)
         if (typeof this.nextStep === "function") this.nextStep();

@@ -433,6 +433,7 @@ export class PronunciationAssessmentEngine {
     this._finalTranscripts = [];
     this._activeRecogText = "";
     this._lastResult = null;
+    try { soundAndFX.stopSpeaking(); } catch {}
     this._setState(STATES.LISTENING);
 
     soundAndFX.init();

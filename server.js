@@ -1,6 +1,7 @@
 import http from "node:http";
 import fs from "node:fs";
 import path from "node:path";
+import crypto from "node:crypto";
 import { fileURLToPath } from "node:url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -60,6 +61,57 @@ export function resolveSafePath(urlPath) {
 
 export { ROOT };
 
+/**
+ * 生成 per-request CSP nonce（128-bit base64），用于给内联 <script> 打标，
+ * 配合 HTTP 层 CSP 移除 script-src 的 'unsafe-inline'。所有内联事件处理器属性
+ * （原 `<img onerror>` 兜底等）已重构为 data-fallback + 全局捕获监听，故严格 CSP 不会破坏功能。
+ */
+function makeNonce() {
+  return crypto.randomBytes(16).toString("base64");
+}
+
+/**
+ * 构建 HTTP 响应层 CSP。与 index.html 的 meta CSP 形成双层防御：
+ * 当本服务器提供响应时，HTTP 头 CSP 作为权威层生效（浏览器忽略 meta CSP），
+ * script-src 使用 nonce 而非 'unsafe-inline'，收敛 XSS 面；并补齐 frame-ancestors（点击劫持防护）。
+ */
+function buildCsp(nonce) {
+  return [
+    "default-src 'self'",
+    `script-src 'self' 'nonce-${nonce}'`,
+    "style-src 'self' 'unsafe-inline'",
+    "img-src 'self' data: blob:",
+    "media-src 'self' data: blob: http://127.0.0.1:8766 http://localhost:8766",
+    "connect-src 'self' http://127.0.0.1:8766 http://localhost:8766 ws://127.0.0.1:8766 ws://localhost:8766",
+    "worker-src 'self' blob:",
+    "frame-src 'self' data: blob:",
+    "object-src 'none'",
+    "base-uri 'self'",
+    "form-action 'none'",
+    "frame-ancestors 'none'",
+  ].join("; ");
+}
+
+/**
+ * 给 HTML 中所有**无 src 的内联 <script>** 注入 nonce 属性。
+ * 带 src 的外部脚本由 'self' 覆盖，无需 nonce；已含 nonce 的不重复注入。
+ */
+function injectNonceToInlineScripts(html, nonce) {
+  return html.replace(/<script\b([^>]*)>/gi, (full, attrs) => {
+    if (/\bsrc\s*=/.test(attrs)) return full; // 外部脚本
+    if (/\bnonce\s*=/.test(attrs)) return full; // 已含 nonce
+    return `<script${attrs} nonce="${nonce}">`;
+  });
+}
+
+const BASE_SECURITY_HEADERS = {
+  "Access-Control-Allow-Origin": "*",
+  "Cache-Control": "no-cache",
+  "X-Content-Type-Options": "nosniff",
+  "X-Frame-Options": "DENY",
+  "Referrer-Policy": "no-referrer",
+};
+
 const server = http.createServer((req, res) => {
   const filePath = resolveSafePath(req.url);
   if (!filePath) {
@@ -77,13 +129,33 @@ const server = http.createServer((req, res) => {
 
     const ext = path.extname(filePath).toLowerCase();
     const contentType = MIME_TYPES[ext] || "application/octet-stream";
-
-    res.writeHead(200, {
+    const headers = {
+      ...BASE_SECURITY_HEADERS,
       "Content-Type": contentType,
-      "Access-Control-Allow-Origin": "*",
-      "Cache-Control": "no-cache",
-    });
+    };
 
+    // HTTPS 场景下强制 HSTS（本地 http 部署下 req.socket.encrypted 为 false，自动跳过）
+    if (req.socket.encrypted) {
+      headers["Strict-Transport-Security"] = "max-age=63072000; includeSubDomains";
+    }
+
+    if (contentType.startsWith("text/html")) {
+      const nonce = makeNonce();
+      headers["Content-Security-Policy"] = buildCsp(nonce);
+      fs.readFile(filePath, (readErr, data) => {
+        if (readErr) {
+          res.writeHead(500, { "Content-Type": "text/plain; charset=utf-8" });
+          res.end("500 Internal Server Error");
+          return;
+        }
+        const body = injectNonceToInlineScripts(data.toString("utf8"), nonce);
+        res.writeHead(200, headers);
+        res.end(body);
+      });
+      return;
+    }
+
+    res.writeHead(200, headers);
     fs.createReadStream(filePath).pipe(res);
   });
 });

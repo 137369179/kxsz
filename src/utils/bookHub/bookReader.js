@@ -256,7 +256,6 @@ export function bindReaderEvents(mainEl, page, book) {
   const playKaraokeBtn = mainEl.querySelector("#btn-play-karaoke");
   if (playKaraokeBtn) {
     this._on(playKaraokeBtn, "click", () => {
-      soundAndFX.playPop();
       this.playKaraoke(page, mainEl);
     });
   }
@@ -287,7 +286,6 @@ export function bindReaderEvents(mainEl, page, book) {
   mainEl.querySelectorAll(".target-char-pill").forEach((pill) => {
     this._on(pill, "click", () => {
       const char = pill.dataset.char;
-      soundAndFX.playPop();
       soundAndFX.speakPriority(char, { kind: "char", priority: 1 });
       this.openCharPopover(char);
     });
@@ -300,7 +298,9 @@ export function bindReaderEvents(mainEl, page, book) {
       const label = btn.dataset.label || "发现宝藏！";
       soundAndFX.playSuccessSound();
       soundAndFX.triggerConfetti(this.container);
-      soundAndFX.speakPriority(label, { kind: "sentence", emotion: "excited" });
+      this._timeout(() => {
+        soundAndFX.speakPriority(label, { kind: "sentence", emotion: "excited" });
+      }, 180);
       showGameToast(this.container, `${label}`, "success");
     });
   });

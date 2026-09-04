@@ -9,7 +9,8 @@ export const MODULE_LOADERS = {
   parent: () => import("../../components/ParentModule.js").then((m) => m.ParentModule),
   reward: () => import("../../components/RewardModule.js").then((m) => m.RewardModule),
   review: () => import("../../components/ReviewModule.js").then((m) => m.ReviewModule),
-  pk: () => import("../../components/PKModule.js").then((m) => m.PKModule),
+  // pk 已并入 playHub/pkArena；保留加载器仅兼容旧调试钩子
+  pk: () => import("../../components/PlayModule.js").then((m) => m.PlayModule),
   pinyin: () => import("../../components/PinyinModule.js").then((m) => m.PinyinModule),
   treehouse: () => import("../../components/TreehouseModule.js").then((m) => m.TreehouseModule),
   learn: () => import("../../components/LearnModule.js").then((m) => m.LearnModule),
@@ -31,7 +32,7 @@ export const MODE_TO_MODULE = {
   reward: "reward",
   rewards: "reward",
   review: "review",
-  pk: "pk",
+  pk: "play",
   pinyin: "pinyin",
   treehouse: "treehouse",
 };

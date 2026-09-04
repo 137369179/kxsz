@@ -10,9 +10,12 @@ export function renderStepPrewrite(stage) {
     const stageLabel = ebbinghausManager.getWritingStage();
     const blockedByAge = ebbinghausManager.isWriteBlockedByAge();
 
-    // B1 铁律：5 岁以下儿童，控笔是全部，不进入描红步骤
-    const nextStepAfterPrewrite = blockedByAge ? 8 : 6;
-    const nextStepLabel = blockedByAge
+    // B1：按 stepSequence 决定控笔后的下一步（禁止写死 6/8）
+    const seqNext = typeof this.getNextStepInSequence === "function"
+      ? this.getNextStepInSequence(5)
+      : -1;
+    const nextStepAfterPrewrite = seqNext > 0 ? seqNext : (blockedByAge ? 8 : 6);
+    const nextStepLabel = nextStepAfterPrewrite === 8
       ? `${char.char}字就学到这里啦，去领取宝箱奖励！`
       : `小手准备好了吗？去描红“${char.char}”字！`;
 
@@ -259,8 +262,11 @@ export function renderStepPrewrite(stage) {
           this.prewriteEngine.destroy();
           this.prewriteEngine = null;
         }
-        this.currentStep = nextStepAfterPrewrite;
-        this.render();
+        if (typeof this.nextStep === "function") this.nextStep();
+        else {
+          this.currentStep = nextStepAfterPrewrite;
+          this.render();
+        }
       });
     }
   }

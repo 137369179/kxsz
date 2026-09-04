@@ -340,13 +340,7 @@ export class PrewriteEngine {
 
     if (coverage >= this.targetProgressRatio) {
       // 过关！
-      soundAndFX.playSuccessSound?.();
-      soundAndFX.speakPriority?.(
-        `太棒啦！${SHAPE_HINTS[shapeKey]?.split("～")[0] || "画得真好"}真厉害！`,
-        { kind: "char", priority: 1 }
-      );
       this.onComplete?.(this.currentShapeIdx, coverage);
-
       this.currentShapeIdx++;
       this.userPath = [];
 
@@ -354,8 +348,13 @@ export class PrewriteEngine {
         this._finishAll();
         return;
       }
-      // 下一形状，短暂提示
-      this._speakHint();
+
+      soundAndFX.playSuccessSound?.();
+      soundAndFX.speakPriority?.(
+        `太棒啦！${SHAPE_HINTS[shapeKey]?.split("～")[0] || "画得真好"}真厉害！`,
+        { kind: "char", priority: 1 }
+      );
+      // 下一形状，启动动画演示
       this._startDemoAnimation();
     } else {
       soundAndFX.playSoftError?.();

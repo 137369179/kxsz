@@ -54,8 +54,8 @@ export class LearnModule extends BaseModule {
     this.prewriteEngine = null;
     this.activePlayGame = null;
     this._isRecordingTransition = false;
-    // P0-2 B9 铁律：存真实朗读评测分数，避免 completeCharacter 硬编码 3 星
-    this._evalStars = 3;
+    // P0-2 B9：未完成朗读评测前不预设满星；跳过「读」步时保持 null，结业用保守默认
+    this._evalStars = null;
     this._evalFromManual = false;
 
     // T8: 3 分钟微课断点续学
@@ -137,6 +137,7 @@ export class LearnModule extends BaseModule {
       document.getElementById("mic-permission-modal")?.remove();
     }
     this._isChestOpening = false;
+    try { soundAndFX.stopSpeaking(); } catch {}
     super.destroy();
   }
 
@@ -211,6 +212,7 @@ export class LearnModule extends BaseModule {
   }
 
   setStep(stepNum) {
+    try { soundAndFX.stopSpeaking(); } catch {}
     try {
       this.markStepComplete(this.currentStep);
       this.currentStep = stepNum;
@@ -237,6 +239,7 @@ export class LearnModule extends BaseModule {
   nextStep() {
     const next = this.getNextStepInSequence();
     if (next < 0) return; // 已到序列末尾，不再推进
+    try { soundAndFX.stopSpeaking(); } catch {}
     try {
       this.markStepComplete(this.currentStep);
       this.currentStep = next;

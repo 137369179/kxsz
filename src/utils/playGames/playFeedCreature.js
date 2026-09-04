@@ -186,7 +186,6 @@ export class PlayFeedCreature {
 
         if (isInMouth) {
           // 投喂成功：嗷呜吞咽！
-          soundAndFX.playPop();
           soundAndFX.playSuccess();
           this.fedCount++;
           food.style.transition = "transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease-out";
@@ -259,13 +258,17 @@ export class PlayFeedCreature {
       `;
     }
 
-    soundAndFX.speakPriority(`吃得好饱呀！大嘴巴变成了“${char.char}”字！`, { kind: "sentence", priority: 1 });
+    this._timeout(() => {
+      if (!this.isDestroyed) {
+        soundAndFX.speakPriority(`吃得好饱呀！大嘴巴变成了“${char.char}”字！`, { kind: "sentence", priority: 1 });
+      }
+    }, 250);
 
     this._timeout(() => {
       if (!this.isDestroyed && typeof this.onComplete === "function") {
         this.onComplete();
       }
-    }, 1300);
+    }, 1500);
   }
 
   destroy() {

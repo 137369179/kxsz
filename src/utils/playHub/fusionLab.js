@@ -17,6 +17,7 @@ import {
   buildMatchPairs,
   spawnFloatingText,
   startCountdown,
+  writeKnownCharsReview,
 } from "./playHelpers.js";
 
 export function renderFusionLab() {
@@ -84,22 +85,25 @@ export function renderFusionLab() {
               <span class="text-xs font-bold text-purple-300">(${escapeHtml(cur.pinyin)})</span>
             </div>
 
-            <div class="relative w-48 h-48 sm:w-56 sm:h-56 mb-4 flex flex-col items-center justify-center">
+            <div class="relative w-56 h-56 sm:w-64 sm:h-64 mb-4 flex flex-col items-center justify-center">
               <div id="cauldron-glow" class="absolute inset-0 rounded-full bg-gradient-to-tr from-purple-500/40 via-fuchsia-500/40 to-cyan-500/40 blur-2xl animate-pulse"></div>
               
-              <div class="relative z-10 w-44 h-44 sm:w-52 sm:h-52 rounded-full bg-gradient-to-b from-purple-800 via-indigo-900 to-slate-950 border-4 border-amber-300/80 shadow-[0_0_50px_rgba(168,85,247,0.5)] flex flex-col items-center justify-center p-4">
+              <!-- 3D 东方炼金八卦铜炉背景 -->
+              <img src="assets/images/fusion_alchemy_furnace.webp" alt="汉字炼金铜炉" class="absolute inset-0 w-full h-full object-contain drop-shadow-[0_0_35px_rgba(168,85,247,0.6)] animate-pulse-slow pointer-events-none" />
+
+              <div class="relative z-10 w-44 h-44 sm:w-52 sm:h-52 rounded-full bg-black/65 backdrop-blur-sm border-2 border-amber-300/80 shadow-[0_0_40px_rgba(168,85,247,0.5)] flex flex-col items-center justify-center p-4">
                 
                 <div class="flex items-center gap-2 mb-2">
-                  <div id="slot-1" class="w-14 h-14 rounded-2xl bg-black/50 border-2 border-dashed border-purple-300 flex items-center justify-center text-2xl font-black text-yellow-300 cursor-pointer transition-all hover:scale-105" title="点击取消选择">
+                  <div id="slot-1" class="w-14 h-14 rounded-2xl bg-black/70 border-2 border-dashed border-purple-300 flex items-center justify-center text-2xl font-black text-yellow-300 cursor-pointer transition-all hover:scale-105" title="点击取消选择">
                     ?
                   </div>
                   <span class="text-xl font-black text-purple-300">+</span>
-                  <div id="slot-2" class="w-14 h-14 rounded-2xl bg-black/50 border-2 border-dashed border-purple-300 flex items-center justify-center text-2xl font-black text-yellow-300 cursor-pointer transition-all hover:scale-105" title="点击取消选择">
+                  <div id="slot-2" class="w-14 h-14 rounded-2xl bg-black/70 border-2 border-dashed border-purple-300 flex items-center justify-center text-2xl font-black text-yellow-300 cursor-pointer transition-all hover:scale-105" title="点击取消选择">
                     ?
                   </div>
                 </div>
 
-                <span class="text-[10px] text-purple-200 font-bold">请点击下方 2 个部件投入锅中（点击槽位可撤回）</span>
+                <span class="text-[10px] text-purple-200 font-bold">请点击下方 2 个部件投入炉中（点击槽位可撤回）</span>
               </div>
             </div>
 
@@ -155,6 +159,7 @@ export function renderFusionLab() {
       const backBtn = this.container.querySelector("#btn-fusion-back");
       if (backBtn) {
         this._on(backBtn, "click", () => {
+          soundAndFX.stopSpeaking();
           soundAndFX.playPop();
           this.currentMode = null;
           this.render();
@@ -186,9 +191,9 @@ export function renderFusionLab() {
       this.container.querySelectorAll(".fusion-part-btn").forEach((btn) => {
         this._on(btn, "click", () => {
           const part = btn.dataset.part;
-          soundAndFX.playPop();
 
           if (selectedParts.length === 0) {
+            soundAndFX.playPop();
             selectedParts.push(part);
             if (slot1) { slot1.textContent = part; slot1.classList.add("bg-purple-600/60", "border-solid", "border-yellow-300"); }
             btn.classList.add("opacity-40", "pointer-events-none");
@@ -205,11 +210,15 @@ export function renderFusionLab() {
               score += 20;
               soundAndFX.playStarPopCombo();
               soundAndFX.triggerConfetti(this.container);
-              soundAndFX.speakPriority(`${cur.target}，${cur.pinyin}。${cur.desc}`, { kind: "sentence", priority: 1 });
+              this._timeout(() => {
+                soundAndFX.speakPriority(`${cur.target}，${cur.pinyin}。${cur.desc}`, { kind: "sentence", priority: 1 });
+              }, 250);
+              writeKnownCharsReview([cur.target], true);
               if (successModal) successModal.classList.remove("hidden");
             } else {
               soundAndFX.playSoftError();
               spawnFloatingText(this.container.querySelector("#fusion-lab-arena"), "差一点，再试一次！", "fusion-err", { color: "#f87171", top: 40 });
+              writeKnownCharsReview([cur.target], false);
               this._timeout(() => {
                 selectedParts = [];
                 if (slot1) { slot1.textContent = "?"; slot1.classList.remove("bg-purple-600/60", "border-solid", "border-yellow-300"); }

@@ -14,7 +14,7 @@ import { mountGameShell, showGameToast } from "./SharedShell.js";
 import { BaseModule } from "../utils/BaseModule.js";
 import { GAME_ICONS } from "../utils/gameIcons.js";
 import { generateParentChallenge } from "../utils/parentGate.js";
-import { generateWeeklyReportPoster } from "../utils/parentHub/parentPoster.js";
+import { generateWeeklyReportPoster, generateChampionCertificate } from "../utils/parentHub/parentPoster.js";
 import { showSyncQRModal, showImportSyncModal } from "../utils/parentHub/parentSync.js";
 import { getChineseNumber, renderParentGate } from "../utils/parentHub/parentGateUI.js";
 import { renderActiveTabContent, renderAiLogTab } from "../utils/parentHub/parentTabs.js";
@@ -141,6 +141,7 @@ export class ParentModule extends BaseModule {
   bindDashboardEvents(mainEl) { return bindDashboardEvents.call(this, mainEl); }
 
   generateWeeklyReportPoster() { return generateWeeklyReportPoster.call(this); }
+  generateChampionCertificate() { return generateChampionCertificate.call(this); }
   showSyncQRModal() { return showSyncQRModal.call(this); }
   showImportSyncModal() { return showImportSyncModal.call(this); }
 }

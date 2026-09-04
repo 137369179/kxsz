@@ -1,18 +1,18 @@
 /**
- *  (Cathy Literacy) - 
+ * @deprecated 运行时已由 ReviewModule + reviewHub（freeRecall / interleave）取代。
+ * 保留本文件仅供单测与历史题型参考；请勿在业务模块中新引入。
  * ------------------------------------------------------------
- * 
- *  6  3 
+ * DrillEngine — 闪卡 / 选择 / 形近 / 填空等题型引擎（遗留）
  *
- *   1. audio_choice    ——  4 
- *   2. image_choice    —— 
- *   3. similar_pick    —— 4 
- *   4. word_fill       —— 
- *   5. sentence_fill   —— 
- *   6. balloon_pop     —— 
+ * 题型概览：
+ *   1. audio_choice    —— 听音选字
+ *   2. image_choice    —— 看图选字
+ *   3. similar_pick    —— 形近辨析
+ *   4. word_fill       —— 组词填空
+ *   5. sentence_fill   —— 造句填空
+ *   6. balloon_pop     —— 气球点选
  *
  * Combo Good / Great / Perfect
- *  + 
  */
 
 import { soundAndFX } from "./soundEngine.js";
@@ -524,7 +524,6 @@ export class DrillEngine {
     const replay = this.mount.querySelector("#btn-replay-audio");
     if (replay) {
       replay.addEventListener("click", () => {
-        soundAndFX.playPop();
         soundAndFX.speakPriority(this.char.char, { kind: "char", priority: 1 });
       });
     }
@@ -746,7 +745,9 @@ export class DrillEngine {
     this.combo += 1;
     this.correctCount += 1;
     this.bestCombo = Math.max(this.bestCombo, this.combo);
-    soundAndFX.playCombo(this.combo);
+    this._timeout(() => {
+      soundAndFX.playCombo(this.combo);
+    }, 100);
 
     // P1: 实时动态难度更新
     this._applyRealtimeDifficulty(true);
@@ -830,9 +831,10 @@ export class DrillEngine {
     const c = this.char;
     const perfect = this.bestCombo >= this.queue.length;
     if (perfect) {
-      soundAndFX.playStarChime();
+      soundAndFX.playCrownFanfare();
+    } else {
+      soundAndFX.playVictoryFanfare();
     }
-    soundAndFX.playVictoryFanfare();
     soundAndFX.triggerConfetti(this.mount);
 
     this.mount.innerHTML = `
