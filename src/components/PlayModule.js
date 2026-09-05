@@ -83,7 +83,7 @@ export class PlayModule extends BaseModule {
               <h1 class="text-2xl font-black drop-shadow-md">凯茜游乐场 · 拓展竞技馆</h1>
             </div>
             <p class="text-xs text-yellow-200 font-bold">
-              趣味游戏化巩固复习 · 难字歼灭 · 汉字消消乐 · 部首拼拼乐 · 双人对决 · 国学成语 · 经典古诗
+              挑一个好玩的，练一练刚学过的字！
             </p>
           </div>
         </div>
@@ -100,10 +100,10 @@ export class PlayModule extends BaseModule {
                 <h1 class="text-3xl font-black drop-shadow-md text-white group-hover:text-yellow-100 transition-colors">汉字探险队 (Rogue-lite)</h1>
               </div>
               <p class="text-sm text-yellow-100 font-bold drop-shadow-sm max-w-2xl mt-2">
-                全新深度挑战！穿越神秘地图，挑选你的局内专属增益，连续闯关战胜大魔王！
+                闯地图、选宝物、打败大魔王！一场超好玩的汉字冒险。
               </p>
             </div>
-            <button class="bg-white text-amber-600 font-black px-8 py-3 rounded-full shadow-lg group-hover:shadow-xl active:scale-95 transition-all flex items-center justify-center gap-2 whitespace-nowrap">
+            <button class="btn-game-orange mode-card-cta text-white whitespace-nowrap">
               ${GAME_ICONS.swords("w-5 h-5")} 开启冒险
             </button>
           </div>
@@ -111,7 +111,7 @@ export class PlayModule extends BaseModule {
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           
-          <div class="mode-card group bg-white/95 backdrop-blur-md rounded-3xl p-6 shadow-xl border-4 border-rose-200 hover:border-rose-400 cursor-pointer transition-all duration-300 hover:scale-105 flex flex-col justify-between" data-mode="boss">
+          <div class="mode-card card-gold-trim group rounded-3xl p-6 border-4 border-rose-200 hover:border-rose-400 cursor-pointer transition-all duration-300 flex flex-col justify-between" data-mode="boss">
             <div>
               <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-3xl bg-gradient-to-tr from-rose-500 to-red-400 text-white flex items-center justify-center shadow-lg mb-4">
                 ${GAME_ICONS.monster("w-10 h-10 sm:w-12 sm:h-12")}
@@ -121,12 +121,12 @@ export class PlayModule extends BaseModule {
                 把难记的字变成小怪兽，打败它们就能记住啦！
               </p>
             </div>
-            <button class="mt-4 bg-gradient-to-r from-rose-500 to-red-500 text-white text-xs sm:text-sm font-black py-3 rounded-full shadow-md active:scale-95 transition-transform flex items-center justify-center gap-1.5 cursor-pointer" data-speak="进入难字歼灭战" aria-label="进入难字歼灭战">
+            <button class="mode-card-cta btn-game-orange text-white text-xs sm:text-sm cursor-pointer" data-speak="进入难字歼灭战" aria-label="进入难字歼灭战">
               <span>进入挑战</span>
             </button>
           </div>
 
-          <div class="mode-card group bg-white/95 backdrop-blur-md rounded-3xl p-6 shadow-xl border-4 border-amber-200 hover:border-amber-400 cursor-pointer transition-all duration-300 hover:scale-105 flex flex-col justify-between" data-mode="match">
+          <div class="mode-card card-gold-trim group rounded-3xl p-6 border-4 border-amber-200 hover:border-amber-400 cursor-pointer transition-all duration-300 flex flex-col justify-between" data-mode="match">
             <div>
               <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-3xl bg-gradient-to-tr from-amber-500 to-yellow-400 text-white flex items-center justify-center shadow-lg mb-4">
                 ${GAME_ICONS.gem("w-10 h-10 sm:w-12 sm:h-12")}
@@ -136,12 +136,12 @@ export class PlayModule extends BaseModule {
                 听一听、翻一翻，把拼音和汉字配对消掉！
               </p>
             </div>
-            <button class="mt-4 bg-gradient-to-r from-amber-500 to-yellow-500 text-white text-xs sm:text-sm font-black py-3 rounded-full shadow-md active:scale-95 transition-transform flex items-center justify-center gap-1.5 cursor-pointer" data-speak="开始汉字消消乐" aria-label="开始汉字消消乐">
+            <button class="mode-card-cta btn-game-orange text-white text-xs sm:text-sm cursor-pointer" data-speak="开始汉字消消乐" aria-label="开始汉字消消乐">
               <span>开始消除</span>
             </button>
           </div>
 
-          <div class="mode-card group bg-white/95 backdrop-blur-md rounded-3xl p-6 shadow-xl border-4 border-purple-200 hover:border-purple-400 cursor-pointer transition-all duration-300 hover:scale-105 flex flex-col justify-between" data-mode="fusion">
+          <div class="mode-card card-gold-trim group rounded-3xl p-6 border-4 border-purple-200 hover:border-purple-400 cursor-pointer transition-all duration-300 flex flex-col justify-between" data-mode="fusion">
             <div>
               <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-3xl bg-gradient-to-tr from-purple-500 to-indigo-500 text-white flex items-center justify-center shadow-lg mb-4">
                 ${GAME_ICONS.sparkle("w-10 h-10 sm:w-12 sm:h-12")}
@@ -151,12 +151,12 @@ export class PlayModule extends BaseModule {
                 偏旁部首魔法合成！投入神奇炼金锅，合成目标汉字！
               </p>
             </div>
-            <button class="mt-4 bg-gradient-to-r from-purple-500 to-indigo-500 text-white text-xs sm:text-sm font-black py-3 rounded-full shadow-md active:scale-95 transition-transform flex items-center justify-center gap-1.5 cursor-pointer" data-speak="开始汉字拼拼乐" aria-label="开始汉字拼拼乐">
+            <button class="mode-card-cta btn-game-purple text-white text-xs sm:text-sm cursor-pointer" data-speak="开始汉字拼拼乐" aria-label="开始汉字拼拼乐">
               <span>开启炼金</span>
             </button>
           </div>
 
-          <div class="mode-card group bg-white/95 backdrop-blur-md rounded-3xl p-6 shadow-xl border-4 border-blue-200 hover:border-blue-400 cursor-pointer transition-all duration-300 hover:scale-105 flex flex-col justify-between" data-mode="pk">
+          <div class="mode-card card-gold-trim group rounded-3xl p-6 border-4 border-blue-200 hover:border-blue-400 cursor-pointer transition-all duration-300 flex flex-col justify-between" data-mode="pk">
             <div>
               <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-3xl bg-gradient-to-tr from-blue-500 to-cyan-400 text-white flex items-center justify-center shadow-lg mb-4">
                 ${GAME_ICONS.swords("w-10 h-10 sm:w-12 sm:h-12")}
@@ -166,12 +166,12 @@ export class PlayModule extends BaseModule {
                 双人极速对决 & 亲子让步欢乐PK，听发音抢拍汉字！
               </p>
             </div>
-            <button class="mt-4 bg-gradient-to-r from-blue-500 to-cyan-500 text-white text-xs sm:text-sm font-black py-3 rounded-full shadow-md active:scale-95 transition-transform flex items-center justify-center gap-1.5 cursor-pointer" data-speak="进入双人竞技场" aria-label="进入双人竞技场">
+            <button class="mode-card-cta btn-game-blue text-white text-xs sm:text-sm cursor-pointer" data-speak="进入双人竞技场" aria-label="进入双人竞技场">
               <span>发起对决</span>
             </button>
           </div>
 
-          <div class="mode-card group bg-white/95 backdrop-blur-md rounded-3xl p-6 shadow-xl border-4 border-emerald-200 hover:border-emerald-400 cursor-pointer transition-all duration-300 hover:scale-105 flex flex-col justify-between" data-mode="idiom">
+          <div class="mode-card card-gold-trim group rounded-3xl p-6 border-4 border-emerald-200 hover:border-emerald-400 cursor-pointer transition-all duration-300 flex flex-col justify-between" data-mode="idiom">
             <div>
               <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-3xl bg-gradient-to-tr from-emerald-500 to-green-400 text-white flex items-center justify-center shadow-lg mb-4">
                 ${GAME_ICONS.scroll("w-10 h-10 sm:w-12 sm:h-12")}
@@ -181,12 +181,12 @@ export class PlayModule extends BaseModule {
                 80+ 经典成语趣味微课堂，生动典故与互动小问答！
               </p>
             </div>
-            <button class="mt-4 bg-gradient-to-r from-emerald-500 to-green-500 text-white text-xs sm:text-sm font-black py-3 rounded-full shadow-md active:scale-95 transition-transform flex items-center justify-center gap-1.5 cursor-pointer" data-speak="进入成语馆" aria-label="进入成语馆">
+            <button class="mode-card-cta btn-game-green text-white text-xs sm:text-sm cursor-pointer" data-speak="进入成语馆" aria-label="进入成语馆">
               <span>探索成语</span>
             </button>
           </div>
 
-          <div class="mode-card group bg-white/95 backdrop-blur-md rounded-3xl p-6 shadow-xl border-4 border-amber-200 hover:border-amber-400 cursor-pointer transition-all duration-300 hover:scale-105 flex flex-col justify-between" data-mode="poem">
+          <div class="mode-card card-gold-trim group rounded-3xl p-6 border-4 border-amber-200 hover:border-amber-400 cursor-pointer transition-all duration-300 flex flex-col justify-between" data-mode="poem">
             <div>
               <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-3xl bg-gradient-to-tr from-amber-500 to-orange-400 text-white flex items-center justify-center shadow-lg mb-4">
                 ${GAME_ICONS.book("w-10 h-10 sm:w-12 sm:h-12")}
@@ -196,12 +196,12 @@ export class PlayModule extends BaseModule {
                 20 首幼儿必背启蒙古诗，逐句有声点读、意境画卷与诗意闯关！
               </p>
             </div>
-            <button class="mt-4 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-xs sm:text-sm font-black py-3 rounded-full shadow-md active:scale-95 transition-transform flex items-center justify-center gap-1.5 cursor-pointer" data-speak="开始诵读古诗" aria-label="开始诵读古诗">
+            <button class="mode-card-cta btn-game-orange text-white text-xs sm:text-sm cursor-pointer" data-speak="开始诵读古诗" aria-label="开始诵读古诗">
               <span>品读古诗</span>
             </button>
           </div>
 
-          <div class="mode-card group bg-white/95 backdrop-blur-md rounded-3xl p-6 shadow-xl border-4 border-emerald-200 hover:border-emerald-400 cursor-pointer transition-all duration-300 hover:scale-105 flex flex-col justify-between" data-mode="family">
+          <div class="mode-card card-gold-trim group rounded-3xl p-6 border-4 border-emerald-200 hover:border-emerald-400 cursor-pointer transition-all duration-300 flex flex-col justify-between" data-mode="family">
             <div>
               <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-3xl bg-gradient-to-tr from-emerald-500 to-teal-400 text-white flex items-center justify-center shadow-lg mb-4">
                 ${GAME_ICONS.sparkle("w-10 h-10 sm:w-12 sm:h-12")}
@@ -211,27 +211,27 @@ export class PlayModule extends BaseModule {
                 字族同偏旁魔法拼插！一字生万字，轻松化解形近字混淆！
               </p>
             </div>
-            <button class="mt-4 bg-gradient-to-r from-emerald-500 to-teal-500 text-white text-xs sm:text-sm font-black py-3 rounded-full shadow-md active:scale-95 transition-transform flex items-center justify-center gap-1.5 cursor-pointer" data-speak="进入汉字积木屋" aria-label="进入汉字积木屋">
+            <button class="mode-card-cta btn-game-green text-white text-xs sm:text-sm cursor-pointer" data-speak="进入汉字积木屋" aria-label="进入汉字积木屋">
               <span>拼插积木</span>
             </button>
           </div>
 
-          <div class="mode-card group bg-white/95 backdrop-blur-md rounded-3xl p-6 shadow-xl border-4 border-rose-200 hover:border-rose-400 cursor-pointer transition-all duration-300 hover:scale-105 flex flex-col justify-between" data-mode="spotter">
+          <div class="mode-card card-gold-trim group rounded-3xl p-6 border-4 border-rose-200 hover:border-rose-400 cursor-pointer transition-all duration-300 flex flex-col justify-between" data-mode="spotter">
             <div>
               <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-3xl bg-gradient-to-tr from-rose-500 to-amber-500 text-white flex items-center justify-center shadow-lg mb-4">
                 ${GAME_ICONS.sparkle("w-10 h-10 sm:w-12 sm:h-12")}
               </div>
               <h3 class="text-xl font-black text-gray-900 group-hover:text-rose-600 transition-colors">火眼金睛辨异同</h3>
               <p class="text-xs text-gray-500 mt-1.5 leading-relaxed font-semibold">
-                AI 错因画像形近字克星！大 vs 太、日 vs 目，特征笔画光晕高亮破解混淆！
+                大 vs 太、日 vs 目，找出哪里不一样，火眼金睛练起来！
               </p>
             </div>
-            <button class="mt-4 bg-gradient-to-r from-rose-500 to-amber-500 text-white text-xs sm:text-sm font-black py-3 rounded-full shadow-md active:scale-95 transition-transform flex items-center justify-center gap-1.5 cursor-pointer" data-speak="开始火眼金睛" aria-label="开始火眼金睛">
+            <button class="mode-card-cta btn-game-orange text-white text-xs sm:text-sm cursor-pointer" data-speak="开始火眼金睛" aria-label="开始火眼金睛">
               <span>开始辨字</span>
             </button>
           </div>
 
-          <div class="mode-card group bg-white/95 backdrop-blur-md rounded-3xl p-6 shadow-xl border-4 border-cyan-200 hover:border-cyan-400 cursor-pointer transition-all duration-300 hover:scale-105 flex flex-col justify-between" data-mode="meteor">
+          <div class="mode-card card-gold-trim group rounded-3xl p-6 border-4 border-cyan-200 hover:border-cyan-400 cursor-pointer transition-all duration-300 flex flex-col justify-between" data-mode="meteor">
             <div>
               <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-3xl bg-gradient-to-tr from-cyan-500 to-blue-500 text-white flex items-center justify-center shadow-lg mb-4">
                 ${GAME_ICONS.rocket ? GAME_ICONS.rocket("w-10 h-10 sm:w-12 sm:h-12") : ""}
@@ -241,7 +241,7 @@ export class PlayModule extends BaseModule {
                 听音辨形拦截汉字陨石！保护凯茜星球，挑战极速反应与抗压能力！
               </p>
             </div>
-            <button class="mt-4 bg-gradient-to-r from-cyan-500 to-blue-500 text-white text-xs sm:text-sm font-black py-3 rounded-full shadow-md active:scale-95 transition-transform flex items-center justify-center gap-1.5 cursor-pointer" data-speak="开始陨石防御" aria-label="开始陨石防御">
+            <button class="mode-card-cta btn-game-blue text-white text-xs sm:text-sm cursor-pointer" data-speak="开始陨石防御" aria-label="开始陨石防御">
               <span>立即迎战</span>
             </button>
           </div>

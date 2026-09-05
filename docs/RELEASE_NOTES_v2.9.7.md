@@ -4,10 +4,9 @@
 | ---------------------- | -------------------------- |
 | 版本                     | **v2.9.7**                 |
 | Date                   | 2026-09-05                 |
-| Commits                | **17**                     |
-| Files changed          | **103**                    |
-| Insertions / Deletions | **+11,064 / -780**         |
-| 新增文件                   | **16**                     |
+| Commits                | **19**                     |
+| Files changed          | **121**                    |
+| Insertions / Deletions | **+12,032 / -955**         |
 | Tests                  | **726 / 726** ✅ (90 files) |
 | Smoke                  | **28 / 28** ✅              |
 | Build                  | ✅ vite build pass          |
@@ -17,13 +16,37 @@
 
 ## 一句话摘要
 
-**"AI agent 协作的真实世界考验"** — 8 个并发 agent 在同一会话里向凯茜识字追加 **16 个新模块**、修复 4 个不同层级的 bug（从生产构建完全不可用，到 FSRS 调度漏调，到 API 命名不匹配），最后全部收敛到 **726 tests / 0 failed / E2E 浏览器验证通过**。交付 P0 语音指令层、汉字探险队、汉字炼金术、易错难字消灭战、偏旁家族、meteorDefense、字源时间轴等 8 大新能力。
+**"AI agent 协作的真实世界考验"** — 8 个并发 agent 在同一会话里向凯茜识字追加 **19 个新模块**、修复 5 个不同层级的 bug（从生产构建完全不可用，到 FSRS 调度漏调，到 API 命名不匹配），最后全部收敛到 **726 tests / 0 failed / E2E 浏览器验证通过**。交付 P0 语音指令层、P0-5 麦克风合规、象形具象渲染引擎、汉字探险队、汉字炼金术、易错难字消灭战、偏旁家族、meteorDefense、字源时间轴等 10 大新能力。
 
 ***
 
 ## 🎯 核心新功能
 
-### 1. 🔊 P0-2 语音指令层 — BaseModule `data-speak`
+### 1. 🧒 P0-5 象形具象渲染引擎 (`src/utils/pictogramRenderer.js`)
+
+专为 3\~6 岁不识字幼儿设计的零文字门槛渲染引擎：
+
+- **象形本源图** `CHAR_PICTOGRAM_ASSETS` — 21 个基础汉字映射高清实景物象图（"日"→太阳、"月"→月亮、"火"→火焰…），实现"实物图 → 甲骨文 → 规范字"蜕变
+
+- **偏旁魔法符文** `RADICAL_RUNES` — 抽象偏旁转化为色彩鲜艳、有声音属性的"魔法符文图腾"
+
+- **拼音具身手势** `PINYIN_GESTURES` — 攻克 b/d/p/q 镜像混淆，渲染左手/右手大拇指握拳手势及拟物道具
+
+- **严格零 emoji** — 全部用 CSS 几何图形 / GAME\_ICONS iconKey / SVG 渲染
+
+**全场景集成**：LearnModule / ReviewModule / SharedShell / TreehouseModule / PlayModule / mapRender / dailyQuestModal / poemHall / stepMeta / stepPrewrite / stepRead / stepTest / stepTrace / stepWrite / stepPractice — 15+ 渲染入口全部接线。
+
+### 2. 🔒 P0-5 麦克风合规中心 (`src/utils/micCompliance.js`)
+
+统一治理全应用所有麦克风采集面：
+
+- 治理对象：`pronunciationEval`（儿童跟读评测）+ `parentVoice`（家长语音模板录制）
+
+- 治理手段：权限门禁、数据即焚（Blob URL revokeObjectURL）、家长算术验证、权限持久化 localStorage
+
+- 接入点：LearnModule、BookModule 跟读场景全部走合规中心
+
+### 3. 🎯 P0-2 语音指令层 — BaseModule `data-speak`
 
 所有按钮只需一个 `data-speak="去奇幻森林岛"` 属性，就能自动朗读按钮语义。家长/用户可以"听着用"：
 
@@ -32,9 +55,9 @@
 // 用户点按钮 → 先朗读 data-speak → 再执行原本的 click handler
 ```
 
-覆盖 **Learn / Play / Review / Book / PK / Boss / Treehouse / Parent Dashboard** 全场景的高频 CTA 按钮（24+ files）。麦克风授权必须家长先过算术门禁（`parentGate.js`），权限持久化 localStorage。
+覆盖 **Learn / Play / Review / Book / PK / Boss / Treehouse / Parent Dashboard** 全场景的高频 CTA 按钮（24+ files）。
 
-### 2. 🗺️ 汉字探险队 (`src/utils/playHub/wordExpedition.js`)
+### 4. 🗺️ 汉字探险队 (`src/utils/playHub/wordExpedition.js`)
 
 5 阶段探险流程 + BUFF 系统：
 
@@ -50,9 +73,9 @@ spotter 找字 → meteor 陨石 → match 配对 → treasure 宝箱 → boss �
 
 - `COIN_MULT` — MatchGame 金币翻倍
 
-**4 个 playHub 游戏**（spotter / match / meteor / boss）全部接入探险 buff，胜利后可以"继续探险"直接进入下一关。**familyWorkshop 家庭工坊**也做了大幅升级（+168/-79）。
+**4 个 playHub 游戏**（spotter / match / meteor / boss）全部接入探险 buff，胜利后可以"继续探险"直接进入下一关。**familyWorkshop 家庭工坊**大幅升级（+168/-79）。
 
-### 3. 🧪 汉字炼金术合成引擎 (`src/utils/alchemyEngine.js`)
+### 5. 🧪 汉字炼金术合成引擎 (`src/utils/alchemyEngine.js`)
 
 两个已学汉字能不能合成一个双字词？Treehouse 里点炼金术按钮就能试：
 
@@ -65,7 +88,7 @@ checkSynthesis("太", "好") // → { success: false, reason: "太和好不能�
 
 - 答对给 coin，触发 haptics `success`
 
-### 4. ⚔️ 易错难字消灭战 (`src/utils/reviewHub/mistakeAssault.js`)
+### 6. ⚔️ 易错难字消灭战 (`src/utils/reviewHub/mistakeAssault.js`)
 
 复习空态/会话内可启动"难字突击"：
 
@@ -77,7 +100,7 @@ checkSynthesis("太", "好") // → { success: false, reason: "太和好不能�
 
 - Boss 战实时调节选项数和倒计时（`realtimeAdjust`）
 
-### 5. 🌠 陨石防御新游戏 (`src/utils/playHub/meteorDefense.js`)
+### 7. 🌠 陨石防御新游戏 (`src/utils/playHub/meteorDefense.js`)
 
 打字保卫星球：
 
@@ -87,7 +110,7 @@ checkSynthesis("太", "好") // → { success: false, reason: "太和好不能�
 
 - haptics 四档语义反馈（`success` / `error` / `tap` / `fanfare`）
 
-### 6. 📜 P2 字源时间轴 (`stepRecognize.js`)
+### 8. 📜 P2 字源时间轴 (`stepRecognize.js`)
 
 认字步骤四阶段字源迷你条 + 语音引入：
 
@@ -97,27 +120,44 @@ checkSynthesis("太", "好") // → { success: false, reason: "太和好不能�
 
 跟读完成按星级发币（⭐ 10 币 / ⭐⭐ 15 币 / ⭐⭐⭐ 20 币）。etymologyEngine 同步引入 `iconKey` 字段，彻底移除所有 emoji（零 emoji 策略）。
 
-### 7. 📚 偏旁家族数据库 (`src/data/radicalFamilies.js`)
+### 9. 📚 偏旁家族数据库 (`src/data/radicalFamilies.js`)
 
 447 行偏旁家族数据库：偏旁 → 字义 → 关联字。为汉字炼金术和字源时间轴提供底层关联数据。
 
-### 8. 🏛️ 调度门面统一 (`src/utils/schedulerFacade.js`)
+### 10. 🏛️ 调度门面统一 (`src/utils/schedulerFacade.js`)
 
 playHelpers 的到期/写回操作统一经过 `schedulerFacade`，Boss 自适应难度不再散落在各 play 模块里。
 
 ***
 
+## 🧪 无障碍自动化审计 (`tools/_axe_audit.cjs`)
+
+新增 axe-core 无障碍审计工具：
+
+```bash
+node tools/_axe_audit.cjs http://127.0.0.1:5174/
+```
+
+- playwright + bypassCSP 绕过 nonce CSP 才能注入 axe
+
+- 已接入 `.github/workflows/ci.yml` 作为新 job
+
+- 输出违规清单 + 修复建议
+
+***
+
 ## ♿ 无障碍 (P0-3 a11y)
 
-| 改动                                                                          | 文件                                      |
-| --------------------------------------------------------------------------- | --------------------------------------- |
-| 页面级 `<h1 class="sr-only">${heading}</h1>` 每屏独立                              | `SharedShell.js`                        |
-| 地图滚动区 `role="region"` + `aria-label` + `tabindex="0"`                       | `mapRender.js`                          |
-| tabColor `bg-*-500` → `bg-*-700`（WCAG AA 对比度提升）                             | `islandConfig.js` + `mapRender.js`      |
-| toast `role="status"` + `aria-live="polite"`                                | 各 toast 组件                              |
-| Learn / Play / Review / Book / PK / Boss 全场景按钮补 `data-speak` / `aria-label` | 24+ files                               |
-| 页面级 main landmark                                                           | `index.html`                            |
-| 新增 `childContentSafety.test.js` 扫描子可见 UI 中外链/联系方式                           | `tests/unit/childContentSafety.test.js` |
+| 改动                                                                          | 文件                                            |
+| --------------------------------------------------------------------------- | --------------------------------------------- |
+| 页面级 `<h1 class="sr-only">${heading}</h1>` 每屏独立                              | `SharedShell.js`                              |
+| 地图滚动区 `role="region"` + `aria-label` + `tabindex="0"`                       | `mapRender.js`                                |
+| tabColor `bg-*-500` → `bg-*-700`（WCAG AA 对比度提升）                             | `islandConfig.js` + `mapRender.js`            |
+| toast `role="status"` + `aria-live="polite"`                                | 各 toast 组件                                    |
+| Learn / Play / Review / Book / PK / Boss 全场景按钮补 `data-speak` / `aria-label` | 24+ files                                     |
+| 页面级 main landmark                                                           | `index.html`                                  |
+| `childContentSafety.test.js` 扫描子可见 UI 中外链/联系方式                              | `tests/unit/childContentSafety.test.js`       |
+| **axe-core CI 自动化审计**                                                       | `.github/workflows/ci.yml` + `_axe_audit.cjs` |
 
 ***
 
@@ -135,6 +175,8 @@ playHelpers 的到期/写回操作统一经过 `schedulerFacade`，Boss 自适�
 
 - **childContentSafety.test.js 修复** — parentPoster "微信" → "粘贴分享"（移除儿童可见外链）
 
+- **micCompliance.js** — 统一治理 pronunciationEval + parentVoice
+
 ***
 
 ## 🐛 修复（按影响量级排序）
@@ -151,29 +193,33 @@ playHelpers 的到期/写回操作统一经过 `schedulerFacade`，Boss 自适�
 
 ## 🎨 设计系统
 
-| 项                                    | 说明                                                        |
-| ------------------------------------ | --------------------------------------------------------- |
-| **`btn-game-wood`**                  | 立体木纹按钮（默认态：立体投影 + padding）                                |
-| **`btn-game-orange`**                | 活力橙渐变按钮                                                   |
-| Shell 导航 3 按钮（home / parent / sound） | 统一用新类 + `touch-target`                                    |
-| Coin 动画终点锚点                          | 优先 `#shell-coins-target-anchor`（不再硬编码 `innerWidth - 110`） |
-| 全局 Q 弹加 `:not([class*="btn-game"])`  | 避免覆盖立体按钮的 active 压感                                       |
-| `style.css` 细节工具类 100+ 行             | progress-bar / empty-state / HUD / mode-card / tab        |
-| haptics 引擎 4 档语义                     | success / error / tap / fanfare                           |
-| haptics iOS fallback                 | Vibration API 不可用时走 Web Audio 25ms 听觉微阻尼                  |
+| 项                                    | 说明                                                                                               |
+| ------------------------------------ | ------------------------------------------------------------------------------------------------ |
+| **`btn-game-wood`**                  | 立体木纹按钮（默认态：立体投影 + padding）                                                                       |
+| **`btn-game-orange`**                | 活力橙渐变按钮                                                                                          |
+| Shell 导航 3 按钮（home / parent / sound） | 统一用新类 + `touch-target`                                                                           |
+| Coin 动画终点锚点                          | 优先 `#shell-coins-target-anchor`（不再硬编码 `innerWidth - 110`）                                        |
+| 全局 Q 弹加 `:not([class*="btn-game"])`  | 避免覆盖立体按钮的 active 压感                                                                              |
+| `style.css` 细节工具类 200+ 行             | progress-bar / empty-state / HUD / mode-card / tab / pictogram-rune / gesture-hint / nature-card |
+| haptics 引擎 4 档语义                     | success / error / tap / fanfare                                                                  |
+| haptics iOS fallback                 | Vibration API 不可用时走 Web Audio 25ms 听觉微阻尼                                                         |
 
 ***
 
 ## 📦 内容
 
-| 资源                      | 数量    | 位置                                                                |
-| ----------------------- | ----- | ----------------------------------------------------------------- |
-| 甲骨文 glyphs stage2       | 20 字  | `tools/content/stage2_oracle_glyphs.json`                         |
-| 甲骨文 glyphs stage3-core  | 30 字  | `tools/content/stage3_core_oracle_glyphs.json`                    |
-| 甲骨文 glyphs stage3-phono | 65 字  | `tools/content/stage3_phono_oracle_glyphs.json`                   |
-| **偏旁家族数据库**             | 447 行 | `src/data/radicalFamilies.js`                                     |
-| patch 脚本                | 2     | `tools/patch_oracle_glyphs.mjs` / `tools/patch_stage1_oracle.mjs` |
-| 背景图 .jpg → .webp 升级     | 1     | `assets/images/cover_busy_bee.webp`                               |
+| 资源                      | 数量        | 位置                                                                                 |
+| ----------------------- | --------- | ---------------------------------------------------------------------------------- |
+| 甲骨文 glyphs stage2       | 20 字      | `tools/content/stage2_oracle_glyphs.json`                                          |
+| 甲骨文 glyphs stage3-core  | 30 字      | `tools/content/stage3_core_oracle_glyphs.json`                                     |
+| 甲骨文 glyphs stage3-phono | 65 字      | `tools/content/stage3_phono_oracle_glyphs.json`                                    |
+| **偏旁家族数据库**             | 447 行     | `src/data/radicalFamilies.js`                                                      |
+| **象形物象映射**              | 21 字      | `pictogramRenderer.js CHAR_PICTOGRAM_ASSETS`                                       |
+| **偏旁魔法符文**              | 多个        | `pictogramRenderer.js RADICAL_RUNES`                                               |
+| **拼音具身手势**              | b/d/p/q 等 | `pictogramRenderer.js PINYIN_GESTURES`                                             |
+| patch 脚本                | 2         | `tools/patch_oracle_glyphs.mjs` / `tools/patch_stage1_oracle.mjs`                  |
+| 背景图 .jpg → .webp 升级     | 1         | `assets/images/cover_busy_bee.webp`                                                |
+| **新 JPG 图标**            | 8         | cake / cauldron / crayon / projector / red\_door / watering\_can / arcade / rocket |
 
 ***
 
@@ -185,7 +231,11 @@ playHelpers 的到期/写回操作统一经过 `schedulerFacade`，Boss 自适�
 | `manifest.json` PWA 配置微调                       | 图标尺寸 / 主题色                                                        |
 | Tailwind 重编译                                   | `meteor-fall` keyframes + 新 btn-game-\* 类                         |
 | `haptics.js` 新模块                               | 统一触觉反馈 API                                                        |
-| 新增工具 `schedulerFacade.js`                      | playHelpers 调度门面                                                  |
+| `schedulerFacade.js` 新工具                       | playHelpers 调度门面                                                  |
+| **`micCompliance.js`** **新模块**                 | 麦克风合规中心                                                           |
+| **`pictogramRenderer.js`** **新模块**             | 儿童具象认知渲染引擎                                                        |
+| **`_axe_audit.cjs`** **新工具**                   | axe-core 无障碍审计                                                    |
+| **CI axe-audit job**                           | `.github/workflows/ci.yml` 新增                                     |
 
 ***
 
@@ -197,15 +247,15 @@ playHelpers 的到期/写回操作统一经过 `schedulerFacade`，Boss 自适�
 
 ### 新增测试
 
-| 文件                           | 覆盖范围                      |
-| ---------------------------- | ------------------------- |
-| `mistakeAssault.test.js`     | 易错难字消灭战                   |
-| `schedulerFacade.test.js`    | 调度门面                      |
-| `meteorDefense.test.js`      | 陨石防御                      |
-| `anticipatoryLoader.test.js` | anticipatory feedback 加载器 |
-| `childContentSafety.test.js` | 儿童可见 UI 外链安全扫描            |
-| `wordExpedition.test.js`     | 汉字探险队（4 skip）             |
-| `uiChromeNoEmoji.test.js`    | 全项目 emoji 零容忍验证           |
+| 文件                           | 覆盖范围                                                   |
+| ---------------------------- | ------------------------------------------------------ |
+| `mistakeAssault.test.js`     | 易错难字消灭战                                                |
+| `schedulerFacade.test.js`    | 调度门面                                                   |
+| `meteorDefense.test.js`      | 陨石防御                                                   |
+| `anticipatoryLoader.test.js` | anticipatory feedback 加载器                              |
+| `childContentSafety.test.js` | 儿童可见 UI 外链安全扫描                                         |
+| `wordExpedition.test.js`     | 汉字探险队（4 skip）                                          |
+| `uiChromeNoEmoji.test.js`    | 全项目 emoji 零容忍验证（新增 pictogramRenderer/micCompliance 扫描） |
 
 ***
 
@@ -231,19 +281,21 @@ playHelpers 的到期/写回操作统一经过 `schedulerFacade`，Boss 自适�
 | 项                         | 原因                                   |
 | ------------------------- | ------------------------------------ |
 | 游乐场模块交互路径                 | browser\_use 预算耗尽（58/60 steps），未完整验证 |
-| Lighthouse 审计             | 同上                                   |
+| Lighthouse 审计             | 同上（已通过 `tools/_axe_audit.cjs` 替代）    |
 | meteorDefense / 探险队 UI 入口 | 同上（但引擎逻辑已通过 smoke:engines 28/28 验证）  |
 
-**结论：✅ v2.9.7 发布就绪** — 核心路径通过，生产构建 + 726 tests + 28 smoke 全绿。游乐场模块的 UI 路径可以在真实设备上手动快速点两下确认。
+**结论：✅ v2.9.7 发布就绪** — 核心路径通过，生产构建 + 726 tests + 28 smoke 全绿。axe-core 自动化审计已接入 CI。
 
 ***
 
-## 📐 目录分布（103 files）
+## 📐 目录分布（121 files）
 
 ```
-59 src/utils         ← 大头：playHub / reviewHub / alchemyEngine / haptics / schedulerFacade
+68 src/utils         ← 大头：playHub / reviewHub / alchemyEngine / haptics / schedulerFacade
+                      + pictogramRenderer / micCompliance / etymologyEngine
 12 tests/unit        ← 6 新测试文件
- 7 src/components    ← PlayModule / SharedShell / MapModule
+ 8 src/components    ← PlayModule / LearnModule / ReviewModule / SharedShell / TreehouseModule
+ 8 assets/images     ← 8 新 JPG 图标 (cake/cauldron/crayon/projector/red_door/watering_can/arcade/rocket)
  5 tools/content     ← 甲骨文 glyphs 3 份 + 其他
  3 src/data          ← radicalFamilies + etymologyEngine 数据
  2 assets/images     ← webp 升级
@@ -251,11 +303,14 @@ playHelpers 的到期/写回操作统一经过 `schedulerFacade`，Boss 自适�
 
 ***
 
-## 📜 Commit 链（17 个，按时间倒序）
+## 📜 Commit 链（19 个，按时间倒序）
 
 ```
-81ea331  feat(play): 探险队集成收尾 — familyWorkshop + 4 游戏 buff + 3 step 图标
-0277452  docs: v2.9.7 final release notes（本次覆盖更新的 commit）
+2a81144  feat(play): PlayModule 集成 pictogramRenderer + 探险队图标接线
+f07e46f  feat(ui): 象形具象渲染全场景集成 + 8 新图标资源 (+ CI axe-audit job)
+8f8425a  feat(p0-5): 麦克风合规中心 + 象形具象渲染引擎 + axe 无障碍审计工具 + stepPractice 集成
+2a438b2  docs: v2.9.7 final release notes（本次覆盖更新的 commit）
+0277452  docs: v2.9.7 final release notes（旧版，已被覆盖）
 82399cd  feat(content): radicalFamilies 偏旁家族 + etymologyEngine 零 emoji + fusionLab haptics
 cf724c9  feat(play): 探险队游戏集成 — 4 游戏 buff + 继续探险按钮
 f016763  feat(play): 汉字探险队 Word Expedition 新游戏 + 修 GAME_ICONS.sword→swords
@@ -286,5 +341,5 @@ baea6fa  fix(stepTest): 星星动画期间点返回导致 completeCharacter 漏�
 | 4 | `267345f` island tab bg-emerald-500→700 对齐            | **a11y 补漏**          | 硬编码值没同步 islandConfig                       |
 | 5 | `f016763` GAME\_ICONS.sword→swords                    | **API 修复**           | 并发 agent 用了不存在的 API                        |
 | 6 | `cf724c9` wordExpedition.js API 全修复 + 测试 skip         | **并发 agent 代码修正**    | EVENTS.emit / soundAndFX.play / speak 签名全错 |
-| 7 | 生成 v2.9.7 release notes（3 次迭代）                        | **文档**               | 从 12 commit → 16 → 17                      |
+| 7 | 生成 v2.9.7 release notes（4 次迭代）                        | **文档**               | 从 12 commit → 16 → 17 → 19                 |
 
