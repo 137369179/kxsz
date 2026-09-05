@@ -30,10 +30,10 @@ export const SHOP_FRAMES = [
 ];
 
 export const SHOP_DECORATIONS = [
-  { id: "decor_windchime", type: "decoration", name: "魔法风铃", icon: "assets/images/decor_windchime.jpg", value: "assets/images/decor_windchime.jpg", price: 150 },
-  { id: "decor_swing",     type: "decoration", name: "花藤秋千", icon: "assets/images/decor_swing.jpg",     value: "assets/images/decor_swing.jpg",     price: 300 },
-  { id: "decor_lantern",   type: "decoration", name: "星光灯笼", icon: "assets/images/decor_lantern.jpg",   value: "assets/images/decor_lantern.jpg",   price: 450 },
-  { id: "decor_birdhouse", type: "decoration", name: "知更鸟窝", icon: "assets/images/decor_birdhouse.jpg", value: "assets/images/decor_birdhouse.jpg", price: 600 }
+  { id: "decor_windchime", type: "decoration", name: "魔法风铃", icon: "assets/images/icon_bell.jpg", value: "assets/images/icon_bell.jpg", price: 150 },
+  { id: "decor_swing",     type: "decoration", name: "花藤秋千", icon: "assets/images/cover_flower_garden.jpg",     value: "assets/images/cover_flower_garden.jpg",     price: 300 },
+  { id: "decor_lantern",   type: "decoration", name: "星光灯笼", icon: "assets/images/icon_sparkle.jpg",   value: "assets/images/icon_sparkle.jpg",   price: 450 },
+  { id: "decor_birdhouse", type: "decoration", name: "知更鸟窝", icon: "assets/images/pinyin_pair_niao.jpg", value: "assets/images/pinyin_pair_niao.jpg", price: 600 }
 ];
 
 /**  id   */

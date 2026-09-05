@@ -119,7 +119,7 @@ export function _renderCollection(panel) {
     const meta = stageMeta[s.stage] || { name: `岛屿 ${s.stage}`, ring: "border-white/30", chip: "bg-white/10 text-white/80" };
     const chars = getCollectionByStage(s.stage);
     const cells = chars.map((c) => c.collected
-      ? `<button class="collect-char-cell collected touch-target aspect-square rounded-2xl bg-gradient-to-b from-amber-100 to-orange-200 border-2 border-amber-300 shadow-md flex flex-col items-center justify-center gap-0.5 active:scale-90 transition-transform cursor-pointer" data-char="${escapeHtml(c.char)}" data-pinyin="${escapeHtml(c.pinyin)}" aria-label="${escapeHtml(c.char)}，拼音 ${escapeHtml(c.pinyin)}">
+      ? `<button class="collect-char-cell collected touch-target aspect-square rounded-2xl bg-gradient-to-b from-amber-100 to-orange-200 border-2 border-amber-300 shadow-md flex flex-col items-center justify-center gap-0.5 active:scale-90 transition-transform cursor-pointer" data-char-id="${escapeHtml(c.id)}" data-char="${escapeHtml(c.char)}" data-pinyin="${escapeHtml(c.pinyin)}" aria-label="${escapeHtml(c.char)}，拼音 ${escapeHtml(c.pinyin)}">
             <span class="text-2xl sm:text-3xl font-black text-amber-950 leading-none">${escapeHtml(c.char)}</span>
             <span class="text-[10px] font-bold text-amber-700">${escapeHtml(c.pinyin)}</span>
           </button>`
@@ -166,10 +166,13 @@ export function _renderCollection(panel) {
     </div>
   `;
 
-  // 已收集字卡：点击朗读（复用 P0-2 语音层）
+  // 已收集字卡：点击朗读 + 活字卡字源小剧场（M1：楷体⇄象形交叉淡入 + 演变故事）
   this._onDom(".collect-char-cell.collected", "click", (e) => {
     const cell = e.currentTarget;
     this.speak(`${cell.dataset.char}，${cell.dataset.pinyin}`);
+    try {
+      this._openGlyphTheater(cell.dataset.charId, cell);
+    } catch {}
   });
   const cheerBtn = panel.querySelector("#btn-collection-cheer");
   if (cheerBtn) {
@@ -177,6 +180,80 @@ export function _renderCollection(panel) {
       this.speak(`我已经收集了${stats.learnedCount}个字，继续加油！`, { priority: 1, kind: "tutor", emotion: "happy" });
     });
   }
+}
+
+/**
+ * M1 活字卡字源小剧场：楷体 ⇄ 象形字交叉淡入 + 演变故事
+ * 数据来源：characterDetails.evolution（story）与 oracleGlyph（字符型象形字），经 ensureDetails 懒加载
+ * @param {string} charId 字卡 id（char_XXX）
+ * @param {HTMLElement} [anchorEl] 粒子定位锚点
+ */
+export async function _openGlyphTheater(charId, anchorEl = null) {
+  if (!charId || typeof document === "undefined") return;
+  if (document.getElementById("glyph-theater")) return;
+
+  // 详情层 2.88MB：仅在点开单字时懒加载（禁止列表渲染时全量加载）
+  const { ensureDetails } = await import("../charDetailLoader.js");
+  await ensureDetails();
+  const { CHARACTER_DATABASE } = await import("../../data/characters.js");
+  const c = CHARACTER_DATABASE.find((x) => x.id === charId);
+  if (!c) return;
+  const oracle = (c.oracleGlyph || "").trim();
+  const bronze = (c.bronzeGlyph || "").trim();
+  const story = String(c.evolution?.story || "").slice(0, 90);
+
+  const backdrop = document.createElement("div");
+  backdrop.id = "glyph-theater";
+  backdrop.style.cssText = "position:fixed;inset:0;z-index:99990;background:rgba(2,6,23,.72);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center";
+  backdrop.innerHTML = `
+    <div class="glyph-theater-card relative w-[300px] max-w-[86vw] rounded-3xl bg-gradient-to-b from-amber-50 to-orange-100 border-4 border-amber-300 shadow-2xl p-6 flex flex-col items-center gap-3 animate-scale-up" role="dialog" aria-label="汉字字源小剧场">
+      <button id="btn-theater-close" class="absolute -top-3 -right-3 w-9 h-9 rounded-full bg-white text-gray-700 font-black border-2 border-amber-300 shadow-md active:scale-90 cursor-pointer flex items-center justify-center" data-speak="关闭小剧场" aria-label="关闭小剧场">${GAME_ICONS.back("w-4 h-4")}</button>
+      <div class="flex items-center gap-3">
+        <div class="flex flex-col items-center gap-1">
+          <span id="theater-glyph-old" class="glyph-theater-glyph text-6xl font-black text-amber-800" style="font-family:'Noto Serif SC',serif">${escapeHtml(oracle || bronze || c.char)}</span>
+          <span class="text-[10px] font-black text-amber-600">古人这样画</span>
+        </div>
+        <span class="text-2xl text-amber-400 font-black">→</span>
+        <div class="flex flex-col items-center gap-1">
+          <span id="theater-glyph-new" class="glyph-theater-glyph text-6xl font-black text-amber-950 opacity-0">${escapeHtml(c.char)}</span>
+          <span class="text-[10px] font-black text-amber-600 opacity-0" id="theater-label-modern">今天这样写</span>
+        </div>
+      </div>
+      ${story ? `<p class="text-[11px] leading-relaxed text-amber-900/90 font-bold text-center bg-white/70 rounded-xl px-3 py-2 border border-amber-200">${escapeHtml(story)}${String(c.evolution?.story || "").length > 90 ? "…" : ""}</p>` : ""}
+      <div class="flex items-center gap-2">
+        <button id="btn-theater-story" class="btn-game-blue text-white text-[11px] font-black px-4 py-1.5 rounded-full shadow-md active:scale-95 cursor-pointer flex items-center gap-1" aria-label="朗读演变故事">
+          <span class="flex items-center">${GAME_ICONS.speaker("w-3.5 h-3.5")}</span>
+          <span>听演变故事</span>
+        </button>
+        <span class="text-[10px] font-black text-amber-700">${escapeHtml(c.pinyin || "")}</span>
+      </div>
+    </div>`;
+  document.body.appendChild(backdrop);
+
+  // 交叉淡入：700ms 后象形字淡出、楷体淡入（600ms CSS 过渡）
+  const oldEl = backdrop.querySelector("#theater-glyph-old");
+  const newEl = backdrop.querySelector("#theater-glyph-new");
+  const labelEl = backdrop.querySelector("#theater-label-modern");
+  const fadeTimer = setTimeout(() => {
+    try {
+      if (oldEl) oldEl.style.transition = "opacity 600ms", oldEl.style.opacity = "0.15";
+      if (newEl) newEl.style.transition = "opacity 600ms", newEl.style.opacity = "1";
+      if (labelEl) labelEl.style.opacity = "1";
+    } catch {}
+  }, 700);
+
+  const close = () => {
+    clearTimeout(fadeTimer);
+    try { backdrop.remove(); } catch {}
+  };
+  backdrop.addEventListener("click", (e) => {
+    if (e.target === backdrop) close();
+  });
+  backdrop.querySelector("#btn-theater-close")?.addEventListener("click", close);
+  backdrop.querySelector("#btn-theater-story")?.addEventListener("click", () => {
+    try { soundAndFX.playPop(); } catch {}
+    this.speak(`${c.char}。${story || "这个字是从古人画的图画变来的。"}`, { priority: 1, kind: "story", emotion: "gentle" });
+  });
 }
 
 /**  */

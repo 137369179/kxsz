@@ -9,6 +9,7 @@ import {
   _renderStickerWall,
   _renderMedalWall,
   _renderCollection,
+  _openGlyphTheater,
   _renderShop,
   _bindShopActions,
   _renderCalendar,
@@ -34,6 +35,7 @@ export class RewardModule extends BaseModule {
   _renderStickerWall(...args) { return _renderStickerWall.call(this, ...args); }
   _renderMedalWall(...args) { return _renderMedalWall.call(this, ...args); }
   _renderCollection(...args) { return _renderCollection.call(this, ...args); }
+  _openGlyphTheater(...args) { return _openGlyphTheater.call(this, ...args); }
   _renderShop(...args) { return _renderShop.call(this, ...args); }
   _bindShopActions(...args) { return _bindShopActions.call(this, ...args); }
   _renderCalendar(...args) { return _renderCalendar.call(this, ...args); }
