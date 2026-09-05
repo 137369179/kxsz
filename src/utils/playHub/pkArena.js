@@ -9,6 +9,7 @@ import {
   spawnFloatingText,
   startCountdown,
 } from "./playHelpers.js";
+import { triggerHapticSuccess, triggerHapticWarning } from "../haptics.js";
 
 export function renderPkArena() {
     const __pmProgress = ebbinghausManager.progress;
@@ -186,6 +187,7 @@ export function renderPkArena() {
           p2Streak++;
           p1Streak = 0;
           soundAndFX.playSoftError();
+          triggerHapticWarning();
           spawnFloatingText(arena, `超时！${p2Label} 夺 5 分`, "pk-timeout", { color: "#22d3ee", top: 34, size: 22 });
           const c = CHARACTER_DATABASE.find((x) => x.char === r.char);
           if (c) ebbinghausManager.completeReview(c.id, false);
@@ -241,6 +243,7 @@ export function renderPkArena() {
             p1Streak++;
             p2Streak = 0;
             soundAndFX.playSuccessSound();
+            triggerHapticSuccess();
             soundAndFX.triggerConfetti(this.container);
             btn.classList.add("ring-8", "ring-emerald-400");
             spawnFloatingText(arena, `${p1Label} +10${p1Streak >= 2 ? ` 连胜 x${p1Streak}` : ""}`, "pk-ok", { color: "#fb7185", top: 34, size: 22 });
@@ -252,6 +255,7 @@ export function renderPkArena() {
             p2Streak++;
             p1Streak = 0;
             soundAndFX.playSoftError();
+            triggerHapticWarning();
             btn.classList.add("ring-8", "ring-rose-400");
             spawnFloatingText(arena, `${p2Label} +10`, "pk-miss", { color: "#22d3ee", top: 34, size: 20 });
             // ===== 闭环：抢拍错误 = 复习失败 + 形近混淆画像 =====

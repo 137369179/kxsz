@@ -144,7 +144,7 @@ export function renderStepPrewrite(stage) {
         ebbinghausManager.addCoins?.(blockedByAge ? 5 : 3);
         soundAndFX.triggerCoinFly?.(finishBtn, blockedByAge ? 5 : 3);
 
-        // ✅ P0-B1-3：写入 prewrite 完成度 → 让后续 hanziEngine 知道控笔能力
+        // [P0-B1-3]：写入 prewrite 完成度 → 让后续 hanziEngine 知道控笔能力
         try {
           ebbinghausManager.setLastPrewriteResult({
             age: age,
@@ -154,7 +154,7 @@ export function renderStepPrewrite(stage) {
           });
         } catch (e) { console.warn("[stepPrewrite] setLastPrewriteResult failed:", e); }
 
-        // ✅ P0-B1-3：用 stepSequence 算下一个，不再硬编码 blockedByAge ? 8 : 6
+        // [P0-B1-3]：用 stepSequence 算下一个，不再硬编码 blockedByAge ? 8 : 6
         const nextStep = typeof this.getNextStepInSequence === "function"
           ? this.getNextStepInSequence(5)
           : (blockedByAge ? 8 : 6);

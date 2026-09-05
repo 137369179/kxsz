@@ -8,7 +8,7 @@ import { shouldUseAirTrace, openAirTracePrompt } from "./airTracePrompt.js";
 export function renderStepTrace(stage) {
     const char = this.charData;
 
-    // ✅ P0-B1-3 计算 guideMode 并据此渲染不同 UI
+    // [P0-B1-3] 计算 guideMode 并据此渲染不同 UI
     const age = ebbinghausManager.getAge();
     const prewriteResult = ebbinghausManager.getLastPrewriteResult();
     let guideMode;
@@ -130,7 +130,7 @@ export function renderStepTrace(stage) {
       (strokeIdx) => {
         updateBeads(strokeIdx + 1);
       },
-      // ✅ P0-B1-3 传 guideMode + strictReverseCheck 给 HanziEngine
+      // [P0-B1-3] 传 guideMode + strictReverseCheck 给 HanziEngine
       {
         guideMode: guideMode,
         strictReverseCheck: guideMode === "strong",  // free/soft 不拦截倒笔画
@@ -187,7 +187,7 @@ export function renderStepTrace(stage) {
       });
     }
 
-    // ✅ P2-7 身体动觉：描红前「空中比划」热身（无摄像头降级为发光 ghost 动画）
+    // [P2-7] 身体动觉：描红前「空中比划」热身（无摄像头降级为发光 ghost 动画）
     // 真实描红画布已在背后就绪；热身模态关闭后儿童直接开始描红即可。
     if (shouldUseAirTrace(age) && !this._airTraceDone) {
       this._airTraceDone = true;

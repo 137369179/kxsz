@@ -34,15 +34,14 @@ describe('Word Expedition', () => {
     vi.restoreAllMocks();
   });
 
-  it.skip('should initialize and display map', () => {
+  it('should initialize and display map', () => {
     mockContext.renderWordExpedition();
     
-    // By default, no state -> displays intro and start button
     const startBtn = mockContainer.querySelector('#expedition-start-btn');
     expect(startBtn).to.not.be.null;
   });
 
-  it.skip('should start a new expedition and set active state', () => {
+  it('should start a new expedition and set active state', () => {
     mockContext.renderWordExpedition();
     const startBtn = mockContainer.querySelector('#expedition-start-btn');
     
@@ -50,12 +49,11 @@ describe('Word Expedition', () => {
     
     expect(mockContext.expeditionState).to.not.be.null;
     expect(mockContext.expeditionState.stage).to.equal(1);
-    expect(mockContext.expeditionState.hp).to.equal(3);
     expect(mockContext.render).toHaveBeenCalled();
   });
 
-  it.skip('should end expedition and clear state on victory', () => {
-    mockContext.expeditionState = { stage: 5, hp: 3, buffs: [] };
+  it('should end expedition and clear state on victory', () => {
+    mockContext.expeditionState = { stage: 5, buffs: [] };
     mockContext.isExpeditionActive = true;
     
     mockContext.renderExpeditionVictory();
@@ -71,8 +69,9 @@ describe('Word Expedition', () => {
     expect(mockContext.render).toHaveBeenCalled();
   });
 
-  it.skip('should grant buffs at the buff stage', () => {
-    mockContext.expeditionState = { stage: 3, hp: 3, buffs: [] };
+  it('should grant buffs at the buff stage', () => {
+    vi.useFakeTimers();
+    mockContext.expeditionState = { stage: 3, buffs: [] };
     mockContext.isExpeditionActive = true;
     
     mockContext.renderExpeditionTreasure();
@@ -84,7 +83,9 @@ describe('Word Expedition', () => {
     
     expect(mockContext.expeditionState.buffs.length).to.equal(1);
     expect(mockContext.expeditionState.stage).to.equal(4); // Advanced to next stage
+    
+    vi.advanceTimersByTime(1600);
     expect(mockContext.currentMode).to.equal('expedition');
-    expect(mockContext.render).toHaveBeenCalled();
+    vi.useRealTimers();
   });
 });

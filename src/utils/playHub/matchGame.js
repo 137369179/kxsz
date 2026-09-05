@@ -10,6 +10,7 @@ import { GAME_ICONS } from "../gameIcons.js";
 import { EVENTS } from "../eventBus.js";
 import { RADICAL_FAMILIES } from "../../data/radicalFamilies.js";
 import { forChar as mmForChar, SCENES as MM_SCENES } from "../multimodalEngine.js";
+import { triggerHapticSuccess, triggerHapticWarning } from "../haptics.js";
 import {
   shuffle,
   pickReviewChars,
@@ -218,7 +219,12 @@ export function renderMatchGame() {
         // ===== 3D 翻牌 =====
         btn.classList.add("flipped");
         soundAndFX.playCardFlip();
-        setTimeout(() => btn.querySelector(".pf-front").classList.add("ring-4", "ring-yellow-200"), 200);
+        const cardIdx = parseInt(btn.dataset.idx, 10);
+        const cardObj = cards[cardIdx];
+        if (cardObj) {
+          soundAndFX.speakPriority(cardObj.val, { kind: "char", priority: 1 });
+        }
+        setTimeout(() => btn.querySelector(".pf-front")?.classList.add("ring-4", "ring-yellow-200"), 200);
 
         flipped.push(btn);
 
@@ -226,6 +232,7 @@ export function renderMatchGame() {
           const [b1, b2] = flipped;
           if (b1.dataset.match === b2.dataset.match) {
             // 配对成功 → 连击 +1
+            triggerHapticSuccess();
             soundAndFX.playSuccessSound();
             soundAndFX.triggerConfetti(this.container);
             combo++;
@@ -233,6 +240,16 @@ export function renderMatchGame() {
             matchedCount++;
             if (scoreEl) scoreEl.textContent = matchedCount;
             updateComboUI();
+
+            // 多感官语音强化（错开 200ms）
+            const matchedChar = b1.dataset.match;
+            const cRec = CHARACTER_DATABASE.find(x => x.char === matchedChar);
+            if (cRec) {
+              this._timeout(() => {
+                soundAndFX.speakPriority(`${matchedChar}，${cRec.pinyin}`, { kind: "char", priority: 1 });
+              }, 220);
+            }
+
             // 连击飘字颜色与大小随等级提升
             const comboColor = combo >= 7 ? "#ec4899" : combo >= 5 ? "#f97316" : combo >= 3 ? "#fbbf24" : "#34d399";
             const comboSize = combo >= 7 ? 28 : combo >= 5 ? 25 : combo >= 3 ? 23 : 20;
@@ -264,6 +281,7 @@ export function renderMatchGame() {
             }, 500);
           } else {
             // 配对失败 → 连击清零 + 字音复习失败写回
+            triggerHapticWarning();
             soundAndFX.playSoftError();
             mistakes++;
             combo = 0;

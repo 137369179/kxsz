@@ -6,6 +6,7 @@ import { mountGameShell, showGameToast } from "../../components/SharedShell.js";
 import { escapeHtml } from "../BaseModule.js";
 import { GAME_ICONS } from "../gameIcons.js";
 import { pickReviewChars, shuffle } from "./playHelpers.js";
+import { triggerHapticSuccess, triggerHapticWarning } from "../haptics.js";
 
 export function renderMeteorDefense() {
   const { content: mainEl, destroy: destroyShell } = mountGameShell(this.container, {
@@ -65,12 +66,26 @@ export function renderMeteorDefense() {
   try {
     const chars = pickReviewChars(TOTAL_ROUNDS, true);
     questions = chars.map(ch => {
-      // distractors
-      let distractors = CHARACTER_DATABASE
-        .filter(c => c.char !== ch.char)
-        .sort(() => 0.5 - Math.random())
-        .slice(0, 2)
-        .map(c => c.char);
+      // 智能干扰项演进：优先形近易混字，次选同音/同声母韵母字，兜底字库字
+      const candidatePool = [];
+      if (Array.isArray(ch.confusingChars) && ch.confusingChars.length > 0) {
+        candidatePool.push(...ch.confusingChars.filter(x => x !== ch.char));
+      }
+      if (candidatePool.length < 2 && ch.pinyin) {
+        const samePinyinChars = CHARACTER_DATABASE
+          .filter(c => c.pinyin === ch.pinyin && c.char !== ch.char)
+          .map(c => c.char);
+        candidatePool.push(...samePinyinChars);
+      }
+      if (candidatePool.length < 2) {
+        const fallbackDistractors = CHARACTER_DATABASE
+          .filter(c => c.char !== ch.char && !candidatePool.includes(c.char))
+          .sort(() => 0.5 - Math.random())
+          .slice(0, 2 - candidatePool.length)
+          .map(c => c.char);
+        candidatePool.push(...fallbackDistractors);
+      }
+      const distractors = shuffle([...new Set(candidatePool)]).slice(0, 2);
       return {
         target: ch,
         options: shuffle([ch.char, ...distractors])
@@ -120,7 +135,7 @@ export function renderMeteorDefense() {
             <span>获得 ${totalCoins} 凯茜星币</span>
           </div>
           <div class="flex gap-4">
-            ${this.isExpeditionActive ? '' : '<button id="btn-meteor-again" class="btn-game-cyan text-white font-black px-8 py-3 rounded-full cursor-pointer shadow-lg active:scale-95">\u518d\u73a9\u4e00\u5c40</button>'}
+            ${this.isExpeditionActive ? '' : '<button id="btn-meteor-again" class="btn-game-cyan text-white font-black px-8 py-3 rounded-full cursor-pointer shadow-lg active:scale-95">再玩一局</button>'}
             <button id="btn-meteor-home" class="bg-white/10 hover:bg-white/20 text-white font-black px-8 py-3 rounded-full cursor-pointer shadow-lg active:scale-95 border border-white/20">${this.isExpeditionActive ? '继续探险 \u2192' : '返回大厅'}</button>
           </div>
         </div>
@@ -245,6 +260,7 @@ export function renderMeteorDefense() {
           btn.classList.add("scale-125", "opacity-0", "transition-all", "duration-500");
           
           soundAndFX.playSuccessSound();
+          triggerHapticSuccess();
           ebbinghausManager.completeReview(targetChar.id, true);
           
           // Bonus coins for high combo
@@ -261,6 +277,7 @@ export function renderMeteorDefense() {
           // Wrong meteor
           combo = 0; // Reset combo
           soundAndFX.playSoftError();
+          triggerHapticWarning();
           btn.classList.add("animate-shake", "border-gray-500", "opacity-50");
           ebbinghausManager.completeReview(targetChar.id, false);
           
@@ -283,6 +300,7 @@ export function renderMeteorDefense() {
       combo = 0; // Reset combo on timeout
       
       soundAndFX.playSoftError();
+      triggerHapticWarning();
       this._timeout(() => {
         soundAndFX.speakPriority(`哎呀，是 ${targetChar.char} 字！`, { kind: "sentence", emotion: "correction" });
       }, 180);

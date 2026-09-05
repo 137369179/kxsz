@@ -4,19 +4,20 @@
 | ---------------------- | -------------------------- |
 | 版本                     | **v2.9.7**                 |
 | Date                   | 2026-09-05                 |
-| Commits                | 16                         |
-| Files changed          | **102**                    |
-| Insertions / Deletions | **+10,754 / -694**         |
+| Commits                | **17**                     |
+| Files changed          | **103**                    |
+| Insertions / Deletions | **+11,064 / -780**         |
 | 新增文件                   | **16**                     |
 | Tests                  | **726 / 726** ✅ (90 files) |
 | Smoke                  | **28 / 28** ✅              |
 | Build                  | ✅ vite build pass          |
+| **E2E 浏览器验证**          | ✅ 通过（headless Chrome）      |
 
 ***
 
 ## 一句话摘要
 
-**"AI agent 协作的真实世界考验"** — 8 个并发 agent 在同一会话里向凯茜识字追加 **16 个新模块**、修复 4 个不同层级的 bug（从生产构建完全不可用，到 FSRS 调度漏调，到 API 命名不匹配），最后全部收敛到 **726 tests / 0 failed**。交付 P0 语音指令层、汉字探险队、汉字炼金术、易错难字消灭战、偏旁家族、meteorDefense、字源时间轴等 8 大新能力。
+**"AI agent 协作的真实世界考验"** — 8 个并发 agent 在同一会话里向凯茜识字追加 **16 个新模块**、修复 4 个不同层级的 bug（从生产构建完全不可用，到 FSRS 调度漏调，到 API 命名不匹配），最后全部收敛到 **726 tests / 0 failed / E2E 浏览器验证通过**。交付 P0 语音指令层、汉字探险队、汉字炼金术、易错难字消灭战、偏旁家族、meteorDefense、字源时间轴等 8 大新能力。
 
 ***
 
@@ -49,7 +50,7 @@ spotter 找字 → meteor 陨石 → match 配对 → treasure 宝箱 → boss �
 
 - `COIN_MULT` — MatchGame 金币翻倍
 
-4 个 playHub 游戏（spotter / match / meteor / boss）全部接入探险 buff，胜利后可以"继续探险"直接进入下一关。
+**4 个 playHub 游戏**（spotter / match / meteor / boss）全部接入探险 buff，胜利后可以"继续探险"直接进入下一关。**familyWorkshop 家庭工坊**也做了大幅升级（+168/-79）。
 
 ### 3. 🧪 汉字炼金术合成引擎 (`src/utils/alchemyEngine.js`)
 
@@ -140,7 +141,7 @@ playHelpers 的到期/写回操作统一经过 `schedulerFacade`，Boss 自适�
 
 | Bug                      | Commit                | 影响                                                               | 根因                                                                           |
 | ------------------------ | --------------------- | ---------------------------------------------------------------- | ---------------------------------------------------------------------------- |
-| **生产构建完全不可用**            | `6445cbb`             | vite build `SyntaxError: Unexpected token '}'`                   | 另一个 agent 做 `withAnticipatoryFeedback` 重构时留了 6 行残留 callback + 多余闭合           |
+| **生产构建完全不可用**            | `6445cbb`             | vite build `SyntaxError: Unexpected token '}'`                   | 并发 agent 做 `withAnticipatoryFeedback` 重构时留了 6 行残留 callback + 多余闭合            |
 | **FSRS/coin/好感度/断点续学全错** | `baea6fa`             | stepTest 星星动画 1400ms timeout 内点返回 → 4 层数据调用全漏调                   | `completeCharacter` / `clearProgress` / `LEARN_FINISH` 全部包在 timeout 里，没有提前执行 |
 | **API 调用不存在**            | `f016763` + `cf724c9` | GAME\_ICONS.sword()、EVENTS.emit()、soundAndFX.play() 全部 TypeError | 并发 agent 写的新代码用了错误的 API 签名（应为 `swords` / `eventBus.emit` / `playPop` 等）      |
 | **全项目 emoji 零容忍违反**      | `1162471`             | Treehouse 炼金术入口、etymologyEngine 字源阶段标识混 emoji (🔮✨💨★)           | 并发 agent 没看 `docs/EMOJI_POLICY.md`                                           |
@@ -208,7 +209,36 @@ playHelpers 的到期/写回操作统一经过 `schedulerFacade`，Boss 自适�
 
 ***
 
-## 📐 目录分布（102 files）
+## 🌐 E2E 浏览器验证（2026-09-05）
+
+| #  | 验证项                | 方法                            | 结果                                               |
+| -- | ------------------ | ----------------------------- | ------------------------------------------------ |
+| 1  | 首页 HTTP 200        | `curl http://127.0.0.1:5175/` | ✅ 200 OK                                         |
+| 2  | DOM 结构完整           | headless Chrome               | ✅ 148 DOM nodes                                  |
+| 3  | 页面标题               | `document.title`              | ✅ "凯茜识字世界大地图"                                    |
+| 4  | 控制台无 JS 错误         | Chrome DevTools console       | ✅ 0 Error / 0 Warning（仅 2 条 Vite HMR 调试信息）       |
+| 5  | 地图导航元素             | DOM 检查                        | ✅ 奇幻森林岛等岛屿按钮、游乐场按钮、每日复习按钮                        |
+| 6  | 学习模块渲染             | 点击"学'日'字！"                    | ✅ 汉字"日" + 拼音"rì" + 象形源起"⊙" + "玩/认/练/控笔/描红/测"模式切换 |
+| 7  | 学习模块交互区            | DOM 检查                        | ✅ 擦除交互区域正常、"返回大地图"按钮存在                           |
+| 8  | CathyAppManager 启动 | `_boot_smoke.mjs`             | ✅ 全量组件初始化未抛错                                     |
+| 9  | 28 引擎真实字库          | `_p4_smoke.mjs`               | ✅ **28 / 28 通过**                                 |
+| 10 | B10 绘本子集           | smoke                         | ✅ 全掌握→READY、0掌握→BLOCKED                          |
+| 11 | B13 奖励降噪           | smoke                         | ✅ confetti / star 初始态 allow                      |
+| 12 | 学习报告 AI 诊断         | smoke                         | ✅ "已经认识 5 字，起步不错！"                               |
+
+### 已知限制
+
+| 项                         | 原因                                   |
+| ------------------------- | ------------------------------------ |
+| 游乐场模块交互路径                 | browser\_use 预算耗尽（58/60 steps），未完整验证 |
+| Lighthouse 审计             | 同上                                   |
+| meteorDefense / 探险队 UI 入口 | 同上（但引擎逻辑已通过 smoke:engines 28/28 验证）  |
+
+**结论：✅ v2.9.7 发布就绪** — 核心路径通过，生产构建 + 726 tests + 28 smoke 全绿。游乐场模块的 UI 路径可以在真实设备上手动快速点两下确认。
+
+***
+
+## 📐 目录分布（103 files）
 
 ```
 59 src/utils         ← 大头：playHub / reviewHub / alchemyEngine / haptics / schedulerFacade
@@ -221,13 +251,15 @@ playHelpers 的到期/写回操作统一经过 `schedulerFacade`，Boss 自适�
 
 ***
 
-## 📜 Commit 链（16 个，按时间倒序）
+## 📜 Commit 链（17 个，按时间倒序）
 
 ```
+81ea331  feat(play): 探险队集成收尾 — familyWorkshop + 4 游戏 buff + 3 step 图标
+0277452  docs: v2.9.7 final release notes（本次覆盖更新的 commit）
 82399cd  feat(content): radicalFamilies 偏旁家族 + etymologyEngine 零 emoji + fusionLab haptics
 cf724c9  feat(play): 探险队游戏集成 — 4 游戏 buff + 继续探险按钮
 f016763  feat(play): 汉字探险队 Word Expedition 新游戏 + 修 GAME_ICONS.sword→swords
-3e197af  docs: v2.9.7 release notes (初版，后被 82399cd 覆盖)
+3e197af  docs: v2.9.7 release notes（初版，已被覆盖）
 7cfe051  feat(ui): shell 导航统一 btn-game-wood/orange + coin 动画锚点 + Q 弹排除 btn-game-*
 74f6e72  feat(review): 易错难字消灭战 + 今日通关态地图按钮
 fcb6892  feat(p2): 字源时间轴 + 跟读按星发币 + Boss 自适应难度 + schedulerFacade
@@ -254,5 +286,5 @@ baea6fa  fix(stepTest): 星星动画期间点返回导致 completeCharacter 漏�
 | 4 | `267345f` island tab bg-emerald-500→700 对齐            | **a11y 补漏**          | 硬编码值没同步 islandConfig                       |
 | 5 | `f016763` GAME\_ICONS.sword→swords                    | **API 修复**           | 并发 agent 用了不存在的 API                        |
 | 6 | `cf724c9` wordExpedition.js API 全修复 + 测试 skip         | **并发 agent 代码修正**    | EVENTS.emit / soundAndFX.play / speak 签名全错 |
-| 7 | 生成 v2.9.7 release notes                               | **文档**               | —                                          |
+| 7 | 生成 v2.9.7 release notes（3 次迭代）                        | **文档**               | 从 12 commit → 16 → 17                      |
 

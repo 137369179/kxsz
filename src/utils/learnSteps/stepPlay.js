@@ -138,7 +138,7 @@ export function renderStepPlay(stage) {
           soundEngine: soundAndFX,
           callbacks: {
             onBeat(beat, text) {
-              // 目标字 ★ 给个视觉强调
+              // 目标字给个视觉强调
               if (text === char.char) {
                 chantBtn.classList.add("scale-110");
               }

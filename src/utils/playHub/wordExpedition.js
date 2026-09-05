@@ -73,7 +73,7 @@ export function renderWordExpedition() {
       animation = "animate-bounce";
     }
 
-    let icon = GAME_ICONS.sword("w-6 h-6");
+    let icon = GAME_ICONS.swords("w-6 h-6");
     if (s.type === "treasure") icon = GAME_ICONS.star("w-6 h-6");
     if (s.type === "boss") icon = GAME_ICONS.monster("w-6 h-6");
 
@@ -112,7 +112,7 @@ export function renderWordExpedition() {
 
   // Action Button
   let btnLabel = currentStageInfo.type === "treasure" ? "开启宝箱" : "进入关卡";
-  let btnIcon = currentStageInfo.type === "treasure" ? GAME_ICONS.star("w-5 h-5") : GAME_ICONS.sword("w-5 h-5");
+  let btnIcon = currentStageInfo.type === "treasure" ? GAME_ICONS.star("w-5 h-5") : GAME_ICONS.swords("w-5 h-5");
 
   mapHtml += `
       <button id="expedition-start-btn" class="bg-gradient-to-r from-amber-500 to-orange-500 text-white font-black text-lg py-4 px-12 rounded-full shadow-lg hover:shadow-xl active:scale-95 transition-all flex items-center gap-2">

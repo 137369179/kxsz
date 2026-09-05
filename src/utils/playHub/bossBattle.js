@@ -19,6 +19,7 @@ import {
   startCountdown,
 } from "./playHelpers.js";
 import { computeAdaptiveProfile, realtimeAdjust } from "../difficultyEngine.js";
+import { triggerHapticSuccess, triggerHapticWarning } from "../haptics.js";
 
 export function renderBossBattle() {
     // ===== 动态出题：优先待复习/难字，每次进入题目不同 =====
@@ -226,6 +227,7 @@ export function renderBossBattle() {
           answered = true;
           roundTimeoutHappened = true;
           soundAndFX.playSoftError();
+          triggerHapticWarning();
           if (tipText) tipText.textContent = `超时！Boss 反扑咬回 8% 血量…`;
           // 超时视同答错：标记难字复习失败
           ebbinghausManager.completeReview(curChar.id, false);
@@ -251,6 +253,7 @@ export function renderBossBattle() {
           const selected = btn.dataset.char;
           if (selected === curChar.char) {
             soundAndFX.playLaserShoot();
+            triggerHapticSuccess();
             soundAndFX.triggerConfetti(this.container);
 
             // ===== 艾宾浩斯复习闭环：答对 → 复习成功 =====
@@ -325,6 +328,7 @@ export function renderBossBattle() {
             }
           } else {
             soundAndFX.playSoftError();
+            triggerHapticWarning();
             this._timeout(() => {
               soundAndFX.speakPriority(`这是“${selected}”字，请释放“${curChar.char}”法术！`, { kind: "sentence", emotion: "correction" });
             }, 180);
