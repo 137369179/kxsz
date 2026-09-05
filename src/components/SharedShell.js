@@ -27,29 +27,29 @@ export function mountGameShell(container, { activeMode, heading }) {
           <div class="flex items-center gap-3 pointer-events-auto">
             ${
               activeMode !== "map"
-              ? `<button data-nav="map" class="shell-nav-btn btn-game-wood touch-target text-white cursor-pointer" title="返回地图" aria-label="返回世界地图" data-speak="返回世界地图">
-                  ${GAME_ICONS.home("w-7 h-7 sm:w-8 sm:h-8")}
+              ? `<button data-nav="map" class="shell-nav-btn rounded-2xl overflow-hidden shadow-lg border-2 border-white/50 touch-target cursor-pointer transform transition-transform hover:scale-105 active:scale-95" title="返回地图" aria-label="返回世界地图" data-speak="返回大地图">
+                  <img src="/assets/images/icon_red_door.jpg" alt="返回" class="w-12 h-12 sm:w-14 sm:h-14 object-cover" />
                  </button>`
-              : `<button data-nav="parent" class="shell-nav-btn btn-game-orange touch-target text-white cursor-pointer" title="家长中心" aria-label="进入家长中心" data-speak="家长中心，需要大人来回答问题哦">
-                  ${GAME_ICONS.shieldLock("w-7 h-7 sm:w-8 sm:h-8")}
+              : `<button data-nav="parent" class="shell-nav-btn touch-target cursor-pointer rounded-2xl overflow-hidden shadow-lg border-2 border-white/50" title="家长中心" aria-label="进入家长中心" data-speak="家长中心，需要大人来回答问题哦">
+                  <img src="/assets/images/icon_shield_lock.jpg" alt="家长中心" class="w-12 h-12 sm:w-14 sm:h-14 object-cover" />
                  </button>`
             }
 
-            <button id="shell-btn-sound-toggle" class="shell-nav-btn btn-game-wood touch-target text-white cursor-pointer" title="声音开关" aria-label="切换声音开关" data-speak="声音开关">
-              <span id="shell-sound-icon-container" class="flex items-center justify-center shrink-0" aria-hidden="true">
-                ${soundAndFX.isMuted ? GAME_ICONS.speaker("w-7 h-7 sm:w-8 sm:h-8", true) : GAME_ICONS.speaker("w-7 h-7 sm:w-8 sm:h-8", false)}
+            <button id="shell-btn-sound-toggle" class="shell-nav-btn rounded-2xl overflow-hidden shadow-lg border-2 border-white/50 touch-target cursor-pointer transform transition-transform hover:scale-105 active:scale-95 bg-white/20" title="声音开关" aria-label="切换声音开关" data-speak="声音开关">
+              <span id="shell-sound-icon-container" class="flex items-center justify-center shrink-0 w-12 h-12 sm:w-14 sm:h-14" aria-hidden="true">
+                <img src="/assets/images/${soundAndFX.isMuted ? 'icon_speaker_muted.jpg' : 'icon_speaker.jpg'}" alt="声音" class="w-full h-full object-cover" />
               </span>
             </button>
           </div>
 
           <div class="flex items-center gap-3 pointer-events-auto">
             <div class="candy-pill shimmer-badge flex items-center gap-2 text-yellow-300 font-black text-sm sm:text-base px-4 sm:px-5 py-1.5 sm:py-2 rounded-full border-2 border-yellow-300 shadow-xl" title="星星" aria-label="星星数量">
-              ${GAME_ICONS.star("w-6 h-6 sm:w-7 sm:h-7", false)}
+              <img src="/assets/images/icon_star.jpg" alt="星星" class="w-6 h-6 sm:w-7 sm:h-7 rounded-full" />
               <span id="shell-stars-count" aria-live="polite">${progress.stars}</span>
             </div>
 
             <div class="candy-pill shimmer-badge flex items-center gap-2 text-amber-300 font-black text-sm sm:text-base px-4 sm:px-5 py-1.5 sm:py-2 rounded-full border-2 border-amber-300 shadow-xl relative" title="金币" aria-label="金币数量">
-              ${GAME_ICONS.coin("w-6 h-6 sm:w-7 sm:h-7")}
+              <img src="/assets/images/icon_coin.jpg" alt="金币" class="w-6 h-6 sm:w-7 sm:h-7 rounded-full" />
               <span id="shell-coins-count" class="relative z-10 font-black text-yellow-200" aria-live="polite">${progress.coins}</span>
               <div id="shell-coins-target-anchor" class="absolute left-1/2 top-1/2 w-1 h-1 -translate-x-1/2 -translate-y-1/2 pointer-events-none" aria-hidden="true"></div>
             </div>
@@ -109,8 +109,8 @@ export function mountGameShell(container, { activeMode, heading }) {
       const containerEl = soundBtn.querySelector("#shell-sound-icon-container");
       if (containerEl) {
         containerEl.innerHTML = muted
-          ? GAME_ICONS.speaker(true)
-          : GAME_ICONS.speaker(false);
+          ? `<img src="/assets/images/icon_speaker_muted.jpg" alt="声音" class="w-full h-full object-cover" />`
+          : `<img src="/assets/images/icon_speaker.jpg" alt="声音" class="w-full h-full object-cover" />`;
       }
     };
     soundBtn.addEventListener("click", soundFn);

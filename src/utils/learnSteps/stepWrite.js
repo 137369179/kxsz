@@ -4,6 +4,7 @@ import { GAME_ICONS } from "../gameIcons.js";
 import { HanziEngine } from "../hanziEngine.js";
 import { HAZARD_PEEK_DURATION_MS } from "../learnScoring.js";
 import { ebbinghausManager } from "../ebbinghaus.js";
+import { escapeHtml } from "../BaseModule.js";
 
 export function renderStepWrite(stage) {
     return this.renderStepTrace(stage);
@@ -22,12 +23,12 @@ export function renderStepFreeWrite(stage) {
         
         <div class="flex-1 flex flex-col items-center justify-center">
           <div class="mb-3 flex items-center gap-2 bg-black/40 px-4 py-1.5 rounded-full border border-white/20 shadow-md">
-            <span class="text-xs font-black text-amber-300">笔画回忆:</span>
+            <span class="text-xs font-black text-amber-300 flex items-center gap-1">${GAME_ICONS.pen("w-3.5 h-3.5")} <span>回忆笔画珠</span></span>
             <div id="freewrite-stroke-beads" class="flex items-center gap-1.5 flex-wrap justify-center">
               ${char.strokes.map((s, idx) => `
-                <span class="stroke-bead px-2.5 py-0.5 rounded-full text-[11px] font-black border transition-all ${idx === 0 ? 'bg-amber-400 text-amber-950 border-white shadow-md animate-pulse' : 'bg-white/15 text-white/60 border-white/20'}" data-idx="${idx}">
-                  ${idx + 1}.${s.name}
-                </span>
+                <button type="button" class="stroke-bead px-2.5 py-0.5 rounded-full text-xs font-black border transition-all cursor-pointer ${idx === 0 ? 'bg-amber-400 text-amber-950 border-white shadow-md animate-pulse' : 'bg-white/15 text-white/60 border-white/20'}" data-idx="${idx}" data-speak="第${idx + 1}笔，${escapeHtml(s.name)}" aria-label="第${idx + 1}笔，${escapeHtml(s.name)}" title="${escapeHtml(s.name)}">
+                  ${idx + 1}
+                </button>
               `).join("")}
             </div>
           </div>
@@ -44,29 +45,29 @@ export function renderStepFreeWrite(stage) {
             </span>
             <h3 class="text-lg font-black text-amber-950 mb-2">小书法家挑战</h3>
             <p class="text-xs text-gray-600 leading-relaxed font-semibold">
-              没有虚线跟着写啦！凭小脑瓜里的记忆，一笔一画写出漂亮的“${char.char}”字！
+              凭小脑瓜里的记忆，一笔一画写出漂亮的「${char.char}」字！
             </p>
           </div>
 
           <div class="flex flex-col gap-2.5">
-            <button id="btn-peek-guide" class="w-full bg-amber-50 hover:bg-amber-100 text-amber-900 font-black text-xs py-2.5 rounded-full border border-amber-300 shadow-sm active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer">
-              <span class="flex items-center">${GAME_ICONS.sparkle("w-3.5 h-3.5")}</span>
-              <span>偷偷看一眼提示 (2秒)</span>
+            <button id="btn-peek-guide" class="w-full bg-amber-50 hover:bg-amber-100 text-amber-900 font-black text-xs py-2.5 rounded-full border border-amber-300 shadow-sm active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer" data-speak="偷偷看一眼提示" aria-label="偷看提示">
+              <span class="flex items-center text-amber-600">${GAME_ICONS.sparkle("w-4 h-4")}</span>
+              <span>魔法眼睛看一眼</span>
             </button>
 
-            <button id="btn-toggle-grid-free" class="w-full bg-amber-50 hover:bg-amber-100 text-amber-900 font-black text-xs py-2 rounded-full border border-amber-300 shadow-sm active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer">
-              <span class="flex items-center">${GAME_ICONS.pen("w-3.5 h-3.5")}</span>
+            <button id="btn-toggle-grid-free" class="w-full bg-amber-50 hover:bg-amber-100 text-amber-900 font-black text-xs py-2 rounded-full border border-amber-300 shadow-sm active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer" data-speak="切换格子" aria-label="切换格子">
+              <span class="flex items-center text-amber-700">${GAME_ICONS.pen("w-3.5 h-3.5")}</span>
               <span id="txt-grid-type-free">当前格线：米字格 (切田字格)</span>
             </button>
 
-            <button id="btn-reset-freewrite" class="w-full bg-amber-100 hover:bg-amber-200 text-amber-900 font-black text-xs py-2.5 rounded-full shadow-sm active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer">
-              <span class="flex items-center">${GAME_ICONS.brush("w-4 h-4")}</span>
-              <span>重写这一字</span>
+            <button id="btn-reset-freewrite" class="w-full bg-amber-100 hover:bg-amber-200 text-amber-900 font-black text-xs py-2.5 rounded-full shadow-sm active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer" data-speak="擦干净重新写" aria-label="重写">
+              <span class="flex items-center text-amber-800">${GAME_ICONS.brush("w-4 h-4")}</span>
+              <span>小橡皮擦重写</span>
             </button>
 
-            <button id="btn-finish-freewrite-step" data-speak="自由书写完成" aria-label="自由书写完成" class="w-full bg-gradient-to-r from-orange-500 via-amber-500 to-yellow-400 text-white font-black text-base py-3.5 rounded-full shadow-[0_8px_25px_rgba(245,158,11,0.6)] border-2 border-white active:scale-95 transition-all flex items-center justify-center gap-2 hidden animate-bounce-slow cursor-pointer hover:brightness-105">
+            <button id="btn-finish-freewrite-step" data-speak="自由书写完成，领宝箱" aria-label="自由书写完成，领宝箱" class="w-full bg-gradient-to-r from-orange-500 via-amber-500 to-yellow-400 text-white font-black text-base py-3.5 rounded-full shadow-[0_8px_25px_rgba(245,158,11,0.6)] border-2 border-white active:scale-95 transition-all flex items-center justify-center gap-2 hidden animate-bounce-slow cursor-pointer hover:brightness-105">
               <span class="flex items-center">${GAME_ICONS.chest("w-5 h-5")}</span>
-              <span>独立书写大成功！去领通关宝箱</span>
+              <span>大成功！开启通关宝箱</span>
             </button>
           </div>
         </div>

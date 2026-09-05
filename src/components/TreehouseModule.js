@@ -59,8 +59,8 @@ export class TreehouseModule extends BaseModule {
         
         <div class="w-full flex flex-col sm:flex-row items-center justify-between bg-white/95 backdrop-blur-md px-6 py-4 rounded-3xl shadow-xl border-2 border-emerald-200 mb-6 gap-4">
           <div class="flex items-center gap-3">
-            <button id="btn-tree-back" data-speak="返回地图" aria-label="返回地图" class="w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-950 flex items-center justify-center shadow-md active:scale-90 transition-transform cursor-pointer" title="返回大地图">
-              ${GAME_ICONS.back("w-5 h-5")}
+            <button id="btn-tree-back" data-speak="返回地图" aria-label="返回地图" class="flex-shrink-0 rounded-2xl overflow-hidden shadow-lg border-2 border-white/50 touch-target cursor-pointer transform transition-transform hover:scale-105 active:scale-95" title="返回大地图">
+              <img src="/assets/images/icon_red_door.jpg" alt="返回" class="w-10 h-10 object-cover" />
             </button>
             <div>
               <h1 class="text-base font-black text-emerald-950 flex items-center gap-2">
@@ -180,23 +180,20 @@ export class TreehouseModule extends BaseModule {
 
           <div class="z-10 w-full max-w-xl bg-white/95 backdrop-blur-md p-4 rounded-3xl border-2 border-emerald-200 shadow-xl flex items-center justify-around gap-3">
             
-            <button id="btn-tree-water" data-speak="给大树浇水" aria-label="浇水培育" class="btn-game-orange text-white text-xs sm:text-sm font-black px-6 py-3.5 rounded-2xl shadow-md active:scale-95 flex items-center gap-2 cursor-pointer flex-1 justify-center">
-              <span class="flex items-center">${GAME_ICONS.sparkle("w-4 h-4")}</span>
-              <span>浇水培育 (5金币)</span>
+            <button id="btn-tree-water" data-speak="给大树浇水" aria-label="浇水培育" class="flex-shrink-0 rounded-2xl overflow-hidden shadow-lg border-4 border-amber-200 touch-target cursor-pointer transform transition-transform hover:scale-105 active:scale-95 flex-1 max-w-xs aspect-square relative">
+              <img src="/assets/images/icon_watering_can.jpg" alt="浇水" class="w-full h-full object-cover" />
             </button>
 
-            <button id="btn-feed-cathy" data-speak="给凯茜点心" aria-label="给凯茜点心" class="bg-gradient-to-r from-teal-500 to-emerald-600 text-white text-xs sm:text-sm font-black px-6 py-3.5 rounded-2xl shadow-md active:scale-95 flex items-center gap-2 cursor-pointer flex-1 justify-center">
-              <span class="flex items-center">${GAME_ICONS.coin("w-4 h-4")}</span>
-              <span>喂食 (10金币)</span>
+            <button id="btn-feed-cathy" data-speak="给凯茜点心" aria-label="给凯茜点心" class="flex-shrink-0 rounded-2xl overflow-hidden shadow-lg border-4 border-amber-200 touch-target cursor-pointer transform transition-transform hover:scale-105 active:scale-95 flex-1 max-w-xs aspect-square relative">
+              <img src="/assets/images/icon_cake.jpg" alt="喂食" class="w-full h-full object-cover" />
             </button>
 
-            <button id="btn-alchemy" data-speak="汉字炼金术" aria-label="汉字炼金术" class="bg-gradient-to-r from-purple-500 to-fuchsia-600 text-white text-xs sm:text-sm font-black px-4 py-3.5 rounded-2xl shadow-md active:scale-95 flex items-center gap-1.5 cursor-pointer flex-1 justify-center">
-              <span class="flex items-center gap-1.5">${GAME_ICONS.sparkle("w-4 h-4")}</span><span>汉字炼金术</span>
+            <button id="btn-alchemy" data-speak="汉字炼金术" aria-label="汉字炼金术" class="flex-shrink-0 rounded-2xl overflow-hidden shadow-lg border-4 border-purple-400 touch-target cursor-pointer transform transition-transform hover:scale-105 active:scale-95 flex-1 max-w-xs aspect-square relative">
+              <img src="/assets/images/icon_cauldron.jpg" alt="炼金" class="w-full h-full object-cover" />
             </button>
 
-            <button id="btn-cathy-riddle" data-speak="听字谜" aria-label="听字谜" class="bg-emerald-100 hover:bg-emerald-200 text-emerald-950 text-xs sm:text-sm font-black px-5 py-3.5 rounded-2xl shadow-md active:scale-95 flex items-center gap-1.5 cursor-pointer hidden sm:flex">
-              <span class="flex items-center">${GAME_ICONS.speaker("w-4 h-4")}</span>
-              <span>听字谜</span>
+            <button id="btn-cathy-riddle" data-speak="听字谜" aria-label="听字谜" class="flex-shrink-0 rounded-2xl overflow-hidden shadow-lg border-4 border-emerald-300 touch-target cursor-pointer transform transition-transform hover:scale-105 active:scale-95 flex-1 max-w-xs aspect-square hidden sm:flex relative">
+              <img src="/assets/images/icon_mic.jpg" alt="字谜" class="w-full h-full object-cover" />
             </button>
 
           </div>

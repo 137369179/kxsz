@@ -37,7 +37,7 @@ export function renderPoemHall() {
       <div class="relative w-full max-w-5xl mx-auto flex flex-col select-none animate-fade-in pb-8">
         
         <div class="flex items-center justify-between mb-6 flex-wrap gap-3">
-          <button id="btn-poem-hall-back" class="bg-white/10 hover:bg-white/20 text-white font-black text-xs sm:text-sm px-4 py-2.5 rounded-full border border-white/20 active:scale-95 transition-transform flex items-center gap-2 cursor-pointer shadow">
+          <button id="btn-poem-hall-back" class="bg-white/10 hover:bg-white/20 text-white font-black text-xs sm:text-sm px-4 py-2.5 rounded-full border border-white/20 active:scale-95 transition-transform flex items-center gap-2 cursor-pointer shadow" data-speak="返回古诗馆入口">
             <span>← 返回游乐场</span>
           </button>
 
@@ -151,20 +151,20 @@ export function renderPoemReader(poem) {
       <div class="relative w-full max-w-4xl mx-auto flex flex-col select-none animate-fade-in pb-10">
         
         <div class="flex items-center justify-between mb-4 flex-wrap gap-3">
-          <button id="btn-reader-back" class="bg-white/10 hover:bg-white/20 text-white font-black text-xs sm:text-sm px-4 py-2 rounded-full border border-white/20 active:scale-95 transition-transform flex items-center gap-1.5 cursor-pointer shadow">
+          <button id="btn-reader-back" class="bg-white/10 hover:bg-white/20 text-white font-black text-xs sm:text-sm px-4 py-2 rounded-full border border-white/20 active:scale-95 transition-transform flex items-center gap-1.5 cursor-pointer shadow" data-speak="返回">
             <span>← 返回古诗馆</span>
           </button>
 
           <div class="flex items-center gap-2">
-            <button id="btn-karaoke-recite" class="bg-gradient-to-r from-amber-400 to-orange-500 text-amber-950 font-black text-xs sm:text-sm px-4 py-2 rounded-full shadow-lg active:scale-95 transition-transform flex items-center gap-1.5 cursor-pointer">
+            <button id="btn-karaoke-recite" class="bg-gradient-to-r from-amber-400 to-orange-500 text-amber-950 font-black text-xs sm:text-sm px-4 py-2 rounded-full shadow-lg active:scale-95 transition-transform flex items-center gap-1.5 cursor-pointer" data-speak="跟我一起诵读">
               <span class="flex items-center">${GAME_ICONS.speaker("w-4 h-4")}</span>
               <span>全文伴读</span>
             </button>
-            <button id="btn-open-feihua" class="bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 text-white font-black text-xs sm:text-sm px-4 py-2 rounded-full shadow-lg active:scale-95 transition-transform flex items-center gap-1.5 cursor-pointer">
+            <button id="btn-open-feihua" class="bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 text-white font-black text-xs sm:text-sm px-4 py-2 rounded-full shadow-lg active:scale-95 transition-transform flex items-center gap-1.5 cursor-pointer" data-speak="玩飞花令">
               <span class="flex items-center">${GAME_ICONS.sparkle("w-4 h-4")}</span>
               <span>古诗飞花令 (+15星币)</span>
             </button>
-            <button id="btn-open-poem-quiz" class="btn-game-orange text-white font-black text-xs sm:text-sm px-4 py-2 rounded-full shadow-lg active:scale-95 transition-transform flex items-center gap-1.5 cursor-pointer">
+            <button id="btn-open-poem-quiz" class="btn-game-orange text-white font-black text-xs sm:text-sm px-4 py-2 rounded-full shadow-lg active:scale-95 transition-transform flex items-center gap-1.5 cursor-pointer" data-speak="古诗小问答">
               <span class="flex items-center">${GAME_ICONS.trophy("w-4 h-4")}</span>
               <span>诗意小问答 (+15星币)</span>
             </button>
@@ -366,8 +366,8 @@ export function _renderPoemQuiz(poem) {
             <span>获得 15 凯茜星币</span>
           </div>
           <div class="flex gap-3">
-            <button id="btn-win-next-poem" class="btn-game-orange text-white font-black px-8 py-3 rounded-full cursor-pointer shadow-lg active:scale-95">再读一首</button>
-            <button id="btn-win-poem-home" class="btn-game-wood text-white font-black px-8 py-3 rounded-full cursor-pointer shadow-lg active:scale-95">返回古诗馆</button>
+            <button id="btn-win-next-poem" class="btn-game-orange text-white font-black px-8 py-3 rounded-full cursor-pointer shadow-lg active:scale-95" data-speak="再读一首">再读一首</button>
+            <button id="btn-win-poem-home" class="btn-game-wood text-white font-black px-8 py-3 rounded-full cursor-pointer shadow-lg active:scale-95" data-speak="返回古诗馆">返回古诗馆</button>
           </div>
         </div>
       </div>

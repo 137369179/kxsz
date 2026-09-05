@@ -4,6 +4,7 @@ import { GAME_ICONS } from "../gameIcons.js";
 import { HanziEngine } from "../hanziEngine.js";
 import { ebbinghausManager } from "../ebbinghaus.js";
 import { shouldUseAirTrace, openAirTracePrompt } from "./airTracePrompt.js";
+import { escapeHtml } from "../BaseModule.js";
 
 export function renderStepTrace(stage) {
     const char = this.charData;
@@ -42,12 +43,12 @@ export function renderStepTrace(stage) {
         
         <div class="flex-1 flex flex-col items-center justify-center">
           <div class="mb-3 flex items-center gap-2 bg-black/40 px-4 py-1.5 rounded-full border border-white/20 shadow-md">
-            <span class="text-xs font-black text-amber-300">笔画推进:</span>
+            <span class="text-xs font-black text-amber-300 flex items-center gap-1">${GAME_ICONS.brush("w-3.5 h-3.5")} <span>笔画糖果珠</span></span>
             <div id="write-stroke-beads" class="flex items-center gap-1.5 flex-wrap justify-center">
               ${char.strokes.map((s, idx) => `
-                <span class="stroke-bead px-2.5 py-0.5 rounded-full text-[11px] font-black border transition-all ${idx === 0 ? 'bg-amber-400 text-amber-950 border-white shadow-md animate-pulse' : 'bg-white/15 text-white/60 border-white/20'}" data-idx="${idx}">
-                  ${idx + 1}.${s.name}
-                </span>
+                <button type="button" class="stroke-bead px-2.5 py-0.5 rounded-full text-xs font-black border transition-all cursor-pointer ${idx === 0 ? 'bg-amber-400 text-amber-950 border-white shadow-md animate-pulse' : 'bg-white/15 text-white/60 border-white/20'}" data-idx="${idx}" data-speak="第${idx + 1}笔，${escapeHtml(s.name)}" aria-label="第${idx + 1}笔，${escapeHtml(s.name)}" title="${escapeHtml(s.name)}">
+                  ${idx + 1}
+                </button>
               `).join("")}
             </div>
           </div>
@@ -66,33 +67,27 @@ export function renderStepTrace(stage) {
             <p class="text-xs text-gray-600 leading-relaxed font-semibold">
               ${GAME_ICONS.sparkle("w-4 h-4 inline-block")} ${hintText}
             </p>
-            ${prewriteSkippedByParent ? `
-            <div class="mt-2 p-2 bg-orange-50 border border-orange-200 rounded-xl text-orange-700 text-[10px] font-bold leading-relaxed">
-              <span class="inline-flex items-center gap-1 mb-0.5">${GAME_ICONS.parent("w-3.5 h-3.5 inline-block")} 家长好！</span>${age}岁宝宝可能还没练过控笔哦～<br>
-              建议先让宝宝在"控笔训练"里画几轮圆圈和横线，<br>
-              小手活动开了再写字会更轻松！
-            </div>` : ""}
           </div>
 
           <div class="flex flex-col gap-2.5">
-            <button id="btn-toggle-grid" class="w-full bg-amber-50 hover:bg-amber-100 text-amber-900 font-black text-xs py-2 rounded-full border border-amber-300 shadow-sm active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer">
-              <span class="flex items-center">${GAME_ICONS.pen("w-3.5 h-3.5")}</span>
+            <button id="btn-demo-write" class="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-white font-black text-xs sm:text-sm py-2.5 rounded-full shadow-md active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer" data-speak="看魔法画笔演示笔顺" aria-label="演示笔顺">
+              <span class="flex items-center text-yellow-200">${GAME_ICONS.sparkle("w-4 h-4")}</span>
+              <span>魔法演示笔顺</span>
+            </button>
+
+            <button id="btn-toggle-grid" class="w-full bg-amber-50 hover:bg-amber-100 text-amber-900 font-black text-xs py-2 rounded-full border border-amber-300 shadow-sm active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer" data-speak="切换格子" aria-label="切换格子">
+              <span class="flex items-center text-amber-700">${GAME_ICONS.pen("w-3.5 h-3.5")}</span>
               <span id="txt-grid-type">当前格线：米字格 (切田字格)</span>
             </button>
 
-            <button id="btn-demo-write" class="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-white font-black text-xs sm:text-sm py-2.5 rounded-full shadow-md active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer">
-              <span class="flex items-center">${GAME_ICONS.sparkle("w-4 h-4")}</span>
-              <span>演示全字笔顺</span>
+            <button id="btn-reset-write" class="w-full bg-amber-100 hover:bg-amber-200 text-amber-900 font-black text-xs py-2.5 rounded-full shadow-sm active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer" data-speak="擦干净重新画" aria-label="橡皮擦重新临摹">
+              <span class="flex items-center text-amber-800">${GAME_ICONS.brush("w-4 h-4")}</span>
+              <span>小橡皮擦重写</span>
             </button>
 
-            <button id="btn-reset-write" class="w-full bg-amber-100 hover:bg-amber-200 text-amber-900 font-black text-xs py-2.5 rounded-full shadow-sm active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer">
-              <span class="flex items-center">${GAME_ICONS.brush("w-4 h-4")}</span>
-              <span>重新临摹这一字</span>
-            </button>
-
-            <button id="btn-finish-write-step" data-speak="描红完成，下一步" aria-label="描红完成，下一步" class="w-full bg-gradient-to-r from-orange-500 via-amber-500 to-yellow-400 text-white font-black text-base py-3.5 rounded-full shadow-[0_8px_25px_rgba(245,158,11,0.6)] border-2 border-white active:scale-95 transition-all flex items-center justify-center gap-2 hidden animate-bounce-slow cursor-pointer hover:brightness-105">
-              <span class="flex items-center">${GAME_ICONS.pen("w-5 h-5")}</span>
-              <span>描红达标！去独立书写</span>
+            <button id="btn-finish-write-step" data-speak="描红完成，去独立写" aria-label="描红完成，去独立写" class="w-full bg-gradient-to-r from-orange-500 via-amber-500 to-yellow-400 text-white font-black text-base py-3.5 rounded-full shadow-[0_8px_25px_rgba(245,158,11,0.6)] border-2 border-white active:scale-95 transition-all flex items-center justify-center gap-2 hidden animate-bounce-slow cursor-pointer hover:brightness-105">
+              <span class="flex items-center">${GAME_ICONS.star("w-5 h-5", false)}</span>
+              <span>大功告成！去独立写</span>
             </button>
           </div>
         </div>

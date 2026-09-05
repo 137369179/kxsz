@@ -36,6 +36,9 @@ jobs:
       - name: Contract & Security Audit
         run: npm run audit
 
+      - name: Voice / A11y coverage report (non-blocking)
+        run: node tools/_a11y_voice_audit.mjs
+
       - name: Smoke tests
         run: npm run smoke
 

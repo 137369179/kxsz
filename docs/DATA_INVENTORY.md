@@ -14,7 +14,7 @@
 | 触感开关 | localStorage `cathy_haptics` | 否 | 家长设置 |
 | 今日任务完成 | localStorage `cathy_daily_quest_done` | 否 | 跨日自然失效 / 清除数据 |
 | 树屋浇水等 | localStorage `cathy_tree_*` | 否 | 清除数据 |
-| 家长语音模板（可选） | IndexedDB | 否 | 清除数据 |
+| 家长语音模板（可选） | IndexedDB（保留最近 30 条，超出自动清理） | 否 | 家长中心逐条删除 / 清除数据 |
 | 本地 TTS（可选） | 本机 `127.0.0.1:8766` | 仅本机环回 | 停用本机语音服务 |
 
 ## 敏感操作 × 家长门禁
@@ -23,7 +23,8 @@
 |------|------|----------|
 | 进入家长中心 | ✅ | `appNavigation.js` |
 | 跳过护眼休息 | ✅ | `eyeCareManager.js` |
-| 首次麦克风评测授权 | ✅ + 持久同意 | `pronunciationEval.js` |
+| 首次麦克风评测授权 | ✅ + 持久同意 | `pronunciationEval.js` → `micCompliance.js`（统一治理：跟读评测 + 家长语音录制） |
+| 家长语音录制授权 | ✅ + 持久同意 + 录音指示 | `parentVoice.js` → `micCompliance.js` |
 | 导出进度 JSON | ✅ | `parentDashboardEvents.js` |
 | 导入同步码 | ✅ | `parentDashboardEvents.js` |
 | 清除全部数据 | ✅ + 二次确认 | `parentDashboardEvents.js` |

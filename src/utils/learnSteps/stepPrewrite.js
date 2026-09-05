@@ -31,8 +31,8 @@ export function renderStepPrewrite(stage) {
 
         <div class="flex-1 flex flex-col items-center justify-center">
           <!-- 训练进度指示 -->
-          <div class="mb-3 flex items-center gap-2 bg-black/30 px-4 py-1.5 rounded-full border border-white/30">
-            <span class="text-xs font-black text-amber-900">控笔进度:</span>
+          <div class="mb-3 flex items-center gap-2 bg-black/40 px-4 py-1.5 rounded-full border border-white/30 text-amber-300 shadow-md">
+            <span class="text-xs font-black flex items-center gap-1.5">${GAME_ICONS.hand("w-3.5 h-3.5")} <span>小手足迹</span></span>
             <div id="prewrite-shape-beads" class="flex items-center gap-2"></div>
           </div>
 
@@ -42,8 +42,9 @@ export function renderStepPrewrite(stage) {
           </div>
 
           <!-- 当前形状名称 -->
-          <div id="prewrite-shape-label" class="mt-3 text-sm font-black text-amber-900 bg-white/70 px-4 py-1 rounded-full border border-amber-300">
-            小手准备好～
+          <div id="prewrite-shape-label" class="mt-3 text-sm font-black text-amber-950 bg-white/90 px-4 py-1 rounded-full border-2 border-amber-400 shadow-sm flex items-center gap-1.5">
+            ${GAME_ICONS.sparkle("w-4 h-4 text-amber-500")}
+            <span>小手准备好～</span>
           </div>
         </div>
 

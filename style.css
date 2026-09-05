@@ -248,6 +248,16 @@
   animation: glowPulse 2.4s infinite ease-in-out;
 }
 
+@keyframes beaconPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255, 180, 0, 0.55); transform: scale(1); }
+  50% { box-shadow: 0 0 0 10px rgba(255, 180, 0, 0); transform: scale(1.06); }
+}
+
+@keyframes shimmerSweep {
+  0% { transform: translateX(-40%) rotate(12deg); }
+  100% { transform: translateX(40%) rotate(12deg); }
+}
+
 .ambient-floating {
   animation: ambientFloating 4.5s infinite ease-in-out;
 }

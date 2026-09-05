@@ -4,6 +4,7 @@ import { GAME_ICONS } from "../gameIcons.js";
 import { ebbinghausManager } from "../ebbinghaus.js";
 import { EVENTS } from "../eventBus.js";
 import { mascotProgress } from "../mascotProgress.js";
+import { getCharPictogramUrl } from "../pictogramRenderer.js";
 
 export function renderStepTestAndChest(stage) {
     const char = this.charData;
@@ -25,21 +26,32 @@ export function renderStepTestAndChest(stage) {
             </div>
           </div>
 
-          <button id="btn-open-golden-chest" class="group relative w-48 h-48 sm:w-56 sm:h-56 rounded-3xl bg-gradient-to-tr from-amber-400 via-yellow-300 to-amber-600 border-4 border-white shadow-[0_0_60px_rgba(255,235,59,0.8)] flex items-center justify-center active:scale-90 transition-transform cursor-pointer animate-bounce-slow">
+          <button id="btn-open-golden-chest" class="group relative w-48 h-48 sm:w-56 sm:h-56 rounded-3xl bg-gradient-to-tr from-amber-400 via-yellow-300 to-amber-600 border-4 border-white shadow-[0_0_60px_rgba(255,235,59,0.8)] flex items-center justify-center active:scale-90 transition-transform cursor-pointer animate-bounce-slow" data-speak="点大宝箱领宝物" aria-label="开启宝箱">
             <span class="flex items-center">${GAME_ICONS.chest("w-28 h-28 sm:w-36 sm:h-36")}</span>
-            <div class="absolute -bottom-3 bg-red-600 text-white font-black text-xs px-4 py-1.5 rounded-full shadow-lg border border-white">
-              点击开启通关宝箱！
+            <div class="absolute -bottom-3 bg-red-600 text-white font-black text-xs px-4 py-1.5 rounded-full shadow-lg border border-white flex items-center gap-1 animate-pulse">
+              <span class="flex items-center">${GAME_ICONS.hand("w-3.5 h-3.5")}</span>
+              <span>轻点开启通关宝箱！</span>
             </div>
           </button>
 
           <h2 class="text-xl sm:text-2xl font-black text-yellow-300 mt-6 mb-1">
-            恭喜凯茜小勇士！通关“${char.char}”字大冒险！
+            恭喜凯茜小勇士！通关「${char.char}」字大冒险！
           </h2>
         </div>
 
         <div id="chest-reward-card" class="absolute inset-0 bg-black/85 backdrop-blur-md rounded-3xl p-8 flex flex-col items-center justify-center text-white hidden animate-scale-up z-30">
-          <div class="w-32 h-32 sm:w-40 sm:h-40 rounded-3xl bg-gradient-to-tr from-orange-500 to-amber-400 border-4 border-white text-7xl sm:text-8xl font-black flex items-center justify-center shadow-2xl mb-4 animate-bounce-cathy">
-            ${char.char}
+          <div class="flex items-center gap-4 mb-4">
+            ${(() => {
+              const picUrl = getCharPictogramUrl(char.char);
+              return picUrl ? `
+              <div class="w-28 h-28 sm:w-36 sm:h-36 rounded-3xl overflow-hidden border-4 border-amber-300 shadow-2xl bg-amber-100 animate-bounce-cathy">
+                <img src="${picUrl}" alt="${char.char}" class="w-full h-full object-cover" />
+              </div>
+              ` : "";
+            })()}
+            <div class="w-28 h-28 sm:w-36 sm:h-36 rounded-3xl bg-gradient-to-tr from-orange-500 to-amber-400 border-4 border-white text-6xl sm:text-7xl font-black flex items-center justify-center shadow-2xl animate-bounce-cathy text-white">
+              ${char.char}
+            </div>
           </div>
 
           <h2 class="text-2xl sm:text-3xl font-black text-yellow-300 mb-1">获得全新专属字卡：${char.char}</h2>
@@ -49,8 +61,8 @@ export function renderStepTestAndChest(stage) {
           </p>
 
           <button id="btn-confirm-return-map" data-speak="领取奖励，返回大地图" aria-label="领取奖励，返回大地图" class="bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 hover:from-yellow-300 hover:to-red-400 text-white font-black text-base sm:text-lg px-12 py-3.5 rounded-full shadow-[0_0_40px_rgba(255,107,0,0.9)] border-2 border-white active:scale-95 transition-transform flex items-center justify-center gap-2 cursor-pointer">
-            <span class="flex items-center">${GAME_ICONS.home("w-5 h-5")}</span>
-            <span>收入生词本，返回大地图</span>
+            <span class="flex items-center">${GAME_ICONS.home("w-6 h-6")}</span>
+            <span>收进小宝库 · 返回地图</span>
           </button>
         </div>
 

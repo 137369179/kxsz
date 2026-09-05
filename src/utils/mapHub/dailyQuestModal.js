@@ -145,16 +145,16 @@ export function openDailyQuestModal(container = document.body, { onStartLearn, o
   const pct = snap.total > 0 ? Math.round((snap.completed / snap.total) * 100) : 0;
 
   overlay.innerHTML = `
-    <div role="dialog" aria-modal="true" aria-labelledby="quest-modal-title" aria-describedby="quest-modal-desc" class="relative w-full max-w-xl bg-gradient-to-b from-amber-50 via-orange-50 to-rose-50 rounded-3xl p-6 sm:p-7 shadow-2xl border-4 border-orange-500 flex flex-col items-center text-amber-950 animate-scale-up">
+    <div role="dialog" aria-modal="true" aria-labelledby="quest-modal-title" aria-describedby="quest-modal-desc" class="parchment-board relative w-full max-w-xl rounded-3xl p-6 sm:p-7 flex flex-col items-center text-amber-950 animate-scale-up">
       
-      <button id="btn-close-quest-modal" class="absolute -top-3.5 -right-3.5 w-12 h-12 rounded-full bg-white text-amber-900 font-extrabold text-base flex items-center justify-center shadow-xl hover:bg-amber-100 active:scale-95 cursor-pointer border-2 border-amber-300 touch-target" aria-label="关闭今日任务" data-speak="关闭">
-        <span class="font-sans font-bold leading-none">✕</span>
+      <button id="btn-close-quest-modal" class="btn-game-wood absolute -top-3.5 -right-3.5 w-12 h-12 rounded-full text-white font-extrabold text-base flex items-center justify-center cursor-pointer touch-target" aria-label="关闭今日任务" data-speak="关闭">
+        <span class="flex items-center">${GAME_ICONS.back("w-5 h-5")}</span>
       </button>
 
       <div class="flex flex-col items-center text-center mb-4">
         <div class="flex items-center gap-2 mb-1.5">
           <span class="flex items-center">${GAME_ICONS.sparkle("w-6 h-6 text-orange-500")}</span>
-          <h2 id="quest-modal-title" class="text-2xl font-black text-orange-600 tracking-wide">今天的小冒险</h2>
+          <h2 id="quest-modal-title" class="text-2xl font-black text-orange-700 tracking-wide">今天的小冒险</h2>
         </div>
         <p id="quest-modal-desc" class="text-base text-amber-800/80 font-bold mb-2">学新字 · 复习老朋友 · 读小故事</p>
         <div class="flex items-center gap-2 flex-wrap justify-center text-xs text-amber-900">
@@ -170,8 +170,8 @@ export function openDailyQuestModal(container = document.body, { onStartLearn, o
             <span>探险进度</span>
             <span>${snap.completed} / ${snap.total || tasks.length}</span>
           </div>
-          <div class="h-3 rounded-full bg-white border-2 border-amber-200 overflow-hidden">
-            <div class="h-full rounded-full bg-gradient-to-r from-amber-400 to-orange-500 transition-all" style="width:${pct}%"></div>
+          <div class="progress-candy-bar ${snap.allDone ? "is-done" : ""}" style="height:0.75rem">
+            <span class="progress-candy-bar-fill" style="width:${pct}%"></span>
           </div>
         </div>
       </div>
@@ -183,7 +183,7 @@ export function openDailyQuestModal(container = document.body, { onStartLearn, o
           <div class="quest-task-item flex items-center justify-between p-3.5 rounded-2xl ${done ? "bg-emerald-50 border-emerald-300 opacity-80" : "bg-white hover:bg-orange-50"} border-2 ${t.type === "new" ? "border-orange-300 hover:border-orange-400" : t.type === "book" ? "border-sky-300 hover:border-sky-400" : "border-teal-300 hover:border-teal-400"} transition-all cursor-pointer group touch-target" data-index="${idx}" data-type="${t.type}" data-speak="${escapeHtml(t.title)}，${escapeHtml(t.subtitle)}" role="button" tabindex="0" aria-label="${escapeHtml(t.title)}">
             <div class="flex items-center gap-3">
               <span class="w-10 h-10 rounded-full ${done ? "bg-emerald-500 text-white" : "bg-amber-100 text-amber-800"} font-black text-sm flex items-center justify-center border border-amber-200">
-                ${done ? "✓" : t.stepNum}
+                ${done ? `<span class="flex items-center">${GAME_ICONS.check("w-5 h-5")}</span>` : t.stepNum}
               </span>
               <div class="w-12 h-12 rounded-2xl ${t.type === "new" ? "bg-gradient-to-br from-amber-400 to-orange-500 text-amber-950" : t.type === "book" ? "bg-gradient-to-br from-sky-400 to-blue-500 text-white" : "bg-gradient-to-br from-teal-400 to-emerald-600 text-white"} flex items-center justify-center font-black text-2xl shadow-md group-hover:scale-110 transition-transform">
                 ${escapeHtml(t.char)}
@@ -196,7 +196,7 @@ export function openDailyQuestModal(container = document.body, { onStartLearn, o
                 <p class="text-[11px] text-amber-800/70 mt-0.5">${escapeHtml(t.subtitle)}</p>
               </div>
             </div>
-            <button class="btn-task-go px-3 py-2 rounded-xl ${done ? "bg-emerald-500" : t.type === "new" ? "bg-orange-500 hover:bg-orange-400" : t.type === "book" ? "bg-sky-500 hover:bg-sky-400" : "bg-teal-600 hover:bg-teal-500"} text-white font-black text-xs active:scale-95 transition-all touch-target" data-speak="${done ? "已经完成啦" : "去完成"}" aria-label="${done ? "已完成" : "去完成"}">
+            <button class="btn-task-go px-3.5 py-2 rounded-full ${done ? "btn-game-green" : t.type === "new" ? "btn-game-orange" : t.type === "book" ? "btn-game-blue" : "btn-game-green"} text-white font-black text-xs touch-target" data-speak="${done ? "已经完成啦" : "去完成"}" aria-label="${done ? "已完成" : "去完成"}">
               ${done ? "完成" : "出发"}
             </button>
           </div>`;
@@ -214,12 +214,12 @@ export function openDailyQuestModal(container = document.body, { onStartLearn, o
           大约需要 10～15 分钟
         </span>
         ${hasTasks ? `
-          <button id="btn-start-quest-flow" class="px-6 py-3 rounded-full bg-orange-500 hover:bg-orange-400 text-white font-black text-sm shadow-xl active:scale-95 transition-all flex items-center gap-2 cursor-pointer touch-target" data-speak="从第一项开始探险" aria-label="从第一项开始">
+          <button id="btn-start-quest-flow" class="btn-game-orange px-6 py-3 rounded-full text-white font-black text-sm flex items-center gap-2 cursor-pointer touch-target" data-speak="从第一项开始探险" aria-label="从第一项开始">
             <span class="flex items-center">${GAME_ICONS.sparkle("w-4 h-4")}</span>
             <span>开始探险</span>
           </button>
         ` : `
-          <button id="btn-quest-confirm" class="px-6 py-3 rounded-full bg-amber-200 text-amber-950 font-black text-xs hover:bg-amber-300 transition-all touch-target" data-speak="知道了" aria-label="知道了">
+          <button id="btn-quest-confirm" class="btn-game-wood px-6 py-3 rounded-full text-white font-black text-xs touch-target" data-speak="知道了" aria-label="知道了">
             知道了
           </button>
         `}

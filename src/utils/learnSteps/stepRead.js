@@ -5,6 +5,7 @@ import { pronunciationEval } from "../pronunciationEval.js";
 import { scoreToStars, RECORD_MAX_DURATION_MS, RECORD_SILENCE_TIMEOUT_MS } from "../learnScoring.js";
 import { ebbinghausManager } from "../ebbinghaus.js";
 import { mascotProgress } from "../mascotProgress.js";
+import { renderRadicalRuneBadge } from "../pictogramRenderer.js";
 
 export function renderStepRead(stage) {
     const char = this.charData;
@@ -18,28 +19,31 @@ export function renderStepRead(stage) {
             ${char.pinyin}
           </div>
 
-          <button id="read-char-circle" class="relative group w-52 h-52 sm:w-60 sm:h-60 rounded-3xl bg-gradient-to-tr from-sky-400 via-blue-500 to-indigo-600 border-4 border-white shadow-[0_0_50px_rgba(56,189,248,0.7)] flex items-center justify-center text-9xl sm:text-[10rem] font-black text-white active:scale-95 transition-all cursor-pointer animate-bounce-cathy" title="点击听示范发音" data-speak="示范发音" aria-label="示范发音">
+          <button id="read-char-circle" class="relative group w-52 h-52 sm:w-60 sm:h-60 rounded-3xl bg-gradient-to-tr from-sky-400 via-blue-500 to-indigo-600 border-4 border-white shadow-[0_0_50px_rgba(56,189,248,0.7)] flex items-center justify-center text-9xl sm:text-[10rem] font-black text-white active:scale-95 transition-all cursor-pointer animate-bounce-cathy" title="点击听示范发音" data-speak="${char.char}，${char.pinyin}" aria-label="示范发音">
             ${char.char}
-            <div class="absolute -bottom-2.5 bg-blue-950 text-sky-200 text-[10px] font-black px-3.5 py-0.5 rounded-full border border-sky-400 flex items-center gap-1 shadow-md">
-              <span>示范发音</span>
+            <div class="absolute -bottom-2.5 bg-blue-950 text-sky-200 text-xs font-black px-4 py-1 rounded-full border border-sky-400 flex items-center gap-1.5 shadow-md">
+              <span>听凯茜读</span>
               <span class="w-3.5 h-3.5 inline-block">${GAME_ICONS.speaker("w-3.5 h-3.5")}</span>
             </div>
           </button>
 
-          <div class="flex items-center gap-3 mt-6">
-            <span class="bg-white/15 text-white/90 text-xs font-black px-3.5 py-1 rounded-full border border-white/20">部首：${char.radical}</span>
-            <span class="bg-white/15 text-white/90 text-xs font-black px-3.5 py-1 rounded-full border border-white/20">笔画：${char.strokeCount || 4}画</span>
+          <div class="flex items-center gap-3 mt-5">
+            ${renderRadicalRuneBadge(char.radical || char.char)}
+            <span class="bg-white/20 text-white text-xs font-black px-4 py-1.5 rounded-full border border-white/30 flex items-center gap-1.5">
+              ${GAME_ICONS.brush("w-3.5 h-3.5")} <span>${char.strokeCount || 4} 笔</span>
+            </span>
           </div>
         </div>
 
         <div id="read-eval-panel" class="w-[380px] flex flex-col justify-between h-full bg-white/10 backdrop-blur-xl rounded-3xl p-6 border-2 border-white/30 text-center relative overflow-hidden">
           
           <div class="z-10">
-            <h3 id="read-panel-title" class="text-base font-black text-yellow-300 mb-1 flex items-center justify-center gap-1.5">
-              <span>${GAME_ICONS.audio("w-4 h-4 inline-block")} 语音评测挑战</span>
+            <h3 id="read-panel-title" class="text-base font-black text-yellow-300 mb-1 flex items-center justify-center gap-2">
+              <span class="flex items-center text-rose-300">${GAME_ICONS.audio("w-5 h-5")}</span>
+              <span>凯茜听你读</span>
             </h3>
             <p id="record-guide-text" class="text-xs text-sky-100 font-bold leading-relaxed">
-              点击麦克风，大声读出“<strong class="text-yellow-300 text-sm font-black">${char.char}</strong>”！
+              轻点大麦克风，大声读出「<strong class="text-yellow-300 text-sm font-black">${char.char}</strong>」！
             </p>
           </div>
 
@@ -54,7 +58,7 @@ export function renderStepRead(stage) {
               <div class="relative w-36 h-36 flex items-center justify-center">
                 <canvas id="record-countdown-ring" width="144" height="144" class="absolute inset-0 w-full h-full pointer-events-none z-20 hidden"></canvas>
 
-                <button id="btn-start-record" class="relative z-10 w-28 h-28 sm:w-32 sm:h-32 rounded-full bg-gradient-to-tr from-rose-500 via-red-500 to-orange-400 shadow-[0_10px_30px_rgba(244,63,94,0.7)] flex items-center justify-center border-4 border-white active:scale-90 transition-all hover:scale-105 cursor-pointer">
+                <button id="btn-start-record" class="relative z-10 w-28 h-28 sm:w-32 sm:h-32 rounded-full bg-gradient-to-tr from-rose-500 via-red-500 to-orange-400 shadow-[0_10px_30px_rgba(244,63,94,0.7)] flex items-center justify-center border-4 border-white active:scale-90 transition-all hover:scale-105 cursor-pointer" title="点击开始录音">
                   <div id="mic-icon-wrapper" class="w-12 h-12 text-white flex items-center justify-center pointer-events-none">
                     ${GAME_ICONS.audio("w-12 h-12")}
                   </div>
@@ -71,14 +75,16 @@ export function renderStepRead(stage) {
                 <div class="vol-bar w-1.5 bg-emerald-400 rounded-full transition-all duration-75" style="height: 20%"></div>
               </div>
 
-              <div id="record-audio-cue" class="mt-2 text-[11px] font-black text-emerald-300 hidden animate-bounce bg-emerald-950/80 border border-emerald-400/50 px-3 py-0.5 rounded-full shadow-lg">
-                听到声音啦，继续读！
+              <div id="record-audio-cue" class="mt-2 text-xs font-black text-emerald-300 hidden animate-bounce bg-emerald-950/80 border border-emerald-400/50 px-3.5 py-1 rounded-full shadow-lg flex items-center gap-1.5">
+                <span>${GAME_ICONS.speaker("w-3.5 h-3.5")}</span>
+                <span>听到啦！继续读～</span>
               </div>
 
               <div id="record-interim-text" class="mt-2 text-xs font-black text-emerald-300 h-5 transition-opacity duration-300 opacity-0"></div>
 
-              <div id="record-status" class="mt-2 text-xs font-black text-rose-200 tracking-wider">
-                点击开始录音
+              <div id="record-status" class="mt-2 text-xs font-black text-rose-200 tracking-wider flex items-center justify-center gap-1">
+                <span>${GAME_ICONS.sparkle("w-3.5 h-3.5")}</span>
+                <span>轻点麦克风开嗓</span>
               </div>
 
               <div id="record-error-text" class="mt-2 text-xs font-black text-rose-300 hidden"></div>

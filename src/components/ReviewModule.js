@@ -205,7 +205,7 @@ export class ReviewModule extends BaseModule {
 
   renderEmpty() {
     const __rvProgress = ebbinghausManager.progress;
-    const __rvSpeakerIcon = soundAndFX.isMuted ? GAME_ICONS.speaker("w-5 h-5", true) : GAME_ICONS.speaker("w-5 h-5", false);
+    const __rvSpeakerIcon = soundAndFX.isMuted ? `<img src="/assets/images/icon_speaker_muted.jpg" class="w-6 h-6 object-cover" alt="Muted" />` : `<img src="/assets/images/icon_speaker.jpg" class="w-6 h-6 object-cover" alt="Speaker" />`;
     const learnedRecords = ebbinghausManager.progress.charRecords || {};
     const difficultIds = (ebbinghausManager.getDifficultCharIds ? ebbinghausManager.getDifficultCharIds() : []).filter(
       (id) => Object.prototype.hasOwnProperty.call(learnedRecords, id)
@@ -221,9 +221,8 @@ export class ReviewModule extends BaseModule {
         
         <header class="relative z-30 w-full px-6 py-3 flex items-center justify-between bg-black/40 backdrop-blur-md border-b border-white/20">
           <div class="flex items-center gap-2">
-            <button id="btn-review-empty-header-back" data-speak="返回大地图" aria-label="返回大地图" class="btn-game-wood text-white font-black text-xs px-4 py-2 rounded-full flex items-center gap-1.5 cursor-pointer active:scale-95 touch-target">
-              <span class="flex items-center">${GAME_ICONS.home("w-4 h-4")}</span>
-              <span>返回地图</span>
+            <button id="btn-review-empty-header-back" data-speak="返回大地图" aria-label="返回大地图" class="flex-shrink-0 rounded-2xl overflow-hidden shadow-lg border-2 border-white/50 touch-target cursor-pointer transform transition-transform hover:scale-105 active:scale-95">
+              <img src="/assets/images/icon_red_door.jpg" alt="返回" class="w-10 h-10 object-cover" />
             </button>
             <button id="btn-review-empty-sound" class="w-10 h-10 bg-black/40 backdrop-blur-md rounded-full text-white flex items-center justify-center hover:bg-black/60 transition-transform active:scale-90 border border-white/30 shadow-lg cursor-pointer touch-target" title="声音开关">
               ${__rvSpeakerIcon}
@@ -231,17 +230,17 @@ export class ReviewModule extends BaseModule {
           </div>
           <div class="flex items-center gap-2">
             <div class="candy-pill flex items-center gap-1.5 text-yellow-300 font-black text-xs px-3 py-1 rounded-full">
-              ${GAME_ICONS.coin("w-4 h-4")}<span>${__rvProgress.coins}</span>
+              <img src="/assets/images/icon_coin.jpg" class="w-5 h-5 rounded-full" alt="Coin" /><span>${__rvProgress.coins}</span>
             </div>
             <div class="candy-pill flex items-center gap-1.5 text-amber-300 font-black text-xs px-3 py-1 rounded-full">
-              ${GAME_ICONS.star("w-4 h-4", false)}<span>${__rvProgress.stars}</span>
+              <img src="/assets/images/icon_star.jpg" class="w-5 h-5 rounded-full" alt="Star" /><span>${__rvProgress.stars}</span>
             </div>
           </div>
         </header>
 
         <main class="relative z-10 flex-1 flex items-center justify-center p-6">
           <div class="flex flex-col items-center text-center animate-scale-up bg-white/10 backdrop-blur-md p-8 sm:p-10 rounded-3xl border-2 border-white/20 shadow-2xl max-w-md">
-            <div class="mb-4 flex items-center justify-center scale-125">${GAME_ICONS.reviewBell("w-20 h-20")}</div>
+            <div class="mb-4 flex items-center justify-center scale-125"><img src="/assets/images/icon_bell.jpg" class="w-20 h-20 object-cover rounded-3xl" alt="Bell" /></div>
             <h2 class="text-2xl font-black text-yellow-300 mb-2">记忆状态极佳！</h2>
             <p class="text-xs sm:text-sm text-white/80 mb-6 font-semibold leading-relaxed">
               今天暂时没有要复习的老朋友啦！可以去大地图认识新字，或打一场难字突击战。
@@ -250,22 +249,20 @@ export class ReviewModule extends BaseModule {
               difficultIds.length > 0
                 ? `
             <button id="btn-start-difficult-assault" class="btn-game-orange text-white font-black text-xs sm:text-sm px-8 py-3 rounded-full flex items-center gap-2 shadow-xl active:scale-95 cursor-pointer mb-3 touch-target" data-speak="开始难字消灭突击战">
-              <span class="flex items-center">${GAME_ICONS.swords("w-4 h-4")}</span>
+              <span class="flex items-center"><img src="/assets/images/icon_swords.jpg" class="w-5 h-5 rounded-md" alt="Swords" /></span>
               <span>难字消灭突击战 (${difficultIds.length})</span>
             </button>
-            <button id="btn-review-empty-back" data-speak="返回大地图" aria-label="返回大地图" class="bg-white/20 hover:bg-white/30 text-white font-bold text-xs px-6 py-2 rounded-full flex items-center gap-1.5 shadow-md active:scale-95 cursor-pointer touch-target">
-              <span class="flex items-center">${GAME_ICONS.home("w-4 h-4")}</span>
-              <span>返回大地图</span>
+            <button id="btn-review-empty-back" data-speak="返回大地图" aria-label="返回大地图" class="flex-shrink-0 rounded-2xl overflow-hidden shadow-lg border-2 border-white/50 touch-target cursor-pointer transform transition-transform hover:scale-105 active:scale-95">
+              <img src="/assets/images/icon_red_door.jpg" alt="返回" class="w-12 h-12 object-cover" />
             </button>
             `
                 : `
             <button id="btn-start-difficult-assault" class="bg-white/20 hover:bg-white/30 text-amber-200 font-bold text-xs px-6 py-2.5 rounded-full flex items-center gap-2 shadow-md active:scale-95 cursor-pointer mb-3 touch-target" data-speak="易错难字专项突击">
-              <span class="flex items-center">${GAME_ICONS.swords("w-4 h-4")}</span>
+              <span class="flex items-center"><img src="/assets/images/icon_swords.jpg" class="w-5 h-5 rounded-md" alt="Swords" /></span>
               <span>易错难字专项突击</span>
             </button>
-            <button id="btn-review-empty-back" data-speak="返回大地图" aria-label="返回大地图" class="btn-game-orange text-white font-black text-sm sm:text-base px-10 py-3 rounded-full flex items-center gap-2 shadow-xl active:scale-95 cursor-pointer touch-target">
-              <span class="flex items-center">${GAME_ICONS.home("w-5 h-5")}</span>
-              <span>返回大地图</span>
+            <button id="btn-review-empty-back" data-speak="返回大地图" aria-label="返回大地图" class="flex-shrink-0 rounded-2xl overflow-hidden shadow-lg border-2 border-white/50 touch-target cursor-pointer transform transition-transform hover:scale-105 active:scale-95">
+              <img src="/assets/images/icon_red_door.jpg" alt="返回" class="w-14 h-14 object-cover" />
             </button>
             `
             }
@@ -347,7 +344,7 @@ export class ReviewModule extends BaseModule {
 
   renderRound() {
     const __rvProgress = ebbinghausManager.progress;
-    const __rvSpeakerIcon = soundAndFX.isMuted ? GAME_ICONS.speaker("w-5 h-5", true) : GAME_ICONS.speaker("w-5 h-5", false);
+    const __rvSpeakerIcon = soundAndFX.isMuted ? `<img src="/assets/images/icon_speaker_muted.jpg" class="w-6 h-6 object-cover" alt="Muted" />` : `<img src="/assets/images/icon_speaker.jpg" class="w-6 h-6 object-cover" alt="Speaker" />`;
     const charData = this.queue[this.currentIndex];
     const progress = this.currentIndex + 1;
 
@@ -361,9 +358,8 @@ export class ReviewModule extends BaseModule {
         </div>
         
         <header class="relative z-30 w-full px-6 py-3 flex items-center justify-between bg-black/40 backdrop-blur-md border-b border-white/20">
-          <button id="btn-review-quit" data-speak="退出复习，返回大地图" aria-label="退出复习，返回大地图" class="btn-game-wood text-white font-black text-xs px-4 py-2 rounded-full flex items-center gap-1.5 cursor-pointer active:scale-95">
-            <span class="flex items-center">${GAME_ICONS.home("w-4 h-4")}</span>
-            <span>返回地图</span>
+          <button id="btn-review-quit" data-speak="退出复习，返回大地图" aria-label="退出复习，返回大地图" class="flex-shrink-0 rounded-2xl overflow-hidden shadow-lg border-2 border-white/50 touch-target cursor-pointer transform transition-transform hover:scale-105 active:scale-95">
+            <img src="/assets/images/icon_red_door.jpg" alt="返回" class="w-10 h-10 object-cover" />
           </button>
 
           <div class="flex items-center gap-2">
@@ -372,7 +368,7 @@ export class ReviewModule extends BaseModule {
               <span class="text-yellow-300 font-black text-sm font-mono">${progress} / ${this.queue.length}</span>
             </div>
             <button id="btn-review-assault-mode" class="candy-pill hidden sm:flex items-center gap-1.5 text-rose-300 hover:text-rose-200 font-black text-xs px-3 py-1.5 rounded-full border border-rose-400/40 cursor-pointer active:scale-95 touch-target" title="难字消灭战" data-speak="难字消灭战">
-              <span class="flex items-center">${GAME_ICONS.swords("w-4 h-4")}</span>
+              <span class="flex items-center"><img src="/assets/images/icon_swords.jpg" class="w-5 h-5 rounded-md" alt="Swords" /></span>
               <span>难字突击</span>
             </button>
           </div>
@@ -382,10 +378,10 @@ export class ReviewModule extends BaseModule {
               ${__rvSpeakerIcon}
             </button>
             <div class="candy-pill flex items-center gap-1.5 text-yellow-300 font-black text-xs px-3 py-1 rounded-full">
-              ${GAME_ICONS.coin("w-4 h-4")}<span>${__rvProgress.coins}</span>
+              <img src="/assets/images/icon_coin.jpg" class="w-5 h-5 rounded-full" alt="Coin" /><span>${__rvProgress.coins}</span>
             </div>
             <div class="candy-pill flex items-center gap-1.5 text-amber-300 font-black text-xs px-3 py-1 rounded-full">
-              ${GAME_ICONS.star("w-4 h-4", false)}<span>${__rvProgress.stars}</span>
+              <img src="/assets/images/icon_star.jpg" class="w-5 h-5 rounded-full" alt="Star" /><span>${__rvProgress.stars}</span>
             </div>
           </div>
         </header>
@@ -418,7 +414,7 @@ export class ReviewModule extends BaseModule {
     if (soundBtn) {
       this._on(soundBtn, "click", () => {
         soundAndFX.toggleMute();
-        const ic = soundAndFX.isMuted ? GAME_ICONS.speaker("w-5 h-5", true) : GAME_ICONS.speaker("w-5 h-5", false);
+        const ic = soundAndFX.isMuted ? `<img src="/assets/images/icon_speaker_muted.jpg" class="w-6 h-6 object-cover" alt="Muted" />` : `<img src="/assets/images/icon_speaker.jpg" class="w-6 h-6 object-cover" alt="Speaker" />`;
         soundBtn.innerHTML = ic;
       });
     }
@@ -591,7 +587,7 @@ export class ReviewModule extends BaseModule {
       'animation:slideDown 0.3s ease',
     ].join(';');
     banner.innerHTML = [
-      GAME_ICONS.star('w-5 h-5', false),
+      `<img src="/assets/images/icon_star.jpg" class="w-6 h-6 rounded-full" alt="Star" />`,
       `<span>「${escapeHtml(charData.char)}」我们再练一次吧 · 已加入本轮末尾</span>`,
     ].join('');
     document.body.appendChild(banner);
@@ -608,7 +604,7 @@ export class ReviewModule extends BaseModule {
     }
 
     const __rvProgress = ebbinghausManager.progress;
-    const __rvSpeakerIcon = soundAndFX.isMuted ? GAME_ICONS.speaker("w-5 h-5", true) : GAME_ICONS.speaker("w-5 h-5", false);
+    const __rvSpeakerIcon = soundAndFX.isMuted ? `<img src="/assets/images/icon_speaker_muted.jpg" class="w-6 h-6 object-cover" alt="Muted" />` : `<img src="/assets/images/icon_speaker.jpg" class="w-6 h-6 object-cover" alt="Speaker" />`;
     const total = this.queue.length;
     const perfect = this.wrongCount === 0;
     const forgottenSet = new Set(this.forgottenChars);
@@ -628,7 +624,7 @@ export class ReviewModule extends BaseModule {
         <div class="flex flex-col items-center text-center bg-white/10 backdrop-blur-md rounded-3xl border-2 border-white/20 p-8 sm:p-10 max-w-lg shadow-2xl animate-scale-up">
           
           <div class="mb-3 flex items-center justify-center">
-            ${perfect ? GAME_ICONS.trophy("w-20 h-20 sm:w-24 sm:h-24") : GAME_ICONS.star("w-20 h-20 sm:w-24 sm:h-24", false)}
+            ${perfect ? `<img src="/assets/images/icon_trophy.jpg" class="w-20 h-20 sm:w-24 sm:h-24 object-cover rounded-3xl" alt="Trophy" />` : `<img src="/assets/images/icon_star.jpg" class="w-20 h-20 sm:w-24 sm:h-24 rounded-full" alt="Star" />`}
           </div>
           
           <h2 class="text-2xl sm:text-3xl font-black text-yellow-300 mb-2">
@@ -656,22 +652,22 @@ export class ReviewModule extends BaseModule {
 
           ${this.forgottenChars.length > 0 ? `
           <div class="w-full bg-sky-900/30 border border-sky-400/40 rounded-2xl px-4 py-2.5 mb-4 text-xs text-sky-100 font-bold flex items-center gap-2">
-            ${GAME_ICONS.star('w-4 h-4', false)}
+            <img src="/assets/images/icon_star.jpg" class="w-5 h-5 rounded-full" alt="Star" />
             <span>明天优先再看看：${this.forgottenChars.map(id => { const c = this.queue.find(q => q.id === id); return c ? c.char : id; }).join('、')}</span>
           </div>` : ''}
 
           <div class="candy-pill rounded-2xl px-6 py-2.5 mb-6 text-sm text-yellow-300 font-black flex items-center gap-2 border border-yellow-300/40">
-            ${GAME_ICONS.coin("w-5 h-5")}
+            <img src="/assets/images/icon_coin.jpg" class="w-6 h-6 rounded-full" alt="Coin" />
             <span>奖励 +${earnedCoins} 凯茜星币</span>
           </div>
 
           <div class="flex flex-col sm:flex-row items-center gap-3 w-full justify-center">
             <button id="btn-review-print" class="bg-rose-500 hover:bg-rose-600 text-white font-black text-xs sm:text-sm px-6 py-3.5 rounded-full flex items-center gap-2 shadow-xl active:scale-95 cursor-pointer">
-              <span class="flex items-center">${GAME_ICONS.print("w-4 h-4")}</span>
+              <span class="flex items-center"><img src="/assets/images/icon_print.jpg" class="w-5 h-5 rounded-md" alt="Print" /></span>
               <span>打印复习字帖</span>
             </button>
             <button id="btn-review-done" data-speak="领取奖励，返回大地图" aria-label="领取奖励，返回大地图" class="btn-game-orange text-white font-black text-xs sm:text-sm px-8 py-3.5 rounded-full flex items-center gap-2 shadow-2xl active:scale-95 cursor-pointer">
-              <span class="flex items-center">${GAME_ICONS.home("w-4 h-4")}</span>
+              <span class="flex items-center"><img src="/assets/images/icon_home.jpg" class="w-5 h-5 object-cover rounded-md" alt="Home" /></span>
               <span>领取奖励 · 返回大地图</span>
             </button>
           </div>

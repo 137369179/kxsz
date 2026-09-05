@@ -18,6 +18,7 @@ import {
   getStepDuration,
 } from "../utils/learnScoring.js";
 import { getLearnStepMeta } from "../utils/learnSteps/stepMeta.js";
+import { getCharPictogramUrl } from "../utils/pictogramRenderer.js";
 import { renderStepPlay } from "../utils/learnSteps/stepPlay.js";
 import { renderStepRecognize } from "../utils/learnSteps/stepRecognize.js";
 import { renderStepRead, _bindManualRating, executeRecordToggle, _showRecordError, _showMicPermissionModal, _resetRecordUI, _showEvalResult } from "../utils/learnSteps/stepRead.js";
@@ -152,9 +153,8 @@ export class LearnModule extends BaseModule {
         
         <header class="relative z-30 w-full px-4 sm:px-8 py-3 flex items-center justify-between bg-black/40 backdrop-blur-md border-b-2 border-white/20 flex-wrap gap-2">
           
-          <button id="btn-learn-back-map" data-speak="返回大地图" aria-label="返回大地图" class="flex items-center gap-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-white font-black text-xs sm:text-sm px-5 py-2.5 rounded-full shadow-[0_6px_20px_rgba(245,158,11,0.5)] border-2 border-white active:translate-y-0.5 active:scale-95 transition-all cursor-pointer">
-            <span class="flex items-center">${GAME_ICONS.home("w-4 h-4")}</span>
-            <span>返回大地图</span>
+          <button id="btn-learn-back-map" data-speak="返回大地图" aria-label="返回大地图" class="flex-shrink-0 rounded-2xl overflow-hidden shadow-lg border-2 border-white/50 touch-target cursor-pointer transform transition-transform hover:scale-105 active:scale-95">
+            <img src="/assets/images/icon_red_door.jpg" alt="返回" class="w-12 h-12 sm:w-14 sm:h-14 object-cover" />
           </button>
 
           <div class="flex items-center gap-2 sm:gap-3 bg-black/60 backdrop-blur-md px-4 sm:px-6 py-2 rounded-full border-2 border-white/30 shadow-[0_8px_30px_rgba(0,0,0,0.6)]">
@@ -164,7 +164,7 @@ export class LearnModule extends BaseModule {
                   const stepInfo = getLearnStepMeta(stepNum);
                   const isLast = stepNum === this.stepSequence[this.stepSequence.length - 1];
                   return `
-              <div class="flex items-center gap-1 sm:gap-1.5">
+              <div class="flex items-center gap-1 sm:gap-1.5 cursor-pointer touch-target" data-speak="${escapeHtml(stepInfo.announcement)}" aria-label="${escapeHtml(stepInfo.announcement)}" title="${escapeHtml(stepInfo.announcement)}">
                 <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center font-black text-xs transition-all duration-500 border-2 ${
                   stepNum === this.currentStep
                     ? "bg-gradient-to-tr from-yellow-300 via-orange-500 to-red-500 text-white border-white shadow-[0_0_20px_rgba(255,180,0,1)] scale-115 ring-4 ring-yellow-300 animate-pulse"
@@ -184,10 +184,16 @@ export class LearnModule extends BaseModule {
           </div>
 
           <div class="flex items-center gap-2.5">
-            <div class="flex items-center gap-2 bg-gradient-to-r from-orange-500 via-amber-500 to-yellow-400 text-white font-black text-xs sm:text-sm px-4 py-2 rounded-full border-2 border-white shadow-xl">
-              <span class="text-white/90">正在学:</span>
-              <span class="text-xl sm:text-2xl text-yellow-100 font-serif leading-none drop-shadow">${escapeHtml(this.charData.char)}</span>
-            </div>
+            ${(() => {
+              const picUrl = getCharPictogramUrl(this.charData.char);
+              return `
+              <button id="btn-learn-current-char" data-speak="${escapeHtml(this.charData.char)}" aria-label="${escapeHtml(this.charData.char)}" class="flex items-center gap-2 bg-gradient-to-r from-orange-500 via-amber-500 to-yellow-400 text-white font-black text-xs sm:text-sm px-3.5 py-1.5 rounded-full border-2 border-white shadow-xl active:scale-95 transition-transform cursor-pointer touch-target" title="点击听发音">
+                ${picUrl ? `<img src="${picUrl}" alt="${escapeHtml(this.charData.char)}" class="w-7 h-7 rounded-full object-cover border border-white/80 shrink-0" />` : ""}
+                <span class="text-xl sm:text-2xl text-yellow-100 font-serif leading-none drop-shadow">${escapeHtml(this.charData.char)}</span>
+                <span class="w-3.5 h-3.5 shrink-0 flex items-center text-yellow-200">${GAME_ICONS.speaker("w-3.5 h-3.5")}</span>
+              </button>
+              `;
+            })()}
             <button id="btn-learn-sound" data-speak="声音开关" aria-label="声音开关" class="w-10 h-10 sm:w-11 sm:h-11 bg-black/40 backdrop-blur-md rounded-full text-white flex items-center justify-center hover:bg-black/60 transition-transform active:scale-90 border-2 border-white/40 shadow-lg cursor-pointer" title="声音开关">
               ${__lnSpeakerIcon}
             </button>
