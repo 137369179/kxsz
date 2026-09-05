@@ -354,32 +354,33 @@ node tools/_axe_audit.cjs http://127.0.0.1:5174/
 ## 📜 Commit 链（27 个，按时间倒序）
 
 ```
-1ad19a1  feat(m2): motionBudget 动效预算分级 + pictogramRenderer 全 review 接线
-5689336  feat(map): feedbackHub map 事件接线 + parentHub 接入 + emoji 扫描更新
-460fca3  feat(reward): RewardModule 象形点缀 + shop 扩展 + rewardViews 反馈接线
-71037d6  feat(ux): 节奏自适应规划器 + 卡册象形点缀 + 树屋凯茜问候
-9180ffe  feat(h3): feedbackHub 儿童即时反馈集中化 + 全模块接入
-2a81144  feat(play): PlayModule 集成 pictogramRenderer + 探险队图标接线
-f07e46f  feat(ui): 象形具象渲染全场景集成 + 8 新图标资源 (+ CI axe-audit job)
-8f8425a  feat(p0-5): 麦克风合规中心 + 象形具象渲染引擎 + axe 无障碍审计工具 + stepPractice 集成
-2a438b2  docs: v2.9.7 final release notes（本次覆盖更新的 commit）
-0277452  docs: v2.9.7 final release notes（旧版，已被覆盖）
-82399cd  feat(content): radicalFamilies 偏旁家族 + etymologyEngine 零 emoji + fusionLab haptics
-cf724c9  feat(play): 探险队游戏集成 — 4 游戏 buff + 继续探险按钮
-f016763  feat(play): 汉字探险队 Word Expedition 新游戏 + 修 GAME_ICONS.sword→swords
-3e197af  docs: v2.9.7 release notes（初版，已被覆盖）
-7cfe051  feat(ui): shell 导航统一 btn-game-wood/orange + coin 动画锚点 + Q 弹排除 btn-game-*
-74f6e72  feat(review): 易错难字消灭战 + 今日通关态地图按钮
-fcb6892  feat(p2): 字源时间轴 + 跟读按星发币 + Boss 自适应难度 + schedulerFacade
-49b7212  chore: tailwind 重编译 (meteor-fall keyframes) + haptics 引擎增强
-3e98e81  feat(kids-ux): 高频控件语音指令收口 + 拼音找字进复习轮换
-267345f  fix(a11y): island tab active bg-emerald-500→700 与 islandConfig 对齐
-715e95a  feat(a11y): P0-3 页面级 h1 + 地图滚动区 role + 颜色对比度
-1162471  feat: 汉字炼金术合成引擎 + Treehouse 入口 + emoji 清零
-d319e91  feat(a11y): 为关键按钮补 data-speak + aria-label
-27324aa  feat: P0 语音指令层 + 麦克风合规 + meteorDefense + 甲骨文 glyphs
-baea6fa  fix(stepTest): 星星动画期间点返回导致 completeCharacter 漏调
-6445cbb  fix(appNavigation): 删除 startLearnFlow 重构残留死代码
+af16f61 docs: v2.9.7 final — 27 commits / 128 files / +12990/-1063 / 737 tests / 14 大功能
+1ad19a1 feat(m2): motionBudget 动效预算分级 + pictogramRenderer 全 review 接线
+41ada5f docs: v2.9.7 final — 25 commits / 126 files / +12796/-1047 / 734 tests
+5689336 feat(map): feedbackHub map 事件接线 + parentHub 接入 + emoji 扫描更新
+460fca3 feat(reward): RewardModule 象形点缀 + shop 扩展 + rewardViews 反馈接线 + update docs
+71037d6 feat(ux): 节奏自适应规划器 + 卡册象形点缀 + 树屋凯茜问候
+9180ffe feat(h3): feedbackHub 儿童即时反馈集中化 + 全模块接入
+16711b6 docs: v2.9.7 final release notes — 19 commits, 121 files, +12032/-955, 726/726 tests, E2E 通过
+f07e46f feat(ui): 象形具象渲染全场景集成 + 6 新图标资源
+8f8425a feat(p0-5): 麦克风合规中心 + 象形具象渲染引擎 + axe 无障碍审计工具 + stepPractice 集成
+2a438b2 docs: v2.9.7 final release notes — 17 commits, 103 files, +11064/-780, 726/726 tests, E2E 通过
+0277452 docs: v2.9.7 final release notes — 102 files, +10754/-694, 16 commits, 726/726 tests
+82399cd feat(content): radicalFamilies 偏旁家族数据 + etymologyEngine 零 emoji + fusionLab haptics
+cf724c9 feat(play): 探险队游戏集成 — 4 游戏 buff + 继续探险按钮
+f016763 feat(play): 汉字探险队 Word Expedition 新游戏 + 修 GAME_ICONS.sword→swords
+3e197af docs: v2.9.7 release notes (96 files, +9418/-580, 12 commits, 722 tests)
+7cfe051 feat(ui): shell 导航统一 btn-game-wood/orange + coin 动画锚点 + Q 弹排除 btn-game-*
+74f6e72 feat(review): 易错难字消灭战 + 今日通关态地图按钮
+fcb6892 feat(p2): 字源时间轴、跟读按星发币、Boss 自适应难度与调度门面
+49b7212 chore: tailwind 重编译 (meteor-fall keyframes) + haptics 引擎增强
+3e98e81 feat(kids-ux): 高频控件语音指令收口 + 拼音找字进复习轮换
+267345f fix(a11y): island tab active state bg-emerald-500→700 与 islandConfig 对齐
+715e95a feat(a11y): P0-3 页面级 h1 + 地图滚动区 role + 颜色对比度
+1162471 feat: 汉字炼金术合成引擎 + Treehouse 入口 + emoji 清零
+d319e91 feat(a11y): 为关键按钮补 data-speak + aria-label 语音指令支持
+27324aa feat: P0 语音指令层 + 麦克风合规 + meteorDefense 新游戏 + 甲骨文 glyphs 内容
+baea6fa fix(stepTest): 修复星星动画期间点返回导致 completeCharacter 漏调
 ```
 
 9180ffe  feat(h3): feedbackHub 儿童即时反馈集中化 + 全模块接入
