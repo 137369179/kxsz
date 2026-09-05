@@ -3,6 +3,7 @@ import { soundAndFX } from "../soundEngine.js";
 import { mountGameShell, showGameToast } from "../../components/SharedShell.js";
 import { GAME_ICONS } from "../gameIcons.js";
 import { EVENTS } from "../eventBus.js";
+import { renderPinyinGestureVisual } from "../pictogramRenderer.js";
 import {
   PINYIN_INITIALS,
   PINYIN_FINALS,
@@ -18,6 +19,7 @@ import {
   TONE_GAME_TYPES
 } from "../toneContrastGame.js";
 import { ebbinghausManager } from "../ebbinghaus.js";
+import { triggerHapticSuccess, triggerHapticWarning } from "../haptics.js";
 
 export function render() {
   this.destroy();
@@ -163,12 +165,12 @@ export function _renderAtlasView() {
               </div>
             </div>
 
-            ${cur.mirrorTip ? `
+            ${renderPinyinGestureVisual(cur.pinyin) || (cur.mirrorTip ? `
               <div class="bg-rose-50 border border-rose-200 rounded-2xl p-3 text-xs text-rose-950 font-bold flex items-center gap-2">
                 <span class="flex items-center text-rose-600 shrink-0">${GAME_ICONS.shieldLock("w-4 h-4")}</span>
                 <span>防混淆小妙招：${cur.mirrorTip}</span>
               </div>
-            ` : ""}
+            ` : "")}
 
             ${cur.tones ? `
               <div class="mt-3">
@@ -530,6 +532,18 @@ export function _bindEvents(mainEl) {
     });
   }
 
+  // 5b. 播放 b/d/p/q 左右手小拳头手势口诀
+  const gestureListenBtn = mainEl.querySelector("#btn-gesture-listen");
+  if (gestureListenBtn) {
+    this._on(gestureListenBtn, "click", () => {
+      soundAndFX.playPop();
+      const cue = gestureListenBtn.dataset.speak;
+      if (cue) {
+        soundAndFX.speakPriority(cue, { kind: "sentence", emotion: "excited", priority: 1 });
+      }
+    });
+  }
+
   // 6. 播放四声调单项
   mainEl.querySelectorAll(".btn-play-tone").forEach(btn => {
     this._on(btn, "click", () => {
@@ -590,8 +604,10 @@ export function _bindEvents(mainEl) {
       if (isCorrect) {
         this.toneQuizScore++;
         soundAndFX.playSuccess();
+        triggerHapticSuccess();
       } else {
         soundAndFX.playWrong();
+        triggerHapticWarning();
       }
       this.render();
 
@@ -714,6 +730,7 @@ export function _bindEvents(mainEl) {
             if (!animCancelled) requestAnimationFrame(stepAnim);
           } else {
             soundAndFX.playSuccess();
+            triggerHapticSuccess();
             soundAndFX.triggerConfetti(mainEl);
             this._timeout(() => drawTrack(this.currentTone), 400);
           }
@@ -750,6 +767,7 @@ export function _bindEvents(mainEl) {
 
       this._timeout(() => {
         soundAndFX.playSuccess();
+        triggerHapticSuccess();
         soundAndFX.triggerConfetti(mainEl);
         if (resultBox) {
           resultBox.classList.remove("opacity-0", "scale-75");

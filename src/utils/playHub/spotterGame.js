@@ -96,7 +96,7 @@ export function renderSpotterGame() {
             <span>获得 ${totalCoins} 凯茜星币</span>
           </div>
           <div class="flex gap-4">
-            ${this.isExpeditionActive ? '' : '<button id="btn-spotter-again" class="btn-game-orange text-white font-black px-8 py-3 rounded-full cursor-pointer shadow-lg active:scale-95">再玩一局</button>'}
+            ${this.isExpeditionActive ? '' : '<button id="btn-spotter-again" class="btn-game-orange text-white font-black px-8 py-3 rounded-full cursor-pointer shadow-lg active:scale-95" data-speak="再玩一局">再玩一局</button>'}
             <button id="btn-spotter-home" class="btn-game-wood text-white font-black px-8 py-3 rounded-full cursor-pointer shadow-lg active:scale-95">${this.isExpeditionActive ? '继续探险 →' : '返回游乐场'}</button>
           </div>
         </div>
@@ -153,7 +153,7 @@ export function renderSpotterGame() {
       mainEl.innerHTML = `
         <div class="relative w-full max-w-3xl mx-auto flex flex-col items-center select-none animate-fade-in pb-8">
           <div class="w-full flex items-center justify-between mb-3">
-            <button id="btn-spotter-back" class="bg-white/10 hover:bg-white/20 text-white font-black text-xs sm:text-sm px-4 py-2 rounded-full border border-white/20 active:scale-95 transition-transform flex items-center gap-1.5 cursor-pointer shadow">
+            <button id="btn-spotter-back" class="bg-white/10 hover:bg-white/20 text-white font-black text-xs sm:text-sm px-4 py-2 rounded-full border border-white/20 active:scale-95 transition-transform flex items-center gap-1.5 cursor-pointer shadow" data-speak="返回游乐场">
               <span>← 返回大厅</span>
             </button>
             <div class="flex items-center gap-4">
@@ -202,7 +202,7 @@ export function renderSpotterGame() {
           </div>
 
           <div class="flex items-center gap-3">
-            <button id="btn-spotter-hint" class="bg-gradient-to-r from-yellow-300 to-amber-400 hover:from-yellow-200 hover:to-amber-300 text-amber-950 text-xs sm:text-sm font-black px-6 py-2.5 rounded-full border-2 border-white shadow-md active:scale-95 transition-transform flex items-center gap-2 cursor-pointer">
+            <button id="btn-spotter-hint" class="bg-gradient-to-r from-yellow-300 to-amber-400 hover:from-yellow-200 hover:to-amber-300 text-amber-950 text-xs sm:text-sm font-black px-6 py-2.5 rounded-full border-2 border-white shadow-md active:scale-95 transition-transform flex items-center gap-2 cursor-pointer" data-speak="给我提示">
               <span class="flex items-center">${GAME_ICONS.sparkle("w-4 h-4")}</span>
               <span>查看辨别秘籍口诀</span>
             </button>
@@ -223,9 +223,22 @@ export function renderSpotterGame() {
 
       const showHint = () => {
         if (hintBox) {
-          hintBox.textContent = `口诀秘籍：${q.diffDesc}，${q.hint}`;
+          hintBox.innerHTML = `
+            <div class="flex items-center justify-center gap-2 text-yellow-300 font-black text-xs sm:text-sm">
+              <span class="flex items-center">${GAME_ICONS.sparkle("w-4 h-4")}</span>
+              <span>仔细看：${escapeHtml(q.diffDesc)}，${escapeHtml(q.hint)}</span>
+            </div>
+          `;
           hintBox.classList.remove("hidden");
         }
+
+        // 金色放大镜高光：为含有目标特征的卡片增加脉冲聚光灯动效
+        mainEl.querySelectorAll(".spotter-char-card").forEach((btn) => {
+          if (btn.dataset.char === q.target) {
+            btn.classList.add("ring-4", "ring-yellow-300", "animate-pulse");
+            this._timeout(() => btn.classList.remove("animate-pulse"), 2000);
+          }
+        });
       };
 
       let roundActive = true;
@@ -246,7 +259,7 @@ export function renderSpotterGame() {
         this._on(hintBtn, "click", () => {
           soundAndFX.playPop();
           showHint();
-          soundAndFX.speakPriority(`口诀秘籍：${q.diffDesc}，${q.hint}`, { kind: "sentence", priority: 2 });
+          soundAndFX.speakPriority(`看这里：${q.diffDesc}，${q.hint}`, { kind: "sentence", priority: 2 });
         });
       }
 
@@ -348,7 +361,7 @@ export function _renderFeihuaGame(poem) {
             </div>
 
             <div class="mt-6 flex justify-center">
-              <button id="btn-feihua-back" class="bg-white/20 hover:bg-white/30 text-white text-xs font-black px-6 py-2.5 rounded-full border border-white/30 cursor-pointer active:scale-95">
+              <button id="btn-feihua-back" class="bg-white/20 hover:bg-white/30 text-white text-xs font-black px-6 py-2.5 rounded-full border border-white/30 cursor-pointer active:scale-95" data-speak="返回">
                 返回诗卷
               </button>
             </div>

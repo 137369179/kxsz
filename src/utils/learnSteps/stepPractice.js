@@ -2,6 +2,7 @@
 import { soundAndFX } from "../soundEngine.js";
 import { GAME_ICONS } from "../gameIcons.js";
 import { ebbinghausManager } from "../ebbinghaus.js";
+import { getCharPictogramUrl } from "../pictogramRenderer.js";
 
 export function renderStepPractice(stage) {
     const char = this.charData;
@@ -15,14 +16,35 @@ export function renderStepPractice(stage) {
         
         <canvas id="laser-effect-canvas" class="absolute inset-0 w-full h-full pointer-events-none z-20"></canvas>
 
-        <div class="w-full flex items-center justify-between bg-black/60 px-6 py-2.5 rounded-full border border-white/30 text-white z-10">
-          <div class="flex items-center gap-2 text-xs font-black text-yellow-300">
-            <span>${GAME_ICONS.star("w-4 h-4 inline-block")} 目标字：</span>
-            <span class="text-xl text-orange-400 bg-black/50 px-3 py-0.5 rounded-xl border border-orange-500">${char.char}</span>
+        <div class="w-full flex items-center justify-between bg-black/60 px-6 py-2 rounded-full border border-white/30 text-white z-10">
+          <div class="flex items-center gap-2.5">
+            ${(() => {
+              const picUrl = getCharPictogramUrl(char.char);
+              return picUrl ? `
+                <div class="w-8 h-8 rounded-full overflow-hidden border-2 border-amber-300 shadow-md shrink-0">
+                  <img src="${picUrl}" alt="${char.char}" class="w-full h-full object-cover" />
+                </div>
+              ` : `
+                <span class="flex items-center text-yellow-300">${GAME_ICONS.star("w-5 h-5", false)}</span>
+              `;
+            })()}
+            <span class="text-xl sm:text-2xl text-yellow-300 font-serif font-black bg-black/50 px-3.5 py-0.5 rounded-xl border border-amber-400 shadow">${char.char}</span>
+            <span class="text-xs text-amber-200 font-bold hidden sm:inline">瞄准气球</span>
           </div>
 
-          <div class="text-xs font-black text-cyan-300">
-            ${GAME_ICONS.sparkle("w-4 h-4 inline-block")} 命中进度: <span id="game-hit-progress" class="text-yellow-400 text-base font-black">0 / ${targetHits}</span>
+          <div class="flex items-center gap-2">
+            <div id="practice-star-slots" class="flex items-center gap-2">
+              <div id="slot-star-0" class="w-8 h-8 rounded-full bg-white/10 border-2 border-white/30 flex items-center justify-center transition-all">
+                <span class="flex items-center text-white/30">${GAME_ICONS.star("w-4 h-4", true)}</span>
+              </div>
+              <div id="slot-star-1" class="w-8 h-8 rounded-full bg-white/10 border-2 border-white/30 flex items-center justify-center transition-all">
+                <span class="flex items-center text-white/30">${GAME_ICONS.star("w-4 h-4", true)}</span>
+              </div>
+              <div id="slot-star-2" class="w-8 h-8 rounded-full bg-white/10 border-2 border-white/30 flex items-center justify-center transition-all">
+                <span class="flex items-center text-white/30">${GAME_ICONS.star("w-4 h-4", true)}</span>
+              </div>
+            </div>
+            <span id="game-hit-progress" class="text-yellow-400 text-xs font-black hidden">0 / ${targetHits}</span>
           </div>
         </div>
 
@@ -134,6 +156,11 @@ export function renderStepPractice(stage) {
           }
 
           if (progressText) progressText.textContent = `${hitCount} / ${targetHits}`;
+          const currentSlot = stage.querySelector(`#slot-star-${hitCount - 1}`);
+          if (currentSlot) {
+            currentSlot.className = "w-8 h-8 rounded-full bg-gradient-to-tr from-yellow-400 to-amber-500 border-2 border-white flex items-center justify-center transition-all shadow-lg animate-bounce";
+            currentSlot.innerHTML = `<span class="flex items-center text-white">${GAME_ICONS.star("w-5 h-5", false)}</span>`;
+          }
 
           if (hitCount >= targetHits) {
             this._timeout(() => {

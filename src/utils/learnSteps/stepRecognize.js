@@ -9,11 +9,13 @@ import { getCognitiveStageData } from "../cognitiveStage.js";
 import { ebbinghausManager } from "../ebbinghaus.js";
 import { EVENTS } from "../eventBus.js";
 import { shouldUseSelfExplain, openSelfExplainPrompt } from "./selfExplainPrompt.js";
+import { renderRadicalRuneBadge, getCharPictogramUrl } from "../pictogramRenderer.js";
 
 export function renderStepRecognize(stage) {
     const char = this.charData;
     const childAge = ebbinghausManager.getAge();
     const cog = getCognitiveStageData(char, childAge);
+    const picUrl = getCharPictogramUrl(char.char);
     soundAndFX.speakPriority(`认一认：“${char.char}”，拼音读作 ${char.pinyin}。点击大字听发音！`, { kind: "sentence", emotion: "gentle" });
 
     stage.innerHTML = `
@@ -24,30 +26,40 @@ export function renderStepRecognize(stage) {
             ${char.pinyin}
           </div>
 
-          <button id="btn-jelly-char" class="relative group w-56 h-56 sm:w-64 sm:h-64 rounded-3xl bg-gradient-to-tr from-amber-400 via-orange-500 to-yellow-300 border-4 border-white shadow-[0_0_60px_rgba(255,160,0,0.8)] flex items-center justify-center text-9xl sm:text-[10rem] font-black text-white active:scale-90 transition-transform cursor-pointer animate-bounce-cathy">
-            ${char.char}
-            <div class="absolute -bottom-2 bg-amber-900 text-yellow-200 text-[10px] font-black px-3 py-0.5 rounded-full border border-yellow-400">
-              点击发音 ${GAME_ICONS.speaker("w-4 h-4 inline-block")}
+          <div class="flex items-center gap-3">
+            <button id="btn-jelly-char" class="relative group w-52 h-52 sm:w-60 sm:h-60 rounded-3xl bg-gradient-to-tr from-amber-400 via-orange-500 to-yellow-300 border-4 border-white shadow-[0_0_60px_rgba(255,160,0,0.8)] flex items-center justify-center text-9xl sm:text-[10rem] font-black text-white active:scale-90 transition-transform cursor-pointer animate-bounce-cathy" title="点击听大字发音" data-speak="${escapeHtml(char.char)}" aria-label="${escapeHtml(char.char)}">
+              ${char.char}
+              <div class="absolute -bottom-2.5 bg-amber-900 text-yellow-200 text-xs font-black px-4 py-1 rounded-full border border-yellow-400 shadow-md flex items-center gap-1.5">
+                <span>听发音</span>
+                <span class="flex items-center">${GAME_ICONS.speaker("w-3.5 h-3.5")}</span>
+              </div>
+            </button>
+
+            ${picUrl ? `
+            <div id="btn-char-pic-companion" class="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl overflow-hidden border-4 border-amber-300 shadow-xl bg-amber-100/90 relative cursor-pointer active:scale-95 transition-transform shrink-0 hover:scale-105" title="点击看自然事物" data-speak="看！这就是大自然里的「${escapeHtml(char.char)}」">
+              <img src="${picUrl}" alt="${escapeHtml(char.char)}" class="w-full h-full object-cover select-none pointer-events-none" />
+              <div class="absolute bottom-0 inset-x-0 bg-black/60 text-[10px] font-black text-yellow-200 text-center py-0.5">
+                自然实物
+              </div>
             </div>
-          </button>
+            ` : ""}
+          </div>
 
           <div class="flex items-center gap-3 mt-4">
             <span class="bg-white/20 text-white text-xs font-black px-4 py-1.5 rounded-full border border-white/30 flex items-center gap-1.5">
-              ${GAME_ICONS.sparkle("w-4 h-4")} <span>共 ${char.strokeCount || 4} 笔</span>
+              ${GAME_ICONS.sparkle("w-4 h-4")} <span>${char.strokeCount || 4} 笔</span>
             </span>
-            <span class="bg-white/20 text-white text-xs font-black px-4 py-1.5 rounded-full border border-white/30 flex items-center gap-1.5">
-              ${GAME_ICONS.gem("w-4 h-4")} <span>偏旁 [${char.radical || char.char}]</span>
-            </span>
+            ${renderRadicalRuneBadge(char.radical || char.char)}
           </div>
 
           <div class="flex items-center gap-2.5 mt-4">
             <button id="btn-open-morph-rec" class="bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 text-white text-xs font-black px-4 py-2 rounded-full shadow-lg border-2 border-white/40 active:scale-95 transition-transform flex items-center gap-1.5 cursor-pointer touch-target" data-speak="看看这个字是怎么来的" aria-label="字源微剧场">
               <span class="flex items-center">${GAME_ICONS.sparkle("w-4 h-4")}</span>
-              <span>字源小故事</span>
+              <span>字源故事</span>
             </button>
             <button id="btn-goto-pinyin-island" class="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white text-xs font-black px-4 py-2 rounded-full shadow-lg border-2 border-white/40 active:scale-95 transition-transform flex items-center gap-1.5 cursor-pointer touch-target" title="前往拼音乐园复习此拼音" data-speak="去拼音岛复习" aria-label="拼音岛复习">
               <span class="flex items-center">${GAME_ICONS.mic("w-4 h-4")}</span>
-              <span>拼音岛复习</span>
+              <span>拼音乐园</span>
             </button>
           </div>
 
@@ -61,7 +73,7 @@ export function renderStepRecognize(stage) {
             ];
             return `
           <div id="evo-mini-strip" class="mt-4 w-full max-w-sm bg-black/40 border border-amber-300/40 rounded-2xl px-3 py-2.5" aria-live="polite">
-            <div class="text-[10px] font-black text-amber-300 mb-1.5 flex items-center gap-1">${GAME_ICONS.sparkle("w-3.5 h-3.5")}<span>字是怎么来的（点一下听故事）</span></div>
+            <div class="text-xs font-black text-amber-300 mb-1.5 flex items-center gap-1">${GAME_ICONS.sparkle("w-3.5 h-3.5")}<span>字形小足迹（轻点听）</span></div>
             <div class="flex items-center justify-between gap-1">
               ${stages.map((s, i) => `
                 <button type="button" class="evo-mini-stage flex-1 flex flex-col items-center gap-0.5 py-1 rounded-xl hover:bg-white/10 active:scale-95 transition-all cursor-pointer" data-evo-idx="${i}" data-speak="${escapeHtml(s.label)}：${escapeHtml((s.tip || s.label).slice(0, 24))}" aria-label="${escapeHtml(s.label)}">
@@ -98,37 +110,38 @@ export function renderStepRecognize(stage) {
             ` : ""}
 
             <h3 class="text-sm font-black text-yellow-300 mb-2.5 flex items-center gap-2">
-              <span class="flex items-center">${GAME_ICONS.chest("w-5 h-5")}</span>
-              <span>生活词语百宝箱：</span>
+              <span class="flex items-center text-amber-300">${GAME_ICONS.chest("w-5 h-5")}</span>
+              <span>生活词语小宝箱</span>
             </h3>
             
             <div class="flex flex-col gap-2.5">
               ${char.words
                 .map(
                   (w) => `
-                <button class="word-balloon-btn p-3 bg-gradient-to-r from-amber-50 to-orange-100 hover:from-yellow-200 hover:to-orange-300 rounded-2xl border-2 border-amber-300 text-left flex items-center justify-between shadow-md active:scale-95 transition-all cursor-pointer" data-word="${w.word}">
+                <button class="word-balloon-btn p-3 bg-gradient-to-r from-amber-50 to-orange-100 hover:from-yellow-200 hover:to-orange-300 rounded-2xl border-2 border-amber-300 text-left flex items-center justify-between shadow-md active:scale-95 transition-all cursor-pointer touch-target" data-word="${escapeHtml(w.word)}" data-speak="${escapeHtml(w.word)}" aria-label="${escapeHtml(w.word)}">
                   <div>
-                    <span class="text-xs font-bold text-amber-700">${w.pinyin}</span>
-                    <h4 class="text-base font-black text-amber-950">${w.word}</h4>
+                    <span class="text-xs font-bold text-amber-700">${escapeHtml(w.pinyin)}</span>
+                    <h4 class="text-base font-black text-amber-950">${escapeHtml(w.word)}</h4>
                   </div>
-                  <span class="flex items-center">${GAME_ICONS.speaker("w-4 h-4")}</span>
+                  <span class="flex items-center text-amber-800">${GAME_ICONS.speaker("w-4 h-4")}</span>
                 </button>
               `
                 )
                 .join("")}
             </div>
 
-            <div id="sentence-card" class="mt-4 p-3 bg-black/40 hover:bg-black/60 rounded-2xl border border-white/20 text-xs text-yellow-200 font-semibold leading-relaxed cursor-pointer transition-all active:scale-95" title="点击朗读例句">
-              <div class="flex items-center gap-1.5 text-amber-300 font-black mb-1">
-                ${GAME_ICONS.pen("w-4 h-4")} <span>趣味造句</span>
+            <div id="sentence-card" class="mt-4 p-3 bg-black/40 hover:bg-black/60 rounded-2xl border border-white/20 text-xs text-yellow-200 font-semibold leading-relaxed cursor-pointer transition-all active:scale-95 touch-target" title="点击朗读例句" data-speak="${escapeHtml(char.sentence)}" aria-label="例句朗读">
+              <div class="flex items-center justify-between text-amber-300 font-black mb-1">
+                <span class="flex items-center gap-1.5">${GAME_ICONS.speaker("w-4 h-4")} <span>凯茜说句子</span></span>
+                <span class="text-[10px] bg-amber-400/20 text-yellow-300 px-2 py-0.5 rounded-full">轻点听</span>
               </div>
-              <p class="text-white/90 text-xs leading-relaxed">${char.sentence}</p>
+              <p class="text-white/90 text-xs leading-relaxed">${escapeHtml(char.sentence)}</p>
             </div>
           </div>
 
           <button id="btn-finish-rec-step" data-speak="认字完成，下一步" aria-label="认字完成，下一步" class="mt-4 w-full bg-gradient-to-r from-orange-500 via-amber-500 to-yellow-400 text-white font-black text-base py-3.5 rounded-full shadow-[0_8px_25px_rgba(245,158,11,0.5)] border-2 border-white active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer hover:brightness-105">
             <span class="flex items-center">${GAME_ICONS.star("w-5 h-5", false)}</span>
-            <span>掌握认字！开启跟读评测</span>
+            <span>认好啦！去跟读</span>
           </button>
         </div>
 
@@ -155,6 +168,27 @@ export function renderStepRecognize(stage) {
         // 阶段 3：弹跳恢复
         jellyBtn.classList.remove("scale-x-85", "scale-y-115");
         jellyBtn.classList.add("animate-bounce-cathy");
+      });
+    }
+
+    const picCompanion = stage.querySelector("#btn-char-pic-companion");
+    if (picCompanion) {
+      this._on(picCompanion, "click", () => {
+        soundAndFX.playPop();
+        soundAndFX.speakPriority(`看！这就是大自然里的「${char.char}」！`, { kind: "sentence", emotion: "gentle" });
+        picCompanion.classList.add("scale-110", "ring-4", "ring-amber-400");
+        this._timeout(() => picCompanion.classList.remove("scale-110", "ring-4", "ring-amber-400"), 600);
+      });
+    }
+
+    const radicalRuneBtn = stage.querySelector("#btn-radical-rune");
+    if (radicalRuneBtn) {
+      this._on(radicalRuneBtn, "click", () => {
+        const speakText = radicalRuneBtn.dataset.speak || `这是「${char.radical}」字偏旁哦！`;
+        soundAndFX.playPop();
+        soundAndFX.speakPriority(speakText, { kind: "sentence", emotion: "gentle" });
+        radicalRuneBtn.classList.add("scale-110", "ring-2", "ring-yellow-300");
+        this._timeout(() => radicalRuneBtn.classList.remove("scale-110", "ring-2", "ring-yellow-300"), 500);
       });
     }
 

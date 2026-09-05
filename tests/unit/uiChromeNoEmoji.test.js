@@ -48,6 +48,9 @@ const CHROME_FILES = [
   "src/utils/learnSteps/stepWrite.js",
   "src/utils/learnSteps/airTracePrompt.js",
   "src/utils/learnSteps/selfExplainPrompt.js",
+  "src/components/PinyinModule.js",
+  "src/utils/pinyinHub/pinyinViews.js",
+  "src/utils/pictogramRenderer.js",
 ];
 
 describe("stripEmoji helper", () => {

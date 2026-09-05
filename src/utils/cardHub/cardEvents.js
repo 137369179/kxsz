@@ -6,6 +6,7 @@ import { showGameToast } from "../../components/SharedShell.js";
 import { GAME_ICONS } from "../gameIcons.js";
 import { printWorksheet } from "../worksheetGenerator.js";
 import { openMorphTheater } from "../morphEngine.js";
+import { getCharPictogramUrl } from "../pictogramRenderer.js";
 import { SEARCH_DEBOUNCE_MS, SCROLL_LOAD_THRESHOLD, RADICAL_ORIGINS } from "./cardConstants.js";
 
 export function bindEvents(mainEl) {
@@ -251,7 +252,7 @@ export function openStrokeDemoModal(c) {
   overlay.className = "fixed inset-0 z-[60] bg-black/80 backdrop-blur-md flex items-center justify-center p-4 animate-fade-in";
   overlay.innerHTML = `
     <div class="relative w-full max-w-md sm:max-w-lg bg-gradient-to-b from-amber-50 to-orange-50 rounded-3xl p-8 shadow-2xl border-4 border-amber-300 flex flex-col items-center select-none">
-      <button id="btn-close-stroke-demo" class="absolute -top-14 right-0 w-11 h-11 rounded-full bg-white text-gray-800 font-extrabold text-xl flex items-center justify-center shadow-2xl hover:bg-gray-100 active:scale-90 cursor-pointer border-2 border-amber-300" title="关闭">
+      <button id="btn-close-stroke-demo" class="absolute -top-14 right-0 w-11 h-11 rounded-full bg-white text-gray-800 font-extrabold text-xl flex items-center justify-center shadow-2xl hover:bg-gray-100 active:scale-90 cursor-pointer border-2 border-amber-300" title="关闭" data-speak="关闭笔顺演示">
         ${GAME_ICONS.back("w-6 h-6")}
       </button>
 
@@ -268,7 +269,7 @@ export function openStrokeDemoModal(c) {
       </div>
 
       <div class="flex items-center gap-3 mt-4 w-full justify-center">
-        <button id="btn-replay-stroke-demo" class="btn-game-orange text-white text-sm font-black px-8 py-3 rounded-full shadow-lg active:scale-95 flex items-center gap-2 cursor-pointer">
+        <button id="btn-replay-stroke-demo" class="btn-game-orange text-white text-sm font-black px-8 py-3 rounded-full shadow-lg active:scale-95 flex items-center gap-2 cursor-pointer" data-speak="再看一遍笔顺">
           <span class="flex items-center">${GAME_ICONS.brush("w-5 h-5")}</span>
           <span>重新演示</span>
         </button>
@@ -403,12 +404,13 @@ export function openStrokeDemoModal(c) {
 export function renderCardDetailModal() {
   const c = this.selectedCard;
   const isDiff = ebbinghausManager.isDifficultChar(c.id);
+  const picUrl = getCharPictogramUrl(c.char);
 
   return `
     <div id="card-modal-backdrop" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 animate-fade-in perspective-1000 select-none">
       <div class="relative w-full max-w-md sm:max-w-lg flex flex-col items-center">
         
-        <button id="btn-close-modal" class="absolute -top-14 right-0 w-11 h-11 rounded-full bg-white text-gray-800 font-extrabold text-xl flex items-center justify-center shadow-2xl hover:bg-gray-100 active:scale-90 z-50 cursor-pointer border-2 border-amber-300" title="关闭">
+        <button id="btn-close-modal" class="absolute -top-14 right-0 w-11 h-11 rounded-full bg-white text-gray-800 font-extrabold text-xl flex items-center justify-center shadow-2xl hover:bg-gray-100 active:scale-90 z-50 cursor-pointer border-2 border-amber-300" title="关闭" data-speak="关闭字卡详情">
           ${GAME_ICONS.back("w-6 h-6")}
         </button>
 
@@ -418,15 +420,15 @@ export function renderCardDetailModal() {
             <div class="flex items-center justify-between">
               <span class="text-xs sm:text-sm font-black bg-amber-200 text-amber-950 px-4 py-1.5 rounded-full shadow-sm">${c.radical}部 · ${c.strokeCount || 4}画</span>
               <div class="flex items-center gap-2">
-                <button id="btn-modal-print-char" class="flex items-center gap-1.5 bg-rose-200 hover:bg-rose-300 text-rose-950 px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-black shadow-md active:scale-90 transition-all cursor-pointer" title="打印该字A4田字格字帖">
+                <button id="btn-modal-print-char" class="flex items-center gap-1.5 bg-rose-200 hover:bg-rose-300 text-rose-950 px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-black shadow-md active:scale-90 transition-all cursor-pointer" title="打印该字A4田字格字帖" data-speak="打印这个字的字帖">
                   <span class="flex items-center">${GAME_ICONS.print("w-4 h-4 sm:w-5 sm:h-5")}</span>
                   <span>打印字帖</span>
                 </button>
-                <button id="btn-modal-morph-theater" class="flex items-center gap-1.5 bg-gradient-to-r from-amber-400 to-orange-400 hover:from-amber-500 hover:to-orange-500 text-white px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-black shadow-md active:scale-90 transition-all cursor-pointer" title="查看象形字源蜕变动效">
+                <button id="btn-modal-morph-theater" class="flex items-center gap-1.5 bg-gradient-to-r from-amber-400 to-orange-400 hover:from-amber-500 hover:to-orange-500 text-white px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-black shadow-md active:scale-90 transition-all cursor-pointer" title="查看象形字源蜕变动效" data-speak="看象形字源变身">
                   <span class="flex items-center">${GAME_ICONS.sparkle("w-4 h-4 sm:w-5 sm:h-5")}</span>
                   <span>象形微剧场</span>
                 </button>
-                <button id="btn-modal-demo-strokes" class="flex items-center gap-1.5 bg-amber-200 hover:bg-amber-300 text-amber-950 px-4 py-1.5 rounded-full text-xs sm:text-sm font-black shadow-md active:scale-90 transition-all cursor-pointer" title="笔顺笔画动画演示">
+                <button id="btn-modal-demo-strokes" class="flex items-center gap-1.5 bg-amber-200 hover:bg-amber-300 text-amber-950 px-4 py-1.5 rounded-full text-xs sm:text-sm font-black shadow-md active:scale-90 transition-all cursor-pointer" title="笔顺笔画动画演示" data-speak="看笔顺动画">
                   <span class="flex items-center">${GAME_ICONS.brush("w-4 h-4 sm:w-5 sm:h-5")}</span>
                   <span>笔顺</span>
                 </button>
@@ -438,7 +440,14 @@ export function renderCardDetailModal() {
 
             <div class="flex flex-col items-center justify-center flex-1 my-3">
               <span class="text-3xl sm:text-4xl font-black text-amber-700 mb-2">${c.pinyin}</span>
-              <span class="text-8xl sm:text-9xl font-black text-amber-950 drop-shadow-md glow-pulse">${c.char}</span>
+              <div class="flex items-center gap-4">
+                <span class="text-8xl sm:text-9xl font-black text-amber-950 drop-shadow-md glow-pulse">${c.char}</span>
+                ${picUrl ? `
+                <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl overflow-hidden border-2 border-amber-400 shadow-md bg-amber-100 shrink-0">
+                  <img src="${picUrl}" alt="${c.char}" class="w-full h-full object-cover select-none pointer-events-none" />
+                </div>
+                ` : ""}
+              </div>
               
               ${c.oracleGlyph ? `
                 <div class="mt-3 flex items-center gap-2 bg-amber-200/70 px-4 py-1.5 rounded-full border border-amber-300 shadow-inner">
@@ -466,11 +475,14 @@ export function renderCardDetailModal() {
 
             <div class="flex-1 my-4 flex flex-col justify-around text-left">
               <div>
-                <span class="text-xs sm:text-sm font-black text-amber-900 block mb-2">常用词组 (点击朗读)：</span>
+                <span class="text-xs sm:text-sm font-black text-amber-900 block mb-2">生活词组 (点击朗读)：</span>
                 <div class="flex flex-wrap gap-2">
                   ${(c.words || [{ word: `${c.char}子`, pinyin: "" }]).map(w => {
                     const wordText = typeof w === "string" ? w : w.word;
-                    return `<button class="card-modal-word-btn bg-white hover:bg-amber-100 text-amber-950 border-2 border-amber-300 text-sm sm:text-base font-black px-4 py-2 rounded-xl shadow-md transition-all active:scale-95 cursor-pointer" data-word="${wordText}">${wordText}</button>`;
+                    return `<button class="card-modal-word-btn bg-white hover:bg-amber-100 text-amber-950 border-2 border-amber-300 text-sm sm:text-base font-black px-4 py-2 rounded-xl shadow-md transition-all active:scale-95 cursor-pointer flex items-center gap-1.5" data-word="${wordText}">
+                      <span>${wordText}</span>
+                      <span class="text-amber-600">${GAME_ICONS.speaker("w-3.5 h-3.5")}</span>
+                    </button>`;
                   }).join("")}
                 </div>
               </div>
@@ -519,7 +531,7 @@ export function openFlashcardSlideshowModal(chars) {
     overlay.innerHTML = `
       <header class="w-full max-w-3xl flex items-center justify-between border-b border-white/10 pb-3">
         <div class="flex items-center gap-3">
-          <button id="btn-close-slideshow" class="btn-game-wood text-white font-black text-xs px-3.5 py-1.5 rounded-full flex items-center gap-1 cursor-pointer">
+          <button id="btn-close-slideshow" class="btn-game-wood text-white font-black text-xs px-3.5 py-1.5 rounded-full flex items-center gap-1 cursor-pointer" data-speak="关闭放映">
             <span>退出轮播</span>
           </button>
           <span class="text-xs sm:text-sm font-black text-amber-300">

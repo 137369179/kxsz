@@ -12,10 +12,13 @@
 
 import { soundAndFX } from "./soundEngine.js";
 import { EVENTS, eventBus } from "./eventBus.js";
+import { isMicEnabled, ensureMicConsent, showMicBadge, removeMicBadge } from "./micCompliance.js";
 
 const DB_NAME = "cathy-parent-voice";
 const DB_VERSION = 1;
 const STORE = "records";
+/** P2-4 保留期策略：家长语音模板只保留最近 MAX_KEEP 条（防 IndexedDB 无限增长） */
+const MAX_KEEP = 30;
 
 // IndexedDB 
 function openDB() {
@@ -77,7 +80,11 @@ export class ParentVoiceManager {
    */
   async startRecording(meta) {
     if (this._currentRecording) throw new Error("");
+    // P0-5 扩展：统一麦克风合规 — 家长总开关 → 首次家长授权 → 录音指示
+    if (!isMicEnabled()) return { started: false, reason: "mic_disabled" };
+    if (!(await ensureMicConsent())) return { started: false, reason: "mic_consent_denied" };
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+    showMicBadge();
     const types = [
       "audio/webm;codecs=opus", "audio/webm", "audio/mp4", "audio/ogg;codecs=opus", "audio/wav"
     ];
@@ -104,6 +111,7 @@ export class ParentVoiceManager {
         const durationMs = performance.now() - rec.startMs;
         const blob = new Blob(rec.chunks, { type: rec.mimeType || "audio/webm" });
         rec.stream.getTracks().forEach(t => t.stop());
+        removeMicBadge();
         this._currentRecording = null;
         const id = [rec.meta.triggerType, (rec.meta.charId || rec.meta.char || ""), Date.now()].join("::");
         const record = {
@@ -120,6 +128,7 @@ export class ParentVoiceManager {
           const db = await this._db();
           const store = await txStore(db, "readwrite");
           await promisify(store.put(record));
+          try { await this._pruneOld(MAX_KEEP); } catch {}
           eventBus.emit(EVENTS.AUDIO_PARENT_VOICE_SAVED, {
             triggerType: rec.meta.triggerType, durationMs, sizeBytes: blob.size,
           });
@@ -131,11 +140,27 @@ export class ParentVoiceManager {
     });
   }
 
+  /** P2-4: 保留期策略 — 按 createdAt 降序仅保留最近 maxKeep 条，其余删除 */
+  async _pruneOld(maxKeep = MAX_KEEP) {
+    const db = await this._db();
+    const store = await txStore(db, "readonly");
+    const all = await promisify(store.getAll());
+    if (all.length <= maxKeep) return 0;
+    const stale = all.sort((a, b) => b.createdAt - a.createdAt).slice(maxKeep);
+    const rw = await txStore(db, "readwrite");
+    let removed = 0;
+    for (const r of stale) {
+      try { await promisify(rw.delete(r.id)); removed += 1; } catch {}
+    }
+    return removed;
+  }
+
   /**  */  async cancel() {
     const rec = this._currentRecording;
     if (!rec) return;
     try { rec.recorder.onstop = null; rec.recorder.stop(); } catch {}
     try { rec.stream.getTracks().forEach(t => t.stop()); } catch {}
+    removeMicBadge();
     this._currentRecording = null;
   }
 

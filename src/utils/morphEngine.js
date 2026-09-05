@@ -9,6 +9,7 @@
 
 import { soundAndFX } from "./soundEngine.js";
 import { GAME_ICONS } from "./gameIcons.js";
+import { renderNaturePictogram } from "./pictogramRenderer.js";
 
 /**
  * 渲染象形动效微剧场 HTML 容器
@@ -50,11 +51,9 @@ export function renderMorphTheaterHTML(charItem) {
         <div class="relative w-full h-64 sm:h-72 rounded-3xl bg-gradient-to-b from-amber-50 to-orange-100 border-2 border-amber-200 shadow-inner flex items-center justify-center overflow-hidden my-2">
           
           <div id="morph-layer-nature" class="absolute inset-0 flex flex-col items-center justify-center transition-opacity duration-300 pointer-events-none opacity-100">
-            <div class="w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-amber-200/80 border-4 border-amber-400 flex items-center justify-center shadow-lg transform transition-transform duration-300">
-              <span class="text-6xl sm:text-7xl font-black text-amber-900 font-serif">${charItem.char}</span>
-            </div>
-            <span class="text-xs font-bold text-amber-800 mt-3 bg-white/90 px-4 py-1 rounded-full shadow-sm border border-amber-200">
-              第 1 幕 · 远古自然形貌
+            ${renderNaturePictogram(charItem, "w-32 h-32 sm:w-36 sm:h-36")}
+            <span class="text-xs font-bold text-amber-800 mt-2 bg-white/90 px-4 py-1 rounded-full shadow-sm border border-amber-200">
+              第 1 幕 · 真实事物大彩图
             </span>
           </div>
 
