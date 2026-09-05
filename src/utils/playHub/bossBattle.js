@@ -161,8 +161,8 @@ export function renderBossBattle() {
               <span id="boss-win-reward">获得 20 凯茜星币 + 难字封印勋章</span>
             </div>
             <div id="boss-win-stats" class="text-xs text-gray-400 mb-6 font-semibold"></div>
-            <button id="btn-boss-claim" class="btn-game-orange text-white font-black text-base px-10 py-3 rounded-full" data-speak="领取奖励并返回游乐场" aria-label="领取奖励并返回游乐场">
-              领取奖励并返回游乐场
+            <button id="btn-boss-claim" class="btn-game-orange text-white font-black text-base px-10 py-3 rounded-full" data-speak="${this.isExpeditionActive ? '继续探险' : '领取奖励并返回游乐场'}" aria-label="${this.isExpeditionActive ? '继续探险' : '领取奖励并返回游乐场'}">
+              ${this.isExpeditionActive ? '继续探险 \u2192' : '领取奖励并返回游乐场'}
             </button>
           </div>
 
@@ -184,8 +184,13 @@ export function renderBossBattle() {
           if (stopTimer) stopTimer();
           soundAndFX.stopSpeaking();
           soundAndFX.playPop();
-          this.currentMode = null;
-          this.render();
+          if (this.isExpeditionActive) {
+            this.currentMode = "expedition";
+            this.render();
+          } else {
+            this.currentMode = null;
+            this.render();
+          }
         });
       }
 
@@ -206,6 +211,11 @@ export function renderBossBattle() {
       this._addCleanup(() => { if (stopTimer) stopTimer(); });
       const startRoundTimer = () => {
         let sec = roundSecondsFor(difficultyLevel);
+        if (this.isExpeditionActive && this.expeditionState) {
+          if (this.expeditionState.buffs.some(b => b.id === "TIME_WARP")) {
+            sec += 8; // Extra 8 seconds per round for boss battle
+          }
+        }
         if (timerVal) timerVal.textContent = sec;
         if (timerEl) timerEl.classList.add("ticking");
         stopTimer = startCountdown(sec, (remain) => {
@@ -349,8 +359,14 @@ export function renderBossBattle() {
           if (stopTimer) stopTimer();
           soundAndFX.stopSpeaking();
           soundAndFX.playPop();
-          this.currentMode = null;
-          this.render();
+          if (this.isExpeditionActive) {
+            this.expeditionState.stage++;
+            this.currentMode = "expedition";
+            this.render();
+          } else {
+            this.currentMode = null;
+            this.render();
+          }
         });
       }
     };

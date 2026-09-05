@@ -3,7 +3,7 @@ import { mountGameShell, showGameToast } from "../../components/SharedShell.js";
 import { soundAndFX } from "../soundEngine.js";
 import { GAME_ICONS } from "../gameIcons.js";
 import { ebbinghausManager } from "../ebbinghaus.js";
-import { EVENTS } from "../eventBus.js";
+import { eventBus } from "../eventBus.js";
 
 const STAGES = [
   { id: 1, type: "spotter", label: "火眼金睛" },
@@ -125,7 +125,7 @@ export function renderWordExpedition() {
 
   const startBtn = mainEl.querySelector("#expedition-start-btn");
   startBtn.addEventListener("click", () => {
-    soundAndFX.play("pop");
+    soundAndFX.playPop();
     
     if (currentStageInfo.type === "treasure") {
       this.renderExpeditionTreasure();
@@ -136,11 +136,11 @@ export function renderWordExpedition() {
     }
   });
 
-  soundAndFX.play("harp");
+  soundAndFX.playVictoryFanfare();
   if (stage === 1) {
-    soundAndFX.speak("汉字探险队，出发！");
+    soundAndFX.speakPriority("汉字探险队，出发！");
   } else {
-    soundAndFX.speak(`第${stage}关，准备好迎接挑战了吗？`);
+    soundAndFX.speakPriority(`第${stage}关，准备好迎接挑战了吗？`);
   }
 }
 
@@ -181,8 +181,8 @@ export function renderExpeditionTreasure() {
       this.expeditionState.buffs.push(buff);
       this.expeditionState.stage++;
       
-      soundAndFX.play("success");
-      soundAndFX.speak(`获得了 ${buff.label}！`);
+      soundAndFX.playPop();
+      soundAndFX.speakPriority(`获得了 ${buff.label}！`);
       
       showGameToast(`获得了增益：${buff.label}`);
       
@@ -193,8 +193,8 @@ export function renderExpeditionTreasure() {
     });
   });
 
-  soundAndFX.play("harp");
-  soundAndFX.speak("哇，你发现了一个宝箱，快选择一个增益吧！");
+  soundAndFX.playVictoryFanfare();
+  soundAndFX.speakPriority("哇，你发现了一个宝箱，快选择一个增益吧！");
 }
 
 export function renderExpeditionVictory() {
@@ -232,17 +232,17 @@ export function renderExpeditionVictory() {
 
   ebbinghausManager.addCoins(rewardCoins, "探险模式通关奖励");
   ebbinghausManager.save();
-  EVENTS.emit("app:coins-changed", { delta: rewardCoins, reason: "expedition_win" });
+  eventBus.emit("app:coins-changed", { delta: rewardCoins, reason: "expedition_win" });
 
   const doneBtn = mainEl.querySelector("#expedition-done-btn");
   doneBtn.addEventListener("click", () => {
-    soundAndFX.play("pop");
+    soundAndFX.playPop();
     this.expeditionState = null; // Reset state
     this.currentMode = null;     // Back to hub
     this.isExpeditionActive = false; // Add this
     this.render();
   });
 
-  soundAndFX.play("tada");
-  soundAndFX.speak("探险成功！你真是太厉害啦！");
+  soundAndFX.playVictoryFanfare();
+  soundAndFX.speakPriority("探险成功！你真是太厉害啦！");
 }

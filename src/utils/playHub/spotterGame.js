@@ -50,6 +50,11 @@ export function renderSpotterGame() {
 
     const MAX_TIME = 60;
     let globalRemain = 30;
+    if (this.isExpeditionActive && this.expeditionState) {
+      if (this.expeditionState.buffs.some(b => b.id === "TIME_WARP")) {
+        globalRemain += 15;
+      }
+    }
     let roundIndex = 0;
     let totalCoins = 0;
     let score = 0;
@@ -74,15 +79,25 @@ export function renderSpotterGame() {
             <span>获得 ${totalCoins} 凯茜星币</span>
           </div>
           <div class="flex gap-4">
-            <button id="btn-spotter-again" class="btn-game-orange text-white font-black px-8 py-3 rounded-full cursor-pointer shadow-lg active:scale-95">\u518d\u73a9\u4e00\u5c40</button>
-            <button id="btn-spotter-home" class="btn-game-wood text-white font-black px-8 py-3 rounded-full cursor-pointer shadow-lg active:scale-95">\u8fd4\u56de\u6e38\u4e50\u573a</button>
+            ${this.isExpeditionActive ? '' : '<button id="btn-spotter-again" class="btn-game-orange text-white font-black px-8 py-3 rounded-full cursor-pointer shadow-lg active:scale-95">\u518d\u73a9\u4e00\u5c40</button>'}
+            <button id="btn-spotter-home" class="btn-game-wood text-white font-black px-8 py-3 rounded-full cursor-pointer shadow-lg active:scale-95">${this.isExpeditionActive ? '继续探险 \u2192' : '\u8fd4\u56de\u6e38\u4e50\u573a'}</button>
           </div>
         </div>
       `;
       const againBtn = mainEl.querySelector("#btn-spotter-again");
       if (againBtn) this._on(againBtn, "click", () => this.renderSpotterGame());
       const homeBtn = mainEl.querySelector("#btn-spotter-home");
-      if (homeBtn) this._on(homeBtn, "click", () => { soundAndFX.playPop(); this.currentMode = null; this.render(); });
+      if (homeBtn) this._on(homeBtn, "click", () => { 
+        soundAndFX.playPop(); 
+        if (this.isExpeditionActive) {
+          this.expeditionState.stage++;
+          this.currentMode = "expedition";
+          this.render();
+        } else {
+          this.currentMode = null; 
+          this.render(); 
+        }
+      });
     };
 
     const drawSpotterRing = (remain) => {

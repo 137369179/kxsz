@@ -38,7 +38,12 @@ export function renderMatchGame() {
     let maxCombo = 0;
     let mistakes = 0;      // 失误次数（重置连击）
     let stopTimer = null;
-    const TIME_LIMIT = 60; // 秒
+    let TIME_LIMIT = 60; // 秒
+    if (this.isExpeditionActive && this.expeditionState) {
+      if (this.expeditionState.buffs.some(b => b.id === "TIME_WARP")) {
+        TIME_LIMIT += 30; // Extra 30 seconds
+      }
+    }
 
     this.container.innerHTML = `
       <div id="match-arena" class="relative w-full h-full min-h-[640px] flex flex-col justify-between select-none overflow-hidden bg-gradient-to-b from-indigo-950 via-purple-950 to-slate-950 text-white">
@@ -116,7 +121,7 @@ export function renderMatchGame() {
             ${GAME_ICONS.coin("w-5 h-5")}<span>获得星币奖励</span>
           </div>
           <button id="btn-match-claim" class="btn-game-orange text-white font-black text-base px-10 py-3 rounded-full">
-            领取奖励并返回
+            ${this.isExpeditionActive ? '继续探险 \u2192' : '领取奖励并返回'}
           </button>
         </div>
 
@@ -138,8 +143,13 @@ export function renderMatchGame() {
       this._on(backBtn, "click", () => {
         if (stopTimer) stopTimer();
         soundAndFX.playPop();
-        this.currentMode = null;
-        this.render();
+        if (this.isExpeditionActive) {
+          this.currentMode = "expedition";
+          this.render();
+        } else {
+          this.currentMode = null;
+          this.render();
+        }
       });
     }
 
@@ -283,8 +293,14 @@ export function renderMatchGame() {
       this._on(claimBtn, "click", () => {
         if (stopTimer) stopTimer();
         soundAndFX.playPop();
-        this.currentMode = null;
-        this.render();
+        if (this.isExpeditionActive) {
+          this.expeditionState.stage++;
+          this.currentMode = "expedition";
+          this.render();
+        } else {
+          this.currentMode = null;
+          this.render();
+        }
       });
     }
 

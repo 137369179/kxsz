@@ -120,15 +120,26 @@ export function renderMeteorDefense() {
             <span>获得 ${totalCoins} 凯茜星币</span>
           </div>
           <div class="flex gap-4">
-            <button id="btn-meteor-again" class="btn-game-cyan text-white font-black px-8 py-3 rounded-full cursor-pointer shadow-lg active:scale-95">再玩一局</button>
-            <button id="btn-meteor-home" class="bg-white/10 hover:bg-white/20 text-white font-black px-8 py-3 rounded-full cursor-pointer shadow-lg active:scale-95 border border-white/20">返回大厅</button>
+            ${this.isExpeditionActive ? '' : '<button id="btn-meteor-again" class="btn-game-cyan text-white font-black px-8 py-3 rounded-full cursor-pointer shadow-lg active:scale-95">\u518d\u73a9\u4e00\u5c40</button>'}
+            <button id="btn-meteor-home" class="bg-white/10 hover:bg-white/20 text-white font-black px-8 py-3 rounded-full cursor-pointer shadow-lg active:scale-95 border border-white/20">${this.isExpeditionActive ? '继续探险 \u2192' : '返回大厅'}</button>
           </div>
         </div>
       `;
       const againBtn = mainEl.querySelector("#btn-meteor-again");
       if (againBtn) this._on(againBtn, "click", () => { soundAndFX.stopSpeaking(); soundAndFX.playPop(); this.renderMeteorDefense(); });
       const homeBtn = mainEl.querySelector("#btn-meteor-home");
-      if (homeBtn) this._on(homeBtn, "click", () => { soundAndFX.stopSpeaking(); soundAndFX.playPop(); this.currentMode = null; this.render(); });
+      if (homeBtn) this._on(homeBtn, "click", () => { 
+        soundAndFX.stopSpeaking(); 
+        soundAndFX.playPop(); 
+        if (this.isExpeditionActive) {
+          this.expeditionState.stage++;
+          this.currentMode = "expedition";
+          this.render();
+        } else {
+          this.currentMode = null; 
+          this.render(); 
+        }
+      });
       return;
     }
 
@@ -137,7 +148,10 @@ export function renderMeteorDefense() {
     const progressPct = Math.round((roundIndex / questions.length) * 100);
 
     // Speed up slightly as rounds progress
-    const currentFallTime = Math.max(3000, FALL_TIME_MS - roundIndex * 300);
+    let currentFallTime = Math.max(3000, FALL_TIME_MS - roundIndex * 300);
+    if (this.isExpeditionActive && this.expeditionState && this.expeditionState.buffs.some(b => b.id === "SLOW_MOTION")) {
+      currentFallTime *= 1.5; // Meteor falls 50% slower
+    }
 
     mainEl.innerHTML = `
       <div class="relative w-full max-w-3xl mx-auto flex flex-col items-center select-none animate-fade-in h-[500px] bg-[url('assets/images/pinyin_pair_yue.webp')] bg-cover bg-center rounded-3xl overflow-hidden border-4 border-cyan-900/50 shadow-2xl">
