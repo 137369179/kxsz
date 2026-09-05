@@ -18,7 +18,9 @@ export function mountGameShell(container, { activeMode, heading }) {
 
   const buildShell = () => {
     container.innerHTML = `
-      <div class="relative w-full h-full min-h-[640px] flex flex-col select-none overflow-hidden bg-gradient-to-b from-sky-400 via-amber-200 to-orange-200" role="application" aria-label="凯茜识字学习应用">
+      <div class="relative w-full h-full min-h-[640px] flex flex-col select-none overflow-hidden bg-gradient-to-b from-sky-400 via-amber-200 to-orange-200" aria-label="凯茜识字学习应用">
+        <!-- P0-3: 页面级 h1（视觉隐藏，读屏可达；每屏由 heading 参数区分） -->
+        <h1 class="sr-only">${heading}</h1>
 
         <div class="absolute top-4 left-4 right-4 z-40 flex items-center justify-between pointer-events-none" role="toolbar" aria-label="顶部导航栏">
 

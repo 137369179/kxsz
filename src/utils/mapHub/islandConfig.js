@@ -7,7 +7,7 @@ const ISLAND_CONFIG = {
     bgImg: "assets/images/cathy_island_forest.webp",
     bgFallback: "assets/images/cathy_world_map.webp",
     themeGrad: "from-emerald-900 via-teal-900 to-emerald-950",
-    tabColor: "bg-emerald-500",
+    tabColor: "bg-emerald-700",
     nodeBorder: "border-emerald-300",
     btnGrad: "from-emerald-400 to-teal-600"
   },
@@ -18,7 +18,7 @@ const ISLAND_CONFIG = {
     bgImg: "assets/images/cathy_island_life.webp",
     bgFallback: "assets/images/cathy_world_map.webp",
     themeGrad: "from-amber-900 via-orange-900 to-amber-950",
-    tabColor: "bg-amber-500",
+    tabColor: "bg-amber-700",
     nodeBorder: "border-amber-300",
     btnGrad: "from-amber-400 to-orange-500"
   },

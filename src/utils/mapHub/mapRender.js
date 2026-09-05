@@ -122,7 +122,7 @@ export function renderMap() {
         </button>
       </div>
 
-      <div id="map-scroll-viewport" class="relative w-full h-full flex-1 overflow-x-auto overflow-y-hidden cursor-grab active:cursor-grabbing no-scrollbar">
+      <div id="map-scroll-viewport" role="region" aria-label="世界地图横向滚动区" tabindex="0" class="relative w-full h-full flex-1 overflow-x-auto overflow-y-hidden cursor-grab active:cursor-grabbing no-scrollbar">
         
         <div class="relative h-full flex items-center bg-gradient-to-r ${islandCfg.themeGrad} overflow-hidden" style="min-width: ${Math.max(2800, displayChars.length * 208 + 400)}px;">
           
