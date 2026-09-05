@@ -85,6 +85,14 @@ export function renderStepTestAndChest(stage) {
           : 2;
         if (this._evalFromManual) earnedStars = Math.min(earnedStars, 2);
 
+        // P0-B8 fix：数据层立即执行（不等 1400ms timeout）
+        // 防止用户在星星动画中途点 header 返回按钮
+        //   → LearnModule.destroy() 清掉 _cleanups 里的 timeout
+        //   → completeCharacter / clearProgress / LEARN_FINISH 永远不执行
+        this.clearProgress();
+        ebbinghausManager.completeCharacter(char.id, earnedStars);
+        this._busEmit(EVENTS.LEARN_FINISH, { charId: char.id, stars: earnedStars });
+
         const starsLabel = stage.querySelector("#chest-reward-stars");
         if (starsLabel) {
           starsLabel.innerHTML = `${GAME_ICONS.star("w-5 h-5", false)} ${earnedStars} 颗凯茜之星`;
@@ -124,9 +132,7 @@ export function renderStepTestAndChest(stage) {
         this._timeout(() => {
           if (rewardCard) rewardCard.classList.remove("hidden");
           soundAndFX.playVictoryFanfare();
-          this.clearProgress();
-          ebbinghausManager.completeCharacter(char.id, earnedStars);
-          this._busEmit(EVENTS.LEARN_FINISH, { charId: char.id, stars: earnedStars });
+          // 数据层已在 chest 点击时立即执行（earnedStars 一确定）
         }, 1400);
       });
     }
