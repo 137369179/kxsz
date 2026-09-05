@@ -38,7 +38,7 @@ export function render() {
           </div>
 
           <div class="flex items-center gap-2 w-full sm:w-auto">
-            <button id="btn-start-slideshow" class="btn-game-orange text-white font-black text-xs px-4 py-2 rounded-full shadow-md active:scale-95 transition-all flex items-center gap-1.5 cursor-pointer whitespace-nowrap">
+            <button id="btn-start-slideshow" class="btn-game-orange text-white font-black text-xs px-4 py-2 rounded-full shadow-md active:scale-95 transition-all flex items-center gap-1.5 cursor-pointer whitespace-nowrap" data-speak="闪卡轮播" aria-label="闪卡轮播">
               <span class="flex items-center">${GAME_ICONS.sparkle("w-3.5 h-3.5")}</span>
               <span>闪卡轮播</span>
             </button>
@@ -117,7 +117,7 @@ export function render() {
             <span class="text-2xl font-black bg-white/20 w-10 h-10 rounded-xl flex items-center justify-center">${this.selectedRadical}</span>
             <span class="text-xs font-bold">${RADICAL_ORIGINS[this.selectedRadical]}</span>
           </div>
-          <button id="btn-speak-radical-origin" class="btn-game-wood text-white text-[10px] font-black px-3 py-1 rounded-full shadow"> 听解说</button>
+          <button id="btn-speak-radical-origin" class="btn-game-wood text-white text-[10px] font-black px-3 py-1 rounded-full shadow" data-speak="听解说" aria-label="听解说"> 听解说</button>
         </div>
       `
           : ""

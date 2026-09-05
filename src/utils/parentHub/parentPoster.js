@@ -169,7 +169,7 @@ export function generateWeeklyReportPoster() {
             try {
               await navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]);
               soundAndFX.playSuccessSound();
-              showGameToast(this.container, "周报图片已复制到剪贴板！可直接去聊天应用中粘贴！", "success");
+              showGameToast(this.container, "周报图片已复制到剪贴板！可直接去粘贴分享！", "success");
               return;
             } catch (err) {
               console.warn("ClipboardItem write failed:", err);

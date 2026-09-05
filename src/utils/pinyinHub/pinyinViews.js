@@ -223,7 +223,7 @@ export function _renderCoasterView() {
 
       <!-- 模式切换：轨道演示 vs 声调大挑战 -->
       <div class="flex items-center gap-2 mb-6 bg-indigo-50 p-1.5 rounded-full border border-indigo-200">
-        <button id="btn-subtab-track" class="px-5 py-2 rounded-full text-xs font-black bg-indigo-600 text-white shadow-md cursor-pointer">
+        <button id="btn-subtab-track" class="px-5 py-2 rounded-full text-xs font-black bg-indigo-600 text-white shadow-md cursor-pointer" data-speak="过山车轨道演示" aria-label="过山车轨道演示">
           过山车轨道演示
         </button>
         <button id="btn-start-tone-quiz" class="px-5 py-2 rounded-full text-xs font-black text-indigo-900 hover:bg-white/60 cursor-pointer">
@@ -465,7 +465,7 @@ export function _renderCollisionView() {
 
 
         <div class="flex items-center gap-4 z-10">
-          <button id="btn-fire-collision" class="btn-game-orange text-white text-xs sm:text-sm font-black px-8 py-3.5 rounded-full shadow-xl active:scale-95 flex items-center gap-2 cursor-pointer">
+          <button id="btn-fire-collision" class="btn-game-orange text-white text-xs sm:text-sm font-black px-8 py-3.5 rounded-full shadow-xl active:scale-95 flex items-center gap-2 cursor-pointer" data-speak="声韵拼读碰撞实验室" aria-label="声韵拼读碰撞实验室">
             <span class="flex items-center">${GAME_ICONS.sparkle("w-5 h-5")}</span>
             <span>发射两车碰撞！</span>
           </button>

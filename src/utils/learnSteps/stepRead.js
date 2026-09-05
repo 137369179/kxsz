@@ -18,7 +18,7 @@ export function renderStepRead(stage) {
             ${char.pinyin}
           </div>
 
-          <button id="read-char-circle" class="relative group w-52 h-52 sm:w-60 sm:h-60 rounded-3xl bg-gradient-to-tr from-sky-400 via-blue-500 to-indigo-600 border-4 border-white shadow-[0_0_50px_rgba(56,189,248,0.7)] flex items-center justify-center text-9xl sm:text-[10rem] font-black text-white active:scale-95 transition-all cursor-pointer animate-bounce-cathy" title="点击听示范发音">
+          <button id="read-char-circle" class="relative group w-52 h-52 sm:w-60 sm:h-60 rounded-3xl bg-gradient-to-tr from-sky-400 via-blue-500 to-indigo-600 border-4 border-white shadow-[0_0_50px_rgba(56,189,248,0.7)] flex items-center justify-center text-9xl sm:text-[10rem] font-black text-white active:scale-95 transition-all cursor-pointer animate-bounce-cathy" title="点击听示范发音" data-speak="示范发音" aria-label="示范发音">
             ${char.char}
             <div class="absolute -bottom-2.5 bg-blue-950 text-sky-200 text-[10px] font-black px-3.5 py-0.5 rounded-full border border-sky-400 flex items-center gap-1 shadow-md">
               <span>示范发音</span>
@@ -87,7 +87,7 @@ export function renderStepRead(stage) {
             <div id="manual-rating-panel" class="hidden flex flex-col items-center justify-center w-full py-4 animate-fade-in">
               <p class="text-xs text-sky-100 font-bold mb-3 leading-relaxed">当前浏览器不支持语音识别<br/>请给自己打分吧！</p>
               <div id="manual-stars-row" class="flex items-center gap-3">
-                <button class="manual-star-btn p-1 transition-transform hover:scale-110 active:scale-90 cursor-pointer" data-stars="1">${GAME_ICONS.star("w-8 h-8", false)}</button>
+                <button class="manual-star-btn p-1 transition-transform hover:scale-110 active:scale-90 cursor-pointer" data-stars="1" data-speak="当前浏览器不支持语音识别" aria-label="当前浏览器不支持语音识别">${GAME_ICONS.star("w-8 h-8", false)}</button>
                 <button class="manual-star-btn p-1 transition-transform hover:scale-110 active:scale-90 cursor-pointer" data-stars="2">${GAME_ICONS.star("w-10 h-10", false)}</button>
                 <button class="manual-star-btn p-1 transition-transform hover:scale-110 active:scale-90 cursor-pointer" data-stars="3">${GAME_ICONS.star("w-8 h-8", false)}</button>
               </div>
@@ -544,7 +544,7 @@ export function _showMicPermissionModal(stage) {
         </div>
 
         <div class="flex items-center gap-3 w-full">
-          <button id="btn-retry-mic" class="flex-1 btn-game-orange text-white font-black text-xs py-3 rounded-2xl shadow-md active:scale-95 cursor-pointer">
+          <button id="btn-retry-mic" class="flex-1 btn-game-orange text-white font-black text-xs py-3 rounded-2xl shadow-md active:scale-95 cursor-pointer" data-speak="听示范发音" aria-label="听示范发音">
             重新尝试授权
           </button>
           <button id="btn-fallback-manual" class="px-4 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-black text-xs rounded-2xl active:scale-95 cursor-pointer">

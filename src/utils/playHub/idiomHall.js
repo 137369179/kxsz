@@ -38,7 +38,7 @@ export function renderIdiomHall() {
       <div class="relative w-full h-full min-h-[640px] flex flex-col select-none overflow-hidden bg-gradient-to-b from-emerald-950 via-teal-950 to-slate-950 text-white">
         
         <header class="relative z-30 w-full px-6 py-3 flex items-center justify-between bg-black/50 backdrop-blur-md border-b border-white/20">
-          <button id="btn-idiom-back" class="btn-game-wood text-white font-black text-xs px-4 py-2 rounded-full flex items-center gap-1.5 cursor-pointer active:scale-95">
+          <button id="btn-idiom-back" class="btn-game-wood text-white font-black text-xs px-4 py-2 rounded-full flex items-center gap-1.5 cursor-pointer active:scale-95" data-speak="返回大厅" aria-label="返回大厅">
             <span class="flex items-center">${GAME_ICONS.home("w-4 h-4")}</span>
             <span>返回大厅</span>
           </button>
@@ -178,7 +178,7 @@ export function _renderIdiomStory(idiom, db) {
                 <span class="flex items-center">${GAME_ICONS.pen("w-4 h-4")}</span>
                 <span class="text-xs font-black text-emerald-300 uppercase tracking-wider">经典故事</span>
               </div>
-              <button id="btn-narrate" class="btn-game-orange text-white font-black text-xs px-4 py-2 rounded-full flex items-center gap-1.5 active:scale-90">
+              <button id="btn-narrate" class="btn-game-orange text-white font-black text-xs px-4 py-2 rounded-full flex items-center gap-1.5 active:scale-90" data-speak="成语释义" aria-label="成语释义">
                 <span class="flex items-center">${GAME_ICONS.speaker("w-4 h-4")}</span>
                 <span>分段高亮朗读</span>
               </button>
