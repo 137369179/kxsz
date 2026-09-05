@@ -60,7 +60,7 @@ export function renderMap() {
         <div class="w-[1px] h-6 bg-white/30 mx-1"></div>
 
         <button class="island-tab-btn px-4 py-2 rounded-full text-xs sm:text-sm font-black transition-all flex items-center gap-2 cursor-pointer touch-target ${
-          this.currentIsland === 1 ? "bg-emerald-500 text-white shadow-lg scale-105 ring-2 ring-emerald-300" : "text-white/80 hover:text-white"
+          this.currentIsland === 1 ? "bg-emerald-700 text-white shadow-lg scale-105 ring-2 ring-emerald-300" : "text-white/80 hover:text-white"
         }" data-island="1" aria-label="奇幻森林岛" data-speak="去奇幻森林岛">
           <span class="flex items-center">${GAME_ICONS.islandForest('w-6 h-6')}</span>
           <span>奇幻森林岛</span>
@@ -207,7 +207,7 @@ export function renderMap() {
                   ${GAME_ICONS.sparkle("w-10 h-10")}
                 </div>
                 <div class="text-center">
-                  <h3 class="text-base font-black">奇趣拼音王国</h3>
+                  <h2 class="text-base font-black">奇趣拼音王国</h2>
                   <p class="text-[10px] text-cyan-100 font-bold mt-0.5">63声韵 · 拼读碰撞</p>
                 </div>
               </div>
@@ -218,7 +218,7 @@ export function renderMap() {
                   ${GAME_ICONS.gem("w-10 h-10")}
                 </div>
                 <div class="text-center">
-                  <h3 class="text-base font-black">魔法积木屋</h3>
+                  <h2 class="text-base font-black">魔法积木屋</h2>
                   <p class="text-[10px] text-emerald-100 font-bold mt-0.5">偏旁字族 · 一字生万字</p>
                 </div>
               </div>
@@ -229,7 +229,7 @@ export function renderMap() {
                   ${GAME_ICONS.crown("w-10 h-10")}
                 </div>
                 <div class="text-center">
-                  <h3 class="text-base font-black">伴学小树屋</h3>
+                  <h2 class="text-base font-black">伴学小树屋</h2>
                   <p class="text-[10px] text-amber-100 font-bold mt-0.5">浇水神木 · 伴学字谜</p>
                 </div>
               </div>
@@ -315,7 +315,7 @@ export function renderMap() {
                     <div class="w-16 h-16 rounded-full overflow-hidden border-2 border-white/40 shadow-md mb-2">
                       <img src="${cfg.bgImg}" class="w-full h-full object-cover" alt="${cfg.name}" />
                     </div>
-                    <h3 class="text-sm font-black text-white mb-0.5">${cfg.name}</h3>
+                    <h3 class="text-sm font-black text-white mb-0.5">${cfg.name}</h2>
                     <p class="text-[10px] text-white/60 font-bold mb-3">${cfg.sub}</p>
                     <button class="w-full py-2 rounded-xl text-xs font-black ${
                       isCurrent
