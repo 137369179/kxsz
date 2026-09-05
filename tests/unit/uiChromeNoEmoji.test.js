@@ -18,6 +18,10 @@ const CHROME_FILES = [
   "src/utils/parentHub/parentDashboardEvents.js",
   "src/utils/bookHub/bookShelf.js",
   "src/utils/bookHub/bookReader.js",
+  "src/components/ReviewModule.js",
+  "src/utils/rewardHub/rewardViews.js",
+  "src/utils/parentHub/parentTabs.js",
+  "src/utils/reviewHub/interleaveView.js",
 ];
 
 describe("stripEmoji helper", () => {

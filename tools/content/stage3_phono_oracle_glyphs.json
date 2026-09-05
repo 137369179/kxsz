@@ -1,0 +1,5189 @@
+{
+  "_meta": {
+    "note": "Stage3 形声字教学占位：简转繁过渡形（opencc cn→tw），非学术甲骨摹写。",
+    "policy": "仅填充原为空的 oracleGlyph/bronzeGlyph。",
+    "counts": {
+      "total": 1294,
+      "converted": 498,
+      "same": 796
+    }
+  },
+  "glyphs": {
+    "桥": {
+      "oracleGlyph": "橋",
+      "bronzeGlyph": "橋"
+    },
+    "房": {
+      "oracleGlyph": "房",
+      "bronzeGlyph": "房"
+    },
+    "楼": {
+      "oracleGlyph": "樓",
+      "bronzeGlyph": "樓"
+    },
+    "床": {
+      "oracleGlyph": "床",
+      "bronzeGlyph": "床"
+    },
+    "桌": {
+      "oracleGlyph": "桌",
+      "bronzeGlyph": "桌"
+    },
+    "椅": {
+      "oracleGlyph": "椅",
+      "bronzeGlyph": "椅"
+    },
+    "灯": {
+      "oracleGlyph": "燈",
+      "bronzeGlyph": "燈"
+    },
+    "球": {
+      "oracleGlyph": "球",
+      "bronzeGlyph": "球"
+    },
+    "晚": {
+      "oracleGlyph": "晚",
+      "bronzeGlyph": "晚"
+    },
+    "冷": {
+      "oracleGlyph": "冷",
+      "bronzeGlyph": "冷"
+    },
+    "快": {
+      "oracleGlyph": "快",
+      "bronzeGlyph": "快"
+    },
+    "慢": {
+      "oracleGlyph": "慢",
+      "bronzeGlyph": "慢"
+    },
+    "你": {
+      "oracleGlyph": "你",
+      "bronzeGlyph": "你"
+    },
+    "他": {
+      "oracleGlyph": "他",
+      "bronzeGlyph": "他"
+    },
+    "们": {
+      "oracleGlyph": "們",
+      "bronzeGlyph": "們"
+    },
+    "都": {
+      "oracleGlyph": "都",
+      "bronzeGlyph": "都"
+    },
+    "和": {
+      "oracleGlyph": "和",
+      "bronzeGlyph": "和"
+    },
+    "这": {
+      "oracleGlyph": "這",
+      "bronzeGlyph": "這"
+    },
+    "那": {
+      "oracleGlyph": "那",
+      "bronzeGlyph": "那"
+    },
+    "谁": {
+      "oracleGlyph": "誰",
+      "bronzeGlyph": "誰"
+    },
+    "哪": {
+      "oracleGlyph": "哪",
+      "bronzeGlyph": "哪"
+    },
+    "忙": {
+      "oracleGlyph": "忙",
+      "bronzeGlyph": "忙"
+    },
+    "时": {
+      "oracleGlyph": "時",
+      "bronzeGlyph": "時"
+    },
+    "秒": {
+      "oracleGlyph": "秒",
+      "bronzeGlyph": "秒"
+    },
+    "低": {
+      "oracleGlyph": "低",
+      "bronzeGlyph": "低"
+    },
+    "远": {
+      "oracleGlyph": "遠",
+      "bronzeGlyph": "遠"
+    },
+    "近": {
+      "oracleGlyph": "近",
+      "bronzeGlyph": "近"
+    },
+    "边": {
+      "oracleGlyph": "邊",
+      "bronzeGlyph": "邊"
+    },
+    "饭": {
+      "oracleGlyph": "飯",
+      "bronzeGlyph": "飯"
+    },
+    "菜": {
+      "oracleGlyph": "菜",
+      "bronzeGlyph": "菜"
+    },
+    "汤": {
+      "oracleGlyph": "湯",
+      "bronzeGlyph": "湯"
+    },
+    "蛋": {
+      "oracleGlyph": "蛋",
+      "bronzeGlyph": "蛋"
+    },
+    "茶": {
+      "oracleGlyph": "茶",
+      "bronzeGlyph": "茶"
+    },
+    "糖": {
+      "oracleGlyph": "糖",
+      "bronzeGlyph": "糖"
+    },
+    "盐": {
+      "oracleGlyph": "鹽",
+      "bronzeGlyph": "鹽"
+    },
+    "油": {
+      "oracleGlyph": "油",
+      "bronzeGlyph": "油"
+    },
+    "酒": {
+      "oracleGlyph": "酒",
+      "bronzeGlyph": "酒"
+    },
+    "桃": {
+      "oracleGlyph": "桃",
+      "bronzeGlyph": "桃"
+    },
+    "梨": {
+      "oracleGlyph": "梨",
+      "bronzeGlyph": "梨"
+    },
+    "橘": {
+      "oracleGlyph": "橘",
+      "bronzeGlyph": "橘"
+    },
+    "苹": {
+      "oracleGlyph": "蘋",
+      "bronzeGlyph": "蘋"
+    },
+    "蕉": {
+      "oracleGlyph": "蕉",
+      "bronzeGlyph": "蕉"
+    },
+    "饼": {
+      "oracleGlyph": "餅",
+      "bronzeGlyph": "餅"
+    },
+    "糕": {
+      "oracleGlyph": "糕",
+      "bronzeGlyph": "糕"
+    },
+    "蜜": {
+      "oracleGlyph": "蜜",
+      "bronzeGlyph": "蜜"
+    },
+    "汁": {
+      "oracleGlyph": "汁",
+      "bronzeGlyph": "汁"
+    },
+    "猪": {
+      "oracleGlyph": "豬",
+      "bronzeGlyph": "豬"
+    },
+    "狗": {
+      "oracleGlyph": "狗",
+      "bronzeGlyph": "狗"
+    },
+    "猴": {
+      "oracleGlyph": "猴",
+      "bronzeGlyph": "猴"
+    },
+    "熊": {
+      "oracleGlyph": "熊",
+      "bronzeGlyph": "熊"
+    },
+    "狼": {
+      "oracleGlyph": "狼",
+      "bronzeGlyph": "狼"
+    },
+    "狮": {
+      "oracleGlyph": "獅",
+      "bronzeGlyph": "獅"
+    },
+    "鸭": {
+      "oracleGlyph": "鴨",
+      "bronzeGlyph": "鴨"
+    },
+    "鹅": {
+      "oracleGlyph": "鵝",
+      "bronzeGlyph": "鵝"
+    },
+    "蜂": {
+      "oracleGlyph": "蜂",
+      "bronzeGlyph": "蜂"
+    },
+    "蚁": {
+      "oracleGlyph": "蟻",
+      "bronzeGlyph": "蟻"
+    },
+    "蛙": {
+      "oracleGlyph": "蛙",
+      "bronzeGlyph": "蛙"
+    },
+    "虾": {
+      "oracleGlyph": "蝦",
+      "bronzeGlyph": "蝦"
+    },
+    "蟹": {
+      "oracleGlyph": "蟹",
+      "bronzeGlyph": "蟹"
+    },
+    "鸽": {
+      "oracleGlyph": "鴿",
+      "bronzeGlyph": "鴿"
+    },
+    "鹰": {
+      "oracleGlyph": "鷹",
+      "bronzeGlyph": "鷹"
+    },
+    "蝶": {
+      "oracleGlyph": "蝶",
+      "bronzeGlyph": "蝶"
+    },
+    "蜻": {
+      "oracleGlyph": "蜻",
+      "bronzeGlyph": "蜻"
+    },
+    "蜓": {
+      "oracleGlyph": "蜓",
+      "bronzeGlyph": "蜓"
+    },
+    "鹤": {
+      "oracleGlyph": "鶴",
+      "bronzeGlyph": "鶴"
+    },
+    "豹": {
+      "oracleGlyph": "豹",
+      "bronzeGlyph": "豹"
+    },
+    "狐": {
+      "oracleGlyph": "狐",
+      "bronzeGlyph": "狐"
+    },
+    "狸": {
+      "oracleGlyph": "狸",
+      "bronzeGlyph": "狸"
+    },
+    "雁": {
+      "oracleGlyph": "雁",
+      "bronzeGlyph": "雁"
+    },
+    "鲸": {
+      "oracleGlyph": "鯨",
+      "bronzeGlyph": "鯨"
+    },
+    "鲨": {
+      "oracleGlyph": "鯊",
+      "bronzeGlyph": "鯊"
+    },
+    "螺": {
+      "oracleGlyph": "螺",
+      "bronzeGlyph": "螺"
+    },
+    "蚕": {
+      "oracleGlyph": "蠶",
+      "bronzeGlyph": "蠶"
+    },
+    "蜘": {
+      "oracleGlyph": "蜘",
+      "bronzeGlyph": "蜘"
+    },
+    "蛛": {
+      "oracleGlyph": "蛛",
+      "bronzeGlyph": "蛛"
+    },
+    "蚂": {
+      "oracleGlyph": "螞",
+      "bronzeGlyph": "螞"
+    },
+    "蚱": {
+      "oracleGlyph": "蚱",
+      "bronzeGlyph": "蚱"
+    },
+    "蝙": {
+      "oracleGlyph": "蝙",
+      "bronzeGlyph": "蝙"
+    },
+    "蝠": {
+      "oracleGlyph": "蝠",
+      "bronzeGlyph": "蝠"
+    },
+    "发": {
+      "oracleGlyph": "發",
+      "bronzeGlyph": "發"
+    },
+    "腰": {
+      "oracleGlyph": "腰",
+      "bronzeGlyph": "腰"
+    },
+    "腿": {
+      "oracleGlyph": "腿",
+      "bronzeGlyph": "腿"
+    },
+    "脚": {
+      "oracleGlyph": "腳",
+      "bronzeGlyph": "腳"
+    },
+    "指": {
+      "oracleGlyph": "指",
+      "bronzeGlyph": "指"
+    },
+    "掌": {
+      "oracleGlyph": "掌",
+      "bronzeGlyph": "掌"
+    },
+    "血": {
+      "oracleGlyph": "血",
+      "bronzeGlyph": "血"
+    },
+    "汗": {
+      "oracleGlyph": "汗",
+      "bronzeGlyph": "汗"
+    },
+    "皮": {
+      "oracleGlyph": "皮",
+      "bronzeGlyph": "皮"
+    },
+    "骨": {
+      "oracleGlyph": "骨",
+      "bronzeGlyph": "骨"
+    },
+    "嘴": {
+      "oracleGlyph": "嘴",
+      "bronzeGlyph": "嘴"
+    },
+    "唇": {
+      "oracleGlyph": "唇",
+      "bronzeGlyph": "唇"
+    },
+    "颈": {
+      "oracleGlyph": "頸",
+      "bronzeGlyph": "頸"
+    },
+    "肩": {
+      "oracleGlyph": "肩",
+      "bronzeGlyph": "肩"
+    },
+    "臂": {
+      "oracleGlyph": "臂",
+      "bronzeGlyph": "臂"
+    },
+    "肚": {
+      "oracleGlyph": "肚",
+      "bronzeGlyph": "肚"
+    },
+    "膝": {
+      "oracleGlyph": "膝",
+      "bronzeGlyph": "膝"
+    },
+    "泪": {
+      "oracleGlyph": "淚",
+      "bronzeGlyph": "淚"
+    },
+    "涕": {
+      "oracleGlyph": "涕",
+      "bronzeGlyph": "涕"
+    },
+    "钟": {
+      "oracleGlyph": "鍾",
+      "bronzeGlyph": "鍾"
+    },
+    "镜": {
+      "oracleGlyph": "鏡",
+      "bronzeGlyph": "鏡"
+    },
+    "杯": {
+      "oracleGlyph": "杯",
+      "bronzeGlyph": "杯"
+    },
+    "碗": {
+      "oracleGlyph": "碗",
+      "bronzeGlyph": "碗"
+    },
+    "筷": {
+      "oracleGlyph": "筷",
+      "bronzeGlyph": "筷"
+    },
+    "勺": {
+      "oracleGlyph": "勺",
+      "bronzeGlyph": "勺"
+    },
+    "锅": {
+      "oracleGlyph": "鍋",
+      "bronzeGlyph": "鍋"
+    },
+    "盆": {
+      "oracleGlyph": "盆",
+      "bronzeGlyph": "盆"
+    },
+    "桶": {
+      "oracleGlyph": "桶",
+      "bronzeGlyph": "桶"
+    },
+    "布": {
+      "oracleGlyph": "布",
+      "bronzeGlyph": "布"
+    },
+    "线": {
+      "oracleGlyph": "線",
+      "bronzeGlyph": "線"
+    },
+    "针": {
+      "oracleGlyph": "針",
+      "bronzeGlyph": "針"
+    },
+    "绳": {
+      "oracleGlyph": "繩",
+      "bronzeGlyph": "繩"
+    },
+    "锁": {
+      "oracleGlyph": "鎖",
+      "bronzeGlyph": "鎖"
+    },
+    "钥": {
+      "oracleGlyph": "鑰",
+      "bronzeGlyph": "鑰"
+    },
+    "箱": {
+      "oracleGlyph": "箱",
+      "bronzeGlyph": "箱"
+    },
+    "包": {
+      "oracleGlyph": "包",
+      "bronzeGlyph": "包"
+    },
+    "袋": {
+      "oracleGlyph": "袋",
+      "bronzeGlyph": "袋"
+    },
+    "瓶": {
+      "oracleGlyph": "瓶",
+      "bronzeGlyph": "瓶"
+    },
+    "罐": {
+      "oracleGlyph": "罐",
+      "bronzeGlyph": "罐"
+    },
+    "裤": {
+      "oracleGlyph": "褲",
+      "bronzeGlyph": "褲"
+    },
+    "袜": {
+      "oracleGlyph": "襪",
+      "bronzeGlyph": "襪"
+    },
+    "巾": {
+      "oracleGlyph": "巾",
+      "bronzeGlyph": "巾"
+    },
+    "扇": {
+      "oracleGlyph": "扇",
+      "bronzeGlyph": "扇"
+    },
+    "窗": {
+      "oracleGlyph": "窗",
+      "bronzeGlyph": "窗"
+    },
+    "墙": {
+      "oracleGlyph": "牆",
+      "bronzeGlyph": "牆"
+    },
+    "壁": {
+      "oracleGlyph": "壁",
+      "bronzeGlyph": "壁"
+    },
+    "瓦": {
+      "oracleGlyph": "瓦",
+      "bronzeGlyph": "瓦"
+    },
+    "钉": {
+      "oracleGlyph": "釘",
+      "bronzeGlyph": "釘"
+    },
+    "锤": {
+      "oracleGlyph": "錘",
+      "bronzeGlyph": "錘"
+    },
+    "斧": {
+      "oracleGlyph": "斧",
+      "bronzeGlyph": "斧"
+    },
+    "城": {
+      "oracleGlyph": "城",
+      "bronzeGlyph": "城"
+    },
+    "村": {
+      "oracleGlyph": "村",
+      "bronzeGlyph": "村"
+    },
+    "街": {
+      "oracleGlyph": "街",
+      "bronzeGlyph": "街"
+    },
+    "市": {
+      "oracleGlyph": "市",
+      "bronzeGlyph": "市"
+    },
+    "店": {
+      "oracleGlyph": "店",
+      "bronzeGlyph": "店"
+    },
+    "场": {
+      "oracleGlyph": "場",
+      "bronzeGlyph": "場"
+    },
+    "园": {
+      "oracleGlyph": "園",
+      "bronzeGlyph": "園"
+    },
+    "院": {
+      "oracleGlyph": "院",
+      "bronzeGlyph": "院"
+    },
+    "馆": {
+      "oracleGlyph": "館",
+      "bronzeGlyph": "館"
+    },
+    "校": {
+      "oracleGlyph": "校",
+      "bronzeGlyph": "校"
+    },
+    "室": {
+      "oracleGlyph": "室",
+      "bronzeGlyph": "室"
+    },
+    "堂": {
+      "oracleGlyph": "堂",
+      "bronzeGlyph": "堂"
+    },
+    "庙": {
+      "oracleGlyph": "廟",
+      "bronzeGlyph": "廟"
+    },
+    "塔": {
+      "oracleGlyph": "塔",
+      "bronzeGlyph": "塔"
+    },
+    "亭": {
+      "oracleGlyph": "亭",
+      "bronzeGlyph": "亭"
+    },
+    "道": {
+      "oracleGlyph": "道",
+      "bronzeGlyph": "道"
+    },
+    "站": {
+      "oracleGlyph": "站",
+      "bronzeGlyph": "站"
+    },
+    "厕": {
+      "oracleGlyph": "廁",
+      "bronzeGlyph": "廁"
+    },
+    "厂": {
+      "oracleGlyph": "廠",
+      "bronzeGlyph": "廠"
+    },
+    "库": {
+      "oracleGlyph": "庫",
+      "bronzeGlyph": "庫"
+    },
+    "仓": {
+      "oracleGlyph": "倉",
+      "bronzeGlyph": "倉"
+    },
+    "江": {
+      "oracleGlyph": "江",
+      "bronzeGlyph": "江"
+    },
+    "河": {
+      "oracleGlyph": "河",
+      "bronzeGlyph": "河"
+    },
+    "湖": {
+      "oracleGlyph": "湖",
+      "bronzeGlyph": "湖"
+    },
+    "海": {
+      "oracleGlyph": "海",
+      "bronzeGlyph": "海"
+    },
+    "溪": {
+      "oracleGlyph": "溪",
+      "bronzeGlyph": "溪"
+    },
+    "泉": {
+      "oracleGlyph": "泉",
+      "bronzeGlyph": "泉"
+    },
+    "沙": {
+      "oracleGlyph": "沙",
+      "bronzeGlyph": "沙"
+    },
+    "泥": {
+      "oracleGlyph": "泥",
+      "bronzeGlyph": "泥"
+    },
+    "冰": {
+      "oracleGlyph": "冰",
+      "bronzeGlyph": "冰"
+    },
+    "雷": {
+      "oracleGlyph": "雷",
+      "bronzeGlyph": "雷"
+    },
+    "露": {
+      "oracleGlyph": "露",
+      "bronzeGlyph": "露"
+    },
+    "霜": {
+      "oracleGlyph": "霜",
+      "bronzeGlyph": "霜"
+    },
+    "霞": {
+      "oracleGlyph": "霞",
+      "bronzeGlyph": "霞"
+    },
+    "虹": {
+      "oracleGlyph": "虹",
+      "bronzeGlyph": "虹"
+    },
+    "阴": {
+      "oracleGlyph": "陰",
+      "bronzeGlyph": "陰"
+    },
+    "晴": {
+      "oracleGlyph": "晴",
+      "bronzeGlyph": "晴"
+    },
+    "浪": {
+      "oracleGlyph": "浪",
+      "bronzeGlyph": "浪"
+    },
+    "波": {
+      "oracleGlyph": "波",
+      "bronzeGlyph": "波"
+    },
+    "潮": {
+      "oracleGlyph": "潮",
+      "bronzeGlyph": "潮"
+    },
+    "岸": {
+      "oracleGlyph": "岸",
+      "bronzeGlyph": "岸"
+    },
+    "岛": {
+      "oracleGlyph": "島",
+      "bronzeGlyph": "島"
+    },
+    "岩": {
+      "oracleGlyph": "巖",
+      "bronzeGlyph": "巖"
+    },
+    "崖": {
+      "oracleGlyph": "崖",
+      "bronzeGlyph": "崖"
+    },
+    "苗": {
+      "oracleGlyph": "苗",
+      "bronzeGlyph": "苗"
+    },
+    "麦": {
+      "oracleGlyph": "麥",
+      "bronzeGlyph": "麥"
+    },
+    "稻": {
+      "oracleGlyph": "稻",
+      "bronzeGlyph": "稻"
+    },
+    "谷": {
+      "oracleGlyph": "谷",
+      "bronzeGlyph": "谷"
+    },
+    "棉": {
+      "oracleGlyph": "棉",
+      "bronzeGlyph": "棉"
+    },
+    "麻": {
+      "oracleGlyph": "麻",
+      "bronzeGlyph": "麻"
+    },
+    "桑": {
+      "oracleGlyph": "桑",
+      "bronzeGlyph": "桑"
+    },
+    "菊": {
+      "oracleGlyph": "菊",
+      "bronzeGlyph": "菊"
+    },
+    "梅": {
+      "oracleGlyph": "梅",
+      "bronzeGlyph": "梅"
+    },
+    "兰": {
+      "oracleGlyph": "蘭",
+      "bronzeGlyph": "蘭"
+    },
+    "荷": {
+      "oracleGlyph": "荷",
+      "bronzeGlyph": "荷"
+    },
+    "莲": {
+      "oracleGlyph": "蓮",
+      "bronzeGlyph": "蓮"
+    },
+    "柏": {
+      "oracleGlyph": "柏",
+      "bronzeGlyph": "柏"
+    },
+    "松": {
+      "oracleGlyph": "松",
+      "bronzeGlyph": "松"
+    },
+    "柳": {
+      "oracleGlyph": "柳",
+      "bronzeGlyph": "柳"
+    },
+    "杏": {
+      "oracleGlyph": "杏",
+      "bronzeGlyph": "杏"
+    },
+    "枣": {
+      "oracleGlyph": "棗",
+      "bronzeGlyph": "棗"
+    },
+    "橙": {
+      "oracleGlyph": "橙",
+      "bronzeGlyph": "橙"
+    },
+    "莓": {
+      "oracleGlyph": "莓",
+      "bronzeGlyph": "莓"
+    },
+    "萝": {
+      "oracleGlyph": "蘿",
+      "bronzeGlyph": "蘿"
+    },
+    "卜": {
+      "oracleGlyph": "卜",
+      "bronzeGlyph": "卜"
+    },
+    "茄": {
+      "oracleGlyph": "茄",
+      "bronzeGlyph": "茄"
+    },
+    "葱": {
+      "oracleGlyph": "蔥",
+      "bronzeGlyph": "蔥"
+    },
+    "蒜": {
+      "oracleGlyph": "蒜",
+      "bronzeGlyph": "蒜"
+    },
+    "姜": {
+      "oracleGlyph": "姜",
+      "bronzeGlyph": "姜"
+    },
+    "芽": {
+      "oracleGlyph": "芽",
+      "bronzeGlyph": "芽"
+    },
+    "笋": {
+      "oracleGlyph": "筍",
+      "bronzeGlyph": "筍"
+    },
+    "藤": {
+      "oracleGlyph": "藤",
+      "bronzeGlyph": "藤"
+    },
+    "枝": {
+      "oracleGlyph": "枝",
+      "bronzeGlyph": "枝"
+    },
+    "茎": {
+      "oracleGlyph": "莖",
+      "bronzeGlyph": "莖"
+    },
+    "葵": {
+      "oracleGlyph": "葵",
+      "bronzeGlyph": "葵"
+    },
+    "芙": {
+      "oracleGlyph": "芙",
+      "bronzeGlyph": "芙"
+    },
+    "蓉": {
+      "oracleGlyph": "蓉",
+      "bronzeGlyph": "蓉"
+    },
+    "茉": {
+      "oracleGlyph": "茉",
+      "bronzeGlyph": "茉"
+    },
+    "莉": {
+      "oracleGlyph": "莉",
+      "bronzeGlyph": "莉"
+    },
+    "想": {
+      "oracleGlyph": "想",
+      "bronzeGlyph": "想"
+    },
+    "知": {
+      "oracleGlyph": "知",
+      "bronzeGlyph": "知"
+    },
+    "问": {
+      "oracleGlyph": "問",
+      "bronzeGlyph": "問"
+    },
+    "答": {
+      "oracleGlyph": "答",
+      "bronzeGlyph": "答"
+    },
+    "做": {
+      "oracleGlyph": "做",
+      "bronzeGlyph": "做"
+    },
+    "拿": {
+      "oracleGlyph": "拿",
+      "bronzeGlyph": "拿"
+    },
+    "放": {
+      "oracleGlyph": "放",
+      "bronzeGlyph": "放"
+    },
+    "给": {
+      "oracleGlyph": "給",
+      "bronzeGlyph": "給"
+    },
+    "送": {
+      "oracleGlyph": "送",
+      "bronzeGlyph": "送"
+    },
+    "买": {
+      "oracleGlyph": "買",
+      "bronzeGlyph": "買"
+    },
+    "卖": {
+      "oracleGlyph": "賣",
+      "bronzeGlyph": "賣"
+    },
+    "找": {
+      "oracleGlyph": "找",
+      "bronzeGlyph": "找"
+    },
+    "见": {
+      "oracleGlyph": "見",
+      "bronzeGlyph": "見"
+    },
+    "望": {
+      "oracleGlyph": "望",
+      "bronzeGlyph": "望"
+    },
+    "怕": {
+      "oracleGlyph": "怕",
+      "bronzeGlyph": "怕"
+    },
+    "喜": {
+      "oracleGlyph": "喜",
+      "bronzeGlyph": "喜"
+    },
+    "怒": {
+      "oracleGlyph": "怒",
+      "bronzeGlyph": "怒"
+    },
+    "思": {
+      "oracleGlyph": "思",
+      "bronzeGlyph": "思"
+    },
+    "念": {
+      "oracleGlyph": "念",
+      "bronzeGlyph": "念"
+    },
+    "忘": {
+      "oracleGlyph": "忘",
+      "bronzeGlyph": "忘"
+    },
+    "记": {
+      "oracleGlyph": "記",
+      "bronzeGlyph": "記"
+    },
+    "感": {
+      "oracleGlyph": "感",
+      "bronzeGlyph": "感"
+    },
+    "谢": {
+      "oracleGlyph": "謝",
+      "bronzeGlyph": "謝"
+    },
+    "帮": {
+      "oracleGlyph": "幫",
+      "bronzeGlyph": "幫"
+    },
+    "助": {
+      "oracleGlyph": "助",
+      "bronzeGlyph": "助"
+    },
+    "懂": {
+      "oracleGlyph": "懂",
+      "bronzeGlyph": "懂"
+    },
+    "认": {
+      "oracleGlyph": "認",
+      "bronzeGlyph": "認"
+    },
+    "识": {
+      "oracleGlyph": "識",
+      "bronzeGlyph": "識"
+    },
+    "醒": {
+      "oracleGlyph": "醒",
+      "bronzeGlyph": "醒"
+    },
+    "睡": {
+      "oracleGlyph": "睡",
+      "bronzeGlyph": "睡"
+    },
+    "梦": {
+      "oracleGlyph": "夢",
+      "bronzeGlyph": "夢"
+    },
+    "游": {
+      "oracleGlyph": "遊",
+      "bronzeGlyph": "遊"
+    },
+    "爬": {
+      "oracleGlyph": "爬",
+      "bronzeGlyph": "爬"
+    },
+    "躺": {
+      "oracleGlyph": "躺",
+      "bronzeGlyph": "躺"
+    },
+    "蹲": {
+      "oracleGlyph": "蹲",
+      "bronzeGlyph": "蹲"
+    },
+    "靠": {
+      "oracleGlyph": "靠",
+      "bronzeGlyph": "靠"
+    },
+    "抱": {
+      "oracleGlyph": "抱",
+      "bronzeGlyph": "抱"
+    },
+    "背": {
+      "oracleGlyph": "背",
+      "bronzeGlyph": "背"
+    },
+    "牵": {
+      "oracleGlyph": "牽",
+      "bronzeGlyph": "牽"
+    },
+    "拉": {
+      "oracleGlyph": "拉",
+      "bronzeGlyph": "拉"
+    },
+    "推": {
+      "oracleGlyph": "推",
+      "bronzeGlyph": "推"
+    },
+    "摇": {
+      "oracleGlyph": "搖",
+      "bronzeGlyph": "搖"
+    },
+    "举": {
+      "oracleGlyph": "舉",
+      "bronzeGlyph": "舉"
+    },
+    "抬": {
+      "oracleGlyph": "抬",
+      "bronzeGlyph": "抬"
+    },
+    "打": {
+      "oracleGlyph": "打",
+      "bronzeGlyph": "打"
+    },
+    "拍": {
+      "oracleGlyph": "拍",
+      "bronzeGlyph": "拍"
+    },
+    "抓": {
+      "oracleGlyph": "抓",
+      "bronzeGlyph": "抓"
+    },
+    "握": {
+      "oracleGlyph": "握",
+      "bronzeGlyph": "握"
+    },
+    "摸": {
+      "oracleGlyph": "摸",
+      "bronzeGlyph": "摸"
+    },
+    "招": {
+      "oracleGlyph": "招",
+      "bronzeGlyph": "招"
+    },
+    "挥": {
+      "oracleGlyph": "揮",
+      "bronzeGlyph": "揮"
+    },
+    "搭": {
+      "oracleGlyph": "搭",
+      "bronzeGlyph": "搭"
+    },
+    "扛": {
+      "oracleGlyph": "扛",
+      "bronzeGlyph": "扛"
+    },
+    "提": {
+      "oracleGlyph": "提",
+      "bronzeGlyph": "提"
+    },
+    "扔": {
+      "oracleGlyph": "扔",
+      "bronzeGlyph": "扔"
+    },
+    "丢": {
+      "oracleGlyph": "丟",
+      "bronzeGlyph": "丟"
+    },
+    "捡": {
+      "oracleGlyph": "撿",
+      "bronzeGlyph": "撿"
+    },
+    "拾": {
+      "oracleGlyph": "拾",
+      "bronzeGlyph": "拾"
+    },
+    "擦": {
+      "oracleGlyph": "擦",
+      "bronzeGlyph": "擦"
+    },
+    "扫": {
+      "oracleGlyph": "掃",
+      "bronzeGlyph": "掃"
+    },
+    "刷": {
+      "oracleGlyph": "刷",
+      "bronzeGlyph": "刷"
+    },
+    "梳": {
+      "oracleGlyph": "梳",
+      "bronzeGlyph": "梳"
+    },
+    "晒": {
+      "oracleGlyph": "曬",
+      "bronzeGlyph": "曬"
+    },
+    "晾": {
+      "oracleGlyph": "晾",
+      "bronzeGlyph": "晾"
+    },
+    "煮": {
+      "oracleGlyph": "煮",
+      "bronzeGlyph": "煮"
+    },
+    "炒": {
+      "oracleGlyph": "炒",
+      "bronzeGlyph": "炒"
+    },
+    "煎": {
+      "oracleGlyph": "煎",
+      "bronzeGlyph": "煎"
+    },
+    "炸": {
+      "oracleGlyph": "炸",
+      "bronzeGlyph": "炸"
+    },
+    "烤": {
+      "oracleGlyph": "烤",
+      "bronzeGlyph": "烤"
+    },
+    "蒸": {
+      "oracleGlyph": "蒸",
+      "bronzeGlyph": "蒸"
+    },
+    "钓": {
+      "oracleGlyph": "釣",
+      "bronzeGlyph": "釣"
+    },
+    "捕": {
+      "oracleGlyph": "捕",
+      "bronzeGlyph": "捕"
+    },
+    "猎": {
+      "oracleGlyph": "獵",
+      "bronzeGlyph": "獵"
+    },
+    "牧": {
+      "oracleGlyph": "牧",
+      "bronzeGlyph": "牧"
+    },
+    "种": {
+      "oracleGlyph": "種",
+      "bronzeGlyph": "種"
+    },
+    "收": {
+      "oracleGlyph": "收",
+      "bronzeGlyph": "收"
+    },
+    "割": {
+      "oracleGlyph": "割",
+      "bronzeGlyph": "割"
+    },
+    "采": {
+      "oracleGlyph": "採",
+      "bronzeGlyph": "採"
+    },
+    "摘": {
+      "oracleGlyph": "摘",
+      "bronzeGlyph": "摘"
+    },
+    "选": {
+      "oracleGlyph": "選",
+      "bronzeGlyph": "選"
+    },
+    "择": {
+      "oracleGlyph": "擇",
+      "bronzeGlyph": "擇"
+    },
+    "决": {
+      "oracleGlyph": "決",
+      "bronzeGlyph": "決"
+    },
+    "定": {
+      "oracleGlyph": "定",
+      "bronzeGlyph": "定"
+    },
+    "计": {
+      "oracleGlyph": "計",
+      "bronzeGlyph": "計"
+    },
+    "算": {
+      "oracleGlyph": "算",
+      "bronzeGlyph": "算"
+    },
+    "量": {
+      "oracleGlyph": "量",
+      "bronzeGlyph": "量"
+    },
+    "教": {
+      "oracleGlyph": "教",
+      "bronzeGlyph": "教"
+    },
+    "习": {
+      "oracleGlyph": "習",
+      "bronzeGlyph": "習"
+    },
+    "练": {
+      "oracleGlyph": "練",
+      "bronzeGlyph": "練"
+    },
+    "试": {
+      "oracleGlyph": "試",
+      "bronzeGlyph": "試"
+    },
+    "验": {
+      "oracleGlyph": "驗",
+      "bronzeGlyph": "驗"
+    },
+    "查": {
+      "oracleGlyph": "查",
+      "bronzeGlyph": "查"
+    },
+    "检": {
+      "oracleGlyph": "檢",
+      "bronzeGlyph": "檢"
+    },
+    "修": {
+      "oracleGlyph": "修",
+      "bronzeGlyph": "修"
+    },
+    "改": {
+      "oracleGlyph": "改",
+      "bronzeGlyph": "改"
+    },
+    "换": {
+      "oracleGlyph": "換",
+      "bronzeGlyph": "換"
+    },
+    "借": {
+      "oracleGlyph": "借",
+      "bronzeGlyph": "借"
+    },
+    "租": {
+      "oracleGlyph": "租",
+      "bronzeGlyph": "租"
+    },
+    "赔": {
+      "oracleGlyph": "賠",
+      "bronzeGlyph": "賠"
+    },
+    "赚": {
+      "oracleGlyph": "賺",
+      "bronzeGlyph": "賺"
+    },
+    "赢": {
+      "oracleGlyph": "贏",
+      "bronzeGlyph": "贏"
+    },
+    "输": {
+      "oracleGlyph": "輸",
+      "bronzeGlyph": "輸"
+    },
+    "胜": {
+      "oracleGlyph": "勝",
+      "bronzeGlyph": "勝"
+    },
+    "败": {
+      "oracleGlyph": "敗",
+      "bronzeGlyph": "敗"
+    },
+    "争": {
+      "oracleGlyph": "爭",
+      "bronzeGlyph": "爭"
+    },
+    "斗": {
+      "oracleGlyph": "鬥",
+      "bronzeGlyph": "鬥"
+    },
+    "战": {
+      "oracleGlyph": "戰",
+      "bronzeGlyph": "戰"
+    },
+    "守": {
+      "oracleGlyph": "守",
+      "bronzeGlyph": "守"
+    },
+    "攻": {
+      "oracleGlyph": "攻",
+      "bronzeGlyph": "攻"
+    },
+    "护": {
+      "oracleGlyph": "護",
+      "bronzeGlyph": "護"
+    },
+    "救": {
+      "oracleGlyph": "救",
+      "bronzeGlyph": "救"
+    },
+    "医": {
+      "oracleGlyph": "醫",
+      "bronzeGlyph": "醫"
+    },
+    "治": {
+      "oracleGlyph": "治",
+      "bronzeGlyph": "治"
+    },
+    "疗": {
+      "oracleGlyph": "療",
+      "bronzeGlyph": "療"
+    },
+    "育": {
+      "oracleGlyph": "育",
+      "bronzeGlyph": "育"
+    },
+    "生": {
+      "oracleGlyph": "生",
+      "bronzeGlyph": "生"
+    },
+    "死": {
+      "oracleGlyph": "死",
+      "bronzeGlyph": "死"
+    },
+    "存": {
+      "oracleGlyph": "存",
+      "bronzeGlyph": "存"
+    },
+    "亡": {
+      "oracleGlyph": "亡",
+      "bronzeGlyph": "亡"
+    },
+    "灭": {
+      "oracleGlyph": "滅",
+      "bronzeGlyph": "滅"
+    },
+    "息": {
+      "oracleGlyph": "息",
+      "bronzeGlyph": "息"
+    },
+    "休": {
+      "oracleGlyph": "休",
+      "bronzeGlyph": "休"
+    },
+    "停": {
+      "oracleGlyph": "停",
+      "bronzeGlyph": "停"
+    },
+    "止": {
+      "oracleGlyph": "止",
+      "bronzeGlyph": "止"
+    },
+    "续": {
+      "oracleGlyph": "續",
+      "bronzeGlyph": "續"
+    },
+    "始": {
+      "oracleGlyph": "始",
+      "bronzeGlyph": "始"
+    },
+    "终": {
+      "oracleGlyph": "終",
+      "bronzeGlyph": "終"
+    },
+    "完": {
+      "oracleGlyph": "完",
+      "bronzeGlyph": "完"
+    },
+    "毕": {
+      "oracleGlyph": "畢",
+      "bronzeGlyph": "畢"
+    },
+    "全": {
+      "oracleGlyph": "全",
+      "bronzeGlyph": "全"
+    },
+    "备": {
+      "oracleGlyph": "備",
+      "bronzeGlyph": "備"
+    },
+    "满": {
+      "oracleGlyph": "滿",
+      "bronzeGlyph": "滿"
+    },
+    "缺": {
+      "oracleGlyph": "缺",
+      "bronzeGlyph": "缺"
+    },
+    "余": {
+      "oracleGlyph": "餘",
+      "bronzeGlyph": "餘"
+    },
+    "剩": {
+      "oracleGlyph": "剩",
+      "bronzeGlyph": "剩"
+    },
+    "增": {
+      "oracleGlyph": "增",
+      "bronzeGlyph": "增"
+    },
+    "减": {
+      "oracleGlyph": "減",
+      "bronzeGlyph": "減"
+    },
+    "加": {
+      "oracleGlyph": "加",
+      "bronzeGlyph": "加"
+    },
+    "倍": {
+      "oracleGlyph": "倍",
+      "bronzeGlyph": "倍"
+    },
+    "缩": {
+      "oracleGlyph": "縮",
+      "bronzeGlyph": "縮"
+    },
+    "张": {
+      "oracleGlyph": "張",
+      "bronzeGlyph": "張"
+    },
+    "卷": {
+      "oracleGlyph": "卷",
+      "bronzeGlyph": "卷"
+    },
+    "伸": {
+      "oracleGlyph": "伸",
+      "bronzeGlyph": "伸"
+    },
+    "展": {
+      "oracleGlyph": "展",
+      "bronzeGlyph": "展"
+    },
+    "舒": {
+      "oracleGlyph": "舒",
+      "bronzeGlyph": "舒"
+    },
+    "曲": {
+      "oracleGlyph": "曲",
+      "bronzeGlyph": "曲"
+    },
+    "甜": {
+      "oracleGlyph": "甜",
+      "bronzeGlyph": "甜"
+    },
+    "酸": {
+      "oracleGlyph": "酸",
+      "bronzeGlyph": "酸"
+    },
+    "苦": {
+      "oracleGlyph": "苦",
+      "bronzeGlyph": "苦"
+    },
+    "辣": {
+      "oracleGlyph": "辣",
+      "bronzeGlyph": "辣"
+    },
+    "咸": {
+      "oracleGlyph": "鹹",
+      "bronzeGlyph": "鹹"
+    },
+    "香": {
+      "oracleGlyph": "香",
+      "bronzeGlyph": "香"
+    },
+    "轻": {
+      "oracleGlyph": "輕",
+      "bronzeGlyph": "輕"
+    },
+    "重": {
+      "oracleGlyph": "重",
+      "bronzeGlyph": "重"
+    },
+    "亮": {
+      "oracleGlyph": "亮",
+      "bronzeGlyph": "亮"
+    },
+    "暗": {
+      "oracleGlyph": "暗",
+      "bronzeGlyph": "暗"
+    },
+    "温": {
+      "oracleGlyph": "溫",
+      "bronzeGlyph": "溫"
+    },
+    "凉": {
+      "oracleGlyph": "涼",
+      "bronzeGlyph": "涼"
+    },
+    "湿": {
+      "oracleGlyph": "溼",
+      "bronzeGlyph": "溼"
+    },
+    "圆": {
+      "oracleGlyph": "圓",
+      "bronzeGlyph": "圓"
+    },
+    "角": {
+      "oracleGlyph": "角",
+      "bronzeGlyph": "角"
+    },
+    "尖": {
+      "oracleGlyph": "尖",
+      "bronzeGlyph": "尖"
+    },
+    "厚": {
+      "oracleGlyph": "厚",
+      "bronzeGlyph": "厚"
+    },
+    "薄": {
+      "oracleGlyph": "薄",
+      "bronzeGlyph": "薄"
+    },
+    "脏": {
+      "oracleGlyph": "髒",
+      "bronzeGlyph": "髒"
+    },
+    "净": {
+      "oracleGlyph": "淨",
+      "bronzeGlyph": "淨"
+    },
+    "齐": {
+      "oracleGlyph": "齊",
+      "bronzeGlyph": "齊"
+    },
+    "乱": {
+      "oracleGlyph": "亂",
+      "bronzeGlyph": "亂"
+    },
+    "静": {
+      "oracleGlyph": "靜",
+      "bronzeGlyph": "靜"
+    },
+    "闹": {
+      "oracleGlyph": "鬧",
+      "bronzeGlyph": "鬧"
+    },
+    "强": {
+      "oracleGlyph": "強",
+      "bronzeGlyph": "強"
+    },
+    "弱": {
+      "oracleGlyph": "弱",
+      "bronzeGlyph": "弱"
+    },
+    "肥": {
+      "oracleGlyph": "肥",
+      "bronzeGlyph": "肥"
+    },
+    "瘦": {
+      "oracleGlyph": "瘦",
+      "bronzeGlyph": "瘦"
+    },
+    "壮": {
+      "oracleGlyph": "壯",
+      "bronzeGlyph": "壯"
+    },
+    "细": {
+      "oracleGlyph": "細",
+      "bronzeGlyph": "細"
+    },
+    "粗": {
+      "oracleGlyph": "粗",
+      "bronzeGlyph": "粗"
+    },
+    "宽": {
+      "oracleGlyph": "寬",
+      "bronzeGlyph": "寬"
+    },
+    "窄": {
+      "oracleGlyph": "窄",
+      "bronzeGlyph": "窄"
+    },
+    "深": {
+      "oracleGlyph": "深",
+      "bronzeGlyph": "深"
+    },
+    "浅": {
+      "oracleGlyph": "淺",
+      "bronzeGlyph": "淺"
+    },
+    "硬": {
+      "oracleGlyph": "硬",
+      "bronzeGlyph": "硬"
+    },
+    "软": {
+      "oracleGlyph": "軟",
+      "bronzeGlyph": "軟"
+    },
+    "脆": {
+      "oracleGlyph": "脆",
+      "bronzeGlyph": "脆"
+    },
+    "鲜": {
+      "oracleGlyph": "鮮",
+      "bronzeGlyph": "鮮"
+    },
+    "丑": {
+      "oracleGlyph": "醜",
+      "bronzeGlyph": "醜"
+    },
+    "善": {
+      "oracleGlyph": "善",
+      "bronzeGlyph": "善"
+    },
+    "恶": {
+      "oracleGlyph": "惡",
+      "bronzeGlyph": "惡"
+    },
+    "假": {
+      "oracleGlyph": "假",
+      "bronzeGlyph": "假"
+    },
+    "错": {
+      "oracleGlyph": "錯",
+      "bronzeGlyph": "錯"
+    },
+    "正": {
+      "oracleGlyph": "正",
+      "bronzeGlyph": "正"
+    },
+    "歪": {
+      "oracleGlyph": "歪",
+      "bronzeGlyph": "歪"
+    },
+    "平": {
+      "oracleGlyph": "平",
+      "bronzeGlyph": "平"
+    },
+    "整": {
+      "oracleGlyph": "整",
+      "bronzeGlyph": "整"
+    },
+    "碎": {
+      "oracleGlyph": "碎",
+      "bronzeGlyph": "碎"
+    },
+    "单": {
+      "oracleGlyph": "單",
+      "bronzeGlyph": "單"
+    },
+    "双": {
+      "oracleGlyph": "雙",
+      "bronzeGlyph": "雙"
+    },
+    "异": {
+      "oracleGlyph": "異",
+      "bronzeGlyph": "異"
+    },
+    "怪": {
+      "oracleGlyph": "怪",
+      "bronzeGlyph": "怪"
+    },
+    "奇": {
+      "oracleGlyph": "奇",
+      "bronzeGlyph": "奇"
+    },
+    "凡": {
+      "oracleGlyph": "凡",
+      "bronzeGlyph": "凡"
+    },
+    "圣": {
+      "oracleGlyph": "聖",
+      "bronzeGlyph": "聖"
+    },
+    "神": {
+      "oracleGlyph": "神",
+      "bronzeGlyph": "神"
+    },
+    "妙": {
+      "oracleGlyph": "妙",
+      "bronzeGlyph": "妙"
+    },
+    "巧": {
+      "oracleGlyph": "巧",
+      "bronzeGlyph": "巧"
+    },
+    "笨": {
+      "oracleGlyph": "笨",
+      "bronzeGlyph": "笨"
+    },
+    "聪": {
+      "oracleGlyph": "聰",
+      "bronzeGlyph": "聰"
+    },
+    "愚": {
+      "oracleGlyph": "愚",
+      "bronzeGlyph": "愚"
+    },
+    "勤": {
+      "oracleGlyph": "勤",
+      "bronzeGlyph": "勤"
+    },
+    "懒": {
+      "oracleGlyph": "懶",
+      "bronzeGlyph": "懶"
+    },
+    "勇": {
+      "oracleGlyph": "勇",
+      "bronzeGlyph": "勇"
+    },
+    "怯": {
+      "oracleGlyph": "怯",
+      "bronzeGlyph": "怯"
+    },
+    "把": {
+      "oracleGlyph": "把",
+      "bronzeGlyph": "把"
+    },
+    "被": {
+      "oracleGlyph": "被",
+      "bronzeGlyph": "被"
+    },
+    "让": {
+      "oracleGlyph": "讓",
+      "bronzeGlyph": "讓"
+    },
+    "叫": {
+      "oracleGlyph": "叫",
+      "bronzeGlyph": "叫"
+    },
+    "使": {
+      "oracleGlyph": "使",
+      "bronzeGlyph": "使"
+    },
+    "令": {
+      "oracleGlyph": "令",
+      "bronzeGlyph": "令"
+    },
+    "得": {
+      "oracleGlyph": "得",
+      "bronzeGlyph": "得"
+    },
+    "着": {
+      "oracleGlyph": "著",
+      "bronzeGlyph": "著"
+    },
+    "过": {
+      "oracleGlyph": "過",
+      "bronzeGlyph": "過"
+    },
+    "又": {
+      "oracleGlyph": "又",
+      "bronzeGlyph": "又"
+    },
+    "再": {
+      "oracleGlyph": "再",
+      "bronzeGlyph": "再"
+    },
+    "更": {
+      "oracleGlyph": "更",
+      "bronzeGlyph": "更"
+    },
+    "最": {
+      "oracleGlyph": "最",
+      "bronzeGlyph": "最"
+    },
+    "极": {
+      "oracleGlyph": "極",
+      "bronzeGlyph": "極"
+    },
+    "非": {
+      "oracleGlyph": "非",
+      "bronzeGlyph": "非"
+    },
+    "莫": {
+      "oracleGlyph": "莫",
+      "bronzeGlyph": "莫"
+    },
+    "勿": {
+      "oracleGlyph": "勿",
+      "bronzeGlyph": "勿"
+    },
+    "却": {
+      "oracleGlyph": "卻",
+      "bronzeGlyph": "卻"
+    },
+    "虽": {
+      "oracleGlyph": "雖",
+      "bronzeGlyph": "雖"
+    },
+    "但": {
+      "oracleGlyph": "但",
+      "bronzeGlyph": "但"
+    },
+    "因": {
+      "oracleGlyph": "因",
+      "bronzeGlyph": "因"
+    },
+    "故": {
+      "oracleGlyph": "故",
+      "bronzeGlyph": "故"
+    },
+    "所": {
+      "oracleGlyph": "所",
+      "bronzeGlyph": "所"
+    },
+    "以": {
+      "oracleGlyph": "以",
+      "bronzeGlyph": "以"
+    },
+    "及": {
+      "oracleGlyph": "及",
+      "bronzeGlyph": "及"
+    },
+    "并": {
+      "oracleGlyph": "並",
+      "bronzeGlyph": "並"
+    },
+    "或": {
+      "oracleGlyph": "或",
+      "bronzeGlyph": "或"
+    },
+    "若": {
+      "oracleGlyph": "若",
+      "bronzeGlyph": "若"
+    },
+    "如": {
+      "oracleGlyph": "如",
+      "bronzeGlyph": "如"
+    },
+    "似": {
+      "oracleGlyph": "似",
+      "bronzeGlyph": "似"
+    },
+    "像": {
+      "oracleGlyph": "像",
+      "bronzeGlyph": "像"
+    },
+    "比": {
+      "oracleGlyph": "比",
+      "bronzeGlyph": "比"
+    },
+    "受": {
+      "oracleGlyph": "受",
+      "bronzeGlyph": "受"
+    },
+    "遭": {
+      "oracleGlyph": "遭",
+      "bronzeGlyph": "遭"
+    },
+    "替": {
+      "oracleGlyph": "替",
+      "bronzeGlyph": "替"
+    },
+    "由": {
+      "oracleGlyph": "由",
+      "bronzeGlyph": "由"
+    },
+    "甲": {
+      "oracleGlyph": "甲",
+      "bronzeGlyph": "甲"
+    },
+    "申": {
+      "oracleGlyph": "申",
+      "bronzeGlyph": "申"
+    },
+    "才": {
+      "oracleGlyph": "才",
+      "bronzeGlyph": "才"
+    },
+    "已": {
+      "oracleGlyph": "已",
+      "bronzeGlyph": "已"
+    },
+    "己": {
+      "oracleGlyph": "己",
+      "bronzeGlyph": "己"
+    },
+    "自": {
+      "oracleGlyph": "自",
+      "bronzeGlyph": "自"
+    },
+    "其": {
+      "oracleGlyph": "其",
+      "bronzeGlyph": "其"
+    },
+    "某": {
+      "oracleGlyph": "某",
+      "bronzeGlyph": "某"
+    },
+    "各": {
+      "oracleGlyph": "各",
+      "bronzeGlyph": "各"
+    },
+    "每": {
+      "oracleGlyph": "每",
+      "bronzeGlyph": "每"
+    },
+    "另": {
+      "oracleGlyph": "另",
+      "bronzeGlyph": "另"
+    },
+    "旁": {
+      "oracleGlyph": "旁",
+      "bronzeGlyph": "旁"
+    },
+    "反": {
+      "oracleGlyph": "反",
+      "bronzeGlyph": "反"
+    },
+    "复": {
+      "oracleGlyph": "復",
+      "bronzeGlyph": "復"
+    },
+    "代": {
+      "oracleGlyph": "代",
+      "bronzeGlyph": "代"
+    },
+    "等": {
+      "oracleGlyph": "等",
+      "bronzeGlyph": "等"
+    },
+    "待": {
+      "oracleGlyph": "待",
+      "bronzeGlyph": "待"
+    },
+    "期": {
+      "oracleGlyph": "期",
+      "bronzeGlyph": "期"
+    },
+    "盼": {
+      "oracleGlyph": "盼",
+      "bronzeGlyph": "盼"
+    },
+    "希": {
+      "oracleGlyph": "希",
+      "bronzeGlyph": "希"
+    },
+    "愿": {
+      "oracleGlyph": "願",
+      "bronzeGlyph": "願"
+    },
+    "肯": {
+      "oracleGlyph": "肯",
+      "bronzeGlyph": "肯"
+    },
+    "敢": {
+      "oracleGlyph": "敢",
+      "bronzeGlyph": "敢"
+    },
+    "能": {
+      "oracleGlyph": "能",
+      "bronzeGlyph": "能"
+    },
+    "可": {
+      "oracleGlyph": "可",
+      "bronzeGlyph": "可"
+    },
+    "应": {
+      "oracleGlyph": "應",
+      "bronzeGlyph": "應"
+    },
+    "该": {
+      "oracleGlyph": "該",
+      "bronzeGlyph": "該"
+    },
+    "当": {
+      "oracleGlyph": "當",
+      "bronzeGlyph": "當"
+    },
+    "须": {
+      "oracleGlyph": "須",
+      "bronzeGlyph": "須"
+    },
+    "必": {
+      "oracleGlyph": "必",
+      "bronzeGlyph": "必"
+    },
+    "务": {
+      "oracleGlyph": "務",
+      "bronzeGlyph": "務"
+    },
+    "暂": {
+      "oracleGlyph": "暫",
+      "bronzeGlyph": "暫"
+    },
+    "永": {
+      "oracleGlyph": "永",
+      "bronzeGlyph": "永"
+    },
+    "恒": {
+      "oracleGlyph": "恆",
+      "bronzeGlyph": "恆"
+    },
+    "零": {
+      "oracleGlyph": "零",
+      "bronzeGlyph": "零"
+    },
+    "亿": {
+      "oracleGlyph": "億",
+      "bronzeGlyph": "億"
+    },
+    "兆": {
+      "oracleGlyph": "兆",
+      "bronzeGlyph": "兆"
+    },
+    "几": {
+      "oracleGlyph": "幾",
+      "bronzeGlyph": "幾"
+    },
+    "许": {
+      "oracleGlyph": "許",
+      "bronzeGlyph": "許"
+    },
+    "众": {
+      "oracleGlyph": "眾",
+      "bronzeGlyph": "眾"
+    },
+    "群": {
+      "oracleGlyph": "群",
+      "bronzeGlyph": "群"
+    },
+    "串": {
+      "oracleGlyph": "串",
+      "bronzeGlyph": "串"
+    },
+    "副": {
+      "oracleGlyph": "副",
+      "bronzeGlyph": "副"
+    },
+    "套": {
+      "oracleGlyph": "套",
+      "bronzeGlyph": "套"
+    },
+    "阵": {
+      "oracleGlyph": "陣",
+      "bronzeGlyph": "陣"
+    },
+    "股": {
+      "oracleGlyph": "股",
+      "bronzeGlyph": "股"
+    },
+    "滴": {
+      "oracleGlyph": "滴",
+      "bronzeGlyph": "滴"
+    },
+    "粒": {
+      "oracleGlyph": "粒",
+      "bronzeGlyph": "粒"
+    },
+    "颗": {
+      "oracleGlyph": "顆",
+      "bronzeGlyph": "顆"
+    },
+    "块": {
+      "oracleGlyph": "塊",
+      "bronzeGlyph": "塊"
+    },
+    "片": {
+      "oracleGlyph": "片",
+      "bronzeGlyph": "片"
+    },
+    "册": {
+      "oracleGlyph": "冊",
+      "bronzeGlyph": "冊"
+    },
+    "幅": {
+      "oracleGlyph": "幅",
+      "bronzeGlyph": "幅"
+    },
+    "朵": {
+      "oracleGlyph": "朵",
+      "bronzeGlyph": "朵"
+    },
+    "束": {
+      "oracleGlyph": "束",
+      "bronzeGlyph": "束"
+    },
+    "根": {
+      "oracleGlyph": "根",
+      "bronzeGlyph": "根"
+    },
+    "条": {
+      "oracleGlyph": "條",
+      "bronzeGlyph": "條"
+    },
+    "周": {
+      "oracleGlyph": "周",
+      "bronzeGlyph": "周"
+    },
+    "季": {
+      "oracleGlyph": "季",
+      "bronzeGlyph": "季"
+    },
+    "朝": {
+      "oracleGlyph": "朝",
+      "bronzeGlyph": "朝"
+    },
+    "夕": {
+      "oracleGlyph": "夕",
+      "bronzeGlyph": "夕"
+    },
+    "昨": {
+      "oracleGlyph": "昨",
+      "bronzeGlyph": "昨"
+    },
+    "岁": {
+      "oracleGlyph": "歲",
+      "bronzeGlyph": "歲"
+    },
+    "刻": {
+      "oracleGlyph": "刻",
+      "bronzeGlyph": "刻"
+    },
+    "昼": {
+      "oracleGlyph": "晝",
+      "bronzeGlyph": "晝"
+    },
+    "夜": {
+      "oracleGlyph": "夜",
+      "bronzeGlyph": "夜"
+    },
+    "昏": {
+      "oracleGlyph": "昏",
+      "bronzeGlyph": "昏"
+    },
+    "板": {
+      "oracleGlyph": "板",
+      "bronzeGlyph": "板"
+    },
+    "凳": {
+      "oracleGlyph": "凳",
+      "bronzeGlyph": "凳"
+    },
+    "屋": {
+      "oracleGlyph": "屋",
+      "bronzeGlyph": "屋"
+    },
+    "顶": {
+      "oracleGlyph": "頂",
+      "bronzeGlyph": "頂"
+    },
+    "砖": {
+      "oracleGlyph": "磚",
+      "bronzeGlyph": "磚"
+    },
+    "梁": {
+      "oracleGlyph": "梁",
+      "bronzeGlyph": "梁"
+    },
+    "柱": {
+      "oracleGlyph": "柱",
+      "bronzeGlyph": "柱"
+    },
+    "台": {
+      "oracleGlyph": "臺",
+      "bronzeGlyph": "臺"
+    },
+    "阶": {
+      "oracleGlyph": "階",
+      "bronzeGlyph": "階"
+    },
+    "梯": {
+      "oracleGlyph": "梯",
+      "bronzeGlyph": "梯"
+    },
+    "帘": {
+      "oracleGlyph": "簾",
+      "bronzeGlyph": "簾"
+    },
+    "框": {
+      "oracleGlyph": "框",
+      "bronzeGlyph": "框"
+    },
+    "网": {
+      "oracleGlyph": "網",
+      "bronzeGlyph": "網"
+    },
+    "带": {
+      "oracleGlyph": "帶",
+      "bronzeGlyph": "帶"
+    },
+    "扣": {
+      "oracleGlyph": "扣",
+      "bronzeGlyph": "扣"
+    },
+    "匙": {
+      "oracleGlyph": "匙",
+      "bronzeGlyph": "匙"
+    },
+    "丝": {
+      "oracleGlyph": "絲",
+      "bronzeGlyph": "絲"
+    },
+    "钳": {
+      "oracleGlyph": "鉗",
+      "bronzeGlyph": "鉗"
+    },
+    "剪": {
+      "oracleGlyph": "剪",
+      "bronzeGlyph": "剪"
+    },
+    "裳": {
+      "oracleGlyph": "裳",
+      "bronzeGlyph": "裳"
+    },
+    "裙": {
+      "oracleGlyph": "裙",
+      "bronzeGlyph": "裙"
+    },
+    "衫": {
+      "oracleGlyph": "衫",
+      "bronzeGlyph": "衫"
+    },
+    "袖": {
+      "oracleGlyph": "袖",
+      "bronzeGlyph": "袖"
+    },
+    "围": {
+      "oracleGlyph": "圍",
+      "bronzeGlyph": "圍"
+    },
+    "毛": {
+      "oracleGlyph": "毛",
+      "bronzeGlyph": "毛"
+    },
+    "蔬": {
+      "oracleGlyph": "蔬",
+      "bronzeGlyph": "蔬"
+    },
+    "醋": {
+      "oracleGlyph": "醋",
+      "bronzeGlyph": "醋"
+    },
+    "饺": {
+      "oracleGlyph": "餃",
+      "bronzeGlyph": "餃"
+    },
+    "馒": {
+      "oracleGlyph": "饅",
+      "bronzeGlyph": "饅"
+    },
+    "粥": {
+      "oracleGlyph": "粥",
+      "bronzeGlyph": "粥"
+    },
+    "壶": {
+      "oracleGlyph": "壺",
+      "bronzeGlyph": "壺"
+    },
+    "盘": {
+      "oracleGlyph": "盤",
+      "bronzeGlyph": "盤"
+    },
+    "碟": {
+      "oracleGlyph": "碟",
+      "bronzeGlyph": "碟"
+    },
+    "缸": {
+      "oracleGlyph": "缸",
+      "bronzeGlyph": "缸"
+    },
+    "筐": {
+      "oracleGlyph": "筐",
+      "bronzeGlyph": "筐"
+    },
+    "篮": {
+      "oracleGlyph": "籃",
+      "bronzeGlyph": "籃"
+    },
+    "机": {
+      "oracleGlyph": "機",
+      "bronzeGlyph": "機"
+    },
+    "行": {
+      "oracleGlyph": "行",
+      "bronzeGlyph": "行"
+    },
+    "轮": {
+      "oracleGlyph": "輪",
+      "bronzeGlyph": "輪"
+    },
+    "军": {
+      "oracleGlyph": "軍",
+      "bronzeGlyph": "軍"
+    },
+    "舰": {
+      "oracleGlyph": "艦",
+      "bronzeGlyph": "艦"
+    },
+    "枪": {
+      "oracleGlyph": "槍",
+      "bronzeGlyph": "槍"
+    },
+    "炮": {
+      "oracleGlyph": "炮",
+      "bronzeGlyph": "炮"
+    },
+    "箭": {
+      "oracleGlyph": "箭",
+      "bronzeGlyph": "箭"
+    },
+    "弓": {
+      "oracleGlyph": "弓",
+      "bronzeGlyph": "弓"
+    },
+    "剑": {
+      "oracleGlyph": "劍",
+      "bronzeGlyph": "劍"
+    },
+    "盾": {
+      "oracleGlyph": "盾",
+      "bronzeGlyph": "盾"
+    },
+    "旗": {
+      "oracleGlyph": "旗",
+      "bronzeGlyph": "旗"
+    },
+    "鼓": {
+      "oracleGlyph": "鼓",
+      "bronzeGlyph": "鼓"
+    },
+    "表": {
+      "oracleGlyph": "表",
+      "bronzeGlyph": "表"
+    },
+    "铃": {
+      "oracleGlyph": "鈴",
+      "bronzeGlyph": "鈴"
+    },
+    "墨": {
+      "oracleGlyph": "墨",
+      "bronzeGlyph": "墨"
+    },
+    "橡": {
+      "oracleGlyph": "橡",
+      "bronzeGlyph": "橡"
+    },
+    "尺": {
+      "oracleGlyph": "尺",
+      "bronzeGlyph": "尺"
+    },
+    "铅": {
+      "oracleGlyph": "鉛",
+      "bronzeGlyph": "鉛"
+    },
+    "钢": {
+      "oracleGlyph": "鋼",
+      "bronzeGlyph": "鋼"
+    },
+    "典": {
+      "oracleGlyph": "典",
+      "bronzeGlyph": "典"
+    },
+    "图": {
+      "oracleGlyph": "圖",
+      "bronzeGlyph": "圖"
+    },
+    "照": {
+      "oracleGlyph": "照",
+      "bronzeGlyph": "照"
+    },
+    "影": {
+      "oracleGlyph": "影",
+      "bronzeGlyph": "影"
+    },
+    "视": {
+      "oracleGlyph": "視",
+      "bronzeGlyph": "視"
+    },
+    "器": {
+      "oracleGlyph": "器",
+      "bronzeGlyph": "器"
+    },
+    "脑": {
+      "oracleGlyph": "腦",
+      "bronzeGlyph": "腦"
+    },
+    "信": {
+      "oracleGlyph": "信",
+      "bronzeGlyph": "信"
+    },
+    "封": {
+      "oracleGlyph": "封",
+      "bronzeGlyph": "封"
+    },
+    "邮": {
+      "oracleGlyph": "郵",
+      "bronzeGlyph": "郵"
+    },
+    "票": {
+      "oracleGlyph": "票",
+      "bronzeGlyph": "票"
+    },
+    "钱": {
+      "oracleGlyph": "錢",
+      "bronzeGlyph": "錢"
+    },
+    "钞": {
+      "oracleGlyph": "鈔",
+      "bronzeGlyph": "鈔"
+    },
+    "币": {
+      "oracleGlyph": "幣",
+      "bronzeGlyph": "幣"
+    },
+    "金": {
+      "oracleGlyph": "金",
+      "bronzeGlyph": "金"
+    },
+    "银": {
+      "oracleGlyph": "銀",
+      "bronzeGlyph": "銀"
+    },
+    "铜": {
+      "oracleGlyph": "銅",
+      "bronzeGlyph": "銅"
+    },
+    "铁": {
+      "oracleGlyph": "鐵",
+      "bronzeGlyph": "鐵"
+    },
+    "镇": {
+      "oracleGlyph": "鎮",
+      "bronzeGlyph": "鎮"
+    },
+    "乡": {
+      "oracleGlyph": "鄉",
+      "bronzeGlyph": "鄉"
+    },
+    "药": {
+      "oracleGlyph": "藥",
+      "bronzeGlyph": "藥"
+    },
+    "工": {
+      "oracleGlyph": "工",
+      "bronzeGlyph": "工"
+    },
+    "农": {
+      "oracleGlyph": "農",
+      "bronzeGlyph": "農"
+    },
+    "原": {
+      "oracleGlyph": "原",
+      "bronzeGlyph": "原"
+    },
+    "野": {
+      "oracleGlyph": "野",
+      "bronzeGlyph": "野"
+    },
+    "树": {
+      "oracleGlyph": "樹",
+      "bronzeGlyph": "樹"
+    },
+    "丛": {
+      "oracleGlyph": "叢",
+      "bronzeGlyph": "叢"
+    },
+    "芒": {
+      "oracleGlyph": "芒",
+      "bronzeGlyph": "芒"
+    },
+    "彩": {
+      "oracleGlyph": "彩",
+      "bronzeGlyph": "彩"
+    },
+    "宇": {
+      "oracleGlyph": "宇",
+      "bronzeGlyph": "宇"
+    },
+    "宙": {
+      "oracleGlyph": "宙",
+      "bronzeGlyph": "宙"
+    },
+    "屿": {
+      "oracleGlyph": "嶼",
+      "bronzeGlyph": "嶼"
+    },
+    "坡": {
+      "oracleGlyph": "坡",
+      "bronzeGlyph": "坡"
+    },
+    "池": {
+      "oracleGlyph": "池",
+      "bronzeGlyph": "池"
+    },
+    "塘": {
+      "oracleGlyph": "塘",
+      "bronzeGlyph": "塘"
+    },
+    "井": {
+      "oracleGlyph": "井",
+      "bronzeGlyph": "井"
+    },
+    "淹": {
+      "oracleGlyph": "淹",
+      "bronzeGlyph": "淹"
+    },
+    "没": {
+      "oracleGlyph": "沒",
+      "bronzeGlyph": "沒"
+    },
+    "干": {
+      "oracleGlyph": "幹",
+      "bronzeGlyph": "幹"
+    },
+    "炎": {
+      "oracleGlyph": "炎",
+      "bronzeGlyph": "炎"
+    },
+    "寒": {
+      "oracleGlyph": "寒",
+      "bronzeGlyph": "寒"
+    },
+    "雾": {
+      "oracleGlyph": "霧",
+      "bronzeGlyph": "霧"
+    },
+    "睫": {
+      "oracleGlyph": "睫",
+      "bronzeGlyph": "睫"
+    },
+    "齿": {
+      "oracleGlyph": "齒",
+      "bronzeGlyph": "齒"
+    },
+    "膀": {
+      "oracleGlyph": "膀",
+      "bronzeGlyph": "膀"
+    },
+    "盖": {
+      "oracleGlyph": "蓋",
+      "bronzeGlyph": "蓋"
+    },
+    "跟": {
+      "oracleGlyph": "跟",
+      "bronzeGlyph": "跟"
+    },
+    "趾": {
+      "oracleGlyph": "趾",
+      "bronzeGlyph": "趾"
+    },
+    "筋": {
+      "oracleGlyph": "筋",
+      "bronzeGlyph": "筋"
+    },
+    "脉": {
+      "oracleGlyph": "脈",
+      "bronzeGlyph": "脈"
+    },
+    "涎": {
+      "oracleGlyph": "涎",
+      "bronzeGlyph": "涎"
+    },
+    "奔": {
+      "oracleGlyph": "奔",
+      "bronzeGlyph": "奔"
+    },
+    "跃": {
+      "oracleGlyph": "躍",
+      "bronzeGlyph": "躍"
+    },
+    "泳": {
+      "oracleGlyph": "泳",
+      "bronzeGlyph": "泳"
+    },
+    "浮": {
+      "oracleGlyph": "浮",
+      "bronzeGlyph": "浮"
+    },
+    "沉": {
+      "oracleGlyph": "沉",
+      "bronzeGlyph": "沉"
+    },
+    "升": {
+      "oracleGlyph": "升",
+      "bronzeGlyph": "升"
+    },
+    "降": {
+      "oracleGlyph": "降",
+      "bronzeGlyph": "降"
+    },
+    "落": {
+      "oracleGlyph": "落",
+      "bronzeGlyph": "落"
+    },
+    "动": {
+      "oracleGlyph": "動",
+      "bronzeGlyph": "動"
+    },
+    "搬": {
+      "oracleGlyph": "搬",
+      "bronzeGlyph": "搬"
+    },
+    "运": {
+      "oracleGlyph": "運",
+      "bronzeGlyph": "運"
+    },
+    "挑": {
+      "oracleGlyph": "挑",
+      "bronzeGlyph": "挑"
+    },
+    "担": {
+      "oracleGlyph": "擔",
+      "bronzeGlyph": "擔"
+    },
+    "取": {
+      "oracleGlyph": "取",
+      "bronzeGlyph": "取"
+    },
+    "挠": {
+      "oracleGlyph": "撓",
+      "bronzeGlyph": "撓"
+    },
+    "击": {
+      "oracleGlyph": "擊",
+      "bronzeGlyph": "擊"
+    },
+    "敲": {
+      "oracleGlyph": "敲",
+      "bronzeGlyph": "敲"
+    },
+    "拖": {
+      "oracleGlyph": "拖",
+      "bronzeGlyph": "拖"
+    },
+    "扯": {
+      "oracleGlyph": "扯",
+      "bronzeGlyph": "扯"
+    },
+    "撕": {
+      "oracleGlyph": "撕",
+      "bronzeGlyph": "撕"
+    },
+    "掰": {
+      "oracleGlyph": "掰",
+      "bronzeGlyph": "掰"
+    },
+    "折": {
+      "oracleGlyph": "折",
+      "bronzeGlyph": "折"
+    },
+    "弯": {
+      "oracleGlyph": "彎",
+      "bronzeGlyph": "彎"
+    },
+    "直": {
+      "oracleGlyph": "直",
+      "bronzeGlyph": "直"
+    },
+    "缠": {
+      "oracleGlyph": "纏",
+      "bronzeGlyph": "纏"
+    },
+    "绕": {
+      "oracleGlyph": "繞",
+      "bronzeGlyph": "繞"
+    },
+    "捆": {
+      "oracleGlyph": "捆",
+      "bronzeGlyph": "捆"
+    },
+    "绑": {
+      "oracleGlyph": "綁",
+      "bronzeGlyph": "綁"
+    },
+    "系": {
+      "oracleGlyph": "系",
+      "bronzeGlyph": "系"
+    },
+    "结": {
+      "oracleGlyph": "結",
+      "bronzeGlyph": "結"
+    },
+    "解": {
+      "oracleGlyph": "解",
+      "bronzeGlyph": "解"
+    },
+    "脱": {
+      "oracleGlyph": "脫",
+      "bronzeGlyph": "脫"
+    },
+    "戴": {
+      "oracleGlyph": "戴",
+      "bronzeGlyph": "戴"
+    },
+    "考": {
+      "oracleGlyph": "考",
+      "bronzeGlyph": "考"
+    },
+    "住": {
+      "oracleGlyph": "住",
+      "bronzeGlyph": "住"
+    },
+    "理": {
+      "oracleGlyph": "理",
+      "bronzeGlyph": "理"
+    },
+    "预": {
+      "oracleGlyph": "預",
+      "bronzeGlyph": "預"
+    },
+    "旧": {
+      "oracleGlyph": "舊",
+      "bronzeGlyph": "舊"
+    },
+    "危": {
+      "oracleGlyph": "危",
+      "bronzeGlyph": "危"
+    },
+    "险": {
+      "oracleGlyph": "險",
+      "bronzeGlyph": "險"
+    },
+    "健": {
+      "oracleGlyph": "健",
+      "bronzeGlyph": "健"
+    },
+    "康": {
+      "oracleGlyph": "康",
+      "bronzeGlyph": "康"
+    },
+    "病": {
+      "oracleGlyph": "病",
+      "bronzeGlyph": "病"
+    },
+    "痛": {
+      "oracleGlyph": "痛",
+      "bronzeGlyph": "痛"
+    },
+    "哀": {
+      "oracleGlyph": "哀",
+      "bronzeGlyph": "哀"
+    },
+    "惧": {
+      "oracleGlyph": "懼",
+      "bronzeGlyph": "懼"
+    },
+    "羞": {
+      "oracleGlyph": "羞",
+      "bronzeGlyph": "羞"
+    },
+    "骄": {
+      "oracleGlyph": "驕",
+      "bronzeGlyph": "驕"
+    },
+    "傲": {
+      "oracleGlyph": "傲",
+      "bronzeGlyph": "傲"
+    },
+    "谦": {
+      "oracleGlyph": "謙",
+      "bronzeGlyph": "謙"
+    },
+    "虚": {
+      "oracleGlyph": "虛",
+      "bronzeGlyph": "虛"
+    },
+    "诚": {
+      "oracleGlyph": "誠",
+      "bronzeGlyph": "誠"
+    },
+    "实": {
+      "oracleGlyph": "實",
+      "bronzeGlyph": "實"
+    },
+    "奋": {
+      "oracleGlyph": "奮",
+      "bronzeGlyph": "奮"
+    },
+    "糊": {
+      "oracleGlyph": "糊",
+      "bronzeGlyph": "糊"
+    },
+    "涂": {
+      "oracleGlyph": "塗",
+      "bronzeGlyph": "塗"
+    },
+    "清": {
+      "oracleGlyph": "清",
+      "bronzeGlyph": "清"
+    },
+    "楚": {
+      "oracleGlyph": "楚",
+      "bronzeGlyph": "楚"
+    },
+    "模": {
+      "oracleGlyph": "模",
+      "bronzeGlyph": "模"
+    },
+    "讲": {
+      "oracleGlyph": "講",
+      "bronzeGlyph": "講"
+    },
+    "话": {
+      "oracleGlyph": "話",
+      "bronzeGlyph": "話"
+    },
+    "谈": {
+      "oracleGlyph": "談",
+      "bronzeGlyph": "談"
+    },
+    "告": {
+      "oracleGlyph": "告",
+      "bronzeGlyph": "告"
+    },
+    "诉": {
+      "oracleGlyph": "訴",
+      "bronzeGlyph": "訴"
+    },
+    "闻": {
+      "oracleGlyph": "聞",
+      "bronzeGlyph": "聞"
+    },
+    "嗅": {
+      "oracleGlyph": "嗅",
+      "bronzeGlyph": "嗅"
+    },
+    "尝": {
+      "oracleGlyph": "嘗",
+      "bronzeGlyph": "嘗"
+    },
+    "觉": {
+      "oracleGlyph": "覺",
+      "bronzeGlyph": "覺"
+    },
+    "作": {
+      "oracleGlyph": "作",
+      "bronzeGlyph": "作"
+    },
+    "劳": {
+      "oracleGlyph": "勞",
+      "bronzeGlyph": "勞"
+    },
+    "保": {
+      "oracleGlyph": "保",
+      "bronzeGlyph": "保"
+    },
+    "养": {
+      "oracleGlyph": "養",
+      "bronzeGlyph": "養"
+    },
+    "卫": {
+      "oracleGlyph": "衛",
+      "bronzeGlyph": "衛"
+    },
+    "利": {
+      "oracleGlyph": "利",
+      "bronzeGlyph": "利"
+    },
+    "失": {
+      "oracleGlyph": "失",
+      "bronzeGlyph": "失"
+    },
+    "成": {
+      "oracleGlyph": "成",
+      "bronzeGlyph": "成"
+    },
+    "功": {
+      "oracleGlyph": "功",
+      "bronzeGlyph": "功"
+    },
+    "紫": {
+      "oracleGlyph": "紫",
+      "bronzeGlyph": "紫"
+    },
+    "色": {
+      "oracleGlyph": "色",
+      "bronzeGlyph": "色"
+    },
+    "艳": {
+      "oracleGlyph": "豔",
+      "bronzeGlyph": "豔"
+    },
+    "丽": {
+      "oracleGlyph": "麗",
+      "bronzeGlyph": "麗"
+    },
+    "漂": {
+      "oracleGlyph": "漂",
+      "bronzeGlyph": "漂"
+    },
+    "难": {
+      "oracleGlyph": "難",
+      "bronzeGlyph": "難"
+    },
+    "坏": {
+      "oracleGlyph": "壞",
+      "bronzeGlyph": "壞"
+    },
+    "对": {
+      "oracleGlyph": "對",
+      "bronzeGlyph": "對"
+    },
+    "燥": {
+      "oracleGlyph": "燥",
+      "bronzeGlyph": "燥"
+    },
+    "润": {
+      "oracleGlyph": "潤",
+      "bronzeGlyph": "潤"
+    },
+    "兴": {
+      "oracleGlyph": "興",
+      "bronzeGlyph": "興"
+    },
+    "欢": {
+      "oracleGlyph": "歡",
+      "bronzeGlyph": "歡"
+    },
+    "恨": {
+      "oracleGlyph": "恨",
+      "bronzeGlyph": "恨"
+    },
+    "急": {
+      "oracleGlyph": "急",
+      "bronzeGlyph": "急"
+    },
+    "闲": {
+      "oracleGlyph": "閒",
+      "bronzeGlyph": "閒"
+    },
+    "空": {
+      "oracleGlyph": "空",
+      "bronzeGlyph": "空"
+    },
+    "够": {
+      "oracleGlyph": "夠",
+      "bronzeGlyph": "夠"
+    },
+    "数": {
+      "oracleGlyph": "數",
+      "bronzeGlyph": "數"
+    },
+    "切": {
+      "oracleGlyph": "切",
+      "bronzeGlyph": "切"
+    },
+    "别": {
+      "oracleGlyph": "別",
+      "bronzeGlyph": "別"
+    },
+    "同": {
+      "oracleGlyph": "同",
+      "bronzeGlyph": "同"
+    },
+    "样": {
+      "oracleGlyph": "樣",
+      "bronzeGlyph": "樣"
+    },
+    "彼": {
+      "oracleGlyph": "彼",
+      "bronzeGlyph": "彼"
+    },
+    "此": {
+      "oracleGlyph": "此",
+      "bronzeGlyph": "此"
+    },
+    "互": {
+      "oracleGlyph": "互",
+      "bronzeGlyph": "互"
+    },
+    "相": {
+      "oracleGlyph": "相",
+      "bronzeGlyph": "相"
+    },
+    "迟": {
+      "oracleGlyph": "遲",
+      "bronzeGlyph": "遲"
+    },
+    "缓": {
+      "oracleGlyph": "緩",
+      "bronzeGlyph": "緩"
+    },
+    "广": {
+      "oracleGlyph": "廣",
+      "bronzeGlyph": "廣"
+    },
+    "狭": {
+      "oracleGlyph": "狹",
+      "bronzeGlyph": "狹"
+    },
+    "矮": {
+      "oracleGlyph": "矮",
+      "bronzeGlyph": "矮"
+    },
+    "胖": {
+      "oracleGlyph": "胖",
+      "bronzeGlyph": "胖"
+    },
+    "幼": {
+      "oracleGlyph": "幼",
+      "bronzeGlyph": "幼"
+    },
+    "间": {
+      "oracleGlyph": "間",
+      "bronzeGlyph": "間"
+    },
+    "节": {
+      "oracleGlyph": "節",
+      "bronzeGlyph": "節"
+    },
+    "古": {
+      "oracleGlyph": "古",
+      "bronzeGlyph": "古"
+    },
+    "现": {
+      "oracleGlyph": "現",
+      "bronzeGlyph": "現"
+    },
+    "将": {
+      "oracleGlyph": "將",
+      "bronzeGlyph": "將"
+    },
+    "在": {
+      "oracleGlyph": "在",
+      "bronzeGlyph": "在"
+    },
+    "从": {
+      "oracleGlyph": "從",
+      "bronzeGlyph": "從"
+    },
+    "忽": {
+      "oracleGlyph": "忽",
+      "bronzeGlyph": "忽"
+    },
+    "然": {
+      "oracleGlyph": "然",
+      "bronzeGlyph": "然"
+    },
+    "逐": {
+      "oracleGlyph": "逐",
+      "bronzeGlyph": "逐"
+    },
+    "渐": {
+      "oracleGlyph": "漸",
+      "bronzeGlyph": "漸"
+    },
+    "于": {
+      "oracleGlyph": "於",
+      "bronzeGlyph": "於"
+    },
+    "的": {
+      "oracleGlyph": "的",
+      "bronzeGlyph": "的"
+    },
+    "了": {
+      "oracleGlyph": "了",
+      "bronzeGlyph": "了"
+    },
+    "吗": {
+      "oracleGlyph": "嗎",
+      "bronzeGlyph": "嗎"
+    },
+    "呢": {
+      "oracleGlyph": "呢",
+      "bronzeGlyph": "呢"
+    },
+    "吧": {
+      "oracleGlyph": "吧",
+      "bronzeGlyph": "吧"
+    },
+    "啊": {
+      "oracleGlyph": "啊",
+      "bronzeGlyph": "啊"
+    },
+    "呀": {
+      "oracleGlyph": "呀",
+      "bronzeGlyph": "呀"
+    },
+    "哦": {
+      "oracleGlyph": "哦",
+      "bronzeGlyph": "哦"
+    },
+    "哼": {
+      "oracleGlyph": "哼",
+      "bronzeGlyph": "哼"
+    },
+    "喂": {
+      "oracleGlyph": "喂",
+      "bronzeGlyph": "喂"
+    },
+    "嗯": {
+      "oracleGlyph": "嗯",
+      "bronzeGlyph": "嗯"
+    },
+    "为": {
+      "oracleGlyph": "為",
+      "bronzeGlyph": "為"
+    },
+    "而": {
+      "oracleGlyph": "而",
+      "bronzeGlyph": "而"
+    },
+    "况": {
+      "oracleGlyph": "況",
+      "bronzeGlyph": "況"
+    },
+    "且": {
+      "oracleGlyph": "且",
+      "bronzeGlyph": "且"
+    },
+    "者": {
+      "oracleGlyph": "者",
+      "bronzeGlyph": "者"
+    },
+    "还": {
+      "oracleGlyph": "還",
+      "bronzeGlyph": "還"
+    },
+    "即": {
+      "oracleGlyph": "即",
+      "bronzeGlyph": "即"
+    },
+    "论": {
+      "oracleGlyph": "論",
+      "bronzeGlyph": "論"
+    },
+    "除": {
+      "oracleGlyph": "除",
+      "bronzeGlyph": "除"
+    },
+    "往": {
+      "oracleGlyph": "往",
+      "bronzeGlyph": "往"
+    },
+    "到": {
+      "oracleGlyph": "到",
+      "bronzeGlyph": "到"
+    },
+    "两": {
+      "oracleGlyph": "兩",
+      "bronzeGlyph": "兩"
+    },
+    "些": {
+      "oracleGlyph": "些",
+      "bronzeGlyph": "些"
+    },
+    "洋": {
+      "oracleGlyph": "洋",
+      "bronzeGlyph": "洋"
+    },
+    "灌": {
+      "oracleGlyph": "灌",
+      "bronzeGlyph": "灌"
+    },
+    "溉": {
+      "oracleGlyph": "溉",
+      "bronzeGlyph": "溉"
+    },
+    "澡": {
+      "oracleGlyph": "澡",
+      "bronzeGlyph": "澡"
+    },
+    "沐": {
+      "oracleGlyph": "沐",
+      "bronzeGlyph": "沐"
+    },
+    "浴": {
+      "oracleGlyph": "浴",
+      "bronzeGlyph": "浴"
+    },
+    "冻": {
+      "oracleGlyph": "凍",
+      "bronzeGlyph": "凍"
+    },
+    "暴": {
+      "oracleGlyph": "暴",
+      "bronzeGlyph": "暴"
+    },
+    "汽": {
+      "oracleGlyph": "汽",
+      "bronzeGlyph": "汽"
+    },
+    "源": {
+      "oracleGlyph": "源",
+      "bronzeGlyph": "源"
+    },
+    "流": {
+      "oracleGlyph": "流",
+      "bronzeGlyph": "流"
+    },
+    "灰": {
+      "oracleGlyph": "灰",
+      "bronzeGlyph": "灰"
+    },
+    "尘": {
+      "oracleGlyph": "塵",
+      "bronzeGlyph": "塵"
+    },
+    "垃": {
+      "oracleGlyph": "垃",
+      "bronzeGlyph": "垃"
+    },
+    "圾": {
+      "oracleGlyph": "圾",
+      "bronzeGlyph": "圾"
+    },
+    "废": {
+      "oracleGlyph": "廢",
+      "bronzeGlyph": "廢"
+    },
+    "洁": {
+      "oracleGlyph": "潔",
+      "bronzeGlyph": "潔"
+    },
+    "宾": {
+      "oracleGlyph": "賓",
+      "bronzeGlyph": "賓"
+    },
+    "客": {
+      "oracleGlyph": "客",
+      "bronzeGlyph": "客"
+    },
+    "谊": {
+      "oracleGlyph": "誼",
+      "bronzeGlyph": "誼"
+    },
+    "邻": {
+      "oracleGlyph": "鄰",
+      "bronzeGlyph": "鄰"
+    },
+    "居": {
+      "oracleGlyph": "居",
+      "bronzeGlyph": "居"
+    },
+    "主": {
+      "oracleGlyph": "主",
+      "bronzeGlyph": "主"
+    },
+    "敌": {
+      "oracleGlyph": "敵",
+      "bronzeGlyph": "敵"
+    },
+    "师": {
+      "oracleGlyph": "師",
+      "bronzeGlyph": "師"
+    },
+    "徒": {
+      "oracleGlyph": "徒",
+      "bronzeGlyph": "徒"
+    },
+    "伴": {
+      "oracleGlyph": "伴",
+      "bronzeGlyph": "伴"
+    },
+    "队": {
+      "oracleGlyph": "隊",
+      "bronzeGlyph": "隊"
+    },
+    "伍": {
+      "oracleGlyph": "伍",
+      "bronzeGlyph": "伍"
+    },
+    "排": {
+      "oracleGlyph": "排",
+      "bronzeGlyph": "排"
+    },
+    "列": {
+      "oracleGlyph": "列",
+      "bronzeGlyph": "列"
+    },
+    "班": {
+      "oracleGlyph": "班",
+      "bronzeGlyph": "班"
+    },
+    "团": {
+      "oracleGlyph": "團",
+      "bronzeGlyph": "團"
+    },
+    "官": {
+      "oracleGlyph": "官",
+      "bronzeGlyph": "官"
+    },
+    "王": {
+      "oracleGlyph": "王",
+      "bronzeGlyph": "王"
+    },
+    "国": {
+      "oracleGlyph": "國",
+      "bronzeGlyph": "國"
+    },
+    "君": {
+      "oracleGlyph": "君",
+      "bronzeGlyph": "君"
+    },
+    "皇": {
+      "oracleGlyph": "皇",
+      "bronzeGlyph": "皇"
+    },
+    "帝": {
+      "oracleGlyph": "帝",
+      "bronzeGlyph": "帝"
+    },
+    "公": {
+      "oracleGlyph": "公",
+      "bronzeGlyph": "公"
+    },
+    "贵": {
+      "oracleGlyph": "貴",
+      "bronzeGlyph": "貴"
+    },
+    "族": {
+      "oracleGlyph": "族",
+      "bronzeGlyph": "族"
+    },
+    "兵": {
+      "oracleGlyph": "兵",
+      "bronzeGlyph": "兵"
+    },
+    "士": {
+      "oracleGlyph": "士",
+      "bronzeGlyph": "士"
+    },
+    "民": {
+      "oracleGlyph": "民",
+      "bronzeGlyph": "民"
+    },
+    "良": {
+      "oracleGlyph": "良",
+      "bronzeGlyph": "良"
+    },
+    "夫": {
+      "oracleGlyph": "夫",
+      "bronzeGlyph": "夫"
+    },
+    "妇": {
+      "oracleGlyph": "婦",
+      "bronzeGlyph": "婦"
+    },
+    "渔": {
+      "oracleGlyph": "漁",
+      "bronzeGlyph": "漁"
+    },
+    "商": {
+      "oracleGlyph": "商",
+      "bronzeGlyph": "商"
+    },
+    "贾": {
+      "oracleGlyph": "賈",
+      "bronzeGlyph": "賈"
+    },
+    "富": {
+      "oracleGlyph": "富",
+      "bronzeGlyph": "富"
+    },
+    "穷": {
+      "oracleGlyph": "窮",
+      "bronzeGlyph": "窮"
+    },
+    "帜": {
+      "oracleGlyph": "幟",
+      "bronzeGlyph": "幟"
+    },
+    "号": {
+      "oracleGlyph": "號",
+      "bronzeGlyph": "號"
+    },
+    "征": {
+      "oracleGlyph": "徵",
+      "bronzeGlyph": "徵"
+    },
+    "伐": {
+      "oracleGlyph": "伐",
+      "bronzeGlyph": "伐"
+    },
+    "防": {
+      "oracleGlyph": "防",
+      "bronzeGlyph": "防"
+    },
+    "营": {
+      "oracleGlyph": "營",
+      "bronzeGlyph": "營"
+    },
+    "寨": {
+      "oracleGlyph": "寨",
+      "bronzeGlyph": "寨"
+    },
+    "堡": {
+      "oracleGlyph": "堡",
+      "bronzeGlyph": "堡"
+    },
+    "垒": {
+      "oracleGlyph": "壘",
+      "bronzeGlyph": "壘"
+    },
+    "烽": {
+      "oracleGlyph": "烽",
+      "bronzeGlyph": "烽"
+    },
+    "烟": {
+      "oracleGlyph": "煙",
+      "bronzeGlyph": "煙"
+    },
+    "烛": {
+      "oracleGlyph": "燭",
+      "bronzeGlyph": "燭"
+    },
+    "焰": {
+      "oracleGlyph": "焰",
+      "bronzeGlyph": "焰"
+    },
+    "炊": {
+      "oracleGlyph": "炊",
+      "bronzeGlyph": "炊"
+    },
+    "烧": {
+      "oracleGlyph": "燒",
+      "bronzeGlyph": "燒"
+    },
+    "熬": {
+      "oracleGlyph": "熬",
+      "bronzeGlyph": "熬"
+    },
+    "炖": {
+      "oracleGlyph": "燉",
+      "bronzeGlyph": "燉"
+    },
+    "焖": {
+      "oracleGlyph": "燜",
+      "bronzeGlyph": "燜"
+    },
+    "烙": {
+      "oracleGlyph": "烙",
+      "bronzeGlyph": "烙"
+    },
+    "烘": {
+      "oracleGlyph": "烘",
+      "bronzeGlyph": "烘"
+    },
+    "焙": {
+      "oracleGlyph": "焙",
+      "bronzeGlyph": "焙"
+    },
+    "熏": {
+      "oracleGlyph": "燻",
+      "bronzeGlyph": "燻"
+    },
+    "燃": {
+      "oracleGlyph": "燃",
+      "bronzeGlyph": "燃"
+    },
+    "料": {
+      "oracleGlyph": "料",
+      "bronzeGlyph": "料"
+    },
+    "煤": {
+      "oracleGlyph": "煤",
+      "bronzeGlyph": "煤"
+    },
+    "柴": {
+      "oracleGlyph": "柴",
+      "bronzeGlyph": "柴"
+    },
+    "炭": {
+      "oracleGlyph": "炭",
+      "bronzeGlyph": "炭"
+    },
+    "烬": {
+      "oracleGlyph": "燼",
+      "bronzeGlyph": "燼"
+    },
+    "柿": {
+      "oracleGlyph": "柿",
+      "bronzeGlyph": "柿"
+    },
+    "柚": {
+      "oracleGlyph": "柚",
+      "bronzeGlyph": "柚"
+    },
+    "荔": {
+      "oracleGlyph": "荔",
+      "bronzeGlyph": "荔"
+    },
+    "蔗": {
+      "oracleGlyph": "蔗",
+      "bronzeGlyph": "蔗"
+    },
+    "藕": {
+      "oracleGlyph": "藕",
+      "bronzeGlyph": "藕"
+    },
+    "菱": {
+      "oracleGlyph": "菱",
+      "bronzeGlyph": "菱"
+    },
+    "苇": {
+      "oracleGlyph": "葦",
+      "bronzeGlyph": "葦"
+    },
+    "蒲": {
+      "oracleGlyph": "蒲",
+      "bronzeGlyph": "蒲"
+    },
+    "芦": {
+      "oracleGlyph": "蘆",
+      "bronzeGlyph": "蘆"
+    },
+    "荻": {
+      "oracleGlyph": "荻",
+      "bronzeGlyph": "荻"
+    },
+    "蒿": {
+      "oracleGlyph": "蒿",
+      "bronzeGlyph": "蒿"
+    },
+    "苔": {
+      "oracleGlyph": "苔",
+      "bronzeGlyph": "苔"
+    },
+    "藻": {
+      "oracleGlyph": "藻",
+      "bronzeGlyph": "藻"
+    },
+    "菌": {
+      "oracleGlyph": "菌",
+      "bronzeGlyph": "菌"
+    },
+    "菇": {
+      "oracleGlyph": "菇",
+      "bronzeGlyph": "菇"
+    },
+    "蘑": {
+      "oracleGlyph": "蘑",
+      "bronzeGlyph": "蘑"
+    },
+    "蕾": {
+      "oracleGlyph": "蕾",
+      "bronzeGlyph": "蕾"
+    },
+    "蕊": {
+      "oracleGlyph": "蕊",
+      "bronzeGlyph": "蕊"
+    },
+    "芯": {
+      "oracleGlyph": "芯",
+      "bronzeGlyph": "芯"
+    },
+    "瓣": {
+      "oracleGlyph": "瓣",
+      "bronzeGlyph": "瓣"
+    },
+    "兽": {
+      "oracleGlyph": "獸",
+      "bronzeGlyph": "獸"
+    },
+    "牲": {
+      "oracleGlyph": "牲",
+      "bronzeGlyph": "牲"
+    },
+    "畜": {
+      "oracleGlyph": "畜",
+      "bronzeGlyph": "畜"
+    },
+    "牺": {
+      "oracleGlyph": "犧",
+      "bronzeGlyph": "犧"
+    },
+    "祭": {
+      "oracleGlyph": "祭",
+      "bronzeGlyph": "祭"
+    },
+    "祀": {
+      "oracleGlyph": "祀",
+      "bronzeGlyph": "祀"
+    },
+    "祈": {
+      "oracleGlyph": "祈",
+      "bronzeGlyph": "祈"
+    },
+    "祷": {
+      "oracleGlyph": "禱",
+      "bronzeGlyph": "禱"
+    },
+    "祝": {
+      "oracleGlyph": "祝",
+      "bronzeGlyph": "祝"
+    },
+    "福": {
+      "oracleGlyph": "福",
+      "bronzeGlyph": "福"
+    },
+    "祸": {
+      "oracleGlyph": "禍",
+      "bronzeGlyph": "禍"
+    },
+    "祥": {
+      "oracleGlyph": "祥",
+      "bronzeGlyph": "祥"
+    },
+    "瑞": {
+      "oracleGlyph": "瑞",
+      "bronzeGlyph": "瑞"
+    },
+    "灾": {
+      "oracleGlyph": "災",
+      "bronzeGlyph": "災"
+    },
+    "凶": {
+      "oracleGlyph": "兇",
+      "bronzeGlyph": "兇"
+    },
+    "吉": {
+      "oracleGlyph": "吉",
+      "bronzeGlyph": "吉"
+    },
+    "迷": {
+      "oracleGlyph": "迷",
+      "bronzeGlyph": "迷"
+    },
+    "鬼": {
+      "oracleGlyph": "鬼",
+      "bronzeGlyph": "鬼"
+    },
+    "仙": {
+      "oracleGlyph": "仙",
+      "bronzeGlyph": "仙"
+    },
+    "佛": {
+      "oracleGlyph": "佛",
+      "bronzeGlyph": "佛"
+    },
+    "寺": {
+      "oracleGlyph": "寺",
+      "bronzeGlyph": "寺"
+    },
+    "观": {
+      "oracleGlyph": "觀",
+      "bronzeGlyph": "觀"
+    },
+    "庵": {
+      "oracleGlyph": "庵",
+      "bronzeGlyph": "庵"
+    },
+    "碑": {
+      "oracleGlyph": "碑",
+      "bronzeGlyph": "碑"
+    },
+    "坟": {
+      "oracleGlyph": "墳",
+      "bronzeGlyph": "墳"
+    },
+    "墓": {
+      "oracleGlyph": "墓",
+      "bronzeGlyph": "墓"
+    },
+    "穴": {
+      "oracleGlyph": "穴",
+      "bronzeGlyph": "穴"
+    },
+    "窟": {
+      "oracleGlyph": "窟",
+      "bronzeGlyph": "窟"
+    },
+    "窑": {
+      "oracleGlyph": "窯",
+      "bronzeGlyph": "窯"
+    },
+    "洞": {
+      "oracleGlyph": "洞",
+      "bronzeGlyph": "洞"
+    },
+    "翼": {
+      "oracleGlyph": "翼",
+      "bronzeGlyph": "翼"
+    },
+    "翅": {
+      "oracleGlyph": "翅",
+      "bronzeGlyph": "翅"
+    },
+    "羽": {
+      "oracleGlyph": "羽",
+      "bronzeGlyph": "羽"
+    },
+    "翎": {
+      "oracleGlyph": "翎",
+      "bronzeGlyph": "翎"
+    },
+    "爪": {
+      "oracleGlyph": "爪",
+      "bronzeGlyph": "爪"
+    },
+    "蹄": {
+      "oracleGlyph": "蹄",
+      "bronzeGlyph": "蹄"
+    },
+    "鳞": {
+      "oracleGlyph": "鱗",
+      "bronzeGlyph": "鱗"
+    },
+    "壳": {
+      "oracleGlyph": "殼",
+      "bronzeGlyph": "殼"
+    },
+    "卵": {
+      "oracleGlyph": "卵",
+      "bronzeGlyph": "卵"
+    },
+    "孵": {
+      "oracleGlyph": "孵",
+      "bronzeGlyph": "孵"
+    },
+    "化": {
+      "oracleGlyph": "化",
+      "bronzeGlyph": "化"
+    },
+    "巢": {
+      "oracleGlyph": "巢",
+      "bronzeGlyph": "巢"
+    },
+    "窝": {
+      "oracleGlyph": "窩",
+      "bronzeGlyph": "窩"
+    },
+    "蝎": {
+      "oracleGlyph": "蠍",
+      "bronzeGlyph": "蠍"
+    },
+    "蚓": {
+      "oracleGlyph": "蚓",
+      "bronzeGlyph": "蚓"
+    },
+    "蜗": {
+      "oracleGlyph": "蝸",
+      "bronzeGlyph": "蝸"
+    },
+    "蚌": {
+      "oracleGlyph": "蚌",
+      "bronzeGlyph": "蚌"
+    },
+    "鳖": {
+      "oracleGlyph": "鱉",
+      "bronzeGlyph": "鱉"
+    },
+    "粱": {
+      "oracleGlyph": "粱",
+      "bronzeGlyph": "粱"
+    },
+    "粟": {
+      "oracleGlyph": "粟",
+      "bronzeGlyph": "粟"
+    },
+    "穗": {
+      "oracleGlyph": "穗",
+      "bronzeGlyph": "穗"
+    },
+    "糠": {
+      "oracleGlyph": "糠",
+      "bronzeGlyph": "糠"
+    },
+    "麸": {
+      "oracleGlyph": "麩",
+      "bronzeGlyph": "麩"
+    },
+    "酥": {
+      "oracleGlyph": "酥",
+      "bronzeGlyph": "酥"
+    },
+    "淡": {
+      "oracleGlyph": "淡",
+      "bronzeGlyph": "淡"
+    },
+    "腥": {
+      "oracleGlyph": "腥",
+      "bronzeGlyph": "腥"
+    },
+    "膻": {
+      "oracleGlyph": "羶",
+      "bronzeGlyph": "羶"
+    },
+    "腻": {
+      "oracleGlyph": "膩",
+      "bronzeGlyph": "膩"
+    },
+    "饱": {
+      "oracleGlyph": "飽",
+      "bronzeGlyph": "飽"
+    },
+    "饥": {
+      "oracleGlyph": "飢",
+      "bronzeGlyph": "飢"
+    },
+    "饿": {
+      "oracleGlyph": "餓",
+      "bronzeGlyph": "餓"
+    },
+    "渴": {
+      "oracleGlyph": "渴",
+      "bronzeGlyph": "渴"
+    },
+    "馋": {
+      "oracleGlyph": "饞",
+      "bronzeGlyph": "饞"
+    },
+    "匹": {
+      "oracleGlyph": "匹",
+      "bronzeGlyph": "匹"
+    },
+    "绸": {
+      "oracleGlyph": "綢",
+      "bronzeGlyph": "綢"
+    },
+    "缎": {
+      "oracleGlyph": "緞",
+      "bronzeGlyph": "緞"
+    },
+    "绢": {
+      "oracleGlyph": "絹",
+      "bronzeGlyph": "絹"
+    },
+    "纱": {
+      "oracleGlyph": "紗",
+      "bronzeGlyph": "紗"
+    },
+    "罗": {
+      "oracleGlyph": "羅",
+      "bronzeGlyph": "羅"
+    },
+    "纺": {
+      "oracleGlyph": "紡",
+      "bronzeGlyph": "紡"
+    },
+    "织": {
+      "oracleGlyph": "織",
+      "bronzeGlyph": "織"
+    },
+    "染": {
+      "oracleGlyph": "染",
+      "bronzeGlyph": "染"
+    },
+    "缝": {
+      "oracleGlyph": "縫",
+      "bronzeGlyph": "縫"
+    },
+    "刺": {
+      "oracleGlyph": "刺",
+      "bronzeGlyph": "刺"
+    },
+    "绣": {
+      "oracleGlyph": "繡",
+      "bronzeGlyph": "繡"
+    },
+    "裁": {
+      "oracleGlyph": "裁",
+      "bronzeGlyph": "裁"
+    },
+    "辟": {
+      "oracleGlyph": "闢",
+      "bronzeGlyph": "闢"
+    },
+    "梭": {
+      "oracleGlyph": "梭",
+      "bronzeGlyph": "梭"
+    },
+    "缕": {
+      "oracleGlyph": "縷",
+      "bronzeGlyph": "縷"
+    },
+    "锡": {
+      "oracleGlyph": "錫",
+      "bronzeGlyph": "錫"
+    },
+    "铝": {
+      "oracleGlyph": "鋁",
+      "bronzeGlyph": "鋁"
+    },
+    "钻": {
+      "oracleGlyph": "鑽",
+      "bronzeGlyph": "鑽"
+    },
+    "珍": {
+      "oracleGlyph": "珍",
+      "bronzeGlyph": "珍"
+    },
+    "珠": {
+      "oracleGlyph": "珠",
+      "bronzeGlyph": "珠"
+    },
+    "宝": {
+      "oracleGlyph": "寶",
+      "bronzeGlyph": "寶"
+    },
+    "瑶": {
+      "oracleGlyph": "瑤",
+      "bronzeGlyph": "瑤"
+    },
+    "琉": {
+      "oracleGlyph": "琉",
+      "bronzeGlyph": "琉"
+    },
+    "玻": {
+      "oracleGlyph": "玻",
+      "bronzeGlyph": "玻"
+    },
+    "璜": {
+      "oracleGlyph": "璜",
+      "bronzeGlyph": "璜"
+    },
+    "玛": {
+      "oracleGlyph": "瑪",
+      "bronzeGlyph": "瑪"
+    },
+    "瑙": {
+      "oracleGlyph": "瑙",
+      "bronzeGlyph": "瑙"
+    },
+    "珊": {
+      "oracleGlyph": "珊",
+      "bronzeGlyph": "珊"
+    },
+    "瑚": {
+      "oracleGlyph": "瑚",
+      "bronzeGlyph": "瑚"
+    },
+    "玳": {
+      "oracleGlyph": "玳",
+      "bronzeGlyph": "玳"
+    },
+    "瑁": {
+      "oracleGlyph": "瑁",
+      "bronzeGlyph": "瑁"
+    },
+    "璐": {
+      "oracleGlyph": "璐",
+      "bronzeGlyph": "璐"
+    },
+    "舟": {
+      "oracleGlyph": "舟",
+      "bronzeGlyph": "舟"
+    },
+    "艇": {
+      "oracleGlyph": "艇",
+      "bronzeGlyph": "艇"
+    },
+    "帆": {
+      "oracleGlyph": "帆",
+      "bronzeGlyph": "帆"
+    },
+    "桨": {
+      "oracleGlyph": "槳",
+      "bronzeGlyph": "槳"
+    },
+    "舵": {
+      "oracleGlyph": "舵",
+      "bronzeGlyph": "舵"
+    },
+    "橹": {
+      "oracleGlyph": "櫓",
+      "bronzeGlyph": "櫓"
+    },
+    "锚": {
+      "oracleGlyph": "錨",
+      "bronzeGlyph": "錨"
+    },
+    "缆": {
+      "oracleGlyph": "纜",
+      "bronzeGlyph": "纜"
+    },
+    "桅": {
+      "oracleGlyph": "桅",
+      "bronzeGlyph": "桅"
+    },
+    "篷": {
+      "oracleGlyph": "篷",
+      "bronzeGlyph": "篷"
+    },
+    "渡": {
+      "oracleGlyph": "渡",
+      "bronzeGlyph": "渡"
+    },
+    "津": {
+      "oracleGlyph": "津",
+      "bronzeGlyph": "津"
+    },
+    "滩": {
+      "oracleGlyph": "灘",
+      "bronzeGlyph": "灘"
+    },
+    "淤": {
+      "oracleGlyph": "淤",
+      "bronzeGlyph": "淤"
+    },
+    "潭": {
+      "oracleGlyph": "潭",
+      "bronzeGlyph": "潭"
+    },
+    "渊": {
+      "oracleGlyph": "淵",
+      "bronzeGlyph": "淵"
+    },
+    "鞍": {
+      "oracleGlyph": "鞍",
+      "bronzeGlyph": "鞍"
+    },
+    "镫": {
+      "oracleGlyph": "鐙",
+      "bronzeGlyph": "鐙"
+    },
+    "辔": {
+      "oracleGlyph": "轡",
+      "bronzeGlyph": "轡"
+    },
+    "驹": {
+      "oracleGlyph": "駒",
+      "bronzeGlyph": "駒"
+    },
+    "犊": {
+      "oracleGlyph": "犢",
+      "bronzeGlyph": "犢"
+    },
+    "羔": {
+      "oracleGlyph": "羔",
+      "bronzeGlyph": "羔"
+    },
+    "崽": {
+      "oracleGlyph": "崽",
+      "bronzeGlyph": "崽"
+    },
+    "雏": {
+      "oracleGlyph": "雛",
+      "bronzeGlyph": "雛"
+    },
+    "鹞": {
+      "oracleGlyph": "鷂",
+      "bronzeGlyph": "鷂"
+    },
+    "鸢": {
+      "oracleGlyph": "鳶",
+      "bronzeGlyph": "鳶"
+    },
+    "鹊": {
+      "oracleGlyph": "鵲",
+      "bronzeGlyph": "鵲"
+    },
+    "鸦": {
+      "oracleGlyph": "鴉",
+      "bronzeGlyph": "鴉"
+    },
+    "鹃": {
+      "oracleGlyph": "鵑",
+      "bronzeGlyph": "鵑"
+    },
+    "莺": {
+      "oracleGlyph": "鶯",
+      "bronzeGlyph": "鶯"
+    },
+    "鸥": {
+      "oracleGlyph": "鷗",
+      "bronzeGlyph": "鷗"
+    },
+    "鹭": {
+      "oracleGlyph": "鷺",
+      "bronzeGlyph": "鷺"
+    },
+    "鸳": {
+      "oracleGlyph": "鴛",
+      "bronzeGlyph": "鴛"
+    },
+    "鸯": {
+      "oracleGlyph": "鴦",
+      "bronzeGlyph": "鴦"
+    },
+    "鹦": {
+      "oracleGlyph": "鸚",
+      "bronzeGlyph": "鸚"
+    },
+    "鸠": {
+      "oracleGlyph": "鳩",
+      "bronzeGlyph": "鳩"
+    },
+    "隼": {
+      "oracleGlyph": "隼",
+      "bronzeGlyph": "隼"
+    },
+    "鸱": {
+      "oracleGlyph": "鴟",
+      "bronzeGlyph": "鴟"
+    },
+    "鸮": {
+      "oracleGlyph": "鴞",
+      "bronzeGlyph": "鴞"
+    },
+    "砾": {
+      "oracleGlyph": "礫",
+      "bronzeGlyph": "礫"
+    },
+    "瓷": {
+      "oracleGlyph": "瓷",
+      "bronzeGlyph": "瓷"
+    },
+    "釉": {
+      "oracleGlyph": "釉",
+      "bronzeGlyph": "釉"
+    },
+    "陶": {
+      "oracleGlyph": "陶",
+      "bronzeGlyph": "陶"
+    },
+    "瓮": {
+      "oracleGlyph": "甕",
+      "bronzeGlyph": "甕"
+    },
+    "坛": {
+      "oracleGlyph": "壇",
+      "bronzeGlyph": "壇"
+    },
+    "钵": {
+      "oracleGlyph": "缽",
+      "bronzeGlyph": "缽"
+    },
+    "盂": {
+      "oracleGlyph": "盂",
+      "bronzeGlyph": "盂"
+    },
+    "瓢": {
+      "oracleGlyph": "瓢",
+      "bronzeGlyph": "瓢"
+    },
+    "笊": {
+      "oracleGlyph": "笊",
+      "bronzeGlyph": "笊"
+    },
+    "篱": {
+      "oracleGlyph": "籬",
+      "bronzeGlyph": "籬"
+    },
+    "帚": {
+      "oracleGlyph": "帚",
+      "bronzeGlyph": "帚"
+    },
+    "簸": {
+      "oracleGlyph": "簸",
+      "bronzeGlyph": "簸"
+    },
+    "箕": {
+      "oracleGlyph": "箕",
+      "bronzeGlyph": "箕"
+    },
+    "笼": {
+      "oracleGlyph": "籠",
+      "bronzeGlyph": "籠"
+    },
+    "箩": {
+      "oracleGlyph": "籮",
+      "bronzeGlyph": "籮"
+    },
+    "筛": {
+      "oracleGlyph": "篩",
+      "bronzeGlyph": "篩"
+    },
+    "秤": {
+      "oracleGlyph": "秤",
+      "bronzeGlyph": "秤"
+    },
+    "砣": {
+      "oracleGlyph": "砣",
+      "bronzeGlyph": "砣"
+    },
+    "砝": {
+      "oracleGlyph": "砝",
+      "bronzeGlyph": "砝"
+    },
+    "码": {
+      "oracleGlyph": "碼",
+      "bronzeGlyph": "碼"
+    },
+    "钩": {
+      "oracleGlyph": "鉤",
+      "bronzeGlyph": "鉤"
+    },
+    "锯": {
+      "oracleGlyph": "鋸",
+      "bronzeGlyph": "鋸"
+    },
+    "刨": {
+      "oracleGlyph": "刨",
+      "bronzeGlyph": "刨"
+    },
+    "凿": {
+      "oracleGlyph": "鑿",
+      "bronzeGlyph": "鑿"
+    },
+    "锉": {
+      "oracleGlyph": "銼",
+      "bronzeGlyph": "銼"
+    },
+    "铲": {
+      "oracleGlyph": "鏟",
+      "bronzeGlyph": "鏟"
+    },
+    "镐": {
+      "oracleGlyph": "鎬",
+      "bronzeGlyph": "鎬"
+    },
+    "锄": {
+      "oracleGlyph": "鋤",
+      "bronzeGlyph": "鋤"
+    },
+    "镰": {
+      "oracleGlyph": "鐮",
+      "bronzeGlyph": "鐮"
+    },
+    "耙": {
+      "oracleGlyph": "耙",
+      "bronzeGlyph": "耙"
+    },
+    "犁": {
+      "oracleGlyph": "犁",
+      "bronzeGlyph": "犁"
+    },
+    "耧": {
+      "oracleGlyph": "耬",
+      "bronzeGlyph": "耬"
+    },
+    "鉴": {
+      "oracleGlyph": "鑑",
+      "bronzeGlyph": "鑑"
+    },
+    "戥": {
+      "oracleGlyph": "戥",
+      "bronzeGlyph": "戥"
+    },
+    "阁": {
+      "oracleGlyph": "閣",
+      "bronzeGlyph": "閣"
+    },
+    "轩": {
+      "oracleGlyph": "軒",
+      "bronzeGlyph": "軒"
+    },
+    "榭": {
+      "oracleGlyph": "榭",
+      "bronzeGlyph": "榭"
+    },
+    "廊": {
+      "oracleGlyph": "廊",
+      "bronzeGlyph": "廊"
+    },
+    "檐": {
+      "oracleGlyph": "簷",
+      "bronzeGlyph": "簷"
+    },
+    "础": {
+      "oracleGlyph": "礎",
+      "bronzeGlyph": "礎"
+    },
+    "陛": {
+      "oracleGlyph": "陛",
+      "bronzeGlyph": "陛"
+    },
+    "墀": {
+      "oracleGlyph": "墀",
+      "bronzeGlyph": "墀"
+    },
+    "垣": {
+      "oracleGlyph": "垣",
+      "bronzeGlyph": "垣"
+    },
+    "垛": {
+      "oracleGlyph": "垛",
+      "bronzeGlyph": "垛"
+    },
+    "堞": {
+      "oracleGlyph": "堞",
+      "bronzeGlyph": "堞"
+    },
+    "袍": {
+      "oracleGlyph": "袍",
+      "bronzeGlyph": "袍"
+    },
+    "袄": {
+      "oracleGlyph": "襖",
+      "bronzeGlyph": "襖"
+    },
+    "裆": {
+      "oracleGlyph": "襠",
+      "bronzeGlyph": "襠"
+    },
+    "襟": {
+      "oracleGlyph": "襟",
+      "bronzeGlyph": "襟"
+    },
+    "领": {
+      "oracleGlyph": "領",
+      "bronzeGlyph": "領"
+    },
+    "冠": {
+      "oracleGlyph": "冠",
+      "bronzeGlyph": "冠"
+    },
+    "盔": {
+      "oracleGlyph": "盔",
+      "bronzeGlyph": "盔"
+    },
+    "胄": {
+      "oracleGlyph": "胄",
+      "bronzeGlyph": "胄"
+    },
+    "靴": {
+      "oracleGlyph": "靴",
+      "bronzeGlyph": "靴"
+    },
+    "履": {
+      "oracleGlyph": "履",
+      "bronzeGlyph": "履"
+    },
+    "屐": {
+      "oracleGlyph": "屐",
+      "bronzeGlyph": "屐"
+    },
+    "膏": {
+      "oracleGlyph": "膏",
+      "bronzeGlyph": "膏"
+    },
+    "脂": {
+      "oracleGlyph": "脂",
+      "bronzeGlyph": "脂"
+    },
+    "肪": {
+      "oracleGlyph": "肪",
+      "bronzeGlyph": "肪"
+    },
+    "荤": {
+      "oracleGlyph": "葷",
+      "bronzeGlyph": "葷"
+    },
+    "疯": {
+      "oracleGlyph": "瘋",
+      "bronzeGlyph": "瘋"
+    },
+    "癫": {
+      "oracleGlyph": "癲",
+      "bronzeGlyph": "癲"
+    },
+    "痴": {
+      "oracleGlyph": "痴",
+      "bronzeGlyph": "痴"
+    },
+    "哑": {
+      "oracleGlyph": "啞",
+      "bronzeGlyph": "啞"
+    },
+    "聋": {
+      "oracleGlyph": "聾",
+      "bronzeGlyph": "聾"
+    },
+    "盲": {
+      "oracleGlyph": "盲",
+      "bronzeGlyph": "盲"
+    },
+    "瘸": {
+      "oracleGlyph": "瘸",
+      "bronzeGlyph": "瘸"
+    },
+    "残": {
+      "oracleGlyph": "殘",
+      "bronzeGlyph": "殘"
+    },
+    "疾": {
+      "oracleGlyph": "疾",
+      "bronzeGlyph": "疾"
+    },
+    "疫": {
+      "oracleGlyph": "疫",
+      "bronzeGlyph": "疫"
+    },
+    "瘟": {
+      "oracleGlyph": "瘟",
+      "bronzeGlyph": "瘟"
+    },
+    "毒": {
+      "oracleGlyph": "毒",
+      "bronzeGlyph": "毒"
+    },
+    "诊": {
+      "oracleGlyph": "診",
+      "bronzeGlyph": "診"
+    },
+    "婚": {
+      "oracleGlyph": "婚",
+      "bronzeGlyph": "婚"
+    },
+    "嫁": {
+      "oracleGlyph": "嫁",
+      "bronzeGlyph": "嫁"
+    },
+    "娶": {
+      "oracleGlyph": "娶",
+      "bronzeGlyph": "娶"
+    },
+    "妻": {
+      "oracleGlyph": "妻",
+      "bronzeGlyph": "妻"
+    },
+    "妾": {
+      "oracleGlyph": "妾",
+      "bronzeGlyph": "妾"
+    },
+    "妃": {
+      "oracleGlyph": "妃",
+      "bronzeGlyph": "妃"
+    },
+    "嫔": {
+      "oracleGlyph": "嬪",
+      "bronzeGlyph": "嬪"
+    },
+    "妓": {
+      "oracleGlyph": "妓",
+      "bronzeGlyph": "妓"
+    },
+    "婢": {
+      "oracleGlyph": "婢",
+      "bronzeGlyph": "婢"
+    },
+    "仆": {
+      "oracleGlyph": "僕",
+      "bronzeGlyph": "僕"
+    },
+    "奴": {
+      "oracleGlyph": "奴",
+      "bronzeGlyph": "奴"
+    },
+    "佣": {
+      "oracleGlyph": "傭",
+      "bronzeGlyph": "傭"
+    },
+    "役": {
+      "oracleGlyph": "役",
+      "bronzeGlyph": "役"
+    },
+    "侍": {
+      "oracleGlyph": "侍",
+      "bronzeGlyph": "侍"
+    },
+    "差": {
+      "oracleGlyph": "差",
+      "bronzeGlyph": "差"
+    },
+    "遣": {
+      "oracleGlyph": "遣",
+      "bronzeGlyph": "遣"
+    },
+    "囚": {
+      "oracleGlyph": "囚",
+      "bronzeGlyph": "囚"
+    },
+    "犯": {
+      "oracleGlyph": "犯",
+      "bronzeGlyph": "犯"
+    },
+    "狱": {
+      "oracleGlyph": "獄",
+      "bronzeGlyph": "獄"
+    },
+    "牢": {
+      "oracleGlyph": "牢",
+      "bronzeGlyph": "牢"
+    },
+    "禁": {
+      "oracleGlyph": "禁",
+      "bronzeGlyph": "禁"
+    },
+    "税": {
+      "oracleGlyph": "稅",
+      "bronzeGlyph": "稅"
+    },
+    "赋": {
+      "oracleGlyph": "賦",
+      "bronzeGlyph": "賦"
+    },
+    "贡": {
+      "oracleGlyph": "貢",
+      "bronzeGlyph": "貢"
+    },
+    "债": {
+      "oracleGlyph": "債",
+      "bronzeGlyph": "債"
+    },
+    "财": {
+      "oracleGlyph": "財",
+      "bronzeGlyph": "財"
+    },
+    "贫": {
+      "oracleGlyph": "貧",
+      "bronzeGlyph": "貧"
+    },
+    "窘": {
+      "oracleGlyph": "窘",
+      "bronzeGlyph": "窘"
+    },
+    "裕": {
+      "oracleGlyph": "裕",
+      "bronzeGlyph": "裕"
+    },
+    "奢": {
+      "oracleGlyph": "奢",
+      "bronzeGlyph": "奢"
+    },
+    "俭": {
+      "oracleGlyph": "儉",
+      "bronzeGlyph": "儉"
+    },
+    "廉": {
+      "oracleGlyph": "廉",
+      "bronzeGlyph": "廉"
+    },
+    "贪": {
+      "oracleGlyph": "貪",
+      "bronzeGlyph": "貪"
+    },
+    "贿": {
+      "oracleGlyph": "賄",
+      "bronzeGlyph": "賄"
+    },
+    "赂": {
+      "oracleGlyph": "賂",
+      "bronzeGlyph": "賂"
+    },
+    "赃": {
+      "oracleGlyph": "贓",
+      "bronzeGlyph": "贓"
+    },
+    "魂": {
+      "oracleGlyph": "魂",
+      "bronzeGlyph": "魂"
+    },
+    "魄": {
+      "oracleGlyph": "魄",
+      "bronzeGlyph": "魄"
+    },
+    "灵": {
+      "oracleGlyph": "靈",
+      "bronzeGlyph": "靈"
+    },
+    "魅": {
+      "oracleGlyph": "魅",
+      "bronzeGlyph": "魅"
+    },
+    "妖": {
+      "oracleGlyph": "妖",
+      "bronzeGlyph": "妖"
+    },
+    "魔": {
+      "oracleGlyph": "魔",
+      "bronzeGlyph": "魔"
+    },
+    "诞": {
+      "oracleGlyph": "誕",
+      "bronzeGlyph": "誕"
+    },
+    "幻": {
+      "oracleGlyph": "幻",
+      "bronzeGlyph": "幻"
+    },
+    "妄": {
+      "oracleGlyph": "妄",
+      "bronzeGlyph": "妄"
+    },
+    "谎": {
+      "oracleGlyph": "謊",
+      "bronzeGlyph": "謊"
+    },
+    "欺": {
+      "oracleGlyph": "欺",
+      "bronzeGlyph": "欺"
+    },
+    "诈": {
+      "oracleGlyph": "詐",
+      "bronzeGlyph": "詐"
+    },
+    "骗": {
+      "oracleGlyph": "騙",
+      "bronzeGlyph": "騙"
+    },
+    "讹": {
+      "oracleGlyph": "訛",
+      "bronzeGlyph": "訛"
+    },
+    "诬": {
+      "oracleGlyph": "誣",
+      "bronzeGlyph": "誣"
+    },
+    "谤": {
+      "oracleGlyph": "謗",
+      "bronzeGlyph": "謗"
+    },
+    "讥": {
+      "oracleGlyph": "譏",
+      "bronzeGlyph": "譏"
+    },
+    "讽": {
+      "oracleGlyph": "諷",
+      "bronzeGlyph": "諷"
+    },
+    "嘲": {
+      "oracleGlyph": "嘲",
+      "bronzeGlyph": "嘲"
+    },
+    "骂": {
+      "oracleGlyph": "罵",
+      "bronzeGlyph": "罵"
+    },
+    "咒": {
+      "oracleGlyph": "咒",
+      "bronzeGlyph": "咒"
+    },
+    "诅": {
+      "oracleGlyph": "詛",
+      "bronzeGlyph": "詛"
+    },
+    "誓": {
+      "oracleGlyph": "誓",
+      "bronzeGlyph": "誓"
+    },
+    "盟": {
+      "oracleGlyph": "盟",
+      "bronzeGlyph": "盟"
+    },
+    "约": {
+      "oracleGlyph": "約",
+      "bronzeGlyph": "約"
+    },
+    "契": {
+      "oracleGlyph": "契",
+      "bronzeGlyph": "契"
+    },
+    "券": {
+      "oracleGlyph": "券",
+      "bronzeGlyph": "券"
+    },
+    "据": {
+      "oracleGlyph": "據",
+      "bronzeGlyph": "據"
+    },
+    "凭": {
+      "oracleGlyph": "憑",
+      "bronzeGlyph": "憑"
+    },
+    "琴": {
+      "oracleGlyph": "琴",
+      "bronzeGlyph": "琴"
+    },
+    "瑟": {
+      "oracleGlyph": "瑟",
+      "bronzeGlyph": "瑟"
+    },
+    "筝": {
+      "oracleGlyph": "箏",
+      "bronzeGlyph": "箏"
+    },
+    "笛": {
+      "oracleGlyph": "笛",
+      "bronzeGlyph": "笛"
+    },
+    "箫": {
+      "oracleGlyph": "簫",
+      "bronzeGlyph": "簫"
+    },
+    "锣": {
+      "oracleGlyph": "鑼",
+      "bronzeGlyph": "鑼"
+    },
+    "钹": {
+      "oracleGlyph": "鈸",
+      "bronzeGlyph": "鈸"
+    },
+    "铙": {
+      "oracleGlyph": "鐃",
+      "bronzeGlyph": "鐃"
+    },
+    "磬": {
+      "oracleGlyph": "磬",
+      "bronzeGlyph": "磬"
+    },
+    "罄": {
+      "oracleGlyph": "罄",
+      "bronzeGlyph": "罄"
+    },
+    "竞": {
+      "oracleGlyph": "競",
+      "bronzeGlyph": "競"
+    },
+    "奏": {
+      "oracleGlyph": "奏",
+      "bronzeGlyph": "奏"
+    },
+    "歌": {
+      "oracleGlyph": "歌",
+      "bronzeGlyph": "歌"
+    },
+    "舞": {
+      "oracleGlyph": "舞",
+      "bronzeGlyph": "舞"
+    },
+    "吟": {
+      "oracleGlyph": "吟",
+      "bronzeGlyph": "吟"
+    },
+    "咏": {
+      "oracleGlyph": "詠",
+      "bronzeGlyph": "詠"
+    },
+    "啸": {
+      "oracleGlyph": "嘯",
+      "bronzeGlyph": "嘯"
+    },
+    "谣": {
+      "oracleGlyph": "謠",
+      "bronzeGlyph": "謠"
+    },
+    "谚": {
+      "oracleGlyph": "諺",
+      "bronzeGlyph": "諺"
+    },
+    "谜": {
+      "oracleGlyph": "謎",
+      "bronzeGlyph": "謎"
+    },
+    "诗": {
+      "oracleGlyph": "詩",
+      "bronzeGlyph": "詩"
+    },
+    "词": {
+      "oracleGlyph": "詞",
+      "bronzeGlyph": "詞"
+    },
+    "谱": {
+      "oracleGlyph": "譜",
+      "bronzeGlyph": "譜"
+    },
+    "章": {
+      "oracleGlyph": "章",
+      "bronzeGlyph": "章"
+    },
+    "篇": {
+      "oracleGlyph": "篇",
+      "bronzeGlyph": "篇"
+    },
+    "轴": {
+      "oracleGlyph": "軸",
+      "bronzeGlyph": "軸"
+    },
+    "笺": {
+      "oracleGlyph": "箋",
+      "bronzeGlyph": "箋"
+    },
+    "铭": {
+      "oracleGlyph": "銘",
+      "bronzeGlyph": "銘"
+    },
+    "篆": {
+      "oracleGlyph": "篆",
+      "bronzeGlyph": "篆"
+    },
+    "隶": {
+      "oracleGlyph": "隸",
+      "bronzeGlyph": "隸"
+    },
+    "楷": {
+      "oracleGlyph": "楷",
+      "bronzeGlyph": "楷"
+    },
+    "绘": {
+      "oracleGlyph": "繪",
+      "bronzeGlyph": "繪"
+    },
+    "雕": {
+      "oracleGlyph": "雕",
+      "bronzeGlyph": "雕"
+    },
+    "塑": {
+      "oracleGlyph": "塑",
+      "bronzeGlyph": "塑"
+    },
+    "印": {
+      "oracleGlyph": "印",
+      "bronzeGlyph": "印"
+    },
+    "戳": {
+      "oracleGlyph": "戳",
+      "bronzeGlyph": "戳"
+    },
+    "冈": {
+      "oracleGlyph": "岡",
+      "bronzeGlyph": "岡"
+    },
+    "岭": {
+      "oracleGlyph": "嶺",
+      "bronzeGlyph": "嶺"
+    },
+    "峰": {
+      "oracleGlyph": "峰",
+      "bronzeGlyph": "峰"
+    },
+    "峦": {
+      "oracleGlyph": "巒",
+      "bronzeGlyph": "巒"
+    },
+    "壑": {
+      "oracleGlyph": "壑",
+      "bronzeGlyph": "壑"
+    },
+    "峪": {
+      "oracleGlyph": "峪",
+      "bronzeGlyph": "峪"
+    },
+    "涧": {
+      "oracleGlyph": "澗",
+      "bronzeGlyph": "澗"
+    },
+    "瀑": {
+      "oracleGlyph": "瀑",
+      "bronzeGlyph": "瀑"
+    },
+    "涯": {
+      "oracleGlyph": "涯",
+      "bronzeGlyph": "涯"
+    },
+    "渚": {
+      "oracleGlyph": "渚",
+      "bronzeGlyph": "渚"
+    },
+    "汀": {
+      "oracleGlyph": "汀",
+      "bronzeGlyph": "汀"
+    },
+    "洲": {
+      "oracleGlyph": "洲",
+      "bronzeGlyph": "洲"
+    },
+    "墩": {
+      "oracleGlyph": "墩",
+      "bronzeGlyph": "墩"
+    },
+    "埠": {
+      "oracleGlyph": "埠",
+      "bronzeGlyph": "埠"
+    },
+    "岔": {
+      "oracleGlyph": "岔",
+      "bronzeGlyph": "岔"
+    },
+    "隘": {
+      "oracleGlyph": "隘",
+      "bronzeGlyph": "隘"
+    },
+    "隧": {
+      "oracleGlyph": "隧",
+      "bronzeGlyph": "隧"
+    },
+    "窖": {
+      "oracleGlyph": "窖",
+      "bronzeGlyph": "窖"
+    },
+    "廪": {
+      "oracleGlyph": "廩",
+      "bronzeGlyph": "廩"
+    },
+    "府": {
+      "oracleGlyph": "府",
+      "bronzeGlyph": "府"
+    },
+    "厢": {
+      "oracleGlyph": "廂",
+      "bronzeGlyph": "廂"
+    },
+    "厨": {
+      "oracleGlyph": "廚",
+      "bronzeGlyph": "廚"
+    },
+    "黔": {
+      "oracleGlyph": "黔",
+      "bronzeGlyph": "黔"
+    },
+    "滇": {
+      "oracleGlyph": "滇",
+      "bronzeGlyph": "滇"
+    },
+    "蜀": {
+      "oracleGlyph": "蜀",
+      "bronzeGlyph": "蜀"
+    },
+    "粤": {
+      "oracleGlyph": "粵",
+      "bronzeGlyph": "粵"
+    },
+    "闽": {
+      "oracleGlyph": "閩",
+      "bronzeGlyph": "閩"
+    },
+    "赣": {
+      "oracleGlyph": "贛",
+      "bronzeGlyph": "贛"
+    },
+    "皖": {
+      "oracleGlyph": "皖",
+      "bronzeGlyph": "皖"
+    },
+    "冀": {
+      "oracleGlyph": "冀",
+      "bronzeGlyph": "冀"
+    },
+    "鲁": {
+      "oracleGlyph": "魯",
+      "bronzeGlyph": "魯"
+    },
+    "豫": {
+      "oracleGlyph": "豫",
+      "bronzeGlyph": "豫"
+    },
+    "鄂": {
+      "oracleGlyph": "鄂",
+      "bronzeGlyph": "鄂"
+    },
+    "湘": {
+      "oracleGlyph": "湘",
+      "bronzeGlyph": "湘"
+    },
+    "陇": {
+      "oracleGlyph": "隴",
+      "bronzeGlyph": "隴"
+    },
+    "哎": {
+      "oracleGlyph": "哎",
+      "bronzeGlyph": "哎"
+    },
+    "哟": {
+      "oracleGlyph": "喲",
+      "bronzeGlyph": "喲"
+    },
+    "嗬": {
+      "oracleGlyph": "嗬",
+      "bronzeGlyph": "嗬"
+    },
+    "嘟": {
+      "oracleGlyph": "嘟",
+      "bronzeGlyph": "嘟"
+    },
+    "喃": {
+      "oracleGlyph": "喃",
+      "bronzeGlyph": "喃"
+    },
+    "嘀": {
+      "oracleGlyph": "嘀",
+      "bronzeGlyph": "嘀"
+    },
+    "嗒": {
+      "oracleGlyph": "嗒",
+      "bronzeGlyph": "嗒"
+    },
+    "咕": {
+      "oracleGlyph": "咕",
+      "bronzeGlyph": "咕"
+    },
+    "哝": {
+      "oracleGlyph": "噥",
+      "bronzeGlyph": "噥"
+    },
+    "呛": {
+      "oracleGlyph": "嗆",
+      "bronzeGlyph": "嗆"
+    },
+    "咳": {
+      "oracleGlyph": "咳",
+      "bronzeGlyph": "咳"
+    },
+    "嗽": {
+      "oracleGlyph": "嗽",
+      "bronzeGlyph": "嗽"
+    },
+    "喷": {
+      "oracleGlyph": "噴",
+      "bronzeGlyph": "噴"
+    },
+    "嚏": {
+      "oracleGlyph": "嚏",
+      "bronzeGlyph": "嚏"
+    },
+    "哈": {
+      "oracleGlyph": "哈",
+      "bronzeGlyph": "哈"
+    },
+    "欠": {
+      "oracleGlyph": "欠",
+      "bronzeGlyph": "欠"
+    },
+    "吁": {
+      "oracleGlyph": "籲",
+      "bronzeGlyph": "籲"
+    },
+    "叹": {
+      "oracleGlyph": "嘆",
+      "bronzeGlyph": "嘆"
+    },
+    "唉": {
+      "oracleGlyph": "唉",
+      "bronzeGlyph": "唉"
+    },
+    "吝": {
+      "oracleGlyph": "吝",
+      "bronzeGlyph": "吝"
+    },
+    "啬": {
+      "oracleGlyph": "嗇",
+      "bronzeGlyph": "嗇"
+    },
+    "慷": {
+      "oracleGlyph": "慷",
+      "bronzeGlyph": "慷"
+    },
+    "慨": {
+      "oracleGlyph": "慨",
+      "bronzeGlyph": "慨"
+    },
+    "惜": {
+      "oracleGlyph": "惜",
+      "bronzeGlyph": "惜"
+    },
+    "惭": {
+      "oracleGlyph": "慚",
+      "bronzeGlyph": "慚"
+    },
+    "愧": {
+      "oracleGlyph": "愧",
+      "bronzeGlyph": "愧"
+    },
+    "懊": {
+      "oracleGlyph": "懊",
+      "bronzeGlyph": "懊"
+    },
+    "恼": {
+      "oracleGlyph": "惱",
+      "bronzeGlyph": "惱"
+    },
+    "惆": {
+      "oracleGlyph": "惆",
+      "bronzeGlyph": "惆"
+    },
+    "怅": {
+      "oracleGlyph": "悵",
+      "bronzeGlyph": "悵"
+    },
+    "惘": {
+      "oracleGlyph": "惘",
+      "bronzeGlyph": "惘"
+    },
+    "惶": {
+      "oracleGlyph": "惶",
+      "bronzeGlyph": "惶"
+    },
+    "怖": {
+      "oracleGlyph": "怖",
+      "bronzeGlyph": "怖"
+    },
+    "悸": {
+      "oracleGlyph": "悸",
+      "bronzeGlyph": "悸"
+    },
+    "悚": {
+      "oracleGlyph": "悚",
+      "bronzeGlyph": "悚"
+    },
+    "惬": {
+      "oracleGlyph": "愜",
+      "bronzeGlyph": "愜"
+    },
+    "恬": {
+      "oracleGlyph": "恬",
+      "bronzeGlyph": "恬"
+    },
+    "惺": {
+      "oracleGlyph": "惺",
+      "bronzeGlyph": "惺"
+    },
+    "巍": {
+      "oracleGlyph": "巍",
+      "bronzeGlyph": "巍"
+    },
+    "峨": {
+      "oracleGlyph": "峨",
+      "bronzeGlyph": "峨"
+    },
+    "崔": {
+      "oracleGlyph": "崔",
+      "bronzeGlyph": "崔"
+    },
+    "嵬": {
+      "oracleGlyph": "嵬",
+      "bronzeGlyph": "嵬"
+    },
+    "嵯": {
+      "oracleGlyph": "嵯",
+      "bronzeGlyph": "嵯"
+    },
+    "嶙": {
+      "oracleGlyph": "嶙",
+      "bronzeGlyph": "嶙"
+    },
+    "峋": {
+      "oracleGlyph": "峋",
+      "bronzeGlyph": "峋"
+    },
+    "逶": {
+      "oracleGlyph": "逶",
+      "bronzeGlyph": "逶"
+    },
+    "迤": {
+      "oracleGlyph": "迤",
+      "bronzeGlyph": "迤"
+    },
+    "蜿": {
+      "oracleGlyph": "蜿",
+      "bronzeGlyph": "蜿"
+    },
+    "蜒": {
+      "oracleGlyph": "蜒",
+      "bronzeGlyph": "蜒"
+    },
+    "潋": {
+      "oracleGlyph": "瀲",
+      "bronzeGlyph": "瀲"
+    },
+    "滟": {
+      "oracleGlyph": "灩",
+      "bronzeGlyph": "灩"
+    },
+    "潆": {
+      "oracleGlyph": "瀠",
+      "bronzeGlyph": "瀠"
+    },
+    "洄": {
+      "oracleGlyph": "洄",
+      "bronzeGlyph": "洄"
+    },
+    "潺": {
+      "oracleGlyph": "潺",
+      "bronzeGlyph": "潺"
+    },
+    "淙": {
+      "oracleGlyph": "淙",
+      "bronzeGlyph": "淙"
+    },
+    "铿": {
+      "oracleGlyph": "鏗",
+      "bronzeGlyph": "鏗"
+    },
+    "锵": {
+      "oracleGlyph": "鏘",
+      "bronzeGlyph": "鏘"
+    },
+    "琳": {
+      "oracleGlyph": "琳",
+      "bronzeGlyph": "琳"
+    },
+    "琅": {
+      "oracleGlyph": "琅",
+      "bronzeGlyph": "琅"
+    },
+    "璀": {
+      "oracleGlyph": "璀",
+      "bronzeGlyph": "璀"
+    },
+    "璨": {
+      "oracleGlyph": "璨",
+      "bronzeGlyph": "璨"
+    },
+    "斑": {
+      "oracleGlyph": "斑",
+      "bronzeGlyph": "斑"
+    },
+    "斓": {
+      "oracleGlyph": "斕",
+      "bronzeGlyph": "斕"
+    },
+    "绚": {
+      "oracleGlyph": "絢",
+      "bronzeGlyph": "絢"
+    },
+    "烂": {
+      "oracleGlyph": "爛",
+      "bronzeGlyph": "爛"
+    },
+    "膳": {
+      "oracleGlyph": "膳",
+      "bronzeGlyph": "膳"
+    },
+    "馐": {
+      "oracleGlyph": "饈",
+      "bronzeGlyph": "饈"
+    },
+    "馔": {
+      "oracleGlyph": "饌",
+      "bronzeGlyph": "饌"
+    },
+    "肴": {
+      "oracleGlyph": "餚",
+      "bronzeGlyph": "餚"
+    },
+    "馅": {
+      "oracleGlyph": "餡",
+      "bronzeGlyph": "餡"
+    },
+    "馄": {
+      "oracleGlyph": "餛",
+      "bronzeGlyph": "餛"
+    },
+    "饨": {
+      "oracleGlyph": "飩",
+      "bronzeGlyph": "飩"
+    }
+  }
+}

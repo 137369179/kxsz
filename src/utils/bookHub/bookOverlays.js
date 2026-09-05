@@ -110,7 +110,7 @@ export function openMiniCharTooltip(charStr, triggerEl) {
 
   const tooltip = document.createElement("div");
   tooltip.id = "book-mini-char-tooltip";
-  tooltip.className = "fixed z-[85] max-w-xs bg-slate-900/95 text-white rounded-2xl p-3.5 shadow-2xl border-2 border-amber-400 backdrop-blur-md animate-scale-up select-none";
+  tooltip.setAttribute("role", "dialog"); tooltip.setAttribute("aria-label", "生字讲解"); tooltip.className = "fixed z-[85] max-w-xs bg-slate-900/95 text-white rounded-2xl p-3.5 shadow-2xl border-2 border-amber-400 backdrop-blur-md animate-scale-up select-none";
 
   const wordSample = (charData.words && charData.words[0]?.word) || charData.char;
   const pinyin = charData.pinyin || "";
@@ -134,8 +134,8 @@ export function openMiniCharTooltip(charStr, triggerEl) {
       <button class="btn-close-mini text-slate-400 hover:text-white text-xs font-bold p-1 cursor-pointer">✕</button>
     </div>
     <div class="mt-2.5 pt-2 border-t border-slate-700/60 flex items-center justify-between gap-2">
-      <button class="btn-mini-speak px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-300 font-bold text-xs flex items-center gap-1 border border-white/10 cursor-pointer">
-        <span>🔊</span>
+      <button class="btn-mini-speak px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-300 font-bold text-xs flex items-center gap-1.5 border border-white/10 cursor-pointer">
+        ${GAME_ICONS.speaker("w-3.5 h-3.5")}
         <span>听读音</span>
       </button>
       <button class="btn-mini-learn px-3 py-1 rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 text-amber-950 font-black text-xs shadow-md hover:brightness-110 active:scale-95 transition-all flex items-center gap-1 cursor-pointer">
@@ -164,6 +164,7 @@ export function openMiniCharTooltip(charStr, triggerEl) {
   }
 
   const close = () => {
+    try { soundAndFX.stopSpeaking?.(); } catch {}
     tooltip.remove();
     document.removeEventListener("click", outsideClickListener);
   };
@@ -190,6 +191,7 @@ export function openMiniCharTooltip(charStr, triggerEl) {
 
   tooltip.querySelector(".btn-mini-learn")?.addEventListener("click", (e) => {
     e.stopPropagation();
+    try { soundAndFX.stopSpeaking?.(); } catch {}
     soundAndFX.playSuccessSound();
     close();
     if (typeof this?._busEmit === "function") {
@@ -229,7 +231,7 @@ export function openCatalogDrawer(book) {
           ${book.pages.map((p, idx) => {
             const isCurrent = idx === this.currentPageIndex;
             return `
-              <div class="catalog-page-card group p-3 rounded-2xl border-2 transition-all cursor-pointer flex items-center gap-3 ${
+              <button class="catalog-page-card w-full text-left group p-3 rounded-2xl border-2 transition-all cursor-pointer flex items-center gap-3 ${
                 isCurrent
                   ? "bg-amber-100/90 border-orange-500 shadow-md ring-2 ring-orange-300"
                   : "bg-white border-amber-200 hover:border-orange-400 hover:shadow"
@@ -247,7 +249,7 @@ export function openCatalogDrawer(book) {
                   <p class="text-[11px] text-gray-500 font-semibold truncate">${p.text}</p>
                 </div>
 
-              </div>
+              </button>
             `;
           }).join("")}
         </div>
@@ -265,6 +267,7 @@ export function openCatalogDrawer(book) {
   document.body.appendChild(overlay);
 
   const closeDrawer = () => {
+    try { soundAndFX.stopSpeaking?.(); } catch {}
     this.isCatalogOpen = false;
     overlay.remove();
   };

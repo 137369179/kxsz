@@ -33,10 +33,12 @@ const TYPE_META = {
   cloze_hint: { iconSvg: (cls) => GAME_ICONS.scroll(cls), name: "句子填空", tip: "提示拼音，填入正确汉字" },
   pinyin_spell: { iconSvg: (cls) => GAME_ICONS.mic(cls), name: "拼读练习", tip: "听拼音，选声母韵母组合" },
   stroke_trace: { iconSvg: (cls) => GAME_ICONS.pen(cls), name: "笔画描红", tip: "跟着虚线，描出汉字笔画" },
-  // T7 新增：主动回忆（听音写字/选字）
-  audio_to_text: { iconSvg: (cls) => GAME_ICONS.mic(cls), name: "听音写字", tip: "听准发音，找出对应的汉字" },
+  // T7 新增：主动回忆（听音写字）
+  listen_to_write: { iconSvg: (cls) => GAME_ICONS.mic(cls), name: "听音写字", tip: "听准发音，默写出对应的汉字" },
   // T3 新增：字义选字
   meaning_pick: { iconSvg: (cls) => GAME_ICONS.book(cls), name: "字义选字", tip: "根据字义描述，找出对应的汉字" },
+  // P1-2 新增：部首归类
+  radical_sort: { iconSvg: (cls) => GAME_ICONS.gear(cls), name: "部首归类", tip: "看看这个字的部首是哪一个" },
 };
 
 /** Fisher-Yates */
@@ -164,12 +166,19 @@ export class DrillEngine {
     const basePool = ["audio_choice", "similar_pick", "balloon_pop"];
 
     if ((c.words || []).some((w) => w.word.includes(c.char))) basePool.push("word_fill");
-    if ((c.sentence || "").includes(c.char)) basePool.push("sentence_fill");
+    
+    // P1-2: 确保挖空的汉字在句子中是唯一的
+    if ((c.sentence || "").includes(c.char) && this.validateClozeUniqueness(c.sentence, c.char)) {
+      basePool.push("sentence_fill");
+    }
+    
     if ((c.sentence || "").includes(c.char)) basePool.push("cloze_hint");
     if (c.pinyin && c.pinyin.length > 1) basePool.push("pinyin_spell");
     if (c.char && c.char.length === 1) basePool.push("stroke_trace");
-    if (c.pinyin) basePool.push("audio_to_text");
+    if (c.pinyin && c.char && c.char.length === 1) basePool.push("listen_to_write");
     if (c.meanings && c.meanings.primary) basePool.push("meaning_pick");
+    // P1-2: 部首归类（索引层每字必带 radical；无 radical 的字自动跳过）
+    if (c.radical && c.char && c.char.length === 1) basePool.push("radical_sort");
 
     // E15: 根据自适应难度加权重复
     return this._applyDifficultyWeights(basePool);
@@ -178,8 +187,8 @@ export class DrillEngine {
   // E15: 题型 → 难度等级映射
   _difficultyOf(type) {
     // recognition → easy, production → hard
-    const easy = new Set(["audio_choice", "similar_pick", "balloon_pop", "stroke_trace", "audio_to_text"]);
-    const hard = new Set(["pinyin_spell", "word_fill", "sentence_fill", "cloze_hint", "meaning_pick"]);
+    const easy = new Set(["audio_choice", "similar_pick", "balloon_pop", "stroke_trace"]);
+    const hard = new Set(["pinyin_spell", "word_fill", "sentence_fill", "cloze_hint", "meaning_pick", "listen_to_write"]);
     if (easy.has(type)) return "easy";
     if (hard.has(type)) return "hard";
     return "medium";
@@ -314,6 +323,17 @@ export class DrillEngine {
       `;
     }
 
+    // P1-2: 部首归类 — 大字展示 + 问"部首是哪个"
+    if (type === "radical_sort") {
+      return `
+        <div class="bg-black/50 border border-white/25 rounded-3xl px-10 py-4 flex flex-col items-center gap-1">
+          <span class="text-6xl font-black text-yellow-300 drop-shadow">${c.char}</span>
+          <span class="text-[11px] text-white/60 font-bold">${c.pinyin || ""}</span>
+        </div>
+        <p class="text-white font-black text-sm">${meta.tip}</p>
+      `;
+    }
+
     if (type === "word_fill") {
       const w = (c.words || []).find((x) => x.word.includes(c.char)) || { word: c.char, pinyin: c.pinyin };
       const blanked = w.word.split(c.char).join(" ( ? ) ");
@@ -399,14 +419,16 @@ export class DrillEngine {
       `;
     }
 
-    // T7 audio_to_text: 听音写字/选字
-    if (type === "audio_to_text") {
+    // P1-2 listen_to_write: 听音写字
+    if (type === "listen_to_write") {
       return `
         <div class="flex flex-col items-center gap-3">
-          <button id="btn-replay-audio" class="w-24 h-24 rounded-full bg-gradient-to-tr from-cyan-400 to-blue-600 border-4 border-white shadow-[0_0_35px_rgba(6,182,212,0.8)] flex items-center justify-center active:scale-90 transition-transform animate-bounce-slow cursor-pointer" title="点击播放发音">
-            ${GAME_ICONS.speaker("w-12 h-12")}
+          <button id="btn-replay-audio" class="w-20 h-20 rounded-full bg-gradient-to-tr from-cyan-400 to-blue-600 border-4 border-white shadow-lg flex items-center justify-center active:scale-90 transition-transform cursor-pointer mb-2" title="点击播放发音">
+            ${GAME_ICONS.speaker("w-10 h-10")}
           </button>
-          <div class="text-xs text-cyan-200 font-bold bg-black/40 px-4 py-1.5 rounded-full border border-cyan-400/30">听发音，找出对应的汉字</div>
+          <canvas id="stroke-trace-canvas" width="280" height="280" class="bg-white rounded-2xl border-4 border-cyan-400 shadow-[0_0_30px_rgba(6,182,212,0.5)] cursor-crosshair touch-none"></canvas>
+          <p class="text-cyan-200 font-black text-xs">提示：听准发音"${c.pinyin}"，在画板上默写出汉字</p>
+          <button id="stroke-trace-submit" class="px-8 py-3 bg-gradient-to-r from-cyan-400 to-blue-500 text-white font-black text-lg rounded-2xl border-b-4 border-cyan-700 shadow-lg active:translate-y-1 cursor-pointer">提交默写</button>
         </div>
       `;
     }
@@ -471,9 +493,22 @@ export class DrillEngine {
         .join("");
     }
 
-    // E4 pinyin_spell / stroke_trace: 自包含选项，无需标准 buildOptionsFor
-    if (type === "pinyin_spell" || type === "stroke_trace") {
+    // E4 pinyin_spell / stroke_trace / listen_to_write: 自包含选项，无需标准 buildOptionsFor
+    if (type === "pinyin_spell" || type === "stroke_trace" || type === "listen_to_write") {
       return "";
+    }
+
+    // P1-2: 部首归类 — 选项是部首而非汉字
+    if (type === "radical_sort") {
+      return this.buildRadicalOptions()
+        .map(
+          (r) => `
+        <button class="drill-opt relative bg-gradient-to-b from-sky-100 to-sky-300 text-sky-950 font-black w-24 h-24 rounded-2xl border-b-6 border-sky-600 shadow-[0_8px_16px_rgba(0,0,0,0.3)] hover:from-sky-200 hover:to-sky-400 active:border-b-0 active:translate-y-2 transition-all flex flex-col items-center justify-center cursor-pointer" data-radical="${r}">
+          <span class="text-4xl leading-none">${r}</span>
+        </button>
+      `
+        )
+        .join("");
     }
 
     return opts
@@ -503,6 +538,7 @@ export class DrillEngine {
       pinyin_spell: "拼音拼读！仔细听发音，选出声母和韵母！",
       stroke_trace: `笔画描红！请在画布上描出汉字"${c.char}"！`,
       meaning_pick: `字义选字！根据字义描述，请选出对应的汉字！`,
+      radical_sort: "部首归类！看看这个字的部首是哪一个！",
     };
     const msg = text[type] || `请找出汉字"${c.char}"！`;
     soundAndFX.speakPriority(msg, { kind: "sentence", emotion: "gentle" });
@@ -514,7 +550,10 @@ export class DrillEngine {
   bindRound(type) {
     // E4: 派发到专用处理器
     if (type === "pinyin_spell") return this.bindPinyinSpellRound();
-    if (type === "stroke_trace") return this.bindStrokeTraceRound();
+    if (type === "stroke_trace") return this.bindStrokeTraceRound(false);
+    if (type === "listen_to_write") return this.bindStrokeTraceRound(true);
+    // P1-2: 部首归类（选项为部首，正确性按 radical 判定）
+    if (type === "radical_sort") return this.bindRadicalSortRound();
 
     const isBalloon = type === "balloon_pop";
     const needHits = 3;
@@ -571,6 +610,55 @@ export class DrillEngine {
           btn.classList.add("ring-4", "ring-emerald-400", "bg-emerald-100");
         }
 
+        this.registerCorrect();
+      });
+    });
+  }
+
+  // ------------------------------------------------------------------
+  // P1-2: 部首归类处理器（选项是部首，正确性按 char.radical 判定）
+  // ------------------------------------------------------------------
+  buildRadicalOptions() {
+    const c = this.char;
+    const correct = c.radical;
+    const distractors = shuffle(
+      [...new Set(this.allChars.map((x) => x.radical).filter((r) => r && r !== correct))]
+    ).slice(0, 3);
+    // 兜底：常见部首补足 4 选项
+    for (const fb of ["口", "木", "氵", "土", "亻", "艹", "日", "扌"]) {
+      if (distractors.length >= 3) break;
+      if (fb !== correct && !distractors.includes(fb)) distractors.push(fb);
+    }
+    return shuffle([correct, ...distractors.slice(0, 3)]);
+  }
+
+  bindRadicalSortRound() {
+    const c = this.char;
+    let isRoundLocked = false;
+
+    this.mount.querySelectorAll(".drill-opt[data-radical]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        if (isRoundLocked) return;
+
+        const selected = btn.dataset.radical;
+        const correct = selected === c.radical;
+
+        if (!correct) {
+          soundAndFX.playSoftError();
+          ebbinghausManager.markDifficult(c.id);
+          this.afterQuestionAnswer(c, "radical_sort", 0, false);
+          this.combo = 0;
+          this._applyRealtimeDifficulty(false);
+          btn.classList.add("animate-shake");
+          this._timeout(() => btn.classList.remove("animate-shake"), 420);
+          return;
+        }
+
+        soundAndFX.playAttackHit();
+        this.afterQuestionAnswer(c, "radical_sort", 3, true);
+        isRoundLocked = true;
+        this.mount.querySelectorAll(".drill-opt").forEach((b) => { b.style.pointerEvents = "none"; });
+        btn.classList.add("ring-4", "ring-emerald-400", "bg-emerald-100");
         this.registerCorrect();
       });
     });
@@ -646,28 +734,37 @@ export class DrillEngine {
   }
 
   // ------------------------------------------------------------------
-  // E4: 笔画描红处理器（Canvas 触控轨迹采样）
+  // E4 / P1-2: 笔画描红 / 听音默写 处理器（Canvas 触控轨迹采样）
   // ------------------------------------------------------------------
-  bindStrokeTraceRound() {
+  bindStrokeTraceRound(isBlank = false) {
     const canvas = this.mount.querySelector("#stroke-trace-canvas");
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
     const W = canvas.width;
     const H = canvas.height;
+    
+    // 如果是听音默写，自动播放发音
+    if (isBlank) {
+       this._timeout(() => soundAndFX.speakPriority(this.char.char, { kind: "char" }), 400);
+       const replay = this.mount.querySelector("#btn-replay-audio");
+       if (replay) replay.addEventListener("click", () => soundAndFX.speakPriority(this.char.char, { kind: "char", priority: 1 }));
+    }
 
     // 1) 绘制目标汉字（灰色虚线 = 描红底图）
     ctx.clearRect(0, 0, W, H);
-    ctx.font = "200px 'KaiTi', 'SimSun', serif";
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    ctx.fillStyle = "rgba(180, 180, 180, 0.25)";
-    ctx.fillText(this.char.char, W / 2, H / 2);
-    ctx.strokeStyle = "rgba(99, 99, 99, 0.4)";
-    ctx.lineWidth = 4;
-    ctx.setLineDash([8, 6]);
-    ctx.strokeText(this.char.char, W / 2, H / 2);
-    ctx.setLineDash([]);
+    if (!isBlank) {
+      ctx.font = "200px 'KaiTi', 'SimSun', serif";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillStyle = "rgba(180, 180, 180, 0.25)";
+      ctx.fillText(this.char.char, W / 2, H / 2);
+      ctx.strokeStyle = "rgba(99, 99, 99, 0.4)";
+      ctx.lineWidth = 4;
+      ctx.setLineDash([8, 6]);
+      ctx.strokeText(this.char.char, W / 2, H / 2);
+      ctx.setLineDash([]);
+    }
 
     // 2) 触控/鼠标轨迹
     let drawing = false;
@@ -732,9 +829,11 @@ export class DrillEngine {
           ctx.fillStyle = "rgba(239, 68, 68, 0.2)";
           ctx.fillRect(0, 0, W, H);
           this._timeout(() => {
-            ctx.fillStyle = "rgba(180, 180, 180, 0.25)";
-            ctx.fillRect(0, 0, W, H);
-            ctx.fillText(this.char.char, W / 2, H / 2);
+            ctx.clearRect(0, 0, W, H);
+            if (!isBlank) {
+              ctx.fillStyle = "rgba(180, 180, 180, 0.25)";
+              ctx.fillText(this.char.char, W / 2, H / 2);
+            }
           }, 800);
         }
       });
@@ -811,7 +910,7 @@ export class DrillEngine {
    */
   afterQuestionAnswer(char, type, rating, correct) {
     if (ebbinghausManager?.completeReview && char?.id) {
-      ebbinghausManager.completeReview(char.id, correct);
+      ebbinghausManager.completeReview(char.id, rating > 0 ? rating : correct);
     }
   }
 

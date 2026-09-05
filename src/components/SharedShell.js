@@ -25,10 +25,10 @@ export function mountGameShell(container, { activeMode, heading }) {
           <div class="flex items-center gap-3 pointer-events-auto">
             ${
               activeMode !== "map"
-              ? `<button data-nav="map" class="shell-nav-btn w-12 h-12 sm:w-14 sm:h-14 bg-black/50 backdrop-blur-md rounded-full text-white flex items-center justify-center hover:bg-black/70 transition-transform active:scale-90 border-2 border-amber-300 shadow-2xl cursor-pointer" title="返回地图" aria-label="返回世界地图">
+              ? `<button data-nav="map" class="shell-nav-btn w-12 h-12 sm:w-14 sm:h-14 bg-black/50 backdrop-blur-md rounded-full text-white flex items-center justify-center hover:bg-black/70 transition-transform active:scale-90 border-2 border-amber-300 shadow-2xl cursor-pointer" title="返回地图" aria-label="返回世界地图" data-speak="返回世界地图">
                   ${GAME_ICONS.home("w-7 h-7 sm:w-8 sm:h-8")}
                  </button>`
-              : `<button data-nav="parent" class="shell-nav-btn w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-tr from-amber-600 to-orange-500 rounded-full text-white flex items-center justify-center hover:scale-105 transition-transform active:scale-90 border-2 border-white shadow-[0_4px_16px_rgba(0,0,0,0.5)] cursor-pointer" title="家长中心" aria-label="进入家长中心">
+              : `<button data-nav="parent" class="shell-nav-btn w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-tr from-amber-600 to-orange-500 rounded-full text-white flex items-center justify-center hover:scale-105 transition-transform active:scale-90 border-2 border-white shadow-[0_4px_16px_rgba(0,0,0,0.5)] cursor-pointer" title="家长中心" aria-label="进入家长中心" data-speak="家长中心，需要大人来回答问题哦">
                   ${GAME_ICONS.shieldLock("w-7 h-7 sm:w-8 sm:h-8")}
                  </button>`
             }
@@ -144,6 +144,9 @@ export function showGameToast(container, message, tone = "info") {
       : "bg-gradient-to-r from-blue-500 to-cyan-500 border-cyan-200 text-white";
 
   toast.className = `absolute top-24 left-1/2 -translate-x-1/2 z-50 ${toneClass} font-black text-sm px-8 py-3 rounded-full border-2 shadow-[0_10px_25px_rgba(0,0,0,0.5)] animate-scale-up pointer-events-none`;
+  // P0-3 无障碍：toast 为状态播报，读屏/辅助技术可感知
+  toast.setAttribute("role", "status");
+  toast.setAttribute("aria-live", "polite");
   // 安全防护：全量采用 textContent 纯文本赋值，彻底杜绝基于 Toast 的 DOM XSS
   toast.textContent = String(message ?? "");
   container.appendChild(toast);

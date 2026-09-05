@@ -173,3 +173,15 @@ describe('NEW_TYPE_META', () => {
     });
   });
 });
+
+describe("pinyin_link", () => {
+  it("builds options for char with pinyin", async () => {
+    const { pinyinLink, canApplyNewType } = await import("../../src/utils/drillTypes.js");
+    const char = { char: "日", pinyin: "ri", confusingChars: ["曰", "目"] };
+    expect(canApplyNewType("pinyin_link", char)).toBe(true);
+    const q = pinyinLink(char, [{ char: "月", pinyin: "yue" }, { char: "水", pinyin: "shui" }]);
+    expect(q.type).toBe("pinyin_link");
+    expect(q.options).toContain("日");
+    expect(q.correctIndex).toBeGreaterThanOrEqual(0);
+  });
+});

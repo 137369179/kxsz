@@ -22,6 +22,7 @@ import { EVENTS, eventBus } from "./eventBus.js";
 import { neuralVoice } from "./neuralVoice.js";
 import { GAME_ICONS } from "./gameIcons.js";
 import { rewardThrottle } from "./rewardThrottle.js";
+import { haptic } from "./haptics.js";
 
 // ============================================================
 // 常量定义（消除魔法数字）
@@ -1172,6 +1173,7 @@ class CathyAudioEngine {
     const now = typeof performance !== "undefined" ? performance.now() : Date.now();
     if (this._lastPopTime && now - this._lastPopTime < 40) return;
     this._lastPopTime = now;
+    haptic("tap");
     this._tone({ type: "sine", from: 600, to: 1200, dur: 0.08, vol: 0.25 });
   }
 
@@ -1224,6 +1226,7 @@ class CathyAudioEngine {
 
   // 8. 错误音/提示音
   playSoftError() {
+    haptic("error");
     this._tone({ type: "sine", from: 280, to: 180, dur: 0.3, vol: 0.2 });
   }
 
@@ -1233,6 +1236,7 @@ class CathyAudioEngine {
 
   // 9.  ()
   playVictoryFanfare() {
+    haptic("fanfare");
     const melody = [
       { f: 523.25, t: 0.0, d: 0.15 },
       { f: 523.25, t: 0.15, d: 0.15 },
@@ -1249,6 +1253,7 @@ class CathyAudioEngine {
   // 10.  ( C5G5)
   playSuccessSound() {
     if (!rewardThrottle.allow("success")) return;
+    haptic("success");
     this._tone({ type: "sine", from: 523.25, dur: 0.12, vol: 0.28 });
     this._tone({ type: "sine", from: 783.99, dur: 0.22, vol: 0.26, delay: 0.1 });
   }
@@ -1259,6 +1264,7 @@ class CathyAudioEngine {
 
   // 11.  ()
   playErrorSound() {
+    haptic("error");
     this._tone({ type: "sine", from: 392.0, to: 349.23, dur: 0.28, vol: 0.22 });
   }
 

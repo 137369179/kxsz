@@ -7,6 +7,7 @@ import { TROPHY_LIST, resolveTrophyUnlocks, describeStepSequenceForAge } from ".
 import { ebbinghausManager } from "../ebbinghaus.js";
 import { storageManager } from "../storageManager.js";
 import { escapeHtml } from "../BaseModule.js";
+import { stripEmoji } from "../stripEmoji.js";
 
 export function renderActiveTabContent(progress, charCount, settings, diffCount) {
   // E14: 预计算多维报告数据（一次算完，所有面板复用）
@@ -62,8 +63,22 @@ export function renderActiveTabContent(progress, charCount, settings, diffCount)
         <div class="bg-gradient-to-br from-violet-100 to-indigo-100 rounded-3xl p-5 shadow-xl border-2 border-violet-300 col-span-full">
           <div class="flex items-center gap-2 mb-3">
             <span class="flex items-center">${GAME_ICONS.sparkle("w-5 h-5")}</span>
-            <h3 class="text-base font-black text-violet-900">AI 学习诊断（E14 多维度报告）</h3>
+            <h3 class="text-base font-black text-violet-900">学习诊断 · 听说读写</h3>
             <span class="ml-auto text-xs font-bold text-violet-700 bg-violet-200 px-2 py-0.5 rounded-full">健康度 ${_report.mastery.healthScore}/100</span>
+          </div>
+          <div class="grid grid-cols-4 gap-2 mb-3 text-center text-xs">
+            ${["listen", "speak", "read", "write"].map((k) => {
+              const v = _report.skills?.[k] ?? 0;
+              const label = _report.skills?.labels?.[k] || k;
+              return `
+              <div class="bg-white/70 rounded-xl py-2 border border-violet-200 px-1">
+                <div class="font-black text-violet-900 text-lg">${v}</div>
+                <div class="text-gray-500 font-bold">${label}</div>
+                <div class="mt-1 h-1.5 rounded-full bg-violet-100 overflow-hidden" aria-hidden="true">
+                  <div class="h-full bg-violet-500 rounded-full" style="width:${v}%"></div>
+                </div>
+              </div>`;
+            }).join("")}
           </div>
           <div class="grid grid-cols-3 gap-2 mb-3 text-center text-xs">
             <div class="bg-white/60 rounded-xl py-2 border border-violet-200">
@@ -80,7 +95,7 @@ export function renderActiveTabContent(progress, charCount, settings, diffCount)
             </div>
           </div>
           <div class="bg-white/80 rounded-xl p-3 text-xs text-gray-700 leading-relaxed border border-violet-200 whitespace-pre-line">
-            ${_report.summary}
+            ${escapeHtml(stripEmoji(_report.summary))}
           </div>
         </div>
 
@@ -475,6 +490,21 @@ export function renderActiveTabContent(progress, charCount, settings, diffCount)
             <input type="checkbox" id="check-focus-mode" ${settings.focusMode ? "checked" : ""} class="w-5 h-5 accent-indigo-500 rounded" />
           </div>
 
+          <!-- P0-5: 麦克风/语音评测总开关（儿童隐私合规） -->
+          <div class="flex items-center justify-between bg-gradient-to-r from-rose-50 to-pink-50 p-3 rounded-2xl border-2 border-rose-200">
+            <div class="flex flex-col gap-1">
+              <span class="text-xs font-bold text-rose-900">发音跟读评测（麦克风）</span>
+              <span class="text-[10px] text-rose-600 leading-tight">录音仅在本设备即时评测，不上传不保存；关闭后孩子无法触达麦克风</span>
+            </div>
+            <input type="checkbox" id="check-voice-eval" ${settings.voiceEval !== false ? "checked" : ""} class="w-5 h-5 accent-rose-500 rounded" />
+          </div>
+
+          <!-- P0-4: 触感反馈开关 -->
+          <div class="flex items-center justify-between bg-amber-50/60 p-3 rounded-2xl border border-amber-200">
+            <span class="text-xs font-bold text-gray-700">触感震动反馈（答对/答错）</span>
+            <input type="checkbox" id="check-haptics" ${settings.haptics !== false ? "checked" : ""} class="w-5 h-5 accent-orange-500 rounded" />
+          </div>
+
         </div>
 
         <div class="mt-6 pt-4 border-t border-amber-100 flex items-center justify-end">
@@ -608,9 +638,42 @@ export function renderAiLogTab(progress, charCount, settings, diffCount) {
     return CHARACTER_DATABASE.find((c) => c.id === id) || { char: "字", pinyin: "zì" };
   });
 
+  // P1-3: 真实数据指标（替换原硬编码演示值，与 charRecords/评测落库联动）
+  const _recs = Object.values(progress.charRecords || {});
+  const _avg = (arr) => (arr.length ? Math.round(arr.reduce((a, b) => a + b, 0) / arr.length) : null);
+  const masteryPct = _avg(_recs.map((r) => Math.round(r.masteryRate || 0)));
+  const streakPct = _recs.length
+    ? Math.round(_recs.reduce((a, r) => a + Math.min(100, Math.round(((r.correctStreak || 0) / 5) * 100)), 0) / _recs.length)
+    : null;
+  const _pronRecs = _recs.filter((r) => (r.pronCount || 0) > 0);
+  const pronPct = _pronRecs.length
+    ? Math.round((_pronRecs.reduce((a, r) => a + (r.pronAvg || 0), 0) / _pronRecs.length) * 100 / 3)
+    : null;
+  const todayCount = progress.todayLearnedCount || 0;
+  const streakDays = progress.attendance?.streakDays || 0;
+  const radar = ebbinghausManager.getRadarStats();
+
   const tutorAdvice = diffCount > 0
-    ? `检测到当前有 ${diffCount} 个重点难字需要巩固。建议在今日饭后或睡前，利用生活实物做偏旁意符联想游戏；复习流已根据艾宾浩斯记忆遗忘规律优先推送。`
-    : `宝宝近期学习节奏非常健康稳定！已掌握 ${charCount} 个汉字，发音饱满，笔顺方向准确率 100%。建议接下来多朗读绘本句子，将生字融入语境！`;
+    ? `当前有 ${diffCount} 个重点字需要多练练。建议饭后或睡前，用家里的实物玩「找偏旁」小游戏；复习清单会优先安排这些字。`
+    : charCount > 0
+      ? `宝宝近期学得很稳！已经认识 ${charCount} 个汉字${pronPct != null ? `，跟读大约 ${pronPct} 分` : ""}。接下来可以多读绘本，把生字放进故事里。`
+      : `欢迎开始识字之旅！先从地图上的「今日学练」认识几个新字吧。`;
+
+  // 四维画像雷达（真实数据；未采样维度显示 待采样）
+  const radarAxes = [
+    { label: "认读掌握", value: radar.mastery, color: "#fbbf24" },
+    { label: "记忆巩固", value: radar.consolidation, color: "#22d3ee" },
+    { label: "跟读发音", value: radar.pronunciation, color: "#34d399" },
+    { label: "识字广度", value: radar.breadth, color: "#a78bfa" },
+  ];
+  const cx = 110, cy = 105, R = 78;
+  const pt = (i, v) => {
+    const angle = -Math.PI / 2 + (i * Math.PI) / 2;
+    const r = (Math.max(0, Math.min(100, v || 0)) / 100) * R;
+    return `${(cx + r * Math.cos(angle)).toFixed(1)},${(cy + r * Math.sin(angle)).toFixed(1)}`;
+  };
+  const gridDiamond = (k) => `M ${cx},${cy - R * k} L ${cx + R * k},${cy} L ${cx},${cy + R * k} L ${cx - R * k},${cy} Z`;
+  const dataPolygon = radarAxes.map((a, i) => pt(i, a.value)).join(" ");
 
   return `
     <div class="flex flex-col gap-6 animate-fade-in">
@@ -626,7 +689,7 @@ export function renderAiLogTab(progress, charCount, settings, diffCount) {
                 <h3 class="text-lg sm:text-xl font-black text-yellow-300">凯茜 AI 伴学专属导师</h3>
                 <span class="text-[10px] bg-emerald-500/80 text-white font-bold px-2.5 py-0.5 rounded-full border border-emerald-300">在线伴学诊断中</span>
               </div>
-              <p class="text-xs text-cyan-200 mt-0.5">基于 FSRS 间隔重复算法与儿童认知发展心理学个性化生成</p>
+              <p class="text-xs text-cyan-200 mt-0.5">根据本设备学习记录生成，不上传云端</p>
             </div>
           </div>
 
@@ -636,27 +699,27 @@ export function renderAiLogTab(progress, charCount, settings, diffCount) {
           </button>
         </div>
 
-        <!-- 诊断核心数据指标 -->
+        <!-- 诊断核心数据指标（P1-3：全部为真实计算值） -->
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 my-4">
           <div class="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/15 text-center">
             <span class="text-[11px] text-gray-300 font-bold">发音评测均分</span>
-            <div class="text-2xl font-black text-yellow-300 mt-1">94.2 分</div>
-            <span class="text-[10px] text-emerald-400">发音清脆饱满</span>
+            <div class="text-2xl font-black ${pronPct != null ? "text-yellow-300" : "text-gray-400"} mt-1">${pronPct != null ? pronPct + " 分" : "待采样"}</div>
+            <span class="text-[10px] ${pronPct != null ? "text-emerald-400" : "text-gray-500"}">${pronPct != null ? `基于 ${radar.pronSample} 字跟读记录` : "完成一次跟读后生成"}</span>
           </div>
           <div class="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/15 text-center">
-            <span class="text-[11px] text-gray-300 font-bold">记忆保持率预测</span>
-            <div class="text-2xl font-black text-cyan-300 mt-1">91.8%</div>
-            <span class="text-[10px] text-cyan-200">处于黄金记忆区</span>
+            <span class="text-[11px] text-gray-300 font-bold">记忆巩固指数</span>
+            <div class="text-2xl font-black ${streakPct != null ? "text-cyan-300" : "text-gray-400"} mt-1">${streakPct != null ? streakPct + "%" : "待采样"}</div>
+            <span class="text-[10px] text-cyan-200">基于复习连对次数</span>
           </div>
           <div class="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/15 text-center">
-            <span class="text-[11px] text-gray-300 font-bold">字理微问答正确率</span>
-            <div class="text-2xl font-black text-emerald-300 mt-1">100%</div>
-            <span class="text-[10px] text-emerald-400">象形感知敏锐</span>
+            <span class="text-[11px] text-gray-300 font-bold">连续打卡</span>
+            <div class="text-2xl font-black text-emerald-300 mt-1">${streakDays} 天</div>
+            <span class="text-[10px] text-emerald-400">坚持就是胜利</span>
           </div>
           <div class="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/15 text-center">
-            <span class="text-[11px] text-gray-300 font-bold">今日专注时长</span>
-            <div class="text-2xl font-black text-orange-300 mt-1">12 分钟</div>
-            <span class="text-[10px] text-orange-200">科学防视疲劳</span>
+            <span class="text-[11px] text-gray-300 font-bold">今日学习</span>
+            <div class="text-2xl font-black text-orange-300 mt-1">${todayCount} 字</div>
+            <span class="text-[10px] text-orange-200">实时统计 · 目标 ${settings?.dailyCharTarget || 5} 字</span>
           </div>
         </div>
 
@@ -666,6 +729,43 @@ export function renderAiLogTab(progress, charCount, settings, diffCount) {
             ${GAME_ICONS.pen("w-4 h-4")} <span>AI 导师给爸爸妈妈的伴学寄语：</span>
           </div>
           <p id="ai-tutor-advice-text" class="text-gray-200">${tutorAdvice}</p>
+        </div>
+      </div>
+
+      <!-- P1-3: 学习四维画像雷达（真实数据） -->
+      <div class="bg-white/95 rounded-3xl p-6 shadow-xl border-2 border-amber-200">
+        <h3 class="text-base font-black text-amber-950 mb-2 flex items-center gap-2">
+          <span class="flex items-center">${GAME_ICONS.chest("w-5 h-5")}</span>
+          <span>学习四维画像（真实数据）</span>
+        </h3>
+        <p class="text-[11px] text-gray-500 font-semibold mb-3">认读掌握 / 记忆巩固 来自复习记录；跟读发音来自麦克风评测（已在家长设置中授权）；识字广度为已学字占 1489 字比例。</p>
+        <div class="flex flex-col sm:flex-row items-center gap-6">
+          <svg viewBox="0 0 220 210" class="w-52 h-52 shrink-0" role="img" aria-label="学习四维画像雷达图">
+            ${[1, 0.66, 0.33].map((k) => `<path d="${gridDiamond(k)}" fill="none" stroke="#e5e7eb" stroke-width="1.5" />`).join("")}
+            ${radarAxes.map((a, i) => {
+              const angle = -Math.PI / 2 + (i * Math.PI) / 2;
+              const lx = cx + (R + 14) * Math.cos(angle);
+              const ly = cy + (R + 14) * Math.sin(angle);
+              return `<line x1="${cx}" y1="${cy}" x2="${(cx + R * Math.cos(angle)).toFixed(1)}" y2="${(cy + R * Math.sin(angle)).toFixed(1)}" stroke="#e5e7eb" stroke-width="1.5" />
+                <text x="${lx.toFixed(1)}" y="${ly.toFixed(1)}" text-anchor="middle" dominant-baseline="middle" font-size="11" font-weight="800" fill="#92400e">${a.label}</text>
+                <text x="${lx.toFixed(1)}" y="${(ly + 13).toFixed(1)}" text-anchor="middle" font-size="10" font-weight="800" fill="${a.color}">${a.value != null ? a.value : "待采样"}</text>`;
+            }).join("")}
+            <polygon points="${dataPolygon}" fill="rgba(251,191,36,0.28)" stroke="#f59e0b" stroke-width="2.5" stroke-linejoin="round" />
+            ${radarAxes.map((a, i) => {
+              const angle = -Math.PI / 2 + (i * Math.PI) / 2;
+              const r = (Math.max(0, Math.min(100, a.value || 0)) / 100) * R;
+              return `<circle cx="${(cx + r * Math.cos(angle)).toFixed(1)}" cy="${(cy + r * Math.sin(angle)).toFixed(1)}" r="3.5" fill="${a.color}" />`;
+            }).join("")}
+          </svg>
+          <div class="flex-1 w-full grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            ${radarAxes.map((a) => `
+              <div class="flex items-center gap-2 bg-amber-50 rounded-xl px-3 py-2 border border-amber-200">
+                <span class="w-2.5 h-2.5 rounded-full shrink-0" style="background:${a.color}"></span>
+                <span class="text-xs font-black text-amber-950">${a.label}</span>
+                <span class="ml-auto text-xs font-black ${a.value != null ? "text-orange-600" : "text-gray-400"}">${a.value != null ? a.value : "待采样"}</span>
+              </div>
+            `).join("")}
+          </div>
         </div>
       </div>
 

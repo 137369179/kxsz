@@ -13,6 +13,8 @@ import { GAME_ICONS } from "../utils/gameIcons.js";
 import { EVENTS } from "../utils/eventBus.js";
 import { ebbinghausManager } from "../utils/ebbinghaus.js";
 import { storageManager } from "../utils/storageManager.js";
+import { getCollectionStats } from "../utils/rewardEngine.js";
+import { SHOP_DECORATIONS } from "../data/shop.js";
 
 export class TreehouseModule extends BaseModule {
   constructor(container) {
@@ -22,13 +24,14 @@ export class TreehouseModule extends BaseModule {
   }
 
   getTreeStage(learnedCount) {
-    if (learnedCount >= 601) {
+    const growthScore = learnedCount + this.treeWaterCount * 5;
+    if (growthScore >= 601) {
       return { level: 4, name: "参天智慧神木", desc: "枝繁叶茂，挂满了 600+ 识字硕果！", scale: "scale-105", image: "assets/images/tree_stage_4.webp" };
     }
-    if (learnedCount >= 201) {
+    if (growthScore >= 201) {
       return { level: 3, name: "茂盛繁花树", desc: "绿意盎然，已经掌握了 200+ 常用汉字！", scale: "scale-100", image: "assets/images/tree_stage_3.webp" };
     }
-    if (learnedCount >= 51) {
+    if (growthScore >= 51) {
       return { level: 2, name: "蓬勃生机树", desc: "生机勃勃，正在大步迈向更高阶！", scale: "scale-95", image: "assets/images/tree_stage_2.webp" };
     }
     return { level: 1, name: "幼嫩识字苗", desc: "刚刚破土而出，每天识字浇水快快长大！", scale: "scale-90", image: "assets/images/tree_stage_1.webp" };
@@ -54,7 +57,7 @@ export class TreehouseModule extends BaseModule {
         
         <div class="w-full flex flex-col sm:flex-row items-center justify-between bg-white/95 backdrop-blur-md px-6 py-4 rounded-3xl shadow-xl border-2 border-emerald-200 mb-6 gap-4">
           <div class="flex items-center gap-3">
-            <button id="btn-tree-back" class="w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-950 flex items-center justify-center shadow-md active:scale-90 transition-transform cursor-pointer" title="返回大地图">
+            <button id="btn-tree-back" data-speak="返回地图" aria-label="返回地图" class="w-10 h-10 rounded-full bg-emerald-100 hover:bg-emerald-200 text-emerald-950 flex items-center justify-center shadow-md active:scale-90 transition-transform cursor-pointer" title="返回大地图">
               ${GAME_ICONS.back("w-5 h-5")}
             </button>
             <div>
@@ -108,11 +111,33 @@ export class TreehouseModule extends BaseModule {
                 <div class="absolute top-2.5 right-2.5 w-7 h-7 rounded-full bg-emerald-400 border-2 border-white shadow-lg flex items-center justify-center text-emerald-950 font-black text-xs animate-bounce-cathy">
                   +1
                 </div>
+
+                ${(() => {
+                  const decors = ebbinghausManager.getEquippedDecorations() || [];
+                  const decorPositions = {
+                    "decor_windchime": "top-2 left-2 w-16 h-16 drop-shadow-xl animate-bounce-slow origin-top",
+                    "decor_swing": "bottom-4 left-4 w-20 h-20 drop-shadow-2xl animate-pulse",
+                    "decor_lantern": "top-2 right-2 w-14 h-14 drop-shadow-lg",
+                    "decor_birdhouse": "top-14 right-2 w-14 h-14 drop-shadow-md"
+                  };
+                  return decors.map(id => {
+                    const item = SHOP_DECORATIONS.find(d => d.id === id);
+                    if (!item) return "";
+                    return `<img src="${item.icon}" class="absolute z-20 ${decorPositions[id] || ''} object-contain rounded-full border-2 border-amber-200/50" alt="${item.name}"/>`;
+                  }).join('');
+                })()}
+
               </div>
             </div>
 
             <div id="cathy-companion-actor" class="mt-4 bg-white/95 backdrop-blur-md px-6 py-3.5 rounded-3xl border-2 border-emerald-300 shadow-xl flex items-center gap-4 cursor-pointer hover:scale-105 active:scale-95 transition-all">
-              <img src="assets/images/cathy_mascot.webp" class="w-14 h-14 rounded-full border-2 border-white shadow-lg object-cover ring-2 ring-orange-400/80 aspect-square shrink-0 animate-bounce-slow" alt="凯茜" data-fallback="assets/images/icon_crown.png" />
+              <div class="flex flex-col items-center">
+                <img src="assets/images/cathy_mascot.webp" class="w-14 h-14 rounded-full border-2 border-white shadow-lg object-cover ring-2 ring-orange-400/80 aspect-square shrink-0 animate-bounce-slow" alt="凯茜" data-fallback="assets/images/icon_crown.png" />
+                <div class="w-full h-2 bg-gray-200 rounded-full mt-2 border border-gray-300 overflow-hidden relative">
+                  <div class="absolute left-0 top-0 h-full bg-gradient-to-r from-orange-400 to-red-500 transition-all duration-300" style="width: ${this.cathyHunger}%;"></div>
+                </div>
+                <div class="text-[9px] text-orange-700 font-bold mt-0.5">饱食度: ${this.cathyHunger}/100</div>
+              </div>
               <div class="flex flex-col">
                 <span class="text-xs font-black text-emerald-950 flex items-center gap-1">
                   <span>伴学小精灵 · 凯茜</span>
@@ -126,19 +151,44 @@ export class TreehouseModule extends BaseModule {
 
           </div>
 
+          ${(() => {
+            const stats = getCollectionStats();
+            const pct = stats.total ? Math.round((stats.learnedCount / stats.total) * 100) : 0;
+            const ornaments = [
+              { need: 5, name: "小风铃", unlock: stats.learnedCount >= 5 },
+              { need: 30, name: "彩虹旗", unlock: stats.learnedCount >= 30 },
+              { need: 100, name: "金鸟巢", unlock: stats.learnedCount >= 100 },
+              { need: 201, name: "星灯笼", unlock: stats.byStage.find(s=>s.stage===2)?.learned >= 1 || stats.learnedCount >= 201 },
+            ];
+            return `
+          <div class="z-10 w-full max-w-xl mt-4 bg-white/95 backdrop-blur-md p-4 rounded-3xl border-2 border-amber-200 shadow-xl" aria-live="polite">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-black text-amber-950">图鉴装饰解锁</span>
+              <span class="text-[11px] font-bold text-amber-700">已收集 ${stats.learnedCount} 字 · ${pct}%</span>
+            </div>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              ${ornaments.map(o => `
+                <div class="rounded-2xl border-2 ${o.unlock ? "border-emerald-400 bg-emerald-50" : "border-gray-200 bg-gray-50 opacity-70"} p-2 text-center">
+                  <div class="text-xs font-black ${o.unlock ? "text-emerald-800" : "text-gray-500"}">${o.unlock ? o.name : "？"}</div>
+                  <div class="text-[10px] font-bold text-gray-500 mt-0.5">${o.unlock ? "已点亮" : `再学到 ${o.need} 字`}</div>
+                </div>`).join("")}
+            </div>
+          </div>`;
+          })()}
+
           <div class="z-10 w-full max-w-xl bg-white/95 backdrop-blur-md p-4 rounded-3xl border-2 border-emerald-200 shadow-xl flex items-center justify-around gap-3">
             
-            <button id="btn-tree-water" class="btn-game-orange text-white text-xs sm:text-sm font-black px-6 py-3.5 rounded-2xl shadow-md active:scale-95 flex items-center gap-2 cursor-pointer flex-1 justify-center">
+            <button id="btn-tree-water" data-speak="给大树浇水" aria-label="浇水培育" class="btn-game-orange text-white text-xs sm:text-sm font-black px-6 py-3.5 rounded-2xl shadow-md active:scale-95 flex items-center gap-2 cursor-pointer flex-1 justify-center">
               <span class="flex items-center">${GAME_ICONS.sparkle("w-4 h-4")}</span>
               <span>浇水培育 (5金币)</span>
             </button>
 
-            <button id="btn-feed-cathy" class="bg-gradient-to-r from-teal-500 to-emerald-600 text-white text-xs sm:text-sm font-black px-6 py-3.5 rounded-2xl shadow-md active:scale-95 flex items-center gap-2 cursor-pointer flex-1 justify-center">
+            <button id="btn-feed-cathy" data-speak="给凯茜点心" aria-label="给凯茜点心" class="bg-gradient-to-r from-teal-500 to-emerald-600 text-white text-xs sm:text-sm font-black px-6 py-3.5 rounded-2xl shadow-md active:scale-95 flex items-center gap-2 cursor-pointer flex-1 justify-center">
               <span class="flex items-center">${GAME_ICONS.coin("w-4 h-4")}</span>
-              <span>给凯茜点心</span>
+              <span>喂食 (10金币)</span>
             </button>
 
-            <button id="btn-cathy-riddle" class="bg-emerald-100 hover:bg-emerald-200 text-emerald-950 text-xs sm:text-sm font-black px-5 py-3.5 rounded-2xl shadow-md active:scale-95 flex items-center gap-1.5 cursor-pointer">
+            <button id="btn-cathy-riddle" data-speak="听字谜" aria-label="听字谜" class="bg-emerald-100 hover:bg-emerald-200 text-emerald-950 text-xs sm:text-sm font-black px-5 py-3.5 rounded-2xl shadow-md active:scale-95 flex items-center gap-1.5 cursor-pointer">
               <span class="flex items-center">${GAME_ICONS.speaker("w-4 h-4")}</span>
               <span>听字谜</span>
             </button>
@@ -205,26 +255,42 @@ export class TreehouseModule extends BaseModule {
     const feedBtn = mainEl.querySelector("#btn-feed-cathy");
     if (feedBtn) {
       this._on(feedBtn, "click", () => {
-        soundAndFX.playSuccess();
-        ebbinghausManager.addCoins(2);
-
-        const actor = mainEl.querySelector("#cathy-companion-actor");
-        if (actor) {
-          actor.classList.add("scale-110", "bg-amber-100");
-          setTimeout(() => actor.classList.remove("scale-110", "bg-amber-100"), 400);
+        if (ebbinghausManager.progress.coins < 10) {
+          soundAndFX.playSoftError();
+          showGameToast(this.container, "金币不足，快去学习赚取吧！", "error");
+          return;
         }
+        if (this.cathyHunger >= 100) {
+          soundAndFX.playPop();
+          showGameToast(this.container, "凯茜吃得很饱啦！明天再喂吧。", "info");
+          return;
+        }
+
+        soundAndFX.playSuccess();
+        ebbinghausManager.deductCoins(10);
+        this.cathyHunger = Math.min(100, this.cathyHunger + 20);
+        storageManager.setItem("cathy_hunger_val", this.cathyHunger.toString());
 
         const speechBubble = mainEl.querySelector("#cathy-speech-bubble");
         if (speechBubble) {
-          speechBubble.textContent = "“哇！美味的小点心！凯茜充满活力啦，送你 2 枚小金币！”";
+          speechBubble.textContent = "“哇！美味的小点心！凯茜充满活力啦！”";
         }
         this._timeout(() => {
           soundAndFX.speakPriority("哇！美味的小点心！凯茜充满活力啦！", { kind: "sentence", priority: 1 });
         }, 280);
 
-        const coinDisplay = mainEl.querySelector("#tree-coin-display");
-        if (coinDisplay) {
-          coinDisplay.textContent = `${ebbinghausManager.progress.coins} 金币`;
+        if (this.cathyHunger === 100) {
+          this._timeout(() => {
+            soundAndFX.playVictoryFanfare();
+            soundAndFX.triggerConfetti(this.container);
+            ebbinghausManager.addCoins(50);
+            showGameToast(this.container, "饱食度全满！凯茜回赠你 50 金币！", "success");
+            this.cathyHunger = 0; // 重置饱食度，以便第二天/下次喂食
+            storageManager.setItem("cathy_hunger_val", this.cathyHunger.toString());
+            this.render();
+          }, 1500);
+        } else {
+          this.render(); // Update UI for progress bar and coins
         }
       });
     }

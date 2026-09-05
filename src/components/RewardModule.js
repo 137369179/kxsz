@@ -8,6 +8,7 @@ import {
   _renderPanel,
   _renderStickerWall,
   _renderMedalWall,
+  _renderCollection,
   _renderShop,
   _bindShopActions,
   _renderCalendar,
@@ -19,7 +20,7 @@ import {
 export class RewardModule extends BaseModule {
   constructor(container) {
     super(container);
-    this.activeTab = "stickers"; // stickers | medals | calendar | shop
+    this.activeTab = "stickers"; // stickers | medals | collection | calendar | shop
     const now = new Date();
     this.calYear = now.getFullYear();
     this.calMonth = now.getMonth();
@@ -32,6 +33,7 @@ export class RewardModule extends BaseModule {
   _renderPanel(...args) { return _renderPanel.call(this, ...args); }
   _renderStickerWall(...args) { return _renderStickerWall.call(this, ...args); }
   _renderMedalWall(...args) { return _renderMedalWall.call(this, ...args); }
+  _renderCollection(...args) { return _renderCollection.call(this, ...args); }
   _renderShop(...args) { return _renderShop.call(this, ...args); }
   _bindShopActions(...args) { return _bindShopActions.call(this, ...args); }
   _renderCalendar(...args) { return _renderCalendar.call(this, ...args); }

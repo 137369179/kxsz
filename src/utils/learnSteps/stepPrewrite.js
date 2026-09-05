@@ -62,7 +62,12 @@ export function renderStepPrewrite(stage) {
                 ? "bg-amber-100 text-amber-700 border border-amber-300"
                 : "bg-emerald-100 text-emerald-700 border border-emerald-300"
             }">
-              <span>${stageLabel === "prewrite_only" ? "🚫" : stageLabel === "guided_trace" ? "🎯" : "✏️"}</span>
+              <span>${stageLabel === "prewrite_only"
+                ? GAME_ICONS.shieldLock("w-3.5 h-3.5 inline-block")
+                : stageLabel === "guided_trace"
+                ? GAME_ICONS.star("w-3.5 h-3.5 inline-block")
+                : GAME_ICONS.pen("w-3.5 h-3.5 inline-block")
+              }</span>
               <span>${age}岁 · ${
                 stageLabel === "prewrite_only" ? "只练控笔不描红"
                 : stageLabel === "guided_trace" ? "引导式描红"
@@ -207,7 +212,6 @@ export function renderStepPrewrite(stage) {
     // 握笔姿势教学
     if (gripBtn) {
       this._on(gripBtn, "click", () => {
-        soundAndFX.playPop();
         soundAndFX.speakPriority(
           "握好笔的小诀窍：食指和拇指轻轻捏住笔杆，中指从下面托住，像三只小鸟站在树枝上～",
           { kind: "sentence", emotion: "gentle" }
@@ -216,21 +220,24 @@ export function renderStepPrewrite(stage) {
         const hint = document.createElement("div");
         hint.className = "fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4 animate-fade-in select-none";
         hint.innerHTML = `
-          <div class="bg-white rounded-3xl p-6 max-w-xs text-center shadow-2xl border-4 border-amber-300">
-            <div class="text-5xl mb-2">✏️</div>
+          <div class="bg-white rounded-3xl p-6 max-w-xs text-center shadow-2xl border-4 border-amber-300 flex flex-col items-center">
+            <div class="mb-2 flex justify-center">${GAME_ICONS.pen("w-12 h-12")}</div>
             <h3 class="font-black text-amber-950 mb-2">三指握笔小口诀</h3>
-            <p class="text-xs text-gray-700 leading-relaxed font-semibold mb-3">
+            <p class="text-xs text-gray-700 leading-relaxed font-semibold mb-3 text-center">
               食指拇指捏笔杆<br/>
               中指下面轻轻托<br/>
               小手放松不要紧<br/>
               像只小鸟站枝头～
             </p>
-            <button class="bg-gradient-to-r from-amber-400 to-orange-500 text-white font-black text-xs px-6 py-2 rounded-full">知道啦</button>
+            <button class="bg-gradient-to-r from-amber-400 to-orange-500 text-white font-black text-xs px-6 py-2 rounded-full cursor-pointer active:scale-95">知道啦</button>
           </div>
         `;
         document.body.appendChild(hint);
         const close = hint.querySelector("button");
-        const remove = () => hint.remove();
+        const remove = () => {
+          try { soundAndFX.stopSpeaking?.(); } catch {}
+          hint.remove();
+        };
         this._on(close, "click", remove);
         this._on(hint, "click", (e) => { if (e.target === hint) remove(); });
       });
@@ -240,6 +247,7 @@ export function renderStepPrewrite(stage) {
     if (skipBtn) {
       this._on(skipBtn, "click", () => {
         soundAndFX.playPop();
+        try { soundAndFX.stopSpeaking?.(); } catch {}
         if (this.prewriteEngine) {
           this.prewriteEngine.skipCurrent();
           if (this.prewriteEngine.getCurrentShapeNumber() > this.prewriteEngine.getTotalShapes()) {
@@ -257,6 +265,7 @@ export function renderStepPrewrite(stage) {
     if (finishBtn) {
       this._on(finishBtn, "click", () => {
         soundAndFX.playPop();
+        try { soundAndFX.stopSpeaking?.(); } catch {}
         if (this.prewriteEngine) {
           // 还没全部完成也允许"硬跳"（宽容模式）
           this.prewriteEngine.destroy();

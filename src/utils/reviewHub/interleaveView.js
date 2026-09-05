@@ -4,6 +4,7 @@
  */
 import { escapeHtml } from "../BaseModule.js";
 import { soundAndFX } from "../soundEngine.js";
+import { GAME_ICONS } from "../gameIcons.js";
 
 const FEEDBACK_MS = 800;
 
@@ -100,9 +101,24 @@ export function runInterleaveSession({
       return;
     }
 
-    const title = question.targetChar
-      ? `找出：${escapeHtml(question.targetChar)}`
-      : "找不同";
+    let subtitle = "形近字小练 · 有点难是正常的";
+    let title = question.targetChar ? `找出：${escapeHtml(question.targetChar)}` : "找不同";
+    let speakPrompt = question.targetChar ? `请找出汉字：“${question.targetChar}”` : "请找出正确的汉字";
+
+    if (question.type === "cloze_fill" && question.promptTitle) {
+      subtitle = question.promptSubtitle || "句子填空 · 选字把句子补充完整";
+      title = `<span class="text-xl sm:text-2xl font-bold leading-relaxed">${escapeHtml(question.promptTitle)}</span>`;
+      speakPrompt = "句子填空：请选出合适的字填入括号中";
+    } else if (question.type === "picture_write" && question.promptTitle) {
+      subtitle = question.promptSubtitle || "字义与字象 · 选出匹配的字";
+      title = `<span class="text-3xl sm:text-4xl font-serif text-amber-300 font-black">${escapeHtml(question.promptTitle)}</span>`;
+      speakPrompt = "字象挑战：请找出匹配的汉字";
+    }
+
+    try {
+      soundAndFX.speakPriority(speakPrompt, { kind: "sentence", emotion: "gentle" });
+    } catch (_) {}
+
     const options = Array.isArray(question.options) ? question.options : [];
 
     containerEl.innerHTML = `
@@ -110,20 +126,23 @@ export function runInterleaveSession({
         <header class="relative z-30 w-full px-6 py-3 flex items-center justify-between bg-black/40 backdrop-blur-md border-b border-white/20">
           <button type="button" id="btn-interleave-quit" class="btn-game-wood text-white font-black text-xs px-4 py-2 rounded-full cursor-pointer active:scale-95">跳过 · 看结果</button>
           <div class="candy-pill flex items-center gap-2 px-5 py-1.5 rounded-full border border-yellow-300/40">
-            <span class="text-xs text-amber-200 font-bold">找不同</span>
+            <span class="text-xs text-amber-200 font-bold">${question.type === "cloze_fill" ? "填句子" : question.type === "picture_write" ? "看图选字" : "找不同"}</span>
             <span class="text-yellow-300 font-black text-sm font-mono">${index + 1} / ${pack.length}</span>
           </div>
-          <div class="w-24"></div>
+          <button type="button" id="btn-interleave-replay-prompt" class="px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-xs font-black text-amber-300 cursor-pointer active:scale-95 flex items-center gap-1" aria-label="再听一遍提示">
+            ${GAME_ICONS.speaker("w-3.5 h-3.5")}
+            <span>听提示</span>
+          </button>
         </header>
         <main class="flex-1 flex flex-col items-center justify-center gap-5 w-full max-w-lg mx-auto text-center px-4 py-8">
-          <p class="text-xs font-black tracking-widest text-white/60">形近字小练 · 有点难是正常的</p>
+          <p class="text-xs font-black tracking-widest text-white/60">${escapeHtml(subtitle)}</p>
           <h2 class="text-2xl sm:text-3xl font-black text-white drop-shadow">${title}</h2>
           <div id="interleave-feedback" class="min-h-[1.5rem] text-sm font-bold text-amber-200" aria-live="polite"></div>
           <div class="grid grid-cols-2 gap-3 w-full max-w-sm mt-1">
             ${options
               .map(
                 (ch) => `
-              <button type="button" class="btn-interleave-option bg-white/15 hover:bg-white/25 text-white text-4xl font-black font-serif py-6 rounded-2xl border border-white/25 shadow-lg active:scale-95 cursor-pointer" data-char="${escapeHtml(ch)}">
+              <button type="button" class="btn-interleave-option bg-white/15 hover:bg-white/25 text-white text-4xl font-black font-serif py-6 rounded-2xl border border-white/25 shadow-lg active:scale-95 cursor-pointer" data-char="${escapeHtml(ch)}" data-speak="${escapeHtml(ch)}" aria-label="选项 ${escapeHtml(ch)}">
                 ${escapeHtml(ch)}
               </button>`
               )
@@ -137,6 +156,15 @@ export function runInterleaveSession({
       soundAndFX.playPop?.();
       quit();
     });
+
+    const replayBtn = containerEl.querySelector("#btn-interleave-replay-prompt");
+    if (replayBtn) {
+      bind(replayBtn, "click", () => {
+        try {
+          soundAndFX.speakPriority(speakPrompt, { kind: "sentence", emotion: "gentle", priority: 1 });
+        } catch (_) {}
+      });
+    }
 
     const feedbackEl = containerEl.querySelector("#interleave-feedback");
 

@@ -69,8 +69,36 @@ export class BaseModule {
   /**  */
   _on(el, evt, fn, opts) {
     if (!el) return;
+    // P0-2 语音指令层：绑定 click 的元素若声明了 data-speak，则点击时自动朗读其语义。
+    // 前阅读期儿童不识字也能独立操作；TTS 不可用时静默降级（不阻塞原处理）。
+    if (evt === "click" && typeof el.getAttribute === "function" && !el.__speakWired) {
+      const speakText = el.getAttribute("data-speak");
+      if (speakText) {
+        el.__speakWired = true;
+        el.addEventListener("click", () => {
+          try { soundAndFX.speak(String(speakText)); } catch {}
+        });
+      }
+    }
     el.addEventListener(evt, fn, opts);
     this._addCleanup(() => el.removeEventListener(evt, fn, opts));
+  }
+
+  /**
+   * 语音播报助手（P0-2）— 模块内统一 TTS 出口
+   * 本地 neural 语音优先，不可用时由 soundEngine 降级到系统 speechSynthesis
+   * @param {string} text 要朗读的文本
+   * @param {Object} [opts] speakPriority 选项（kind/priority/emotion）
+   */
+  speak(text, opts = {}) {
+    if (!text) return;
+    try {
+      if (opts && opts.priority != null) {
+        soundAndFX.speakPriority(String(text), opts);
+      } else {
+        soundAndFX.speak(String(text));
+      }
+    } catch {}
   }
 
   /**

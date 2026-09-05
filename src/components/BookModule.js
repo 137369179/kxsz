@@ -14,6 +14,7 @@
  */
 
 import { BaseModule } from "../utils/BaseModule.js";
+import { soundAndFX } from "../utils/soundEngine.js";
 import { pronunciationEval } from "../utils/pronunciationEval.js";
 import { openUserVoiceModal } from "../utils/bookHub/bookVoiceModal.js";
 import { renderShelf } from "../utils/bookHub/bookShelf.js";
@@ -97,6 +98,7 @@ export class BookModule extends BaseModule {
     this.isVoiceModalOpen = false;
     this.isCatalogOpen = false;
     this.isCharPopoverOpen = false;
+    try { soundAndFX.stopSpeaking?.(); } catch {}
     super.destroy();
   }
 

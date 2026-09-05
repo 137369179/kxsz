@@ -240,6 +240,7 @@ export function renderPoemReader(poem) {
     const backBtn = mainEl.querySelector("#btn-reader-back");
     if (backBtn) {
       this._on(backBtn, "click", () => {
+        soundAndFX.stopSpeaking();
         soundAndFX.playPop();
         this.renderPoemHall();
       });
@@ -268,6 +269,7 @@ export function renderPoemReader(poem) {
     const karaokeBtn = mainEl.querySelector("#btn-karaoke-recite");
     if (karaokeBtn) {
       this._on(karaokeBtn, "click", () => {
+        soundAndFX.stopSpeaking();
         const lineBoxes = mainEl.querySelectorAll(".poem-line-box");
         let idx = 0;
 
@@ -420,6 +422,7 @@ export function _renderPoemQuiz(poem) {
     const winNextBtn = this.container.querySelector("#btn-win-next-poem");
     if (winNextBtn) {
       this._on(winNextBtn, "click", () => {
+        soundAndFX.stopSpeaking();
         soundAndFX.playPop();
         this.renderPoemHall();
       });
@@ -428,6 +431,7 @@ export function _renderPoemQuiz(poem) {
     const winHomeBtn = this.container.querySelector("#btn-win-poem-home");
     if (winHomeBtn) {
       this._on(winHomeBtn, "click", () => {
+        soundAndFX.stopSpeaking();
         soundAndFX.playPop();
         this.renderPoemHall();
       });

@@ -211,6 +211,9 @@ export function showToast(message, opts = {}) {
   };
   const toast = document.createElement("div");
   toast.className = `fixed top-6 left-1/2 -translate-x-1/2 z-[99997] px-5 py-3 rounded-2xl bg-gradient-to-r ${colors[variant] || colors.info} text-white font-black text-sm shadow-xl border-2 border-white/30 pointer-events-none`;
+  // P0-3 无障碍：toast 为状态播报，读屏可感知
+  toast.setAttribute("role", "status");
+  toast.setAttribute("aria-live", "polite");
   toast.textContent = message;
   document.body.appendChild(toast);
   setTimeout(() => {

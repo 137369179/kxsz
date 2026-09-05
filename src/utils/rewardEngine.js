@@ -11,7 +11,7 @@
 import { CHARACTER_DATABASE } from "../data/characters.js";
 import { STORYBOOKS_DATABASE } from "../data/books.js";
 import { ebbinghausManager } from "./ebbinghaus.js";
-import { SHOP_AVATARS, SHOP_FRAMES, FRAME_CLASSES } from "../data/shop.js";
+import { SHOP_AVATARS, SHOP_FRAMES, FRAME_CLASSES, SHOP_DECORATIONS } from "../data/shop.js";
 
 // ---------------------------------------------------------------------------
 //  YYYY-MM-DD
@@ -182,6 +182,8 @@ export function getShopData() {
     equipped:
       item.type === "avatar"
         ? p.profile.avatar === item.value
+        : item.type === "decoration"
+        ? (p.shop.equippedDecorations || []).includes(item.id)
         : p.shop.equippedFrame === item.id,
     affordable: p.coins >= item.price,
     frameClass: FRAME_CLASSES[item.id] || ""
@@ -190,8 +192,43 @@ export function getShopData() {
     coins: p.coins,
     avatars: SHOP_AVATARS.map(decorate),
     frames: SHOP_FRAMES.map(decorate),
+    decorations: SHOP_DECORATIONS.map(decorate),
     equippedFrame: p.shop.equippedFrame
   };
+}
+
+// ---------------------------------------------------------------------------
+// P1-4 汉字收集图鉴（纯派生：学过的字 = charRecords 中出现过的字，零新增存储）
+// ---------------------------------------------------------------------------
+export function getCollectionStats() {
+  const records = ebbinghausManager.progress?.charRecords || {};
+  const learned = new Set(Object.keys(records));
+  const byStage = {};
+  for (const c of CHARACTER_DATABASE) {
+    const st = c.stage || 1;
+    if (!byStage[st]) byStage[st] = { stage: st, total: 0, learned: 0 };
+    byStage[st].total += 1;
+    if (learned.has(c.id)) byStage[st].learned += 1;
+  }
+  return {
+    total: CHARACTER_DATABASE.length,
+    learnedCount: learned.size,
+    byStage: Object.values(byStage).sort((a, b) => a.stage - b.stage),
+  };
+}
+
+/** 单岛图鉴明细：按 stage 返回 [{id,char,pinyin,radical,strokeCount,collected}] */
+export function getCollectionByStage(stage) {
+  const records = ebbinghausManager.progress?.charRecords || {};
+  return CHARACTER_DATABASE.filter((c) => (c.stage || 1) === Number(stage))
+    .map((c) => ({
+      id: c.id,
+      char: c.char,
+      pinyin: c.pinyin,
+      radical: c.radical,
+      strokeCount: c.strokeCount,
+      collected: Boolean(records[c.id]),
+    }));
 }
 
 // ---------------------------------------------------------------------------
@@ -207,6 +244,8 @@ export const rewardEngine = {
   getCalendar,
   getNewMedalIds,
   getShopData,
+  getCollectionStats,
+  getCollectionByStage,
 };
 
 if (typeof window !== "undefined") {

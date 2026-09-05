@@ -20,6 +20,52 @@
 }
 
 /* ----------------------------------------------------
+ * P0-1 儿童 UI 设计 Token 层（语义变量，纯增量）
+ * 现有视觉不受影响；新增/改版界面统一从此取值，便于全局调优
+ * ---------------------------------------------------- */
+:root {
+  /* 品牌色（与现有主视觉一致） */
+  --kid-primary: #FF6B00;
+  --kid-primary-deep: #E64A00;
+  --kid-primary-soft: #FFB03A;
+  /* 快乐辅助色 */
+  --kid-joy-green: #4CAF50;
+  --kid-joy-blue: #0288D1;
+  --kid-joy-purple: #8E24AA;
+  /* 语义色 */
+  --kid-success: #22c55e;
+  --kid-warning: #f59e0b;
+  --kid-danger: #ef4444;
+  /* 触控标准：儿童手指精细度低，最小有效命中 48px（HIG） */
+  --touch-min: 48px;
+  /* 儿童字号刻度：正文 18px 起，汉字卡特大 */
+  --kid-fs-body: 18px;
+  --kid-fs-title: 28px;
+  --kid-fs-hanzi: 88px;
+  --kid-fs-hanzi-hero: 120px;
+}
+
+/* 触控标准工具类：新交互元素统一引用 */
+.touch-target {
+  min-width: var(--touch-min);
+  min-height: var(--touch-min);
+}
+
+/* P0-5 麦克风录音指示圆点 */
+.mic-rec-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #f43f5e;
+  box-shadow: 0 0 8px rgba(244, 63, 94, 0.9);
+  animation: micRecPulse 1.1s ease-in-out infinite;
+}
+@keyframes micRecPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.35; transform: scale(0.72); }
+}
+
+/* ----------------------------------------------------
  * 洪恩 1:1 专属高品质儿童游戏视觉 UI 系统 (Game UI Kit)
  * ---------------------------------------------------- */
 
@@ -510,4 +556,18 @@ html[data-flip-dir="prev"] ::view-transition-new(root) {
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+}
+
+/* A11y: Keyboard Focus Outline (Kid-friendly Glow) */
+:focus-visible {
+    outline: 4px solid #FFD700;
+    outline-offset: 4px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.8);
+    transition: outline-offset 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Ensure round buttons have a round focus ring */
+button.rounded-full:focus-visible {
+    border-radius: 50%;
 }

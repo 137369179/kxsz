@@ -19,11 +19,49 @@
 import { soundAndFX } from "./soundEngine.js";
 import { g2p } from "./g2p.js";
 import { EVENTS, eventBus } from "./eventBus.js";
+import { showParentGate } from "./parentGate.js";
 
 const STATES = Object.freeze({
   IDLE: "idle", LISTENING: "listening", EVALUATING: "evaluating",
   RESULT: "result", ERROR: "error",
 });
+
+// ============================================================
+// P0-5 麦克风合规（儿童隐私）：
+//  - 家长总开关（cathy_voice_eval_enabled）关闭后评测入口直接不可达
+//  - 首次使用需通过家长算术门禁授权；授权持久化于 cathy_mic_consent
+//  - 录音仅在本设备即时评测，不上传、不持久化；音频 Blob URL 用后即焚
+//  - 录音期间展示全局 🎙️ 指示徽标（儿童与家长可感知）
+// ============================================================
+const MIC_CONSENT_KEY = "cathy_mic_consent";
+const VOICE_EVAL_TOGGLE_KEY = "cathy_voice_eval_enabled";
+
+export function isVoiceEvalEnabled() {
+  try { return localStorage.getItem(VOICE_EVAL_TOGGLE_KEY) !== "0"; } catch { return true; }
+}
+
+export function setVoiceEvalEnabled(on) {
+  try { localStorage.setItem(VOICE_EVAL_TOGGLE_KEY, on ? "1" : "0"); } catch {}
+}
+
+async function ensureMicConsent() {
+  try {
+    if (localStorage.getItem(MIC_CONSENT_KEY) === "granted") return true;
+  } catch {}
+  let passed = false;
+  try {
+    passed = await showParentGate({
+      title: "家长授权 · 麦克风",
+      level: "medium",
+      confirmText: "同意并开始",
+      cancelText: "暂不使用",
+    });
+  } catch {}
+  if (!passed) return false;
+  // 授权后向家长明示数据边界（本地处理）
+  try { localStorage.setItem(MIC_CONSENT_KEY, "granted"); } catch {}
+  return true;
+}
 
 // ============================================================
 // 1. 拼音音素工具
@@ -414,9 +452,42 @@ export class PronunciationAssessmentEngine {
    * @param {number} [opts.silenceTimeoutMs=4000]  无语音自动停止（从最近一次有声开始计时）
    * @param {Function} [opts.onResult]    中间/最终结果回调：({ transcript, isFinal }) => void
    */
+  /** P0-5：焚毁上一次录音的 Blob URL（音频不驻留内存/不持久化） */
+  _revokeRecordedAudio() {
+    if (this._recordedAudioUrl) {
+      try { URL.revokeObjectURL(this._recordedAudioUrl); } catch {}
+      this._recordedAudioUrl = null;
+    }
+  }
+
+  /** P0-5：录音中全局指示徽标（麦克风激活期可见，停止即消失） */
+  _showMicBadge() {
+    if (typeof document === "undefined" || document.getElementById("mic-recording-badge")) return;
+    const badge = document.createElement("div");
+    badge.id = "mic-recording-badge";
+    badge.setAttribute("role", "status");
+    badge.setAttribute("aria-live", "assertive");
+    badge.style.cssText = "position:fixed;top:14px;right:14px;z-index:99999;display:flex;align-items:center;gap:8px;background:rgba(15,23,42,.88);color:#fff;font-weight:800;font-size:12px;padding:8px 14px;border-radius:9999px;border:2px solid rgba(255,255,255,.35);box-shadow:0 8px 20px rgba(0,0,0,.4);pointer-events:none";
+    badge.innerHTML = '<span class="mic-rec-dot"></span><span>录音中 · 仅本设备评测</span>';
+    (document.body || document.documentElement).appendChild(badge);
+  }
+
+  _removeMicBadge() {
+    try { document.getElementById("mic-recording-badge")?.remove(); } catch {}
+  }
+
   async startEvaluation(opts = {}) {
     if (this.state === STATES.LISTENING || this.state === STATES.EVALUATING) {
       return { ok: false, reason: "already_running" };
+    }
+
+    // P0-5 麦克风合规：家长总开关 → 首次使用家长授权
+    if (!isVoiceEvalEnabled()) {
+      eventBus.emit(EVENTS.AUDIO_EVAL_ERROR, { reason: "voice_eval_disabled" });
+      return { ok: false, reason: "voice_eval_disabled" };
+    }
+    if (!(await ensureMicConsent())) {
+      return { ok: false, reason: "mic_consent_denied" };
     }
 
     const targetText = opts.text || "";
@@ -428,7 +499,7 @@ export class PronunciationAssessmentEngine {
     this._currentEvalTarget = targetText;
     this._currentEvalOpts = opts;
     this._audioChunks = [];
-    this._recordedAudioUrl = null;
+    this._revokeRecordedAudio();
     this._transcripts = [];
     this._finalTranscripts = [];
     this._activeRecogText = "";
@@ -467,6 +538,9 @@ export class PronunciationAssessmentEngine {
         return { ok: false, reason: "mic_permission_denied" };
       }
     }
+
+    // P0-5：麦克风激活 → 展示录音中指示徽标（停止时移除）
+    if (this._activeStream) this._showMicBadge();
 
     // 2. Web Audio AnalyserNode + RhythmAnalyzer（能量检测）
     if (this._activeStream && ctx) {
@@ -586,6 +660,8 @@ export class PronunciationAssessmentEngine {
     if (this._stopping) return this._lastResult;
     this._stopping = true;
     this._cleanupTimers();
+    // P0-5：无论走哪条分支，先摘除录音指示徽标
+    this._removeMicBadge();
 
     if (this.state === STATES.RESULT && this._lastResult) {
       this._stopping = false;

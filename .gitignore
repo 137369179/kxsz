@@ -44,3 +44,8 @@ vitest.config.js.timestamp-*.mjs
 .claude/skills/
 .trae/skills/
 skills-lock.json
+
+# 临时审计产物
+tools/_a11y_voice_audit.mjs
+tools/_a11y_voice_audit_last.json
+tools/*_last.json

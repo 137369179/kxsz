@@ -666,6 +666,7 @@ export function openFlashcardSlideshowModal(chars) {
         if (currentIndex > 0) {
           currentIndex--;
           isFlipped = false;
+          soundAndFX.stopSpeaking();
           soundAndFX.playPop();
           renderCurrentCard();
         }
@@ -679,6 +680,7 @@ export function openFlashcardSlideshowModal(chars) {
         if (currentIndex < chars.length - 1) {
           currentIndex++;
           isFlipped = false;
+          soundAndFX.stopSpeaking();
           soundAndFX.playPop();
           renderCurrentCard();
         }
@@ -726,6 +728,7 @@ export function openFlashcardSlideshowModal(chars) {
             if (currentIndex < chars.length - 1) {
               currentIndex++;
               isFlipped = false;
+              soundAndFX.stopSpeaking();
               renderCurrentCard();
             } else {
               clearInterval(autoPlayTimer);

@@ -1,16 +1,7 @@
 /**
- * @deprecated 业务侧尚未接线；保留供调研原型与单测。请勿在新功能中默认依赖。
- * src/utils/anticipatoryLoader.js
- * ================================================================
- * 凯茜识字 —— 触屏 UX 预测性动效引擎 (Anticipatory Animation Loader)
- * ─────────────────────────────────────────────────────────────
- * 调研报告 §5.3 建议：
- *   1. 点击确认即时反馈 (<150ms)：提供弹性触感响应，消除犹豫区
- *   2. 异步过渡延迟弥补 (>150ms)：呈现微光等待指引，防止儿童连续狂点重试
- *   3. 零 Emoji、零外部大体积依赖，使用 GAME_ICONS 与 CSS 硬件加速动效
- * ─────────────────────────────────────────────────────────────
+ * 触屏 UX 预测性动效 — 异步点击反馈（<150ms 触感 + >150ms 等待微光）
+ * 已接线：startLearnFlow / ensureModule
  */
-
 import { GAME_ICONS } from './gameIcons.js';
 
 /**
@@ -36,7 +27,7 @@ export async function withAnticipatoryFeedback(element, asyncFn, options = {}) {
 
   // 2. 预测动效定时器：若 150ms 内未完成，浮现呼吸小星光
   timerId = setTimeout(() => {
-    if (!document.body.contains(element)) return;
+    if (typeof document?.body?.contains === 'function' && !document.body.contains(element)) return;
     badgeEl = document.createElement('span');
     badgeEl.className = 'anticipatory-badge inline-flex items-center gap-1 text-xs font-bold text-amber-600 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-full animate-pulse pointer-events-none shadow-sm ml-1.5';
     badgeEl.setAttribute('role', 'status');

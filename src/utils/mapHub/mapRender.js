@@ -4,7 +4,8 @@ import { ebbinghausManager } from "../ebbinghaus.js";
 import { mountGameShell } from "../../components/SharedShell.js";
 import { GAME_ICONS } from "../gameIcons.js";
 import { ISLAND_CONFIG } from "./islandConfig.js";
-import { getSessionConfig } from "../sessionPlanner.js";
+import { getSessionConfig, planDailySession, setDeps } from "../sessionPlanner.js";
+import { getQuestProgressSnapshot } from "./dailyQuestModal.js";
 
 export function renderMap() {
   this.destroy();
@@ -13,6 +14,9 @@ export function renderMap() {
   const allChars = CHARACTER_DATABASE;
   const age = ebbinghausManager.getAge();
   const sessionCfg = getSessionConfig(age);
+  setDeps({ ebbinghaus: ebbinghausManager, characterDB: CHARACTER_DATABASE });
+  const questSnap = getQuestProgressSnapshot(planDailySession());
+  const questPct = questSnap.total > 0 ? Math.round((questSnap.completed / questSnap.total) * 100) : 0;
 
   // 智能定位当前正在学的主题岛屿（若用户未手动切换过岛屿）
   if (!this._userSelectedIsland) {
@@ -39,79 +43,80 @@ export function renderMap() {
     <div class="relative w-full h-full min-h-[640px] flex flex-col justify-between overflow-hidden select-none bg-slate-950">
       
       <div class="absolute top-20 left-6 z-20 flex items-center gap-2.5 bg-black/60 backdrop-blur-md p-2 rounded-full border border-white/30 shadow-2xl">
-        <button id="btn-daily-quest" class="px-4 py-2 rounded-full text-xs sm:text-sm font-black transition-all flex items-center gap-2 bg-gradient-to-r from-rose-500 via-pink-500 to-amber-500 text-white shadow-lg ring-2 ring-pink-300 hover:scale-105 active:scale-95 cursor-pointer" title="开始科学认知编排的今日学练探险">
+        <button id="btn-daily-quest" class="px-4 py-2 rounded-full text-xs sm:text-sm font-black transition-all flex items-center gap-2 bg-gradient-to-r from-rose-500 via-pink-500 to-amber-500 text-white shadow-lg ring-2 ring-pink-300 hover:scale-105 active:scale-95 cursor-pointer touch-target" title="今天的小冒险" aria-label="打开今天的小冒险，已完成${questSnap.completed}项共${questSnap.total}项" data-speak="开始今天的小冒险！">
           <span class="flex items-center">${GAME_ICONS.sparkle('w-5 h-5')}</span>
           <span>今日学练</span>
-          <span class="bg-white/25 px-2 py-0.5 rounded-full text-[10px] font-mono">${sessionCfg.newChars}新·${sessionCfg.reviews}复</span>
+          <span class="bg-white/25 px-2 py-0.5 rounded-full text-[10px] font-mono" aria-hidden="true">${questSnap.completed}/${questSnap.total || sessionCfg.newChars + sessionCfg.reviews}</span>
+          <span class="hidden sm:inline-flex w-10 h-2 rounded-full bg-white/30 overflow-hidden" aria-hidden="true"><span class="h-full bg-white rounded-full" style="width:${questPct}%"></span></span>
         </button>
 
         <div class="w-[1px] h-6 bg-white/30 mx-1"></div>
 
-        <button id="btn-open-world-overview" class="px-4 py-2 rounded-full text-xs sm:text-sm font-black transition-all flex items-center gap-2 bg-gradient-to-r from-amber-400 to-orange-500 text-amber-950 shadow-md active:scale-95 cursor-pointer" title="查看三大岛屿世界全景图">
+        <button id="btn-open-world-overview" class="px-4 py-2 rounded-full text-xs sm:text-sm font-black transition-all flex items-center gap-2 bg-gradient-to-r from-amber-400 to-orange-500 text-amber-950 shadow-md active:scale-95 cursor-pointer" title="查看三大岛屿世界全景图" data-speak="看看世界全景图吧！">
           <span class="flex items-center">${GAME_ICONS.compass('w-6 h-6')}</span>
           <span>世界全景</span>
         </button>
 
         <div class="w-[1px] h-6 bg-white/30 mx-1"></div>
 
-        <button class="island-tab-btn px-4 py-2 rounded-full text-xs sm:text-sm font-black transition-all flex items-center gap-2 cursor-pointer ${
+        <button class="island-tab-btn px-4 py-2 rounded-full text-xs sm:text-sm font-black transition-all flex items-center gap-2 cursor-pointer touch-target ${
           this.currentIsland === 1 ? "bg-emerald-500 text-white shadow-lg scale-105 ring-2 ring-emerald-300" : "text-white/80 hover:text-white"
-        }" data-island="1">
+        }" data-island="1" aria-label="奇幻森林岛" data-speak="去奇幻森林岛">
           <span class="flex items-center">${GAME_ICONS.islandForest('w-6 h-6')}</span>
           <span>奇幻森林岛</span>
         </button>
-        <button class="island-tab-btn px-4 py-2 rounded-full text-xs sm:text-sm font-black transition-all flex items-center gap-2 cursor-pointer ${
+        <button class="island-tab-btn px-4 py-2 rounded-full text-xs sm:text-sm font-black transition-all flex items-center gap-2 cursor-pointer touch-target ${
           this.currentIsland === 2 ? "bg-amber-500 text-white shadow-lg scale-105 ring-2 ring-amber-300" : "text-white/80 hover:text-white"
-        }" data-island="2">
+        }" data-island="2" aria-label="缤纷生活岛" data-speak="去缤纷生活岛">
           <span class="flex items-center">${GAME_ICONS.islandTown('w-6 h-6')}</span>
           <span>缤纷生活岛</span>
         </button>
-        <button class="island-tab-btn px-4 py-2 rounded-full text-xs sm:text-sm font-black transition-all flex items-center gap-2 cursor-pointer ${
+        <button class="island-tab-btn px-4 py-2 rounded-full text-xs sm:text-sm font-black transition-all flex items-center gap-2 cursor-pointer touch-target ${
           this.currentIsland === 3 ? "bg-indigo-600 text-white shadow-lg scale-105 ring-2 ring-indigo-300" : "text-white/80 hover:text-white"
-        }" data-island="3">
+        }" data-island="3" aria-label="星际探索岛" data-speak="去星际探索岛">
           <span class="flex items-center">${GAME_ICONS.islandSpace('w-6 h-6')}</span>
           <span>星际探索岛</span>
         </button>
       </div>
 
       <div class="absolute top-20 right-6 z-20 flex items-center gap-2 max-w-[calc(100vw-540px)] overflow-x-auto no-scrollbar py-1.5 px-2.5 bg-black/40 backdrop-blur-md rounded-2xl border border-white/20 shadow-2xl">
-        <button class="map-landmark-btn shrink-0 group bg-white/95 backdrop-blur-md px-3.5 py-2 rounded-2xl border-2 border-purple-300 shadow-xl flex items-center gap-2 active:scale-95 transition-all cursor-pointer" data-mode="play" title="趣味游戏与字卡特训">
+        <button class="map-landmark-btn shrink-0 group bg-white/95 backdrop-blur-md px-3.5 py-2 rounded-2xl border-2 border-purple-300 shadow-xl flex items-center gap-2 active:scale-95 transition-all cursor-pointer touch-target" data-mode="play" title="游乐场" aria-label="游乐场" data-speak="去游乐场玩吧！">
           <span class="flex items-center group-hover:scale-110 transition-transform">${GAME_ICONS.arcade('w-7 h-7')}</span>
           <span class="text-xs sm:text-sm font-black text-purple-950">游乐场</span>
         </button>
-        <button class="map-landmark-btn shrink-0 group bg-white/95 backdrop-blur-md px-3.5 py-2 rounded-2xl border-2 border-sky-300 shadow-xl flex items-center gap-2 active:scale-95 transition-all cursor-pointer" data-mode="books" title="130本分级绘本">
+        <button class="map-landmark-btn shrink-0 group bg-white/95 backdrop-blur-md px-3.5 py-2 rounded-2xl border-2 border-sky-300 shadow-xl flex items-center gap-2 active:scale-95 transition-all cursor-pointer touch-target" data-mode="books" title="绘本馆" aria-label="绘本馆" data-speak="去绘本馆读故事啦！">
           <span class="flex items-center group-hover:scale-110 transition-transform">${GAME_ICONS.book('w-7 h-7')}</span>
           <span class="text-xs sm:text-sm font-black text-sky-950">绘本馆</span>
         </button>
-        <button class="map-landmark-btn shrink-0 group bg-white/95 backdrop-blur-md px-3.5 py-2 rounded-2xl border-2 border-amber-300 shadow-xl flex items-center gap-2 active:scale-95 transition-all cursor-pointer" data-mode="cards" title="1490字卡中心">
+        <button class="map-landmark-btn shrink-0 group bg-white/95 backdrop-blur-md px-3.5 py-2 rounded-2xl border-2 border-amber-300 shadow-xl flex items-center gap-2 active:scale-95 transition-all cursor-pointer touch-target" data-mode="cards" title="字卡库" aria-label="字卡库" data-speak="打开字卡库">
           <span class="flex items-center group-hover:scale-110 transition-transform">${GAME_ICONS.cards('w-7 h-7')}</span>
           <span class="text-xs sm:text-sm font-black text-amber-950">字卡库</span>
         </button>
-        <button class="map-landmark-btn shrink-0 group bg-white/95 backdrop-blur-md px-3.5 py-2 rounded-2xl border-2 border-rose-300 shadow-xl flex items-center gap-2 active:scale-95 transition-all cursor-pointer" data-mode="reward" title="成就勋章与限定装扮商城">
+        <button class="map-landmark-btn shrink-0 group bg-white/95 backdrop-blur-md px-3.5 py-2 rounded-2xl border-2 border-rose-300 shadow-xl flex items-center gap-2 active:scale-95 transition-all cursor-pointer touch-target" data-mode="reward" title="奖励城堡" aria-label="奖励城堡" data-speak="去奖励城堡领奖励！">
           <span class="flex items-center group-hover:scale-110 transition-transform">${GAME_ICONS.chest('w-7 h-7')}</span>
           <span class="text-xs sm:text-sm font-black text-rose-950">奖励城堡</span>
         </button>
-        <button class="map-landmark-btn shrink-0 group bg-white/95 backdrop-blur-md px-3.5 py-2 rounded-2xl border-2 border-indigo-300 shadow-xl flex items-center gap-2 active:scale-95 transition-all cursor-pointer" data-mode="pk" title="字词1v1竞技场对战">
+        <button class="map-landmark-btn shrink-0 group bg-white/95 backdrop-blur-md px-3.5 py-2 rounded-2xl border-2 border-indigo-300 shadow-xl flex items-center gap-2 active:scale-95 transition-all cursor-pointer touch-target" data-mode="pk" title="竞技场" aria-label="竞技场" data-speak="去竞技场对战！">
           <span class="flex items-center group-hover:scale-110 transition-transform">${GAME_ICONS.swords('w-7 h-7')}</span>
           <span class="text-xs sm:text-sm font-black text-indigo-950">竞技场</span>
         </button>
-        <button class="map-landmark-btn shrink-0 group bg-white/95 backdrop-blur-md px-3.5 py-2 rounded-2xl border-2 border-emerald-300 shadow-xl flex items-center gap-2 active:scale-95 transition-all cursor-pointer" data-mode="idiom" title="80+国学成语故事馆">
+        <button class="map-landmark-btn shrink-0 group bg-white/95 backdrop-blur-md px-3.5 py-2 rounded-2xl border-2 border-emerald-300 shadow-xl flex items-center gap-2 active:scale-95 transition-all cursor-pointer touch-target" data-mode="idiom" title="成语馆" aria-label="成语馆" data-speak="去成语馆听故事！">
           <span class="flex items-center group-hover:scale-110 transition-transform">${GAME_ICONS.scroll('w-7 h-7')}</span>
           <span class="text-xs sm:text-sm font-black text-emerald-950">成语馆</span>
         </button>
-        <button class="map-landmark-btn shrink-0 group bg-white/95 backdrop-blur-md px-3.5 py-2 rounded-2xl border-2 border-orange-300 shadow-xl flex items-center gap-2 active:scale-95 transition-all cursor-pointer" data-mode="poem" title="20首经典启蒙古诗卡拉OK诵读">
+        <button class="map-landmark-btn shrink-0 group bg-white/95 backdrop-blur-md px-3.5 py-2 rounded-2xl border-2 border-orange-300 shadow-xl flex items-center gap-2 active:scale-95 transition-all cursor-pointer touch-target" data-mode="poem" title="古诗馆" aria-label="古诗馆" data-speak="去诵读古诗吧！">
           <span class="flex items-center group-hover:scale-110 transition-transform">${GAME_ICONS.book('w-7 h-7')}</span>
           <span class="text-xs sm:text-sm font-black text-orange-950">古诗馆</span>
         </button>
-        <button class="map-landmark-btn shrink-0 group bg-white/95 backdrop-blur-md px-3.5 py-2 rounded-2xl border-2 border-cyan-300 shadow-xl flex items-center gap-2 active:scale-95 transition-all cursor-pointer" data-mode="pinyin" title="部编版幼小衔接拼音王国">
+        <button class="map-landmark-btn shrink-0 group bg-white/95 backdrop-blur-md px-3.5 py-2 rounded-2xl border-2 border-cyan-300 shadow-xl flex items-center gap-2 active:scale-95 transition-all cursor-pointer touch-target" data-mode="pinyin" title="拼音岛" aria-label="拼音岛" data-speak="去拼音岛玩拼音！">
           <span class="flex items-center group-hover:scale-110 transition-transform">${GAME_ICONS.sparkle('w-7 h-7')}</span>
           <span class="text-xs sm:text-sm font-black text-cyan-950">拼音岛</span>
         </button>
-        <button class="map-landmark-btn shrink-0 group bg-white/95 backdrop-blur-md px-3.5 py-2 rounded-2xl border-2 border-emerald-300 shadow-xl flex items-center gap-2 active:scale-95 transition-all cursor-pointer" data-mode="treehouse" title="凯茜伴学小树屋养成家园">
+        <button class="map-landmark-btn shrink-0 group bg-white/95 backdrop-blur-md px-3.5 py-2 rounded-2xl border-2 border-emerald-300 shadow-xl flex items-center gap-2 active:scale-95 transition-all cursor-pointer touch-target" data-mode="treehouse" title="伴学树屋" aria-label="伴学树屋" data-speak="去伴学树屋找凯茜玩！">
           <span class="flex items-center group-hover:scale-110 transition-transform">${GAME_ICONS.crown('w-7 h-7')}</span>
           <span class="text-xs sm:text-sm font-black text-emerald-950">伴学树屋</span>
         </button>
-        <button class="map-landmark-btn shrink-0 group bg-white/95 backdrop-blur-md px-3.5 py-2 rounded-2xl border-2 border-teal-300 shadow-xl flex items-center gap-2 active:scale-95 transition-all cursor-pointer" data-mode="review" title="艾宾浩斯每日复习">
+        <button class="map-landmark-btn shrink-0 group bg-white/95 backdrop-blur-md px-3.5 py-2 rounded-2xl border-2 border-teal-300 shadow-xl flex items-center gap-2 active:scale-95 transition-all cursor-pointer touch-target" data-mode="review" title="每日复习" aria-label="每日复习" data-speak="去复习老朋友吧！">
           <span class="flex items-center group-hover:scale-110 transition-transform">${GAME_ICONS.bell('w-7 h-7')}</span>
           <span class="text-xs sm:text-sm font-black text-teal-950">每日复习</span>
         </button>

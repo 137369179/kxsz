@@ -5,6 +5,9 @@ import { mountGameShell } from "../../components/SharedShell.js";
 import { GAME_ICONS } from "../gameIcons.js";
 import { buildBookStage1Quiz } from "./bookStage1Quiz.js";
 import { CHARACTER_DATABASE } from "../../data/characters.js";
+import { escapeHtml } from "../BaseModule.js";
+import { markQuestTaskDone } from "../mapHub/dailyQuestModal.js";
+import { triggerMicroReview } from "../microReviewScheduler.js";
 
 export function renderQuiz() {
   const book = this.currentBook;
@@ -46,23 +49,27 @@ export function renderQuiz() {
           ${activeQuiz.title}
         </span>
         
-        ${this.currentQuizStage === 1 ? `
-          <button id="btn-quiz-replay-char" class="mb-3 btn-game-orange text-white font-black text-xs px-5 py-2 rounded-full shadow cursor-pointer">
-            再听一遍生字
+        <div class="flex items-center gap-2 mb-4">
+          <button id="btn-quiz-replay-question" class="btn-game-orange text-white font-black text-xs px-5 py-2 rounded-full shadow cursor-pointer flex items-center gap-1.5" aria-label="朗读题目">
+            ${GAME_ICONS.speaker("w-4 h-4")}
+            <span>${this.currentQuizStage === 1 ? "再听一遍生字" : "再听一遍题目"}</span>
           </button>
-        ` : ''}
+        </div>
 
         <h2 class="text-xl sm:text-2xl font-black text-amber-950 mb-6 leading-relaxed">
-          ${activeQuiz.question}
+          ${escapeHtml(activeQuiz.question)}
         </h2>
 
         <div class="flex ${this.currentQuizStage === 1 ? "flex-row flex-wrap justify-center" : "flex-col"} gap-3.5 w-full max-w-lg">
           ${activeQuiz.options
             .map(
               (opt, idx) => `
-            <button class="quiz-option-btn group ${this.currentQuizStage === 1 ? "w-20 h-20 text-3xl font-serif justify-center" : "p-4 text-sm sm:text-base text-left justify-between"} rounded-2xl bg-white hover:bg-amber-50/80 border-2 border-amber-200 hover:border-orange-400 shadow-md hover:shadow-xl text-amber-950 font-black active:scale-95 hover:scale-[1.02] transition-all duration-300 flex items-center cursor-pointer" data-index="${idx}">
-              <span class="group-hover:text-orange-700 transition-colors">${opt}</span>
-              ${this.currentQuizStage === 1 ? "" : `<span class="w-8 h-8 rounded-full bg-gradient-to-b from-amber-200 to-amber-400 shadow-sm border border-amber-500 flex items-center justify-center text-xs text-amber-900 font-black">${String.fromCharCode(65 + idx)}</span>`}
+            <button class="quiz-option-btn group ${this.currentQuizStage === 1 ? "w-20 h-20 text-3xl font-serif justify-center" : "p-4 text-sm sm:text-base text-left justify-between"} rounded-2xl bg-white hover:bg-amber-50/80 border-2 border-amber-200 hover:border-orange-400 shadow-md hover:shadow-xl text-amber-950 font-black active:scale-95 hover:scale-[1.02] transition-all duration-300 flex items-center cursor-pointer" data-index="${idx}" data-speak="${escapeHtml(opt)}" aria-label="选项 ${String.fromCharCode(65 + idx)}: ${escapeHtml(opt)}">
+              <div class="flex items-center gap-2 flex-1">
+                ${this.currentQuizStage === 1 ? "" : `<span class="text-amber-500/80 group-hover:text-orange-600 transition-colors shrink-0">${GAME_ICONS.speaker("w-4 h-4")}</span>`}
+                <span class="group-hover:text-orange-700 transition-colors">${escapeHtml(opt)}</span>
+              </div>
+              ${this.currentQuizStage === 1 ? "" : `<span class="w-8 h-8 rounded-full bg-gradient-to-b from-amber-200 to-amber-400 shadow-sm border border-amber-500 flex items-center justify-center text-xs text-amber-900 font-black shrink-0 ml-2">${String.fromCharCode(65 + idx)}</span>`}
             </button>
           `
             )
@@ -73,10 +80,10 @@ export function renderQuiz() {
     </div>
   `;
 
-  const replayBtn = mainEl.querySelector("#btn-quiz-replay-char");
-  if (replayBtn && activeQuiz.speakPrompt) {
+  const replayBtn = mainEl.querySelector("#btn-quiz-replay-question");
+  if (replayBtn) {
     this._on(replayBtn, "click", () => {
-      soundAndFX.speakPriority(activeQuiz.speakPrompt, { kind: "char", priority: 1 });
+      soundAndFX.speakPriority(speakText, { kind: activeQuiz.speakPrompt ? "char" : "sentence", priority: 1 });
     });
   }
 
@@ -108,6 +115,14 @@ export function renderQuiz() {
             ebbinghausManager.addCoins(15);
             ebbinghausManager.addStars(5);
             ebbinghausManager.save();
+            markQuestTaskDone("book:daily");
+            try {
+              const ids = (book.targetChars || [])
+                .map((ch) => CHARACTER_DATABASE.find((c) => c.char === ch)?.id)
+                .filter(Boolean)
+                .slice(0, 3);
+              triggerMicroReview(ids);
+            } catch (_) {}
 
             this.isQuizMode = false;
             this.isCertificateMode = true;

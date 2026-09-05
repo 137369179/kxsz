@@ -6,6 +6,7 @@
  */
 import { escapeHtml } from "../BaseModule.js";
 import { soundAndFX } from "../soundEngine.js";
+import { GAME_ICONS } from "../gameIcons.js";
 
 /** 3 岁以上均开放（动觉 priming 对各年龄有益），由调用方用 _airTraceDone 控制每字只一次 */
 export function shouldUseAirTrace(age) {
@@ -85,7 +86,8 @@ export function openAirTracePrompt(charItem, onDone) {
     <div id="air-trace-modal" class="fixed inset-0 z-[60] bg-black/80 backdrop-blur-md flex items-center justify-center p-4 select-none">
       <div class="relative w-full max-w-md bg-white rounded-3xl p-6 shadow-2xl border-4 border-sky-300 flex flex-col items-center gap-3">
         <div class="text-2xl font-black text-sky-950 flex items-center gap-2">
-          <span>✋</span><span>空中比划热身</span>
+          ${GAME_ICONS.hand ? GAME_ICONS.hand("w-6 h-6 inline-block") : ""}
+          <span>空中比划热身</span>
         </div>
         <p class="text-xs font-bold text-sky-800/80 text-center leading-relaxed">
           看小精灵在空中画出「${escapeHtml(char)}」字的笔顺～<br>
@@ -96,11 +98,15 @@ export function openAirTracePrompt(charItem, onDone) {
         </div>
         <div id="air-trace-stroke-tip" class="text-xs font-black text-sky-700 h-4"></div>
         <div class="flex flex-wrap justify-center gap-2 w-full">
-          <button type="button" id="btn-air-replay" class="bg-sky-100 hover:bg-sky-200 text-sky-900 font-black text-sm px-5 py-2.5 rounded-full border border-sky-300 cursor-pointer active:scale-95">🔁 再看一遍</button>
+          <button type="button" id="btn-air-replay" class="bg-sky-100 hover:bg-sky-200 text-sky-900 font-black text-sm px-5 py-2.5 rounded-full border border-sky-300 cursor-pointer active:scale-95 flex items-center gap-1">
+            ${GAME_ICONS.back ? GAME_ICONS.back("w-4 h-4 inline-block") : ""}
+            <span>再看一遍</span>
+          </button>
           <button type="button" id="btn-air-done" class="bg-gradient-to-r from-sky-500 to-cyan-500 hover:from-sky-400 hover:to-cyan-400 text-white font-black text-sm px-6 py-2.5 rounded-full shadow-md cursor-pointer active:scale-95">我比划好啦，开始写！</button>
         </div>
-        <div class="flex items-center gap-1 text-[10px] font-bold text-sky-700/70">
-          <span>✨</span><span>小手动起来，记得更牢</span>
+        <div class="flex items-center gap-1.5 text-[10px] font-bold text-sky-700/70">
+          ${GAME_ICONS.sparkle("w-3.5 h-3.5 inline-block")}
+          <span>小手动起来，记得更牢</span>
         </div>
       </div>
     </div>

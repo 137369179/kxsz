@@ -213,7 +213,46 @@ export function buildFullReport(progress) {
     trend,
     books,
     focus,
+    skills: computeSkillRadar(progress),
     summary: generateParentDiagnosis({ coverage, mastery, trend, books, focus }),
+  };
+}
+
+/**
+ * 听说读写四维雷达（0–100，纯派生自 progress，无假数据）
+ * - listen：复习正确倾向（mastery 均值）
+ * - speak：发音相关错误越少分越高
+ * - read：绘本阅读覆盖 + 已学字覆盖折中
+ * - write：笔顺错误越少、掌握度越高分越高
+ */
+export function computeSkillRadar(progress) {
+  const charRecords = progress?.charRecords || {};
+  const records = Object.values(charRecords);
+  const ep = progress?.errorProfiles || {};
+  const n = records.length;
+
+  const avgMastery = n
+    ? Math.round(records.reduce((s, r) => {
+        let rate = r.masteryRate ?? r.correctRate ?? 0;
+        if (rate > 0 && rate <= 1) rate *= 100;
+        return s + rate;
+      }, 0) / n)
+    : 0;
+
+  const pronErr = Object.values(ep.pronunciationErrors || {}).reduce((a, b) => a + (b || 0), 0);
+  const strokeErr = Object.values(ep.reverseStrokeErrors || ep.strokeErrors || {}).reduce((a, b) => a + (b || 0), 0);
+  const speak = Math.max(0, Math.min(100, 100 - Math.min(60, pronErr * 8) + Math.round(avgMastery * 0.15)));
+  const write = Math.max(0, Math.min(100, Math.round(avgMastery * 0.7 + Math.max(0, 30 - strokeErr * 5))));
+  const booksRead = (progress?.readBooks || []).length;
+  const read = Math.max(0, Math.min(100, Math.round(avgMastery * 0.5 + Math.min(50, booksRead * 5))));
+  const listen = Math.max(0, Math.min(100, avgMastery || (n ? 40 : 0)));
+
+  return {
+    listen,
+    speak: n ? speak : 0,
+    read: n ? read : 0,
+    write: n ? write : 0,
+    labels: { listen: "听", speak: "说", read: "读", write: "写" },
   };
 }
 

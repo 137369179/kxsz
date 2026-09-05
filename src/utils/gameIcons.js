@@ -209,6 +209,10 @@ export const GAME_ICONS = {
   monster: (...args) => {
     const { cls } = GAME_ICONS._parseIconParams(args, "badge", "object-cover");
     return `<img src="assets/images/cathy_boss_monster.webp" class="${cls} shadow-md" alt="monster" data-fallback="assets/images/icon_parent.webp" />`;
+  },
+  rocket: (...args) => {
+    const { cls } = GAME_ICONS._parseIconParams(args, "badge", "object-contain");
+    return `<img src="assets/images/cover_space_rocket.webp" class="${cls} shadow-md" alt="rocket" data-fallback="assets/images/icon_sparkle.webp" />`;
   }
 };
 

@@ -9,6 +9,8 @@ import {
   getCalendar,
   getNewMedalIds,
   getShopData,
+  getCollectionStats,
+  getCollectionByStage,
   rewardEngine
 } from "../rewardEngine.js";
 import { storageManager } from "../storageManager.js";
@@ -63,14 +65,15 @@ export function render() {
         </div>
       </div>
 
-      <div class="mx-5 mt-4 grid grid-cols-4 gap-2 bg-black/40 backdrop-blur-md p-1.5 rounded-2xl border border-white/15">
+      <div class="mx-5 mt-4 grid grid-cols-5 gap-2 bg-black/40 backdrop-blur-md p-1.5 rounded-2xl border border-white/15">
         ${[
           { key: "stickers", label: "贴纸墙", iconSvg: (cls) => GAME_ICONS.cards(cls) },
           { key: "medals", label: "荣誉室", iconSvg: (cls) => GAME_ICONS.trophy(cls) },
+          { key: "collection", label: "汉字图鉴", iconSvg: (cls) => GAME_ICONS.book(cls) },
           { key: "calendar", label: "打卡日历", iconSvg: (cls) => GAME_ICONS.reviewBell(cls) },
           { key: "shop", label: "装扮商城", iconSvg: (cls) => GAME_ICONS.chest(cls) }
         ].map((t) => `
-          <button data-tab="${t.key}" class="reward-tab py-2.5 rounded-xl font-black text-sm transition-all flex items-center justify-center gap-1.5 ${this.activeTab === t.key ? "bg-gradient-to-r from-amber-400 to-orange-500 text-white shadow-lg scale-[1.02]" : "text-white/60 hover:text-white hover:bg-white/10"}">
+          <button data-tab="${t.key}" class="reward-tab py-2.5 rounded-xl font-black text-sm transition-all flex items-center justify-center gap-1.5 ${this.activeTab === t.key ? "bg-gradient-to-r from-amber-400 to-orange-500 text-white shadow-lg scale-[1.02]" : "text-white/60 hover:text-white hover:bg-white/10"}" data-speak="打开${t.label}">
             <span class="flex items-center">${t.iconSvg("w-4 h-4")}</span>
             <span>${t.label}</span>
           </button>
@@ -95,8 +98,85 @@ export function _renderPanel() {
 
   if (this.activeTab === "stickers") this._renderStickerWall(panel);
   else if (this.activeTab === "medals") this._renderMedalWall(panel);
+  else if (this.activeTab === "collection") this._renderCollection(panel);
   else if (this.activeTab === "shop") this._renderShop(panel);
   else this._renderCalendar(panel);
+}
+
+// ------------------------------------------------------------
+// P1-4 汉字收集图鉴 — 学过的字点亮成卡，按岛分册；零新增存储（纯派生 charRecords）
+// ------------------------------------------------------------
+export function _renderCollection(panel) {
+  const stats = getCollectionStats();
+  const pct = stats.total ? Math.round((stats.learnedCount / stats.total) * 100) : 0;
+  const stageMeta = {
+    1: { name: "奇幻森林岛", ring: "border-emerald-300", chip: "bg-emerald-500/20 text-emerald-200" },
+    2: { name: "缤纷生活岛", ring: "border-amber-300", chip: "bg-amber-500/20 text-amber-200" },
+    3: { name: "星际探索岛", ring: "border-indigo-300", chip: "bg-indigo-500/20 text-indigo-200" },
+  };
+
+  const sections = stats.byStage.map((s) => {
+    const meta = stageMeta[s.stage] || { name: `岛屿 ${s.stage}`, ring: "border-white/30", chip: "bg-white/10 text-white/80" };
+    const chars = getCollectionByStage(s.stage);
+    const cells = chars.map((c) => c.collected
+      ? `<button class="collect-char-cell collected touch-target aspect-square rounded-2xl bg-gradient-to-b from-amber-100 to-orange-200 border-2 border-amber-300 shadow-md flex flex-col items-center justify-center gap-0.5 active:scale-90 transition-transform cursor-pointer" data-char="${escapeHtml(c.char)}" data-pinyin="${escapeHtml(c.pinyin)}" aria-label="${escapeHtml(c.char)}，拼音 ${escapeHtml(c.pinyin)}">
+            <span class="text-2xl sm:text-3xl font-black text-amber-950 leading-none">${escapeHtml(c.char)}</span>
+            <span class="text-[10px] font-bold text-amber-700">${escapeHtml(c.pinyin)}</span>
+          </button>`
+      : `<div class="touch-target aspect-square rounded-2xl bg-white/5 border-2 border-white/10 flex flex-col items-center justify-center gap-0.5" aria-label="尚未收集">
+            <span class="text-2xl sm:text-3xl font-black text-white/25 leading-none">？</span>
+            <span class="text-[10px] font-bold text-white/25">未解锁</span>
+          </div>`
+    ).join("");
+    return `
+      <section class="cv-auto-large mt-4 first:mt-0">
+        <div class="flex items-center justify-between mb-2">
+          <h3 class="font-black text-sm text-white/90 flex items-center gap-1.5">
+            <span class="w-2.5 h-2.5 rounded-full bg-amber-400 inline-block"></span>
+            <span>${meta.name}</span>
+          </h3>
+          <span class="text-[11px] font-black px-2.5 py-1 rounded-full ${meta.chip}">${s.learned}<span class="opacity-60">/${s.total}</span></span>
+        </div>
+        <div class="grid grid-cols-6 sm:grid-cols-8 md:grid-cols-10 gap-2 p-3 rounded-3xl bg-black/30 border-2 ${meta.ring}">
+          ${cells}
+        </div>
+      </section>`;
+  }).join("");
+
+  panel.innerHTML = `
+    <div class="bg-white/5 backdrop-blur-md rounded-3xl border border-white/15 p-5 animate-fade-in">
+      <div class="flex items-center justify-between flex-wrap gap-3">
+        <h2 class="font-black text-amber-200 text-base flex items-center gap-2">
+          <span class="flex items-center">${GAME_ICONS.book("w-5 h-5")}</span>
+          <span>我的汉字收集图鉴</span>
+        </h2>
+        <button id="btn-collection-cheer" class="text-[11px] font-black px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-white/80 active:scale-95 cursor-pointer flex items-center gap-1" aria-label="播报收集进度">${GAME_ICONS.speaker("w-3.5 h-3.5")}<span>进度播报</span></button>
+      </div>
+      <div class="mt-3">
+        <div class="flex items-center justify-between text-[11px] font-black text-white/70 mb-1">
+          <span>收集进度</span>
+          <span class="text-amber-300">${stats.learnedCount}<span class="opacity-60">/${stats.total}（${pct}%）</span></span>
+        </div>
+        <div class="h-3 rounded-full bg-black/40 border border-white/10 overflow-hidden">
+          <div class="h-full rounded-full bg-gradient-to-r from-amber-400 to-orange-500 transition-all duration-700" style="width:${pct}%"></div>
+        </div>
+      </div>
+      ${sections}
+      <p class="mt-4 text-[11px] text-white/40 font-bold text-center">学过的字会自动点亮成收集卡 · 点一点可以听读音哦</p>
+    </div>
+  `;
+
+  // 已收集字卡：点击朗读（复用 P0-2 语音层）
+  this._onDom(".collect-char-cell.collected", "click", (e) => {
+    const cell = e.currentTarget;
+    this.speak(`${cell.dataset.char}，${cell.dataset.pinyin}`);
+  });
+  const cheerBtn = panel.querySelector("#btn-collection-cheer");
+  if (cheerBtn) {
+    this._on(cheerBtn, "click", () => {
+      this.speak(`我已经收集了${stats.learnedCount}个字，继续加油！`, { priority: 1, kind: "tutor", emotion: "happy" });
+    });
+  }
 }
 
 /**  */
@@ -223,7 +303,6 @@ export function _renderStickerWall(panel) {
       const y = `${Math.floor(Math.random() * 60) + 20}%`;
       this.scrapbookStickers.push({ char, pinyin, x, y });
       storageManager.putJSON("cathy_scrapbook_stickers_v1", this.scrapbookStickers);
-      soundAndFX.playPop();
       soundAndFX.speakPriority(char, { kind: "char", priority: 1 });
       this._renderStickerWall(panel);
     });
@@ -234,7 +313,6 @@ export function _renderStickerWall(panel) {
       const char = stEl.dataset.char;
       const pinyin = stEl.dataset.pinyin;
       soundAndFX.speakPriority(`${char}，${pinyin}`, { kind: "char", priority: 1 });
-      soundAndFX.playStarPopCombo();
     });
 
     const clearBtn = panel.querySelector("#btn-clear-scrapbook");
@@ -338,7 +416,6 @@ export function _renderStickerWall(panel) {
   this._onDom(panel.querySelectorAll(".sticker-cell"), "click", (e) => {
     const char = e.currentTarget.querySelector("span.text-lg")?.textContent;
     if (char) {
-      soundAndFX.playPop();
       soundAndFX.speakPriority(char, { kind: "char", priority: 1 });
     }
   });
@@ -396,7 +473,7 @@ export function _renderShop(panel) {
   const previewCircle = (item, size = "w-14 h-14 sm:w-16 sm:h-16") => {
     const frameCls = item.type === "frame" ? item.frameClass : "";
     const inner =
-      item.type === "avatar"
+      item.type === "avatar" || item.type === "decoration"
         ? item.icon
           ? `<img src="${item.icon}" class="w-full h-full rounded-full object-cover shrink-0" alt="${item.name}" />`
           : `<div class="w-8 h-8">${GAME_ICONS.cards()}</div>`
@@ -405,11 +482,20 @@ export function _renderShop(panel) {
   };
 
   const card = (item) => {
-    const state = item.equipped
-      ? `<span class="text-[10px] font-black text-amber-300 mt-1">已装备</span>`
-      : item.owned
-      ? `<button data-buy="${item.id}" class="shop-action mt-1.5 bg-emerald-500/90 hover:bg-emerald-500 text-white text-[11px] font-black px-4 py-1.5 rounded-full active:scale-95 transition-transform">装备</button>`
-      : `<button data-buy="${item.id}" class="shop-action mt-1.5 ${item.affordable ? "bg-gradient-to-r from-amber-400 to-orange-500 hover:brightness-110" : "bg-white/10 opacity-50 cursor-not-allowed"} text-white text-[11px] font-black px-4 py-1.5 rounded-full active:scale-95 transition-transform flex items-center gap-1"><span class="flex items-center">${GAME_ICONS.coin()}</span><span>${item.price}</span></button>`;
+    let state = "";
+    if (item.type === "decoration") {
+      state = item.equipped
+        ? `<button data-buy="${item.id}" class="shop-action mt-1.5 bg-red-500/80 hover:bg-red-500 text-white text-[11px] font-black px-4 py-1.5 rounded-full active:scale-95 transition-transform">卸下</button>`
+        : item.owned
+        ? `<button data-buy="${item.id}" class="shop-action mt-1.5 bg-emerald-500/90 hover:bg-emerald-500 text-white text-[11px] font-black px-4 py-1.5 rounded-full active:scale-95 transition-transform">装备</button>`
+        : `<button data-buy="${item.id}" class="shop-action mt-1.5 ${item.affordable ? "bg-gradient-to-r from-amber-400 to-orange-500 hover:brightness-110" : "bg-white/10 opacity-50 cursor-not-allowed"} text-white text-[11px] font-black px-4 py-1.5 rounded-full active:scale-95 transition-transform flex items-center gap-1"><span class="flex items-center">${GAME_ICONS.coin()}</span><span>${item.price}</span></button>`;
+    } else {
+      state = item.equipped
+        ? `<span class="text-[10px] font-black text-amber-300 mt-1">已装备</span>`
+        : item.owned
+        ? `<button data-buy="${item.id}" class="shop-action mt-1.5 bg-emerald-500/90 hover:bg-emerald-500 text-white text-[11px] font-black px-4 py-1.5 rounded-full active:scale-95 transition-transform">装备</button>`
+        : `<button data-buy="${item.id}" class="shop-action mt-1.5 ${item.affordable ? "bg-gradient-to-r from-amber-400 to-orange-500 hover:brightness-110" : "bg-white/10 opacity-50 cursor-not-allowed"} text-white text-[11px] font-black px-4 py-1.5 rounded-full active:scale-95 transition-transform flex items-center gap-1"><span class="flex items-center">${GAME_ICONS.coin()}</span><span>${item.price}</span></button>`;
+    }
 
     const border = item.equipped
       ? "border-amber-400 bg-amber-400/15"
@@ -448,6 +534,11 @@ export function _renderShop(panel) {
         ${shop.avatars.map(card).join("")}
       </div>
 
+      <h3 class="text-xs font-black text-white/50 mb-2.5">树屋装饰</h3>
+      <div class="grid grid-cols-3 lg:grid-cols-4 gap-3 mb-6">
+        ${shop.decorations.map(card).join("")}
+      </div>
+
       <h3 class="text-xs font-black text-white/50 mb-2.5">个性边框</h3>
       <div class="grid grid-cols-3 lg:grid-cols-5 gap-3">
         ${shop.frames.map(card).join("")}
@@ -463,18 +554,34 @@ export function _bindShopActions() {
     this._on(btn, "click", () => {
       const id = btn.dataset.buy;
       const shop = getShopData();
-      const item = [...shop.avatars, ...shop.frames].find((i) => i.id === id);
+      const item = [...shop.avatars, ...shop.frames, ...shop.decorations].find((i) => i.id === id);
       if (!item) return;
 
       if (item.owned) {
-        if (item.type === "avatar") ebbinghausManager.equipAvatar(item.value);
-        else ebbinghausManager.equipFrame(item.id);
-        soundAndFX.playSuccessSound();
-        showGameToast(this.container, `已装备: ${item.name}`, "success");
+        if (item.type === "avatar") {
+          ebbinghausManager.equipAvatar(item.value);
+          soundAndFX.playSuccessSound();
+          showGameToast(this.container, `已装备: ${item.name}`, "success");
+        } else if (item.type === "decoration") {
+          if (item.equipped) {
+            ebbinghausManager.unequipDecoration(item.id);
+            soundAndFX.playPop();
+            showGameToast(this.container, `已卸下: ${item.name}`, "success");
+          } else {
+            ebbinghausManager.equipDecoration(item.id);
+            soundAndFX.playSuccessSound();
+            showGameToast(this.container, `已装备: ${item.name}`, "success");
+          }
+        } else {
+          ebbinghausManager.equipFrame(item.id);
+          soundAndFX.playSuccessSound();
+          showGameToast(this.container, `已装备: ${item.name}`, "success");
+        }
       } else {
         const res = ebbinghausManager.purchase(id);
         if (res.ok) {
           if (item.type === "avatar") ebbinghausManager.equipAvatar(item.value);
+          else if (item.type === "decoration") ebbinghausManager.equipDecoration(item.id);
           else ebbinghausManager.equipFrame(item.id);
           soundAndFX.playCoinClink();
           soundAndFX.playStarChime();
@@ -590,7 +697,7 @@ export function _celebrateNewMedals() {
     try {
       soundAndFX.playVictoryFanfare();
       soundAndFX.triggerConfetti(this.container);
-      showGameToast(this.container, `🏆 ${names.join("、")} 获得新勋章！`, "success");
+      showGameToast(this.container, `恭喜！${names.join("、")} 获得新勋章！`, "success");
     } catch (e) {
       // 缓存或实现细节导致的非致命错误，静默忽略
     }

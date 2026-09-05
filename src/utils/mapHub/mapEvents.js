@@ -60,6 +60,9 @@ export function bindEvents(mainEl) {
         onStartReview: () => {
           this._busEmit(EVENTS.SWITCH_MODE, { mode: "review" });
         },
+        onStartBook: () => {
+          this._busEmit(EVENTS.SWITCH_MODE, { mode: "books" });
+        },
       });
     });
   }

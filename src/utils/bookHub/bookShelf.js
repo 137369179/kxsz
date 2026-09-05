@@ -22,6 +22,19 @@ export function renderShelf() {
     return (b.stage || 1) === parseInt(this.currentFilterStage, 10);
   });
 
+  // P1-5 今日推荐：优先「生字全学完(READY)且未通关」的书，不足 3 本时补「生字最少的在学(PARTIAL)」书
+  const _pool = (status) =>
+    filteredBooks
+      .filter((b) => !readBooks.includes(b.id))
+      .map((b) => ({ book: b, r: checkBookReadiness(b, charRecords) }))
+      .filter((x) => x.r.status === status);
+  const recs = [
+    ..._pool(READING_STATUS.READY).sort((a, b) => (a.book.level || 1) - (b.book.level || 1)),
+    ..._pool(READING_STATUS.PARTIAL).sort(
+      (a, b) => (a.r.stats?.unknownCount ?? 99) - (b.r.stats?.unknownCount ?? 99)
+    ),
+  ].slice(0, 3);
+
   mainEl.innerHTML = `
       <div class="relative w-full max-w-5xl mx-auto flex flex-col select-none animate-fade-in pt-16 sm:pt-20 px-4 pb-12 overflow-y-auto no-scrollbar max-h-[calc(100vh-60px)]">
         
@@ -71,6 +84,41 @@ export function renderShelf() {
             )
             .join("")}
         </div>
+
+        ${
+          recs.length
+            ? `
+        <div class="mb-5 rounded-3xl bg-gradient-to-r from-amber-100 via-orange-50 to-amber-100 border-2 border-amber-300 shadow-md p-4">
+          <div class="flex items-center gap-2 mb-3" data-speak="这是为你挑选的今日推荐绘本，生字你都已经学过啦！">
+            <span class="w-8 h-8 rounded-full bg-orange-500 text-white flex items-center justify-center shadow">${GAME_ICONS.sparkle("w-5 h-5")}</span>
+            <h2 class="text-sm font-black text-orange-900">今日推荐 · 刚好匹配你学过的字</h2>
+          </div>
+          <div class="flex gap-3 overflow-x-auto no-scrollbar pb-1">
+            ${recs
+              .map(({ book, r }) => {
+                const total = r.stats?.total || (book.targetChars || []).length;
+                const known = r.stats?.learnedCount ?? 0;
+                const pct = total ? Math.round((known / total) * 100) : 100;
+                return `
+              <div class="book-card rec-card shrink-0 w-44 bg-white rounded-2xl overflow-hidden border-2 border-orange-300 shadow-lg hover:-translate-y-1 hover:shadow-xl transition-all cursor-pointer" data-book-id="${book.id}" title="去读《${book.title}》">
+                <div class="relative w-full h-24 bg-amber-100">
+                  <img src="${book.coverImg}" alt="${book.title}" loading="lazy" decoding="async" class="w-full h-full object-cover" />
+                  <div class="absolute bottom-1.5 left-1.5 bg-orange-500 text-white text-[10px] font-black px-2 py-0.5 rounded-full shadow">
+                    ${r.status === READING_STATUS.READY ? `生字已学 ${pct}%` : `还差 ${r.stats?.unknownCount ?? 0} 个生字`}
+                  </div>
+                </div>
+                <div class="p-2.5">
+                  <h3 class="text-xs font-black text-amber-950 line-clamp-1">${book.title}</h3>
+                  <p class="text-[10px] text-gray-500 font-bold mt-0.5 line-clamp-1">${book.theme || "精选绘本"}</p>
+                </div>
+              </div>`;
+              })
+              .join("")}
+          </div>
+        </div>
+        `
+            : ""
+        }
 
         ${
           filteredBooks.length === 0
@@ -172,6 +220,7 @@ export function renderShelf() {
   // 书籍点击进入阅读（E11: gatekeeper 拦截）
   mainEl.querySelectorAll(".book-card").forEach((card) => {
     this._on(card, "click", () => {
+      try { soundAndFX.stopSpeaking?.(); } catch {}
       const bookId = card.dataset.bookId;
       this.currentBook = STORYBOOKS_DATABASE.find((b) => b.id === bookId);
       const records = ebbinghausManager.progress.charRecords || {};

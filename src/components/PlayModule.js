@@ -16,13 +16,14 @@ import { renderIdiomHall, _renderIdiomStory, _renderIdiomQuiz } from "../utils/p
 import { renderPoemHall, renderPoemReader, _renderPoemQuiz } from "../utils/playHub/poemHall.js";
 import { renderFamilyWorkshop } from "../utils/playHub/familyWorkshop.js";
 import { renderSpotterGame, _renderFeihuaGame } from "../utils/playHub/spotterGame.js";
+import { renderMeteorDefense } from "../utils/playHub/meteorDefense.js";
 
 ensurePlayStyles();
 
 export class PlayModule extends BaseModule {
   constructor(container) {
     super(container);
-    this.currentMode = null; // null: 大厅, "boss": 难字歼灭, "match": 消消乐, "fusion": 汉字拼拼乐, "pk": 竞技PK, "idiom": 成语馆, "poem": 古诗馆
+    this.currentMode = null; // null: 大厅, "boss": 难字歼灭, "match": 消消乐, "fusion": 汉字拼拼乐, "pk": 竞技PK, "idiom": 成语馆, "poem": 古诗馆, "meteor": 陨石防御战
   }
 
   destroy() {
@@ -50,6 +51,8 @@ export class PlayModule extends BaseModule {
       this.renderFamilyWorkshop();
     } else if (this.currentMode === "spotter") {
       this.renderSpotterGame();
+    } else if (this.currentMode === "meteor") {
+      this.renderMeteorDefense();
     }
   }
 
@@ -204,6 +207,21 @@ export class PlayModule extends BaseModule {
             </button>
           </div>
 
+          <div class="mode-card group bg-white/95 backdrop-blur-md rounded-3xl p-6 shadow-xl border-4 border-cyan-200 hover:border-cyan-400 cursor-pointer transition-all duration-300 hover:scale-105 flex flex-col justify-between" data-mode="meteor">
+            <div>
+              <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-3xl bg-gradient-to-tr from-cyan-500 to-blue-500 text-white flex items-center justify-center shadow-lg mb-4">
+                ${GAME_ICONS.rocket ? GAME_ICONS.rocket("w-10 h-10 sm:w-12 sm:h-12") : ""}
+              </div>
+              <h3 class="text-xl font-black text-gray-900 group-hover:text-cyan-600 transition-colors">陨石防御战</h3>
+              <p class="text-xs text-gray-500 mt-1.5 leading-relaxed font-semibold">
+                听音辨形拦截汉字陨石！保护凯茜星球，挑战极速反应与抗压能力！
+              </p>
+            </div>
+            <button class="mt-4 bg-gradient-to-r from-cyan-500 to-blue-500 text-white text-xs sm:text-sm font-black py-3 rounded-full shadow-md active:scale-95 transition-transform flex items-center justify-center gap-1.5 cursor-pointer">
+              <span>立即迎战</span>
+            </button>
+          </div>
+
         </div>
 
       </div>
@@ -238,4 +256,5 @@ export class PlayModule extends BaseModule {
   renderFamilyWorkshop() { return renderFamilyWorkshop.call(this); }
   renderSpotterGame() { return renderSpotterGame.call(this); }
   _renderFeihuaGame(poem) { return _renderFeihuaGame.call(this, poem); }
+  renderMeteorDefense() { return renderMeteorDefense.call(this); }
 }

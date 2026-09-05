@@ -232,6 +232,7 @@ export function renderFusionLab() {
 
       if (nextBtn) {
         this._on(nextBtn, "click", () => {
+          soundAndFX.stopSpeaking();
           soundAndFX.playPop();
           if (successModal) successModal.classList.add("hidden");
           if (currentRound < totalRounds) {
@@ -248,6 +249,7 @@ export function renderFusionLab() {
 
       if (againBtn) {
         this._on(againBtn, "click", () => {
+          soundAndFX.stopSpeaking();
           soundAndFX.playPop();
           this.renderFusionLab();
         });
@@ -255,6 +257,7 @@ export function renderFusionLab() {
 
       if (claimBtn) {
         this._on(claimBtn, "click", () => {
+          soundAndFX.stopSpeaking();
           soundAndFX.playPop();
           this.currentMode = null;
           this.render();

@@ -199,6 +199,7 @@ export function bindReaderEvents(mainEl, page, book) {
   if (backShelfBtn) {
     this._on(backShelfBtn, "click", () => {
       soundAndFX.playPop();
+      try { soundAndFX.stopSpeaking?.(); } catch {}
       this._saveProgress();
       this.currentBook = null;
       this.render();
@@ -248,6 +249,7 @@ export function bindReaderEvents(mainEl, page, book) {
   if (userReadBtn) {
     this._on(userReadBtn, "click", () => {
       soundAndFX.playPop();
+      try { soundAndFX.stopSpeaking?.(); } catch {}
       this.openUserVoiceModal(page);
     });
   }
@@ -311,6 +313,7 @@ export function bindReaderEvents(mainEl, page, book) {
     this._on(prevBtn, "click", () => {
       if (this.currentPageIndex > 0) {
         soundAndFX.playPop();
+        try { soundAndFX.stopSpeaking?.(); } catch {}
         this.currentPageIndex--;
         this._saveProgress();
         this.render();
@@ -322,6 +325,7 @@ export function bindReaderEvents(mainEl, page, book) {
   if (nextBtn) {
     this._on(nextBtn, "click", () => {
       soundAndFX.playPop();
+      try { soundAndFX.stopSpeaking?.(); } catch {}
       if (this.currentPageIndex < totalPages - 1) {
         this.currentPageIndex++;
         this._saveProgress();
@@ -340,12 +344,14 @@ export function bindReaderEvents(mainEl, page, book) {
   const keyHandler = (e) => {
     if (e.key === "ArrowRight" || e.key === "PageDown") {
       if (this.currentPageIndex < totalPages - 1) {
+        try { soundAndFX.stopSpeaking?.(); } catch {}
         this.currentPageIndex++;
         this._saveProgress();
         this.render();
       }
     } else if (e.key === "ArrowLeft" || e.key === "PageUp") {
       if (this.currentPageIndex > 0) {
+        try { soundAndFX.stopSpeaking?.(); } catch {}
         this.currentPageIndex--;
         this._saveProgress();
         this.render();

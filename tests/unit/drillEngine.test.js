@@ -46,7 +46,7 @@ describe("DrillEngine (6-Mode Micro Drills)", () => {
     const mount = { innerHTML: "", querySelector: vi.fn(), querySelectorAll: vi.fn(() => []) };
     const engine = new DrillEngine(mount, sampleChar, vi.fn());
 
-    const types = ["audio_choice", "similar_pick", "balloon_pop", "word_fill", "sentence_fill", "audio_to_text"];
+    const types = ["audio_choice", "similar_pick", "balloon_pop", "word_fill", "sentence_fill", "listen_to_write"];
     for (const t of types) {
       const prompt = engine.buildPrompt(t);
       expect(typeof prompt).toBe("string");
@@ -57,12 +57,12 @@ describe("DrillEngine (6-Mode Micro Drills)", () => {
     }
   });
 
-  it("T7: should support audio_to_text drill type and cloze uniqueness validation", () => {
+  it("T7: should support listen_to_write drill type and cloze uniqueness validation", () => {
     const mount = { innerHTML: "", querySelector: vi.fn(), querySelectorAll: vi.fn(() => []) };
     const engine = new DrillEngine(mount, sampleChar, vi.fn());
 
     const pool = engine.buildTypePool();
-    expect(pool).toContain("audio_to_text");
+    expect(pool).toContain("listen_to_write");
 
     expect(engine.validateClozeUniqueness("红红的日头升起来了。", "日")).toBe(true);
     expect(engine.validateClozeUniqueness("红红的日头日的太阳。", "日")).toBe(false);

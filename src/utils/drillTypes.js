@@ -15,6 +15,8 @@
  * ─────────────────────────────────────────────────────────────
  */
 
+import { GAME_ICONS } from "./gameIcons.js";
+
 /** Cloze 填空 — 难度分级 */
 const CLOZE_DIFFICULTY = {
   easy: { blanks: 1, distractors: 2 },
@@ -51,7 +53,7 @@ export function clozeFill(char, allChars = []) {
   const promptHTML = `
     <div class="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/30 dark:to-pink-900/30
                 border-2 border-purple-300 rounded-2xl px-6 py-4 flex flex-col items-center gap-3">
-      <div class="text-xs font-bold text-purple-700 uppercase tracking-wider">📖 句子填空</div>
+      <div class="text-xs font-bold text-purple-700 uppercase tracking-wider">句子填空</div>
       <div class="text-2xl font-bold leading-relaxed text-gray-800 dark:text-gray-100">
         ${escapeHtml(blanked)}
       </div>
@@ -95,11 +97,11 @@ export function pinyinRead(char, allChars = []) {
   const promptHTML = `
     <div class="bg-gradient-to-br from-cyan-50 to-blue-50 dark:from-cyan-900/30 dark:to-blue-900/30
                 border-2 border-cyan-300 rounded-2xl px-6 py-4 flex flex-col items-center gap-3">
-      <div class="text-xs font-bold text-cyan-700 uppercase tracking-wider">🎵 拼音拼读</div>
+      <div class="text-xs font-bold text-cyan-700 uppercase tracking-wider">拼音拼读</div>
       <div class="text-7xl font-bold text-gray-800 dark:text-gray-100">${escapeHtml(char.char)}</div>
       <div class="text-sm text-cyan-600">${escapeHtml(hint)}</div>
       <button data-pinyin-speak class="mt-2 px-4 py-2 rounded-full bg-cyan-500 text-white text-sm font-bold
-              hover:bg-cyan-600 transition-colors">🔊 听发音</button>
+              hover:bg-cyan-600 transition-colors">听发音</button>
     </div>
   `;
 
@@ -140,7 +142,7 @@ export function pictureWrite(char, allChars = []) {
   const promptHTML = `
     <div class="bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/30 dark:to-orange-900/30
                 border-2 border-amber-300 rounded-2xl px-6 py-4 flex flex-col items-center gap-3">
-      <div class="text-xs font-bold text-amber-700 uppercase tracking-wider">🖼️ 看图写字</div>
+      <div class="text-xs font-bold text-amber-700 uppercase tracking-wider">看图写字</div>
       <div class="text-8xl font-bold text-gray-800 dark:text-gray-100">${escapeHtml(pictureHint)}</div>
       <div class="text-sm text-amber-600">${escapeHtml(meaning)}</div>
     </div>
@@ -159,26 +161,61 @@ export function pictureWrite(char, allChars = []) {
   return { promptHTML, optionsHTML, correctIndex, options, type: "picture_write" };
 }
 
+
+/**
+ * 拼音-字连线：给出拼音，选出对应汉字（语音优先练习化）
+ */
+export function pinyinLink(char, allChars = []) {
+  if (!char?.pinyin || !char?.char) return null;
+  const confusing = (char.confusingChars || []).slice(0, 2);
+  const randoms = shuffle(
+    (allChars || []).filter((x) => x.char !== char.char && !(confusing || []).includes(x.char))
+  ).slice(0, Math.max(1, 3 - confusing.length));
+  const distractorChars = shuffle([...confusing, ...randoms.map((r) => r.char)]).slice(0, 3);
+  const options = shuffle([char.char, ...distractorChars]);
+  const correctIndex = options.indexOf(char.char);
+  const promptHTML = `
+    <div class="bg-gradient-to-br from-sky-50 to-cyan-50 border-2 border-sky-300 rounded-2xl px-6 py-4 flex flex-col items-center gap-3">
+      <div class="text-xs font-bold text-sky-700 uppercase tracking-wider">拼音找字</div>
+      <div class="text-3xl font-black text-sky-900">${escapeHtml(char.pinyin)}</div>
+      <div class="text-sm text-sky-600">听拼音，找出对应的汉字宝宝</div>
+    </div>
+  `;
+  const optionsHTML = options
+    .map(
+      (c, i) =>
+        `<button data-pinyin-link-option="${i}" class="min-w-[100px] h-20 rounded-2xl border-2 border-sky-300 bg-white text-4xl font-bold text-gray-800 shadow-md hover:scale-105 active:scale-95 transition-transform touch-target" data-speak="选择${c}" aria-label="选择${c}">${escapeHtml(c)}</button>`
+    )
+    .join("");
+  return { promptHTML, optionsHTML, correctIndex, options, type: "pinyin_link" };
+}
+
 // ── 元数据（与 drillEngine 的 TYPE_META 结构对齐）────────────
 
 export const NEW_TYPE_META = {
   cloze_fill: {
     name: "完形填空",
     tip: "把生字宝宝送回句子中",
-    iconSvg: (cls) => `<svg class="${cls}" viewBox="0 0 24 24"><path d="M4 4h16v16H4z" fill="none" stroke="currentColor" stroke-width="2"/></svg>`,
+    iconSvg: (cls) => GAME_ICONS.scroll(cls),
     renderer: clozeFill,
   },
   pinyin_read: {
     name: "拼音拼读",
     tip: "听准发音，选出对应拼音",
-    iconSvg: (cls) => `<svg class="${cls}" viewBox="0 0 24 24"><path d="M12 2L2 12h3v8h14v-8h3z" fill="none" stroke="currentColor" stroke-width="2"/></svg>`,
+    iconSvg: (cls) => GAME_ICONS.mic(cls),
     renderer: pinyinRead,
   },
   picture_write: {
     name: "看图写字",
     tip: "观察图景，选出正确的汉字",
-    iconSvg: (cls) => `<svg class="${cls}" viewBox="0 0 24 24"><path d="M3 3h18v18H3z" fill="none" stroke="currentColor" stroke-width="2"/></svg>`,
+    iconSvg: (cls) => GAME_ICONS.cards(cls),
     renderer: pictureWrite,
+  },
+  pinyin_link: {
+    name: "拼音找字",
+    tip: "看拼音，选出对应汉字",
+    iconSvg: (cls) => GAME_ICONS.sparkle(cls),
+    renderer: pinyinLink,
   },
 };
 
@@ -194,6 +231,8 @@ export function canApplyNewType(type, char) {
       return !!char.pinyin;
     case "picture_write":
       return true; // 任何字都可以用图提示（fallback 到 char 本身）
+    case "pinyin_link":
+      return !!(char.pinyin && char.char);
     default:
       return false;
   }

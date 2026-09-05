@@ -6,6 +6,7 @@ import { storageManager } from "../storageManager.js";
 import { eyeCareManager } from "../eyeCareManager.js";
 import { mascotProgress } from "../mascotProgress.js";
 import { bindMicroReviewUI } from "../microReviewUI.js";
+import { ebbinghausManager } from "../ebbinghaus.js";
 
 export function init() {
   this.storage = storageManager;
@@ -25,6 +26,17 @@ export function init() {
       this.pinyinModule.locatePinyin(highlightPinyin);
     }
     this.transitionToMode(mode);
+  });
+
+  // P1-3: 发音评测结果全局落库（零侵入挂钩，供家长端四维画像统计）
+  eventBus.on(EVENTS.AUDIO_EVAL_RESULT, (res) => {
+    try {
+      if (res && res.target && res.stars) {
+        ebbinghausManager.recordPronunciation(res.target, res.stars);
+      }
+    } catch (e) {
+      console.warn("[AppInit] 发音结果落库失败:", e);
+    }
   });
 
   eventBus.on(EVENTS.SELECT_CHAR, ({ charData }) => {

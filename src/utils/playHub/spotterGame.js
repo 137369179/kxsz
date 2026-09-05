@@ -36,7 +36,7 @@ export function renderSpotterGame() {
       { a: "\u725b", b: "\u5348", target: "\u725b", diffDesc: "\"\u725b\"\u5b57\u4e00\u7ad9\u4f38\u51fa\u5934", hint: "\u5c31\u50cf\u53ef\u7231\u5c0f\u725b\u957f\u51fa\u728a\u89d2\uff01" }
     ];
 
-    let questions = shuffle([...CONFUSED_PAIRS_BANK]).slice(0, 5);
+    let questions = shuffle([...CONFUSED_PAIRS_BANK]);
     try {
       const topPair = ebbinghausManager.getTopConfusedPair();
       if (topPair && topPair.target && topPair.confused) {
@@ -45,51 +45,78 @@ export function renderSpotterGame() {
           diffDesc: `"${topPair.target}"\u4e0e"${topPair.confused}"\u4ed4\u7ec6\u8fa8\u522b`,
           hint: `AI \u9519\u56e0\u753b\u50cf\u6355\u6349\u5230\u4f60\u7ecf\u5e38\u6df7\u6de1\u8fd9\u4e00\u7ec4\uff0c\u7279\u8bad\u653b\u514b\uff01`
         });
-        questions = questions.slice(0, 5);
       }
     } catch {}
 
-    const ROUND_TIME = 15;
+    const MAX_TIME = 60;
+    let globalRemain = 30;
     let roundIndex = 0;
     let totalCoins = 0;
-    let stopRoundTimer = null;
+    let score = 0;
+    let globalTimer = null;
+
+    const endGame = () => {
+      if (globalTimer) { clearInterval(globalTimer); globalTimer = null; }
+      soundAndFX.playVictoryFanfare();
+      soundAndFX.triggerConfetti(this.container);
+      ebbinghausManager.addCoins(totalCoins);
+      mainEl.innerHTML = `
+        <div class="relative w-full max-w-xl mx-auto h-[480px] bg-gradient-to-b from-slate-950 via-rose-950 to-slate-900 rounded-3xl overflow-hidden shadow-2xl border-4 border-amber-300 flex flex-col items-center justify-center p-8 animate-fade-in text-center select-none">
+          <div class="mb-3 animate-bounce-slow flex items-center justify-center">
+            ${GAME_ICONS.trophy("w-20 h-20")}
+          </div>
+          <h2 class="text-3xl font-black text-yellow-300 mb-2">极限生存结束！</h2>
+          <p class="text-sm text-gray-200 mb-4 font-bold">
+            你一共找出了 <span class="text-2xl text-amber-300 mx-1">${score}</span> 个形近字，火眼金睛等级提升！
+          </p>
+          <div class="candy-pill px-6 py-2.5 mb-8 text-yellow-300 font-black flex items-center gap-2 border border-amber-400">
+            <span class="flex items-center">${GAME_ICONS.coin()}</span>
+            <span>获得 ${totalCoins} 凯茜星币</span>
+          </div>
+          <div class="flex gap-4">
+            <button id="btn-spotter-again" class="btn-game-orange text-white font-black px-8 py-3 rounded-full cursor-pointer shadow-lg active:scale-95">\u518d\u73a9\u4e00\u5c40</button>
+            <button id="btn-spotter-home" class="btn-game-wood text-white font-black px-8 py-3 rounded-full cursor-pointer shadow-lg active:scale-95">\u8fd4\u56de\u6e38\u4e50\u573a</button>
+          </div>
+        </div>
+      `;
+      const againBtn = mainEl.querySelector("#btn-spotter-again");
+      if (againBtn) this._on(againBtn, "click", () => this.renderSpotterGame());
+      const homeBtn = mainEl.querySelector("#btn-spotter-home");
+      if (homeBtn) this._on(homeBtn, "click", () => { soundAndFX.playPop(); this.currentMode = null; this.render(); });
+    };
+
+    const drawSpotterRing = (remain) => {
+      const ringCanvas = mainEl.querySelector("#spotter-ring");
+      const timerTxt = mainEl.querySelector("#spotter-timer-txt");
+      if (!ringCanvas || typeof ringCanvas.getContext !== "function") return;
+      const ctx = ringCanvas.getContext("2d");
+      if (!ctx) return;
+      const cx = 22, cy = 22, r = 18;
+      ctx.clearRect(0, 0, 44, 44);
+      ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2);
+      ctx.strokeStyle = "rgba(255,255,255,0.15)"; ctx.lineWidth = 4; ctx.stroke();
+      const color = remain <= 5 ? "#f87171" : remain <= 10 ? "#fbbf24" : "#34d399";
+      const frac = Math.max(remain, 0) / MAX_TIME;
+      ctx.beginPath(); ctx.arc(cx, cy, r, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * frac);
+      ctx.strokeStyle = color; ctx.lineWidth = 4; ctx.lineCap = "round"; ctx.stroke();
+      if (timerTxt) { timerTxt.textContent = Math.max(Math.floor(remain), 0); timerTxt.style.color = color; }
+    };
+
+    // Global timer
+    globalTimer = setInterval(() => {
+      globalRemain -= 1;
+      drawSpotterRing(globalRemain);
+      if (globalRemain <= 0) {
+        endGame();
+      }
+    }, 1000);
+    this._addCleanup(() => { if (globalTimer) clearInterval(globalTimer); });
 
     const renderRound = () => {
-      if (stopRoundTimer) { stopRoundTimer(); stopRoundTimer = null; }
+      // Loop questions infinitely
+      const q = questions[roundIndex % questions.length];
 
-      if (roundIndex >= questions.length) {
-        soundAndFX.playVictoryFanfare();
-        soundAndFX.triggerConfetti(this.container);
-        ebbinghausManager.addCoins(totalCoins);
-        mainEl.innerHTML = `
-          <div class="relative w-full max-w-xl mx-auto h-[480px] bg-gradient-to-b from-slate-950 via-rose-950 to-slate-900 rounded-3xl overflow-hidden shadow-2xl border-4 border-amber-300 flex flex-col items-center justify-center p-8 animate-fade-in text-center select-none">
-            <div class="mb-3 animate-bounce-slow flex items-center justify-center">
-              ${GAME_ICONS.trophy("w-20 h-20")}
-            </div>
-            <h2 class="text-3xl font-black text-yellow-300 mb-2">\u706b\u773c\u91d1\u775b\uff01\u5927\u83b7\u5168\u80dc\uff01</h2>
-            <p class="text-sm text-gray-200 mb-4 font-bold">
-              \u592a\u5389\u5bb3\u4e86\uff01\u5f62\u8fd1\u5b57\u5168\u90e8\u706b\u773c\u91d1\u775b\u79d2\u8ba4\uff0c\u638c\u63e1\u5ea6\u5927\u5e45\u63d0\u5347\uff01
-            </p>
-            <div class="candy-pill px-6 py-2.5 mb-8 text-yellow-300 font-black flex items-center gap-2 border border-amber-400">
-              <span class="flex items-center">${GAME_ICONS.coin()}</span>
-              <span>\u83b7\u5f97 ${totalCoins} \u51ef\u831c\u661f\u5e01</span>
-            </div>
-            <div class="flex gap-4">
-              <button id="btn-spotter-again" class="btn-game-orange text-white font-black px-8 py-3 rounded-full cursor-pointer shadow-lg active:scale-95">\u518d\u73a9\u4e00\u5c40</button>
-              <button id="btn-spotter-home" class="btn-game-wood text-white font-black px-8 py-3 rounded-full cursor-pointer shadow-lg active:scale-95">\u8fd4\u56de\u6e38\u4e50\u573a</button>
-            </div>
-          </div>
-        `;
-        const againBtn = mainEl.querySelector("#btn-spotter-again");
-        if (againBtn) this._on(againBtn, "click", () => this.renderSpotterGame());
-        const homeBtn = mainEl.querySelector("#btn-spotter-home");
-        if (homeBtn) this._on(homeBtn, "click", () => { soundAndFX.playPop(); this.currentMode = null; this.render(); });
-        return;
-      }
-
-      const q = questions[roundIndex];
       const cards = shuffle([q.a, q.b]);
-      const progressPct = questions.length ? Math.round((roundIndex / questions.length) * 100) : 0;
 
       mainEl.innerHTML = `
         <div class="relative w-full max-w-3xl mx-auto flex flex-col items-center select-none animate-fade-in pb-8">
@@ -97,18 +124,16 @@ export function renderSpotterGame() {
             <button id="btn-spotter-back" class="bg-white/10 hover:bg-white/20 text-white font-black text-xs sm:text-sm px-4 py-2 rounded-full border border-white/20 active:scale-95 transition-transform flex items-center gap-1.5 cursor-pointer shadow">
               <span>\u2190 \u8fd4\u56de\u5927\u5385</span>
             </button>
-            <div class="flex items-center gap-3">
-              <div class="text-xs sm:text-sm font-black text-amber-300 bg-black/40 px-4 py-1.5 rounded-full border border-white/20">
-                \u7b2c ${roundIndex + 1} / ${questions.length} \u9898
+            <div class="flex items-center gap-4">
+              <div class="text-sm font-black text-white bg-black/40 px-4 py-1.5 rounded-full border border-white/20 shadow-inner flex items-center gap-2">
+                ${GAME_ICONS.sparkle("w-4 h-4 text-amber-300")}
+                得分 <span class="text-lg text-amber-300">${score}</span>
               </div>
               <div class="relative w-11 h-11">
                 <canvas id="spotter-ring" width="44" height="44"></canvas>
-                <span id="spotter-timer-txt" class="absolute inset-0 flex items-center justify-center text-xs font-black text-yellow-300">${ROUND_TIME}</span>
+                <span id="spotter-timer-txt" class="absolute inset-0 flex items-center justify-center text-xs font-black text-yellow-300">${globalRemain}</span>
               </div>
             </div>
-          </div>
-          <div class="w-full h-2 bg-white/10 rounded-full mb-5 overflow-hidden">
-            <div class="h-full bg-gradient-to-r from-amber-400 to-yellow-300 rounded-full transition-all duration-500" style="width:${progressPct}%"></div>
           </div>
 
           <div class="w-full bg-gradient-to-r from-rose-900/90 to-amber-900/90 border-2 border-amber-300/80 rounded-3xl p-5 text-center shadow-xl mb-6">
@@ -162,21 +187,7 @@ export function renderSpotterGame() {
       const hintBox = mainEl.querySelector("#spotter-hint-box");
       const roundStartTime = Date.now();
 
-      const drawSpotterRing = (remain) => {
-        if (!ringCanvas || typeof ringCanvas.getContext !== "function") return;
-        const ctx = ringCanvas.getContext("2d");
-        if (!ctx) return;
-        const cx = 22, cy = 22, r = 18;
-        ctx.clearRect(0, 0, 44, 44);
-        ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2);
-        ctx.strokeStyle = "rgba(255,255,255,0.15)"; ctx.lineWidth = 4; ctx.stroke();
-        const color = remain <= 4 ? "#f87171" : remain <= 8 ? "#fbbf24" : "#34d399";
-        const frac = Math.max(remain, 0) / ROUND_TIME;
-        ctx.beginPath(); ctx.arc(cx, cy, r, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * frac);
-        ctx.strokeStyle = color; ctx.lineWidth = 4; ctx.lineCap = "round"; ctx.stroke();
-        if (timerTxt) { timerTxt.textContent = Math.max(remain, 0); timerTxt.style.color = color; }
-      };
-      drawSpotterRing(ROUND_TIME);
+      drawSpotterRing(globalRemain);
 
       const showHint = () => {
         if (hintBox) {
@@ -185,26 +196,13 @@ export function renderSpotterGame() {
         }
       };
 
-      const onTimeout = () => {
-        stopRoundTimer = null;
-        showHint();
-        soundAndFX.playSoftError();
-        soundAndFX.speakPriority(`时间到！是"${q.target}"字！${q.diffDesc}`, { kind: "sentence", emotion: "correction" });
-        mainEl.querySelectorAll(".spotter-char-card").forEach(b => {
-          if (b.dataset.char === q.target) b.classList.add("ring-8", "ring-emerald-400", "scale-105");
-          else b.classList.add("opacity-30");
-        });
-        roundIndex++;
-        this._timeout(renderRound, 2000);
-      };
-
-      stopRoundTimer = startCountdown(ROUND_TIME, (remain) => drawSpotterRing(remain), onTimeout);
-      this._addCleanup(() => { if (stopRoundTimer) stopRoundTimer(); });
+      let roundActive = true;
 
       const backBtn = mainEl.querySelector("#btn-spotter-back");
       if (backBtn) {
         this._on(backBtn, "click", () => {
-          if (stopRoundTimer) { stopRoundTimer(); stopRoundTimer = null; }
+          if (globalTimer) clearInterval(globalTimer);
+          soundAndFX.stopSpeaking();
           soundAndFX.playPop();
           this.currentMode = null;
           this.render();
@@ -222,30 +220,46 @@ export function renderSpotterGame() {
 
       mainEl.querySelectorAll(".spotter-char-card").forEach((btn) => {
         this._on(btn, "click", () => {
-          if (!stopRoundTimer) return;
+          if (!roundActive) return;
           const ch = btn.dataset.char;
           if (ch === q.target) {
-            if (stopRoundTimer) { stopRoundTimer(); stopRoundTimer = null; }
+            roundActive = false;
             soundAndFX.playSuccessSound();
             soundAndFX.triggerConfetti(this.container);
             btn.classList.add("ring-8", "ring-emerald-400", "scale-110");
             const elapsed = (Date.now() - roundStartTime) / 1000;
-            const bonus = elapsed <= 5 ? 3 : elapsed <= 10 ? 2 : 1;
-            totalCoins += bonus;
+            
+            // Time bonus
+            const timeBonus = elapsed <= 3 ? 3 : elapsed <= 6 ? 2 : 1;
+            globalRemain = Math.min(MAX_TIME, globalRemain + timeBonus);
+            
+            score++;
+            totalCoins += timeBonus;
+            
             if (speedBadge) {
-              speedBadge.textContent = elapsed <= 5 ? `闪电反应！+${bonus} 星币！` : elapsed <= 10 ? `快速答对！+${bonus} 星币！` : `+${bonus} 星币`;
-              speedBadge.className = "mt-2 text-sm font-black " + (elapsed <= 5 ? "text-yellow-300" : "text-emerald-300");
+              speedBadge.textContent = elapsed <= 3 ? `闪电反应！+${timeBonus}秒！` : `答对！+${timeBonus}秒`;
+              speedBadge.className = "mt-2 text-sm font-black " + (elapsed <= 3 ? "text-emerald-300" : "text-green-300");
+              speedBadge.classList.add("animate-bounce");
             }
+            
             this._timeout(() => {
-              soundAndFX.speakPriority(`太准啦！这是"${q.target}"字！${q.diffDesc}！`, { kind: "sentence", emotion: "excited" });
+              soundAndFX.speakPriority(`太准啦！这是"${q.target}"字！`, { kind: "sentence", emotion: "excited" });
             }, 250);
             const matchedChar = CHARACTER_DATABASE.find((c) => c.char === q.target);
             if (matchedChar) ebbinghausManager.completeReview(matchedChar.id, true);
             roundIndex++;
-            this._timeout(renderRound, 2200);
+            this._timeout(renderRound, 1500);
           } else {
+            // Wrong answer penalizes time
+            globalRemain = Math.max(0, globalRemain - 3);
             soundAndFX.playSoftError();
             btn.classList.add("animate-shake", "border-red-500", "ring-4", "ring-red-400");
+            
+            if (speedBadge) {
+              speedBadge.textContent = "找错了！时间 -3 秒！";
+              speedBadge.className = "mt-2 text-sm font-black text-red-300 animate-shake";
+            }
+            
             showHint();
             if (hintBox) hintBox.textContent = `小贴士：这是"${ch}"字哦！${q.diffDesc}才是"${q.target}"字！`;
             soundAndFX.speakPriority(`这是"${ch}"字哦！${q.diffDesc}才是"${q.target}"字！`, { kind: "sentence", emotion: "correction" });
@@ -314,6 +328,7 @@ export function _renderFeihuaGame(poem) {
     const backBtn = this.container.querySelector("#btn-feihua-back");
     if (backBtn) {
       this._on(backBtn, "click", () => {
+        soundAndFX.stopSpeaking();
         soundAndFX.playPop();
         this.renderPoemReader(poem);
       });
@@ -326,14 +341,21 @@ export function _renderFeihuaGame(poem) {
           soundAndFX.playVictoryFanfare();
           soundAndFX.triggerConfetti(this.container);
           ebbinghausManager.addCoins(15);
-          soundAndFX.speakPriority(`太棒啦！“${text}”里面就有“${keyword}”字！飞花令通关，奖励 15 星币！`, { kind: "sentence", emotion: "excited" });
           btn.classList.add("bg-emerald-500/60", "border-emerald-300", "scale-105");
           showGameToast(this.container, `飞花令成功！获得 +15 凯茜星币！`, "success");
-          this._timeout(() => this.renderPoemReader(poem), 1800);
+          this._timeout(() => {
+            soundAndFX.speakPriority(`太棒啦！“${text}”里面就有“${keyword}”字！飞花令通关，奖励 15 星币！`, { kind: "sentence", emotion: "excited" });
+          }, 250);
+          this._timeout(() => {
+            soundAndFX.stopSpeaking();
+            this.renderPoemReader(poem);
+          }, 3200);
         } else {
           soundAndFX.playSoftError();
           btn.classList.add("animate-shake", "border-red-400");
-          soundAndFX.speakPriority(`这句诗里面没有“${keyword}”字哦，再仔细找找看！`, { kind: "sentence", emotion: "correction" });
+          this._timeout(() => {
+            soundAndFX.speakPriority(`这句诗里面没有“${keyword}”字哦，再仔细找找看！`, { kind: "sentence", emotion: "correction" });
+          }, 180);
           this._timeout(() => btn.classList.remove("animate-shake", "border-red-400"), 600);
         }
       });

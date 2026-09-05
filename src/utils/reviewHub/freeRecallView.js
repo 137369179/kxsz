@@ -6,6 +6,7 @@ import { escapeHtml } from "../BaseModule.js";
 import { soundAndFX } from "../soundEngine.js";
 import { checkCardAnswer } from "../flashcardEngine.js";
 import { pickRecallMode } from "./freeRecallLogic.js";
+import { GAME_ICONS } from "../gameIcons.js";
 
 function shuffle(arr) {
   const a = [...arr];
@@ -74,14 +75,14 @@ export function mountFreeRecallRound(ctx) {
         <div class="text-8xl sm:text-9xl font-black font-serif text-white drop-shadow-lg leading-none select-none">${escapeHtml(charData.char)}</div>
         <p class="text-sm sm:text-base text-white/85 font-bold">先自己读出来，你对它熟悉吗？</p>
         <div class="flex flex-wrap items-center justify-center gap-3">
-          <button type="button" id="btn-recall-easy" class="btn-game-orange text-white font-black text-sm sm:text-base px-6 py-3 rounded-full shadow-xl active:scale-95 cursor-pointer flex items-center gap-1.5">
-            <span>🌟</span><span>很熟</span>
+          <button type="button" id="btn-recall-easy" class="btn-game-orange text-white font-black text-sm sm:text-base px-6 py-3 rounded-full shadow-xl active:scale-95 cursor-pointer flex items-center gap-1.5 touch-target" data-speak="我很熟这个字" aria-label="很熟">
+            ${GAME_ICONS.star("w-4 h-4 mr-1")}<span>很熟</span>
           </button>
-          <button type="button" id="btn-recall-fuzzy" class="bg-amber-500/80 hover:bg-amber-500 text-white font-black text-sm sm:text-base px-6 py-3 rounded-full border border-amber-300/40 shadow-xl active:scale-95 cursor-pointer flex items-center gap-1.5">
-            <span>🤔</span><span>想想</span>
+          <button type="button" id="btn-recall-fuzzy" class="bg-amber-500/80 hover:bg-amber-500 text-white font-black text-sm sm:text-base px-6 py-3 rounded-full border border-amber-300/40 shadow-xl active:scale-95 cursor-pointer flex items-center gap-1.5 touch-target" data-speak="我想一想" aria-label="想想">
+            ${GAME_ICONS.sparkle("w-4 h-4 mr-1")}<span>想想</span>
           </button>
-          <button type="button" id="btn-recall-hard" class="bg-slate-600/80 hover:bg-slate-500 text-white font-black text-sm sm:text-base px-6 py-3 rounded-full border border-white/20 shadow-xl active:scale-95 cursor-pointer flex items-center gap-1.5">
-            <span>❓</span><span>直接听</span>
+          <button type="button" id="btn-recall-hard" class="bg-slate-600/80 hover:bg-slate-500 text-white font-black text-sm sm:text-base px-6 py-3 rounded-full border border-white/20 shadow-xl active:scale-95 cursor-pointer flex items-center gap-1.5 touch-target" data-speak="直接听一听" aria-label="直接听">
+            ${GAME_ICONS.speaker("w-4 h-4 mr-1")}<span>直接听</span>
           </button>
         </div>
       </div>
@@ -113,8 +114,9 @@ export function mountFreeRecallRound(ctx) {
       <div class="free-recall-round flex flex-col items-center justify-center gap-5 w-full max-w-md mx-auto text-center px-4">
         <div class="text-8xl sm:text-9xl font-black font-serif text-white drop-shadow-lg leading-none select-none">${escapeHtml(charData.char)}</div>
         <div class="text-3xl sm:text-4xl font-black text-yellow-300 tracking-wide">${escapeHtml(charData.pinyin || "")}</div>
-        <button type="button" id="btn-recall-speak" class="bg-white/15 hover:bg-white/25 text-white font-bold text-sm px-5 py-2 rounded-full border border-white/30 cursor-pointer active:scale-95">
-          听示范
+        <button type="button" id="btn-recall-speak" class="bg-white/15 hover:bg-white/25 text-white font-bold text-sm px-5 py-2 rounded-full border border-white/30 cursor-pointer active:scale-95 flex items-center gap-1.5 mx-auto">
+          ${GAME_ICONS.speaker("w-3.5 h-3.5 inline-block")}
+          <span>听示范</span>
         </button>
         <div class="flex flex-wrap items-center justify-center gap-3 mt-2">
           ${isDirectListen ? `
@@ -138,6 +140,7 @@ export function mountFreeRecallRound(ctx) {
       soundAndFX.speakPriority?.(charData.char, { kind: "char", priority: 1 });
       bind(containerEl.querySelector("#btn-recall-ack"), "click", () => {
         soundAndFX.playPop?.();
+        try { soundAndFX.stopSpeaking?.(); } catch {}
         finish(false, "hard");
       });
     }
@@ -150,6 +153,7 @@ export function mountFreeRecallRound(ctx) {
     if (knewBtn) {
       bind(knewBtn, "click", () => {
         soundAndFX.playPop?.();
+        try { soundAndFX.stopSpeaking?.(); } catch {}
         finish(true, currentJol);
       });
     }
@@ -180,8 +184,9 @@ export function mountFreeRecallRound(ctx) {
     containerEl.innerHTML = `
       <div class="free-recall-round flex flex-col items-center justify-center gap-5 w-full max-w-lg mx-auto text-center px-4">
         <p class="text-sm sm:text-base text-white/90 font-bold">听一听，选出正确的字</p>
-        <button type="button" id="btn-recall-replay" class="bg-white/15 hover:bg-white/25 text-white font-bold text-sm px-5 py-2 rounded-full border border-white/30 cursor-pointer active:scale-95">
-          再听一遍
+        <button type="button" id="btn-recall-replay" class="bg-white/15 hover:bg-white/25 text-white font-bold text-sm px-5 py-2 rounded-full border border-white/30 cursor-pointer active:scale-95 flex items-center gap-1.5 mx-auto">
+          ${GAME_ICONS.speaker("w-3.5 h-3.5 inline-block")}
+          <span>再听一遍</span>
         </button>
         <div class="grid grid-cols-2 gap-3 w-full max-w-sm mt-2">
           ${options
@@ -210,6 +215,7 @@ export function mountFreeRecallRound(ctx) {
       bind(btn, "click", () => {
         if (destroyed || completed) return;
         soundAndFX.playPop?.();
+        try { soundAndFX.stopSpeaking?.(); } catch {}
         const result = checkCardAnswer(card, btn.dataset.char);
         finish(!!result.correct);
       });

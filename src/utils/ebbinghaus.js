@@ -6,6 +6,7 @@ import { eventBus, EVENTS } from "./eventBus.js";
 import { storageManager } from "./storageManager.js";
 import { findShopItem } from "../data/shop.js";
 import { fsrsCompleteCharacter, fsrsCompleteReview, fsrsGetDueIds } from "./fsrsScheduler.js";
+import { CHARACTER_DATABASE } from "../data/characters.js";
 
 const STORAGE_KEY = "CATHY_LITERACY_USER_PROGRESS_V1";
 
@@ -69,7 +70,8 @@ export class EbbinghausManager {
       },
       shop: {
         owned: ["av_cathy", "av_fairy", "av_hero", "frame_none"],
-        equippedFrame: "frame_none"
+        equippedFrame: "frame_none",
+        equippedDecorations: []
       },
       // 真实学习/签到日期 YYYY-MM-DD 列表 —— 奖励城堡「连胜日历」热力图数据源
       attendance: { dates: [], streakDays: 0 },
@@ -731,6 +733,58 @@ export class EbbinghausManager {
       .map((r) => r.charId);
   }
 
+  // ------------------------------------------------------------------
+  // P1-3: 发音评测结果落库（滚动均值）— 家长雷达"跟读发音"维度的真实数据源
+  // target 可以是单字或词组；逐字映射到 charRecords，无对应记录时创建最小记录
+  // ------------------------------------------------------------------
+  recordPronunciation(targetText, stars = 3) {
+    const clamped = Math.max(1, Math.min(3, Number(stars) || 3));
+    const chars = new Set(String(targetText || "").match(/[\u4e00-\u9fa5]/g) || []);
+    let touched = 0;
+    for (const ch of chars) {
+      const entry = CHARACTER_DATABASE.find((c) => c.char === ch);
+      if (!entry) continue;
+      const rec = this.progress.charRecords[entry.id] || {
+        charId: entry.id,
+        learnedAt: Date.now(),
+        reviewCount: 0,
+        correctStreak: 0,
+        masteryRate: 60,
+        nextReviewDate: Date.now() + 86400000,
+        isDifficult: false,
+      };
+      const prevSum = (rec.pronAvg || 0) * (rec.pronCount || 0);
+      const count = (rec.pronCount || 0) + 1;
+      rec.pronAvg = Math.round(((prevSum + clamped) / count) * 100) / 100;
+      rec.pronCount = count;
+      this.progress.charRecords[entry.id] = rec;
+      touched += 1;
+    }
+    if (touched) this.save();
+    return touched;
+  }
+
+  /**
+   * P1-3: 家长端学习四维画像（全部真实数据，无采样显示 null）
+   * 认读掌握 = 已学字 masteryRate 均值；记忆巩固 = 连对次数归一；
+   * 跟读发音 = pronAvg(1~3) 折算百分制；识字广度 = 已学/1489
+   */
+  getRadarStats() {
+    const records = Object.values(this.progress.charRecords || {});
+    const avg = (arr) => (arr.length ? Math.round(arr.reduce((a, b) => a + b, 0) / arr.length) : null);
+    const mastery = avg(records.map((r) => Math.round(r.masteryRate || 0)));
+    const consolidation = records.length
+      ? Math.round(records.reduce((a, r) => a + Math.min(100, Math.round(((r.correctStreak || 0) / 5) * 100)), 0) / records.length)
+      : null;
+    const pronRecs = records.filter((r) => (r.pronCount || 0) > 0);
+    const pronunciation = pronRecs.length
+      ? Math.round((pronRecs.reduce((a, r) => a + (r.pronAvg || 0), 0) / pronRecs.length) * 100 / 3)
+      : null;
+    const TOTAL_CHARS = 1489;
+    const breadth = Math.round((records.length / TOTAL_CHARS) * 100);
+    return { mastery, consolidation, pronunciation, breadth, learned: records.length, pronSample: pronRecs.length };
+  }
+
   // ===== 装扮商城与道具背包系统 =====
   isOwned(id) {
     if (!this.progress.shop) {
@@ -753,7 +807,7 @@ export class EbbinghausManager {
 
   equipFrame(id) {
     if (!this.progress.shop) {
-      this.progress.shop = { owned: ["av_cathy", "av_fairy", "av_hero", "frame_none"], equippedFrame: "frame_none" };
+      this.progress.shop = { owned: ["av_cathy", "av_fairy", "av_hero", "frame_none"], equippedFrame: "frame_none", equippedDecorations: [] };
     }
     this.progress.shop.equippedFrame = id;
     if (!this.progress.profile) this.progress.profile = {};
@@ -762,9 +816,35 @@ export class EbbinghausManager {
     eventBus.emit(EVENTS.PROGRESS_CHANGED, { progress: this.progress });
   }
 
+  getEquippedDecorations() {
+    if (!this.progress.shop) return [];
+    return this.progress.shop.equippedDecorations || [];
+  }
+
+  equipDecoration(id) {
+    if (!this.progress.shop) {
+      this.progress.shop = { owned: ["av_cathy", "av_fairy", "av_hero", "frame_none"], equippedFrame: "frame_none", equippedDecorations: [] };
+    }
+    if (!this.progress.shop.equippedDecorations) {
+      this.progress.shop.equippedDecorations = [];
+    }
+    if (!this.progress.shop.equippedDecorations.includes(id)) {
+      this.progress.shop.equippedDecorations.push(id);
+    }
+    this.save();
+    eventBus.emit(EVENTS.PROGRESS_CHANGED, { progress: this.progress });
+  }
+
+  unequipDecoration(id) {
+    if (!this.progress.shop || !this.progress.shop.equippedDecorations) return;
+    this.progress.shop.equippedDecorations = this.progress.shop.equippedDecorations.filter(d => d !== id);
+    this.save();
+    eventBus.emit(EVENTS.PROGRESS_CHANGED, { progress: this.progress });
+  }
+
   purchase(id) {
     if (!this.progress.shop) {
-      this.progress.shop = { owned: ["av_cathy", "av_fairy", "av_hero", "frame_none"], equippedFrame: "frame_none" };
+      this.progress.shop = { owned: ["av_cathy", "av_fairy", "av_hero", "frame_none"], equippedFrame: "frame_none", equippedDecorations: [] };
     }
     if (this.isOwned(id)) return { ok: true, success: true };
     const item = findShopItem ? findShopItem(id) : null;

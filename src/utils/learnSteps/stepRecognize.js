@@ -181,7 +181,6 @@ export function renderStepRecognize(stage) {
     const pinyinIslandBtn = stage.querySelector("#btn-goto-pinyin-island");
     if (pinyinIslandBtn) {
       this._on(pinyinIslandBtn, "click", () => {
-        soundAndFX.playPop();
         soundAndFX.speakPriority(`去拼音乐园复习拼音“${char.pinyin}”吧！`, { kind: "sentence", emotion: "gentle" });
         this._busEmit(EVENTS.SWITCH_MODE, { mode: "pinyin", highlightPinyin: char.pinyin });
       });

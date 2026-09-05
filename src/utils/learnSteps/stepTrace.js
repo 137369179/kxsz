@@ -68,7 +68,7 @@ export function renderStepTrace(stage) {
             </p>
             ${prewriteSkippedByParent ? `
             <div class="mt-2 p-2 bg-orange-50 border border-orange-200 rounded-xl text-orange-700 text-[10px] font-bold leading-relaxed">
-              🧸 家长好！${age}岁宝宝可能还没练过控笔哦～<br>
+              <span class="inline-flex items-center gap-1 mb-0.5">${GAME_ICONS.parent("w-3.5 h-3.5 inline-block")} 家长好！</span>${age}岁宝宝可能还没练过控笔哦～<br>
               建议先让宝宝在"控笔训练"里画几轮圆圈和横线，<br>
               小手活动开了再写字会更轻松！
             </div>` : ""}

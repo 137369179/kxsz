@@ -78,30 +78,52 @@ export class ReviewModule extends BaseModule {
     this.isBedtime = isBedtimeWindow();
     try { ensureDetails(); } catch {}
 
-    // 仅已学字；无已学 → 空队列（禁止字库前 N 字凑数）
-    if (learnedIds.length === 0) {
-      this.queue = [];
-      this.hasOvernightChars = false;
-      return;
-    }
+    // P1-1: Implement 70/20/10 ratio queue (due, confused, new)
+    let dueCount = Math.floor(wantRev * 0.7);
+    let confusedCount = Math.floor(wantRev * 0.2);
+    let newCount = wantRev - dueCount - confusedCount;
 
-    // 睡眠巩固机制：优先提取隔夜待巩固字 (Walker 2006)
     const overnightIds = getOvernightChars(records).filter((id) => learnedSet.has(id));
     this.hasOvernightChars = overnightIds.length > 0;
 
     const dueIds = ebbinghausManager
       .getDueReviewCharIds()
-      .filter((id) => learnedSet.has(id))
-      .slice(0, Math.max(wantRev, 3));
+      .filter((id) => learnedSet.has(id));
 
     const confusedChars = confusedTargetsForReview(
       ebbinghausManager.progress.errorProfiles,
-      Math.max(wantRev - dueIds.length, 2)
+      wantRev
     ).filter((c) => learnedSet.has(c.id));
     const confusedIds = confusedChars.map((c) => c.id);
 
-    // 优先排隔夜字，再排到期字与混淆字
-    const allIds = [...new Set([...overnightIds, ...dueIds, ...confusedIds])].slice(0, wantRev);
+    // 优先从 overnight 和 due 中选取
+    const availableDue = [...new Set([...overnightIds, ...dueIds])];
+    let finalDue = availableDue.slice(0, dueCount);
+    
+    // 如果 due 不足，将剩余名额给 confused
+    if (finalDue.length < dueCount) {
+      confusedCount += (dueCount - finalDue.length);
+    }
+    
+    let finalConfused = confusedIds.filter(id => !finalDue.includes(id)).slice(0, confusedCount);
+
+    // 如果 confused 不足，将剩余名额给 new
+    if (finalConfused.length < confusedCount) {
+      newCount += (confusedCount - finalConfused.length);
+    }
+    
+    const unlearned = CHARACTER_DATABASE.filter(c => !learnedSet.has(c.id)).map(c => c.id);
+    let finalNew = unlearned.slice(0, newCount);
+
+    // 如果 new 不足（几乎不可能，除非快学完所有字），将剩余名额退回给已学字巩固
+    let fallback = [];
+    if (finalNew.length < newCount) {
+      const needed = newCount - finalNew.length;
+      fallback = learnedIds.filter(id => !finalDue.includes(id) && !finalConfused.includes(id)).slice(0, needed);
+    }
+
+    const allIds = [...new Set([...finalDue, ...finalConfused, ...finalNew, ...fallback])].slice(0, wantRev);
+
     this.queue = allIds
       .map((id) => CHARACTER_DATABASE.find((c) => c.id === id))
       .filter(Boolean);
@@ -210,6 +232,7 @@ export class ReviewModule extends BaseModule {
     if (backBtn) {
       this._on(backBtn, "click", () => {
         soundAndFX.playPop();
+        try { soundAndFX.stopSpeaking?.(); } catch {}
         this._busEmit(EVENTS.SWITCH_MODE, { mode: "map" });
       });
     }
@@ -218,6 +241,7 @@ export class ReviewModule extends BaseModule {
     if (headerBackBtn) {
       this._on(headerBackBtn, "click", () => {
         soundAndFX.playPop();
+        try { soundAndFX.stopSpeaking?.(); } catch {}
         this._busEmit(EVENTS.SWITCH_MODE, { mode: "map" });
       });
     }
@@ -288,7 +312,7 @@ export class ReviewModule extends BaseModule {
           </button>
 
           <div class="candy-pill flex items-center gap-2 px-5 py-1.5 rounded-full border border-yellow-300/40">
-            <span class="text-xs text-amber-200 font-bold">${this.hasOvernightChars ? "🌙 隔夜巩固:" : (this.isBedtime ? "🌙 睡前轻复习:" : "艾宾浩斯复习:")}</span>
+            <span class="text-xs text-amber-200 font-bold">${this.hasOvernightChars ? "隔夜巩固:" : (this.isBedtime ? "睡前轻复习:" : "艾宾浩斯复习:")}</span>
             <span class="text-yellow-300 font-black text-sm font-mono">${progress} / ${this.queue.length}</span>
           </div>
 
@@ -314,6 +338,7 @@ export class ReviewModule extends BaseModule {
     if (quitBtn) {
       this._on(quitBtn, "click", () => {
         soundAndFX.playPop();
+        try { soundAndFX.stopSpeaking?.(); } catch {}
         this._busEmit(EVENTS.REVIEW_FINISH, { correct: this.correctCount, total: this.queue.length });
         this._busEmit(EVENTS.SWITCH_MODE, { mode: "map" });
       });
@@ -604,6 +629,7 @@ export class ReviewModule extends BaseModule {
     if (doneBtn) {
       this._on(doneBtn, "click", () => {
         soundAndFX.playPop();
+        try { soundAndFX.stopSpeaking?.(); } catch {}
         const res = { correct: this.correctCount, total: this.queue.length };
         this.initQueue();
         this._busEmit(EVENTS.REVIEW_FINISH, res);

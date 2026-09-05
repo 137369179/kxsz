@@ -238,16 +238,76 @@ export class LearnModule extends BaseModule {
   /** P0-7 B1/B6 年龄自适应：推进到序列内的下一步（而非盲目的 currentStep++） */
   nextStep() {
     const next = this.getNextStepInSequence();
-    if (next < 0) return; // 已到序列末尾，不再推进
+    
     try { soundAndFX.stopSpeaking(); } catch {}
+    
+    // P1-3: 3-minute micro-lesson logic
+    if (!this.sessionStartTime) this.sessionStartTime = Date.now();
+    const elapsedMinutes = (Date.now() - this.sessionStartTime) / 60000;
+    
     try {
       this.markStepComplete(this.currentStep);
+      
+      if (next < 0 || elapsedMinutes >= 3) {
+        // 微课完成 (已学完所有步骤，或时间到达3分钟)
+        this.saveProgress();
+        this.showMicroLessonComplete();
+        return;
+      }
+      
       this.currentStep = next;
       this.saveProgress();
     } catch (e) {
       console.warn("[LearnModule] 保存进度失败:", e);
     }
     this.render();
+  }
+
+  showMicroLessonComplete() {
+    this.container.innerHTML = `
+      <div class="relative w-full h-full min-h-[640px] flex flex-col items-center justify-center bg-gradient-to-br from-indigo-950 via-purple-950 to-slate-950">
+        <div class="bg-black/60 backdrop-blur-md px-10 py-12 rounded-3xl border border-yellow-400 shadow-2xl flex flex-col items-center text-center max-w-lg">
+          <div class="mb-6 animate-bounce-slow">${GAME_ICONS.trophy("w-32 h-32")}</div>
+          <h2 class="text-4xl font-black text-yellow-300 mb-4">微课完成！</h2>
+          <p class="text-lg text-white font-bold mb-8">太棒了，你已经坚持学习了一段时间，进度已自动保存。让眼睛休息一下吧！</p>
+          <div class="flex gap-4 w-full">
+             <button id="btn-micro-continue" class="flex-1 btn-game-orange text-white font-black text-xl px-6 py-4 rounded-full shadow-lg active:scale-95 cursor-pointer">
+               继续学习
+             </button>
+             <button id="btn-micro-back" class="flex-1 btn-game-wood text-white font-black text-xl px-6 py-4 rounded-full shadow-lg active:scale-95 cursor-pointer">
+               返回地图
+             </button>
+          </div>
+        </div>
+      </div>
+    `;
+    
+    soundAndFX.playVictoryFanfare?.();
+    soundAndFX.triggerConfetti?.(this.container);
+
+    const btnContinue = this.container.querySelector("#btn-micro-continue");
+    if (btnContinue) {
+      this._on(btnContinue, "click", () => {
+        soundAndFX.playPop?.();
+        this.sessionStartTime = Date.now(); // 重置时间
+        const next = this.getNextStepInSequence();
+        if (next < 0) {
+           // 已经全部学完
+           if (this.onFinish) this.onFinish();
+        } else {
+           this.currentStep = next;
+           this.render();
+        }
+      });
+    }
+
+    const btnBack = this.container.querySelector("#btn-micro-back");
+    if (btnBack) {
+      this._on(btnBack, "click", () => {
+        soundAndFX.playPop?.();
+        if (this.onBackToMap) this.onBackToMap();
+      });
+    }
   }
 
   bindHeaderEvents() {

@@ -33,8 +33,9 @@ export function sparkleAt(x, y) {
   this._lastSparkleTime = now;
 
   const existing = document.querySelectorAll(".magic-particle");
-  if (existing.length > 8) {
-    for (let i = 0; i < existing.length - 8; i++) {
+  // P1-4: 限制粒子上限 30 个，防止 DOM 膨胀和视觉噪音
+  if (existing.length > 30) {
+    for (let i = 0; i < existing.length - 30; i++) {
       existing[i].remove();
     }
   }
@@ -46,19 +47,20 @@ export function sparkleAt(x, y) {
   document.body.appendChild(ripple);
   setTimeout(() => ripple.remove(), 450);
 
-  const colors = ["#FBBF24", "#F59E0B", "#F472B6", "#38BDF8", "#4ADE80"];
-  const particleCount = 2 + Math.floor(Math.random() * 2);
+  // 柔和视觉风格 (Khan Academy Kids 风格)
+  const colors = ["#FDE68A", "#FCD34D", "#FBCFE8", "#BAE6FD", "#86EFAC"];
+  const particleCount = 1 + Math.floor(Math.random() * 2); // 减少粒子数量
   for (let i = 0; i < particleCount; i++) {
     const particle = document.createElement("div");
     const angle = (Math.PI * 2 * i) / particleCount + (Math.random() - 0.5) * 0.4;
-    const dist = 18 + Math.random() * 24;
+    const dist = 10 + Math.random() * 15; // 减小飞行距离
     const tx = Math.cos(angle) * dist;
     const ty = Math.sin(angle) * dist;
     const rot = Math.random() * 120 - 60;
 
     particle.className = "magic-particle";
     const color = colors[Math.floor(Math.random() * colors.length)];
-    const size = 4 + Math.random() * 3;
+    const size = 3 + Math.random() * 2.5; // 减小粒子体积
 
     particle.style.cssText = `
       position: fixed;
@@ -66,9 +68,10 @@ export function sparkleAt(x, y) {
       width: ${size}px; height: ${size}px;
       background: ${color};
       border-radius: 50%;
-      box-shadow: 0 0 6px ${color};
+      box-shadow: 0 0 4px ${color};
       pointer-events: none;
       z-index: 99999;
+      opacity: 0.8;
       --tx: ${tx}px; --ty: ${ty}px; --rot: ${rot};
     `;
     document.body.appendChild(particle);

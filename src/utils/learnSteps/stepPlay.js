@@ -61,7 +61,8 @@ export function renderStepPlay(stage) {
             ` : ''}
             ${_showConfuse ? `
               <div class="bg-rose-100/90 text-rose-800 text-xs font-bold px-3 py-1.5 rounded-full shadow-md border-2 border-rose-300 flex items-center gap-1.5">
-                <span>⚠️ 别搞混：</span>
+                <span class="bg-rose-500 text-white font-black text-[10px] px-1.5 py-0.5 rounded-full">辨析</span>
+                <span>别搞混：</span>
                 ${_etym.confusing.pairs.map(p => `<span class="font-black text-rose-950">${p.other}${p.otherPinyin?'('+p.otherPinyin+')':''}</span>`).join(' ')}
               </div>
             ` : ''}

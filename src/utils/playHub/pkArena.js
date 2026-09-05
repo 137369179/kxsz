@@ -23,7 +23,15 @@ export function renderPkArena() {
     let stopTimer = null;
 
     // ===== 动态出题：5 轮从字库（优先待复习）抽取，每轮选项含 confusingChars =====
-    const _roundChars = pickReviewChars(totalRounds);
+    let _roundChars = pickReviewChars(totalRounds);
+    
+    // P1-5: 已学字 < 4 时，用阶段一前 20 字作为 fallback
+    const learnedCount = Object.keys(ebbinghausManager.progress?.charRecords || {}).length;
+    if (learnedCount < 4) {
+      const fallbackPool = CHARACTER_DATABASE.slice(0, 20);
+      _roundChars = fallbackPool.sort(() => Math.random() - 0.5).slice(0, totalRounds);
+    }
+    
     const roundData = _roundChars.map((c) => ({
       char: c.char,
       pinyin: c.pinyin || "",

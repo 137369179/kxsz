@@ -8,3 +8,4 @@ export { renderIdiomHall, _renderIdiomStory, _renderIdiomQuiz } from "./idiomHal
 export { renderPoemHall, renderPoemReader, _renderPoemQuiz } from "./poemHall.js";
 export { renderFamilyWorkshop } from "./familyWorkshop.js";
 export { renderSpotterGame, _renderFeihuaGame } from "./spotterGame.js";
+export { renderMeteorDefense } from "./meteorDefense.js";

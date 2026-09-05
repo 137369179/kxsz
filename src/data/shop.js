@@ -29,6 +29,13 @@ export const SHOP_FRAMES = [
   { id: "frame_crystal", type: "frame", name: "冰晶雪魄", price: 600 }
 ];
 
+export const SHOP_DECORATIONS = [
+  { id: "decor_windchime", type: "decoration", name: "魔法风铃", icon: "assets/images/decor_windchime.jpg", value: "assets/images/decor_windchime.jpg", price: 150 },
+  { id: "decor_swing",     type: "decoration", name: "花藤秋千", icon: "assets/images/decor_swing.jpg",     value: "assets/images/decor_swing.jpg",     price: 300 },
+  { id: "decor_lantern",   type: "decoration", name: "星光灯笼", icon: "assets/images/decor_lantern.jpg",   value: "assets/images/decor_lantern.jpg",   price: 450 },
+  { id: "decor_birdhouse", type: "decoration", name: "知更鸟窝", icon: "assets/images/decor_birdhouse.jpg", value: "assets/images/decor_birdhouse.jpg", price: 600 }
+];
+
 /**  id   */
 export const FRAME_CLASSES = {
   frame_none: "",
@@ -38,7 +45,7 @@ export const FRAME_CLASSES = {
   frame_crystal: "ring-4 ring-cyan-300 shadow-[0_0_14px_rgba(103,232,249,0.95)]"
 };
 
-export const SHOP_ALL = [...SHOP_AVATARS, ...SHOP_FRAMES];
+export const SHOP_ALL = [...SHOP_AVATARS, ...SHOP_FRAMES, ...SHOP_DECORATIONS];
 export const SHOP_ITEMS = SHOP_ALL;
 export const SHOP_DATABASE = SHOP_ALL;
 

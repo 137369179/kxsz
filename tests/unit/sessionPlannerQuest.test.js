@@ -16,23 +16,27 @@ describe("DailyQuestModal Task Builder", () => {
     };
 
     const tasks = buildDailyQuestTasks(mockSession);
-    expect(tasks.length).toBe(4);
+    // 4 learn/review + 1 book trailer
+    expect(tasks.length).toBe(5);
 
     expect(tasks[0].type).toBe("new");
     expect(tasks[0].char).toBe("日");
     expect(tasks[0].stepNum).toBe(1);
-    expect(tasks[0].badge).toBe("新字探索");
+    expect(tasks[0].badge).toBe("新字宝宝");
 
     expect(tasks[1].type).toBe("review");
     expect(tasks[1].char).toBe("水");
     expect(tasks[1].stepNum).toBe(2);
-    expect(tasks[1].badge).toBe("艾宾浩斯复习");
+    expect(tasks[1].badge).toBe("老朋友");
 
     expect(tasks[2].type).toBe("new");
     expect(tasks[2].char).toBe("月");
 
     expect(tasks[3].type).toBe("review");
     expect(tasks[3].char).toBe("火");
+
+    expect(tasks[4].type).toBe("book");
+    expect(tasks[4].questId).toBe("book:daily");
   });
 
   it("handles empty or partial sessions gracefully", () => {

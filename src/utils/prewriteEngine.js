@@ -350,18 +350,22 @@ export class PrewriteEngine {
       }
 
       soundAndFX.playSuccessSound?.();
-      soundAndFX.speakPriority?.(
-        `太棒啦！${SHAPE_HINTS[shapeKey]?.split("～")[0] || "画得真好"}真厉害！`,
-        { kind: "char", priority: 1 }
-      );
+      setTimeout(() => {
+        soundAndFX.speakPriority?.(
+          `太棒啦！${SHAPE_HINTS[shapeKey]?.split("～")[0] || "画得真好"}真厉害！`,
+          { kind: "char", priority: 1 }
+        );
+      }, 200);
       // 下一形状，启动动画演示
       this._startDemoAnimation();
     } else {
       soundAndFX.playSoftError?.();
-      soundAndFX.speakPriority?.(
-        "再试一次吧，勇敢的小手指！",
-        { kind: "char", priority: 1 }
-      );
+      setTimeout(() => {
+        soundAndFX.speakPriority?.(
+          "再试一次吧，勇敢的小手指！",
+          { kind: "char", priority: 1 }
+        );
+      }, 180);
       this.userPath = [];
     }
     this.render();

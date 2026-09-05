@@ -124,11 +124,31 @@ export function buildInterleavePack({
     const options = shuffle([target.char, ...cappedOthers]);
     if (options.length < 2) continue;
 
+    const canCloze = !!(target.sentence && target.sentence.includes(target.char));
+    const canPic = !!(target.oracleGlyph || target.meaning || (target.words && target.words[0]));
+
+    let questionType = "similar_pick";
+    let promptTitle = "";
+    let promptSubtitle = "";
+
+    if (i % 3 === 1 && canCloze) {
+      questionType = "cloze_fill";
+      promptTitle = target.sentence.split(target.char).join("（　）");
+      promptSubtitle = "句子填空 · 把生字宝宝送回句子中";
+    } else if (i % 3 === 2 && canPic) {
+      questionType = "picture_write";
+      promptTitle = target.oracleGlyph || (target.words && target.words[0]?.word) || target.char;
+      promptSubtitle = target.meaning ? `字义认知 · ${target.meaning}` : "观察图象，找出对应的汉字";
+    }
+
     pack.push({
       targetId: target.id,
       targetChar: target.char,
       options,
       hint: target.confusingHint || "",
+      type: questionType,
+      promptTitle,
+      promptSubtitle,
     });
   }
 

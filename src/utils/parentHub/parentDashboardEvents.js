@@ -6,8 +6,10 @@ import { showGameToast } from "../../components/SharedShell.js";
 import { printWorksheet, getTodayWorksheetChars, getDifficultWorksheetChars, getQuestWorksheetChars } from "../worksheetGenerator.js";
 import { storageManager, sanitizeProfileName } from "../storageManager.js";
 import { rewardEngine } from "../rewardEngine.js";
-import { showConfirm } from "../parentGate.js";
+import { showConfirm, showParentGate } from "../parentGate.js";
 import { describeStepSequenceForAge } from "./parentTrophies.js";
+import { setHapticsEnabled } from "../haptics.js";
+import { setVoiceEvalEnabled } from "../pronunciationEval.js";
 
 export function bindDashboardEvents(mainEl) {
   // 标签切换
@@ -29,10 +31,17 @@ export function bindDashboardEvents(mainEl) {
     });
   }
 
-  // 隐私与数据：导出进度备份
+  // 隐私与数据：导出进度备份（需家长门禁）
   const exportBtn = mainEl.querySelector("#btn-export-data");
   if (exportBtn) {
-    this._on(exportBtn, "click", () => {
+    this._on(exportBtn, "click", async () => {
+      const gatePassed = await showParentGate({
+        title: "导出备份 · 家长验证",
+        level: "medium",
+        confirmText: "同意导出",
+        cancelText: "取消",
+      });
+      if (!gatePassed) return;
       try {
         const data = {};
         for (let i = 0; i < localStorage.length; i++) {
@@ -55,10 +64,18 @@ export function bindDashboardEvents(mainEl) {
     });
   }
 
-  // 隐私与数据：清除全部学习数据（二次确认，项目内 Modal）
+  // 隐私与数据：清除全部学习数据（家长门禁 + 二次确认，项目内 Modal）
   const wipeBtn = mainEl.querySelector("#btn-wipe-data");
   if (wipeBtn) {
     this._on(wipeBtn, "click", async () => {
+      // P0-6 纵深防御：破坏性操作即使已过入口门禁，执行前再次验证
+      const gatePassed = await showParentGate({
+        title: "清除数据 · 家长验证",
+        level: "hard",
+        confirmText: "继续清除流程",
+        cancelText: "取消",
+      });
+      if (!gatePassed) return;
       const ok = await showConfirm({
         title: "清除全部学习数据",
         message: "此操作不可恢复，建议先导出备份！",
@@ -254,6 +271,13 @@ export function bindDashboardEvents(mainEl) {
       ebbinghausManager.progress.settings.strokeTolerance = tolerance;
       ebbinghausManager.progress.settings.enablePlayStep = enablePlay;
       ebbinghausManager.progress.settings.enableWriteStep = enableWrite;
+      // P0-4 / P0-5：触感反馈 与 麦克风（语音评测）总开关
+      const voiceEvalOn = mainEl.querySelector("#check-voice-eval")?.checked ?? true;
+      const hapticsOn = mainEl.querySelector("#check-haptics")?.checked ?? true;
+      ebbinghausManager.progress.settings.voiceEval = voiceEvalOn;
+      ebbinghausManager.progress.settings.haptics = hapticsOn;
+      setVoiceEvalEnabled(voiceEvalOn);
+      setHapticsEnabled(hapticsOn);
       ebbinghausManager.save();
 
       // E7 专注模式：读复选框并桥接 focusMode.js（减弱动画/大字模式/装饰屏蔽）
@@ -284,10 +308,18 @@ export function bindDashboardEvents(mainEl) {
     });
   }
 
-  // 跨设备换机迁移：导入进度
+  // 跨设备换机迁移：导入进度（覆盖性写入 → 家长门禁）
   const importSyncBtn = mainEl.querySelector("#btn-import-sync-code");
   if (importSyncBtn) {
-    this._on(importSyncBtn, "click", () => {
+    this._on(importSyncBtn, "click", async () => {
+      // P0-6 纵深防御：导入会覆盖现有学习数据，执行前再次验证
+      const gatePassed = await showParentGate({
+        title: "导入进度 · 家长验证",
+        level: "medium",
+        confirmText: "继续导入",
+        cancelText: "取消",
+      });
+      if (!gatePassed) return;
       soundAndFX.playPop();
       this.showImportSyncModal();
     });
@@ -308,12 +340,19 @@ export function bindDashboardEvents(mainEl) {
     });
   }
 
-  // 多儿童档案平滑切换
+  // 多儿童档案平滑切换（需家长门禁，防止儿童误切）
   mainEl.querySelectorAll(".btn-switch-child").forEach((btn) => {
-    this._on(btn, "click", () => {
+    this._on(btn, "click", async () => {
       const pid = btn.dataset.profileId;
       const pname = btn.dataset.profileName || "宝宝";
       if (pid && pid !== storageManager.getActiveProfileId()) {
+        const gatePassed = await showParentGate({
+          title: "切换档案 · 家长验证",
+          level: "easy",
+          confirmText: "切换",
+          cancelText: "取消",
+        });
+        if (!gatePassed) return;
         soundAndFX.playSuccessSound();
         ebbinghausManager.switchProfile(pid);
         showGameToast(this.container, `已切换到【${pname}】的学习档案`, "success");
@@ -324,9 +363,16 @@ export function bindDashboardEvents(mainEl) {
 
   // 重命名宝宝小名
   mainEl.querySelectorAll(".btn-rename-child").forEach((btn) => {
-    this._on(btn, "click", (e) => {
+    this._on(btn, "click", async (e) => {
       e.stopPropagation();
       soundAndFX.playPop();
+      const gatePassed = await showParentGate({
+        title: "重命名档案 · 家长验证",
+        level: "easy",
+        confirmText: "继续",
+        cancelText: "取消",
+      });
+      if (!gatePassed) return;
       const pid = btn.dataset.profileId;
       const oldName = btn.dataset.profileName || "宝宝";
       const newName = typeof window !== "undefined" && window.prompt
@@ -346,14 +392,25 @@ export function bindDashboardEvents(mainEl) {
 
   // 删除冗余宝宝档案
   mainEl.querySelectorAll(".btn-delete-child").forEach((btn) => {
-    this._on(btn, "click", (e) => {
+    this._on(btn, "click", async (e) => {
       e.stopPropagation();
       soundAndFX.playPop();
       const pid = btn.dataset.profileId;
       const pname = btn.dataset.profileName || "宝宝";
-      const confirmed = typeof window !== "undefined" && window.confirm
-        ? window.confirm(`确定要删除【${pname}】的学习档案吗？此操作将清除该宝贝的独立学习记录。`)
-        : false;
+      const gatePassed = await showParentGate({
+        title: "删除档案 · 家长验证",
+        level: "hard",
+        confirmText: "继续删除流程",
+        cancelText: "取消",
+      });
+      if (!gatePassed) return;
+      const confirmed = await showConfirm({
+        title: "删除学习档案",
+        message: `确定要删除【${pname}】的学习档案吗？此操作将清除该宝贝的独立学习记录。`,
+        variant: "danger",
+        okText: "确认删除",
+        cancelText: "取消",
+      });
       if (confirmed) {
         const ok = storageManager.deleteProfile(pid);
         if (ok) {
@@ -371,8 +428,15 @@ export function bindDashboardEvents(mainEl) {
   // 添加新宝宝档案
   const addChildBtn = mainEl.querySelector("#btn-add-child-profile");
   if (addChildBtn) {
-    this._on(addChildBtn, "click", () => {
+    this._on(addChildBtn, "click", async () => {
       soundAndFX.playPop();
+      const gatePassed = await showParentGate({
+        title: "新建档案 · 家长验证",
+        level: "easy",
+        confirmText: "创建",
+        cancelText: "取消",
+      });
+      if (!gatePassed) return;
       const profiles = storageManager.listProfiles();
       const nextIdx = profiles.length + 1;
       const newId = `child_${Date.now()}`;
