@@ -15,6 +15,8 @@ import { ebbinghausManager } from "../utils/ebbinghaus.js";
 import { storageManager } from "../utils/storageManager.js";
 import { getCollectionStats } from "../utils/rewardEngine.js";
 import { SHOP_DECORATIONS } from "../data/shop.js";
+import { CHARACTER_DATABASE } from "../data/characters.js";
+import { checkSynthesis } from "../utils/alchemyEngine.js";
 
 export class TreehouseModule extends BaseModule {
   constructor(container) {
@@ -188,7 +190,11 @@ export class TreehouseModule extends BaseModule {
               <span>喂食 (10金币)</span>
             </button>
 
-            <button id="btn-cathy-riddle" data-speak="听字谜" aria-label="听字谜" class="bg-emerald-100 hover:bg-emerald-200 text-emerald-950 text-xs sm:text-sm font-black px-5 py-3.5 rounded-2xl shadow-md active:scale-95 flex items-center gap-1.5 cursor-pointer">
+            <button id="btn-alchemy" data-speak="汉字炼金术" aria-label="汉字炼金术" class="bg-gradient-to-r from-purple-500 to-fuchsia-600 text-white text-xs sm:text-sm font-black px-4 py-3.5 rounded-2xl shadow-md active:scale-95 flex items-center gap-1.5 cursor-pointer flex-1 justify-center">
+              <span class="flex items-center gap-1.5">${GAME_ICONS.sparkle("w-4 h-4")}</span><span>汉字炼金术</span>
+            </button>
+
+            <button id="btn-cathy-riddle" data-speak="听字谜" aria-label="听字谜" class="bg-emerald-100 hover:bg-emerald-200 text-emerald-950 text-xs sm:text-sm font-black px-5 py-3.5 rounded-2xl shadow-md active:scale-95 flex items-center gap-1.5 cursor-pointer hidden sm:flex">
               <span class="flex items-center">${GAME_ICONS.speaker("w-4 h-4")}</span>
               <span>听字谜</span>
             </button>
@@ -313,5 +319,154 @@ export class TreehouseModule extends BaseModule {
         soundAndFX.speakPriority(r, { kind: "sentence", priority: 1 });
       });
     }
+
+    // 5. 汉字炼金术
+    const alchemyBtn = mainEl.querySelector("#btn-alchemy");
+    if (alchemyBtn) {
+      this._on(alchemyBtn, "click", () => {
+        soundAndFX.playPop();
+        this._openAlchemyModal();
+      });
+    }
+  }
+
+  _openAlchemyModal() {
+    const overlay = document.createElement("div");
+    overlay.className = "fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/60 backdrop-blur-sm animate-fade-in p-4";
+    this.container.appendChild(overlay);
+
+    const progress = ebbinghausManager.progress;
+    const learnedChars = Object.keys(progress.charRecords || {}).map(id => CHARACTER_DATABASE.find(c => c.id === id)?.char).filter(Boolean);
+
+    let slot1 = null;
+    let slot2 = null;
+
+    const renderModal = () => {
+      overlay.innerHTML = `
+        <div class="bg-white/95 backdrop-blur-md rounded-3xl border-4 border-purple-400 p-6 shadow-2xl w-full max-w-2xl flex flex-col relative animate-scale-up">
+          <button id="btn-close-alchemy" class="absolute top-4 right-4 w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center hover:bg-red-100 active:scale-90 transition-transform text-2xl font-black text-gray-600 cursor-pointer">&times;</button>
+          
+          <h2 class="text-2xl font-black text-purple-900 mb-2 flex items-center justify-center gap-2">
+            ${GAME_ICONS.sparkle("w-6 h-6")} 汉字炼金术
+          </h2>
+          <p class="text-xs text-center text-gray-500 font-bold mb-4">把两个字投入炼金炉，看看能不能合成新词！首次合成奖励 50 金币哦！</p>
+
+          <div class="relative w-full flex flex-col items-center mb-6">
+            <img src="assets/images/fusion_alchemy_furnace.jpg" alt="炼金炉" class="w-48 h-48 object-cover rounded-2xl shadow-lg border-2 border-purple-200" data-fallback="assets/images/icon_chest.webp" />
+            
+            <div class="absolute bottom-4 flex gap-4">
+              <div id="slot-1" class="w-14 h-14 bg-white/80 backdrop-blur-sm rounded-xl border-2 border-dashed border-purple-500 shadow-inner flex items-center justify-center text-3xl font-black text-purple-900 cursor-pointer hover:scale-105 active:scale-95 transition-transform ${slot1 ? 'bg-purple-100 border-solid' : ''}">
+                ${slot1 || ""}
+              </div>
+              <div id="slot-2" class="w-14 h-14 bg-white/80 backdrop-blur-sm rounded-xl border-2 border-dashed border-purple-500 shadow-inner flex items-center justify-center text-3xl font-black text-purple-900 cursor-pointer hover:scale-105 active:scale-95 transition-transform ${slot2 ? 'bg-purple-100 border-solid' : ''}">
+                ${slot2 || ""}
+              </div>
+            </div>
+          </div>
+
+          <button id="btn-synthesize" class="w-full max-w-xs mx-auto bg-gradient-to-r from-purple-500 to-fuchsia-600 text-white text-lg font-black py-3 rounded-2xl shadow-xl active:scale-95 transition-transform disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100 mb-6 flex items-center justify-center gap-2" ${(!slot1 || !slot2) ? 'disabled' : ''}>
+            <span>开始炼金</span>
+            <span class="text-sm font-black">星</span>
+          </button>
+
+          <div class="w-full bg-purple-50 p-4 rounded-2xl border border-purple-100 max-h-48 overflow-y-auto">
+            <p class="text-xs font-black text-purple-800 mb-2">你的已学汉字库 (${learnedChars.length} 个)</p>
+            <div class="flex flex-wrap gap-2">
+              ${learnedChars.map(c => `
+                <button class="char-btn w-10 h-10 bg-white rounded-lg shadow-sm border border-purple-200 text-xl font-black text-gray-800 hover:bg-purple-100 hover:border-purple-400 hover:scale-105 active:scale-95 transition-all flex items-center justify-center cursor-pointer" data-char="${c}">
+                  ${c}
+                </button>
+              `).join('')}
+              ${learnedChars.length === 0 ? `<p class="text-xs text-gray-400 w-full text-center">还没学过汉字哦，先去闯关吧！</p>` : ''}
+            </div>
+          </div>
+        </div>
+      `;
+
+      this._on(overlay.querySelector("#btn-close-alchemy"), "click", () => {
+        soundAndFX.playPop();
+        overlay.remove();
+      });
+
+      overlay.querySelectorAll(".char-btn").forEach(btn => {
+        this._on(btn, "click", (e) => {
+          soundAndFX.playTap1();
+          const c = e.currentTarget.dataset.char;
+          if (!slot1) {
+            slot1 = c;
+          } else if (!slot2) {
+            slot2 = c;
+          }
+          renderModal();
+        });
+      });
+
+      const s1El = overlay.querySelector("#slot-1");
+      if (s1El) this._on(s1El, "click", () => { if(slot1) { slot1 = null; soundAndFX.playPop(); renderModal(); } });
+      const s2El = overlay.querySelector("#slot-2");
+      if (s2El) this._on(s2El, "click", () => { if(slot2) { slot2 = null; soundAndFX.playPop(); renderModal(); } });
+
+      const synthBtn = overlay.querySelector("#btn-synthesize");
+      if (synthBtn && slot1 && slot2) {
+        this._on(synthBtn, "click", () => {
+          soundAndFX.playSuccess();
+          const result = checkSynthesis(slot1, slot2);
+          if (result.success) {
+            const isNew = ebbinghausManager.recordSynthesizedWord(result.word);
+            let rewardMsg = "";
+            if (isNew) {
+              ebbinghausManager.addCoins(50);
+              rewardMsg = "恭喜解锁新词汇，获得 50 金币！";
+              soundAndFX.playVictoryFanfare();
+              soundAndFX.triggerConfetti(overlay);
+            } else {
+              rewardMsg = "这个词之前已经合成过啦！";
+              soundAndFX.playSuccess();
+            }
+
+            const coinDisplay = this.container.querySelector("#tree-coin-display");
+            if (coinDisplay) {
+              coinDisplay.textContent = `${ebbinghausManager.progress.coins} 金币`;
+            }
+
+            overlay.innerHTML = `
+              <div class="bg-white/95 backdrop-blur-md rounded-3xl border-4 border-purple-400 p-8 shadow-2xl w-full max-w-sm flex flex-col items-center relative animate-scale-up">
+                <h2 class="text-2xl font-black text-emerald-600 mb-1">炼金成功！</h2>
+                <p class="text-xs font-bold text-amber-600 mb-6">${rewardMsg}</p>
+                <div class="w-32 h-32 bg-purple-100 rounded-full flex flex-col items-center justify-center border-4 border-purple-300 shadow-inner mb-6">
+                  <span class="text-lg font-bold text-gray-500 mb-1">${result.pinyin}</span>
+                  <span class="text-5xl font-black text-purple-900 font-serif">${result.word}</span>
+                </div>
+                <p class="text-sm font-bold text-gray-600 text-center mb-6 px-4">${result.desc || ''}</p>
+                <button id="btn-continue-alchemy" class="w-full bg-emerald-500 text-white text-lg font-black py-3 rounded-2xl shadow-md active:scale-95 transition-transform cursor-pointer">继续炼金</button>
+              </div>
+            `;
+            this._on(overlay.querySelector("#btn-continue-alchemy"), "click", () => {
+              soundAndFX.playPop();
+              slot1 = null; slot2 = null;
+              renderModal();
+            });
+
+          } else {
+            soundAndFX.playSoftError();
+            overlay.innerHTML = `
+              <div class="bg-white/95 backdrop-blur-md rounded-3xl border-4 border-gray-300 p-8 shadow-2xl w-full max-w-sm flex flex-col items-center relative animate-scale-up">
+                <h2 class="text-2xl font-black text-gray-500 mb-4">炼金失败...</h2>
+                <div class="text-6xl mb-4 opacity-70">${GAME_ICONS.cloud("w-12 h-12")}</div>
+                <p class="text-sm font-bold text-gray-500 text-center mb-6 px-4">“${slot1}” 和 “${slot2}” 似乎不能组成词语，再换个组合试试吧！</p>
+                <button id="btn-retry-alchemy" class="w-full bg-gray-200 text-gray-700 text-lg font-black py-3 rounded-2xl shadow-md active:scale-95 transition-transform cursor-pointer">再试一次</button>
+              </div>
+            `;
+            this._on(overlay.querySelector("#btn-retry-alchemy"), "click", () => {
+              soundAndFX.playPop();
+              slot1 = null; slot2 = null;
+              renderModal();
+            });
+          }
+        });
+      }
+    };
+
+    renderModal();
   }
 }

@@ -51,7 +51,7 @@ async function ensureMicConsent() {
   let passed = false;
   try {
     passed = await showParentGate({
-      title: "家长授权 · 麦克风",
+      title: "家长授权 · 麦克风（仅本机评测，不上传）",
       level: "medium",
       confirmText: "同意并开始",
       cancelText: "暂不使用",

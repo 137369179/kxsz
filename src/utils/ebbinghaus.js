@@ -83,6 +83,7 @@ export class EbbinghausManager {
         pronunciationErrors: {},  // { charId: count }
         updatedAt: 0
       },
+      synthesizedWords: [], // 汉字炼金术合成的词汇历史记录
       charRecords: {},
       todayLearnedCount: 0,
       // P0-4 今日已学分钟数（用于每日时长硬限）
@@ -821,6 +822,26 @@ export class EbbinghausManager {
     return this.progress.shop.equippedDecorations || [];
   }
 
+  /**
+   * 汉字炼金术 - 记录合成词
+   */
+  recordSynthesizedWord(word) {
+    if (!this.progress.synthesizedWords) {
+      this.progress.synthesizedWords = [];
+    }
+    if (!this.progress.synthesizedWords.includes(word)) {
+      this.progress.synthesizedWords.push(word);
+      this.saveProgress();
+      return true; // 新合成
+    }
+    return false; // 已经合成过
+  }
+
+  hasSynthesized(word) {
+    return (this.progress.synthesizedWords || []).includes(word);
+  }
+
+  // ===== 防沉迷 & 每日上限检查模块 (独立不耦合流程，仅作数据统计和校验) =====
   equipDecoration(id) {
     if (!this.progress.shop) {
       this.progress.shop = { owned: ["av_cathy", "av_fairy", "av_hero", "frame_none"], equippedFrame: "frame_none", equippedDecorations: [] };

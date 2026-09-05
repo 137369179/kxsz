@@ -182,3 +182,29 @@ describe('buildFullReport — 综合报告', () => {
     expect(r.generatedAt).toBeTruthy();
   });
 });
+
+import { computeSkillRadar } from "../../src/utils/reportEngine.js";
+
+describe("computeSkillRadar", () => {
+  it("returns zeroed skills for empty progress", () => {
+    const s = computeSkillRadar({ charRecords: {}, readBooks: [] });
+    expect(s.listen).toBe(0);
+    expect(s.speak).toBe(0);
+    expect(s.read).toBe(0);
+    expect(s.write).toBe(0);
+  });
+
+  it("derives scores from mastery and books", () => {
+    const s = computeSkillRadar({
+      charRecords: {
+        a: { masteryRate: 80, correctRate: 80 },
+        b: { masteryRate: 60 },
+      },
+      readBooks: ["b1", "b2"],
+      errorProfiles: { pronunciationErrors: {}, reverseStrokeErrors: {} },
+    });
+    expect(s.listen).toBeGreaterThan(0);
+    expect(s.read).toBeGreaterThan(0);
+    expect(s.labels.listen).toBe("听");
+  });
+});
