@@ -27,15 +27,15 @@ export function mountGameShell(container, { activeMode, heading }) {
           <div class="flex items-center gap-3 pointer-events-auto">
             ${
               activeMode !== "map"
-              ? `<button data-nav="map" class="shell-nav-btn w-12 h-12 sm:w-14 sm:h-14 bg-black/50 backdrop-blur-md rounded-full text-white flex items-center justify-center hover:bg-black/70 transition-transform active:scale-90 border-2 border-amber-300 shadow-2xl cursor-pointer" title="返回地图" aria-label="返回世界地图" data-speak="返回世界地图">
+              ? `<button data-nav="map" class="shell-nav-btn btn-game-wood touch-target text-white cursor-pointer" title="返回地图" aria-label="返回世界地图" data-speak="返回世界地图">
                   ${GAME_ICONS.home("w-7 h-7 sm:w-8 sm:h-8")}
                  </button>`
-              : `<button data-nav="parent" class="shell-nav-btn w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-tr from-amber-600 to-orange-500 rounded-full text-white flex items-center justify-center hover:scale-105 transition-transform active:scale-90 border-2 border-white shadow-[0_4px_16px_rgba(0,0,0,0.5)] cursor-pointer" title="家长中心" aria-label="进入家长中心" data-speak="家长中心，需要大人来回答问题哦">
+              : `<button data-nav="parent" class="shell-nav-btn btn-game-orange touch-target text-white cursor-pointer" title="家长中心" aria-label="进入家长中心" data-speak="家长中心，需要大人来回答问题哦">
                   ${GAME_ICONS.shieldLock("w-7 h-7 sm:w-8 sm:h-8")}
                  </button>`
             }
 
-            <button id="shell-btn-sound-toggle" class="w-12 h-12 sm:w-14 sm:h-14 bg-black/50 backdrop-blur-md rounded-full text-white flex items-center justify-center hover:bg-black/70 transition-transform active:scale-90 border-2 border-white/40 shadow-xl cursor-pointer" title="声音开关" aria-label="切换声音开关">
+            <button id="shell-btn-sound-toggle" class="shell-nav-btn btn-game-wood touch-target text-white cursor-pointer" title="声音开关" aria-label="切换声音开关" data-speak="声音开关">
               <span id="shell-sound-icon-container" class="flex items-center justify-center shrink-0" aria-hidden="true">
                 ${soundAndFX.isMuted ? GAME_ICONS.speaker("w-7 h-7 sm:w-8 sm:h-8", true) : GAME_ICONS.speaker("w-7 h-7 sm:w-8 sm:h-8", false)}
               </span>
@@ -43,15 +43,15 @@ export function mountGameShell(container, { activeMode, heading }) {
           </div>
 
           <div class="flex items-center gap-3 pointer-events-auto">
-            <div class="candy-pill flex items-center gap-2 text-yellow-300 font-black text-sm sm:text-base px-4 sm:px-5 py-1.5 sm:py-2 rounded-full border-2 border-yellow-300 shadow-xl bg-black/50 backdrop-blur-md" title="星星" aria-label="星星数量">
+            <div class="candy-pill shimmer-badge flex items-center gap-2 text-yellow-300 font-black text-sm sm:text-base px-4 sm:px-5 py-1.5 sm:py-2 rounded-full border-2 border-yellow-300 shadow-xl" title="星星" aria-label="星星数量">
               ${GAME_ICONS.star("w-6 h-6 sm:w-7 sm:h-7", false)}
               <span id="shell-stars-count" aria-live="polite">${progress.stars}</span>
             </div>
 
-            <div class="candy-pill flex items-center gap-2 text-amber-300 font-black text-sm sm:text-base px-4 sm:px-5 py-1.5 sm:py-2 rounded-full border-2 border-amber-300 shadow-xl bg-black/50 backdrop-blur-md relative" title="金币" aria-label="金币数量">
+            <div class="candy-pill shimmer-badge flex items-center gap-2 text-amber-300 font-black text-sm sm:text-base px-4 sm:px-5 py-1.5 sm:py-2 rounded-full border-2 border-amber-300 shadow-xl relative" title="金币" aria-label="金币数量">
               ${GAME_ICONS.coin("w-6 h-6 sm:w-7 sm:h-7")}
               <span id="shell-coins-count" class="relative z-10 font-black text-yellow-200" aria-live="polite">${progress.coins}</span>
-              <div id="shell-coins-target-anchor" class="absolute left-4 top-4 w-1 h-1"></div>
+              <div id="shell-coins-target-anchor" class="absolute left-1/2 top-1/2 w-1 h-1 -translate-x-1/2 -translate-y-1/2 pointer-events-none" aria-hidden="true"></div>
             </div>
           </div>
 
@@ -75,11 +75,16 @@ export function mountGameShell(container, { activeMode, heading }) {
     if (coinSpan && data.progress) {
       coinSpan.textContent = data.progress.coins;
       const pill = coinSpan.parentElement;
-      pill.classList.add("scale-125", "shadow-[0_0_25px_rgba(253,224,71,0.9)]");
-      setTimeout(() => pill.classList.remove("scale-125", "shadow-[0_0_25px_rgba(253,224,71,0.9)]"), 500);
+      pill?.classList.remove("hud-pop");
+      void pill?.offsetWidth;
+      pill?.classList.add("hud-pop");
     }
     if (starSpan && data.progress) {
       starSpan.textContent = data.progress.stars;
+      const pill = starSpan.parentElement;
+      pill?.classList.remove("hud-pop");
+      void pill?.offsetWidth;
+      pill?.classList.add("hud-pop");
     }
   });
   cleanups.push(offCoins);

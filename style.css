@@ -353,13 +353,116 @@ html, body {
   -webkit-tap-highlight-color: transparent; /* 去除点击高亮 */
 }
 
-/* 游戏化全局按钮基础反馈 (Q弹压感) */
-button, .cursor-pointer {
-  transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.2s !important;
+/* 游戏化全局按钮基础反馈 (Q弹压感) — 不覆盖 btn-game-* 立体压感 */
+button:not([class*="btn-game"]), .cursor-pointer:not([class*="btn-game"]) {
+  transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.2s;
 }
-button:active, .cursor-pointer:active {
-  transform: scale(0.92) !important;
-  filter: brightness(0.9) !important;
+button:not([class*="btn-game"]):active, .cursor-pointer:not([class*="btn-game"]):active {
+  transform: scale(0.92);
+  filter: brightness(0.9);
+}
+
+/* ----------------------------------------------------
+ * 细节美化工具类（进度条 / 空态 / HUD / 模式卡 / Tab）
+ * ---------------------------------------------------- */
+.progress-candy-bar {
+  height: 0.625rem;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.22);
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  overflow: hidden;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.25);
+}
+.progress-candy-bar > span,
+.progress-candy-bar-fill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #FFB03A 0%, #FF6B00 55%, #E64A00 100%);
+  box-shadow: 0 0 10px rgba(255, 107, 0, 0.45);
+  transition: width 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.progress-candy-bar.is-done > span,
+.progress-candy-bar.is-done .progress-candy-bar-fill {
+  background: linear-gradient(90deg, #8EE635 0%, #4CAF50 55%, #2E7D32 100%);
+  box-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
+}
+
+.hud-pop {
+  animation: hudPop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes hudPop {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.22); filter: drop-shadow(0 0 12px rgba(253, 224, 71, 0.95)); }
+  100% { transform: scale(1); }
+}
+
+.shell-nav-btn.btn-game-wood,
+.shell-nav-btn.btn-game-orange {
+  width: 3.25rem;
+  height: 3.25rem;
+  border-radius: 9999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+@media (min-width: 640px) {
+  .shell-nav-btn.btn-game-wood,
+  .shell-nav-btn.btn-game-orange {
+    width: 3.5rem;
+    height: 3.5rem;
+  }
+}
+
+.mode-card {
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease, border-color 0.2s ease;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.65);
+}
+.mode-card:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.18), 0 0 0 2px rgba(255, 179, 58, 0.35);
+}
+.mode-card:active {
+  transform: scale(0.98);
+}
+.mode-card .mode-card-cta {
+  margin-top: 1rem;
+  width: 100%;
+  font-weight: 900;
+  font-size: 0.8rem;
+  padding: 0.7rem 1rem;
+  border-radius: 9999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+}
+
+.reward-tab-rail {
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(12px);
+  border: 2px solid rgba(180, 83, 9, 0.45);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 8px 20px rgba(0, 0, 0, 0.25);
+}
+.reward-tab-active {
+  background: linear-gradient(180deg, #FFB03A 0%, #FF6600 55%, #E64A00 100%) !important;
+  color: #fff !important;
+  box-shadow: 0 4px 0 #A83200, 0 8px 16px rgba(255, 102, 0, 0.35) !important;
+  transform: scale(1.03);
+}
+
+.learn-step-current {
+  animation: beaconPulse 2s ease-in-out infinite;
+}
+
+.quest-done-glow .glow-pulse {
+  animation: glowPulse 1.8s ease-in-out infinite;
+}
+
+.parchment-empty {
+  background: radial-gradient(circle at 50% 28%, #FFF9E6 0%, #FFE8B8 100%);
+  border: 5px solid #8D4F1E;
+  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.35), inset 0 0 22px rgba(181, 101, 29, 0.2);
 }
 
 /* 提示气泡专用动画 */

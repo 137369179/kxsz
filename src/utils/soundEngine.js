@@ -1573,9 +1573,21 @@ class CathyAudioEngine {
 
         setTimeout(() => {
           coin.style.transition = "all 0.65s cubic-bezier(0.25, 0.46, 0.45, 0.94)";
-          coin.style.left = `${window.innerWidth - 110}px`;
-          coin.style.top = "20px";
-          coin.style.transform = "scale(0.5) rotate(0deg)";
+          let tx = window.innerWidth - 110;
+          let ty = 20;
+          try {
+            const anchor = document.getElementById("shell-coins-target-anchor");
+            if (anchor) {
+              const ar = anchor.getBoundingClientRect();
+              if (ar.width >= 0 && ar.height >= 0) {
+                tx = ar.left + ar.width / 2;
+                ty = ar.top + ar.height / 2;
+              }
+            }
+          } catch {}
+          coin.style.left = `${tx}px`;
+          coin.style.top = `${ty}px`;
+          coin.style.transform = "translate(-50%, -50%) scale(0.5) rotate(0deg)";
           coin.style.opacity = "0.8";
 
           setTimeout(() => {
