@@ -4,9 +4,9 @@
 | ---------------------- | -------------------------- |
 | 版本                     | **v2.9.7**                 |
 | Date                   | 2026-09-05                 |
-| Commits                | **20**                     |
-| Files changed          | **124**                    |
-| Insertions / Deletions | **+12,472 / -1,038**       |
+| Commits                | **25**                     |
+| Files changed          | **126**                    |
+| Insertions / Deletions | **+12,796 / -1,047**       |
 | Tests                  | **734 / 734** ✅ (91 files) |
 | Smoke                  | **28 / 28** ✅              |
 | Build                  | ✅ vite build pass          |
@@ -16,7 +16,7 @@
 
 ## 一句话摘要
 
-**"AI agent 协作的真实世界考验"** — 8 个并发 agent 在同一会话里向凯茜识字追加 **20 个新模块**、修复 5 个不同层级的 bug（从生产构建完全不可用，到 FSRS 调度漏调，到 API 命名不匹配），最后全部收敛到 **726 tests / 0 failed / E2E 浏览器验证通过**。交付 P0 语音指令层、P0-5 麦克风合规、象形具象渲染引擎、汉字探险队、汉字炼金术、易错难字消灭战、偏旁家族、meteorDefense、字源时间轴等 11 大新能力。
+\*\*"AI agent 协作的真实世界考验" — 8 个并发 agent 在同一会话里向凯茜识字追加 **25 个新模块**、修复 5 个不同层级的 bug（从生产构建完全不可用，到 FSRS 调度漏调，到 API 命名不匹配），最后全部收敛到 **734 tests / 0 failed / E2E 浏览器验证通过**。交付 P0 语音指令层、P0-5 麦克风合规、象形具象渲染引擎、汉字探险队、汉字炼金术、易错难字消灭战、偏旁家族、meteorDefense、字源时间轴、feedbackHub 反馈集中化、节奏自适应规划器等 13 大新能力。
 
 ***
 
@@ -139,6 +139,26 @@ playHelpers 的到期/写回操作统一经过 `schedulerFacade`，Boss 自适�
 - **动效时长预算**：微反馈 120ms · 成功 400ms · 奖励 800ms · 庆祝 1000ms
 
 - **全模块接入**：LearnModule / PlayModule / ReviewModule / TreehouseModule / rewardViews / Learn step 4 步骤
+
+### 12. 📊 节奏自适应规划器 (`src/utils/sessionPlannerAdaptive.js`)
+
+根据儿童实时表现动态调整学习节奏：
+
+- 正确率高 → 加速推进
+
+- 错误率集中 → 降速并插入重复
+
+- 测试覆盖：`sessionPlannerAdaptive.test.js`（8 tests）
+
+### 13. 🧭 MapHub / ParentHub feedbackHub 接线
+
+feedbackHub 全链路延伸：
+
+- `mapEvents.js` · `mapRender.js`：地图交互反馈事件
+
+- `parentDashboardEvents.js` · `parentTabs.js`：家长面板反馈
+
+- `uiChromeNoEmoji.test.js`：emoji 扫描扩展覆盖新文件
 
 ***
 
@@ -315,9 +335,12 @@ node tools/_axe_audit.cjs http://127.0.0.1:5174/
 
 ***
 
-## 📜 Commit 链（19 个，按时间倒序）
+## 📜 Commit 链（25 个，按时间倒序）
 
 ```
+5689336  feat(map): feedbackHub map 事件接线 + parentHub 接入 + emoji 扫描更新
+460fca3  feat(reward): RewardModule 象形点缀 + shop 扩展 + rewardViews 反馈接线
+71037d6  feat(ux): 节奏自适应规划器 + 卡册象形点缀 + 树屋凯茜问候
 9180ffe  feat(h3): feedbackHub 儿童即时反馈集中化 + 全模块接入
 2a81144  feat(play): PlayModule 集成 pictogramRenderer + 探险队图标接线
 f07e46f  feat(ui): 象形具象渲染全场景集成 + 8 新图标资源 (+ CI axe-audit job)
