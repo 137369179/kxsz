@@ -17,6 +17,7 @@ import { renderPoemHall, renderPoemReader, _renderPoemQuiz } from "../utils/play
 import { renderFamilyWorkshop } from "../utils/playHub/familyWorkshop.js";
 import { renderSpotterGame, _renderFeihuaGame } from "../utils/playHub/spotterGame.js";
 import { renderMeteorDefense } from "../utils/playHub/meteorDefense.js";
+import { renderWordExpedition, renderExpeditionTreasure, renderExpeditionVictory } from "../utils/playHub/wordExpedition.js";
 
 ensurePlayStyles();
 
@@ -53,6 +54,8 @@ export class PlayModule extends BaseModule {
       this.renderSpotterGame();
     } else if (this.currentMode === "meteor") {
       this.renderMeteorDefense();
+    } else if (this.currentMode === "expedition") {
+      this.renderWordExpedition();
     }
   }
 
@@ -82,6 +85,27 @@ export class PlayModule extends BaseModule {
             <p class="text-xs text-yellow-200 font-bold">
               趣味游戏化巩固复习 · 难字歼灭 · 汉字消消乐 · 部首拼拼乐 · 双人对决 · 国学成语 · 经典古诗
             </p>
+          </div>
+        </div>
+
+        <!-- 新增探险队入口 -->
+        <div class="mode-card group relative w-full h-auto rounded-3xl overflow-hidden shadow-2xl border-4 border-yellow-300 hover:border-yellow-400 mb-6 bg-gradient-to-r from-yellow-400 via-amber-500 to-orange-500 flex flex-col justify-end p-6 cursor-pointer hover:scale-[1.02] transition-transform duration-300" data-mode="expedition">
+          <div class="absolute -right-10 -bottom-10 opacity-30 transform scale-150">
+            ${GAME_ICONS.swords("w-40 h-40 text-white")}
+          </div>
+          <div class="relative z-10 text-white flex flex-col sm:flex-row sm:justify-between sm:items-end gap-4">
+            <div>
+              <div class="flex items-center gap-3 mb-1">
+                <span class="flex items-center">${GAME_ICONS.star("w-8 h-8")}</span>
+                <h1 class="text-3xl font-black drop-shadow-md text-white group-hover:text-yellow-100 transition-colors">汉字探险队 (Rogue-lite)</h1>
+              </div>
+              <p class="text-sm text-yellow-100 font-bold drop-shadow-sm max-w-2xl mt-2">
+                全新深度挑战！穿越神秘地图，挑选你的局内专属增益，连续闯关战胜大魔王！
+              </p>
+            </div>
+            <button class="bg-white text-amber-600 font-black px-8 py-3 rounded-full shadow-lg group-hover:shadow-xl active:scale-95 transition-all flex items-center justify-center gap-2 whitespace-nowrap self-start sm:self-auto">
+              ${GAME_ICONS.swords("w-5 h-5")} 开启冒险
+            </button>
           </div>
         </div>
 
@@ -234,9 +258,11 @@ export class PlayModule extends BaseModule {
         if (mode === "pk") {
           // 统一走 playHub/pkArena（含 completeReview），不再切换到独立 PKModule
           this.currentMode = "pk";
+          this.isExpeditionActive = false;
           this.render();
         } else {
           this.currentMode = mode;
+          this.isExpeditionActive = (mode === "expedition");
           this.render();
         }
       });
@@ -257,4 +283,7 @@ export class PlayModule extends BaseModule {
   renderSpotterGame() { return renderSpotterGame.call(this); }
   _renderFeihuaGame(poem) { return _renderFeihuaGame.call(this, poem); }
   renderMeteorDefense() { return renderMeteorDefense.call(this); }
+  renderWordExpedition() { return renderWordExpedition.call(this); }
+  renderExpeditionTreasure() { return renderExpeditionTreasure.call(this); }
+  renderExpeditionVictory() { return renderExpeditionVictory.call(this); }
 }
