@@ -65,7 +65,7 @@ export function render() {
         </div>
       </div>
 
-      <div class="mx-5 mt-4 grid grid-cols-5 gap-2 bg-black/40 backdrop-blur-md p-1.5 rounded-2xl border border-white/15">
+      <div class="mx-5 mt-4 grid grid-cols-5 gap-2 reward-tab-rail p-1.5 rounded-2xl">
         ${[
           { key: "stickers", label: "贴纸墙", iconSvg: (cls) => GAME_ICONS.cards(cls) },
           { key: "medals", label: "荣誉室", iconSvg: (cls) => GAME_ICONS.trophy(cls) },
@@ -73,7 +73,7 @@ export function render() {
           { key: "calendar", label: "打卡日历", iconSvg: (cls) => GAME_ICONS.reviewBell(cls) },
           { key: "shop", label: "装扮商城", iconSvg: (cls) => GAME_ICONS.chest(cls) }
         ].map((t) => `
-          <button data-tab="${t.key}" class="reward-tab py-2.5 rounded-xl font-black text-sm transition-all flex items-center justify-center gap-1.5 ${this.activeTab === t.key ? "bg-gradient-to-r from-amber-400 to-orange-500 text-white shadow-lg scale-[1.02]" : "text-white/60 hover:text-white hover:bg-white/10"}" data-speak="打开${t.label}">
+          <button data-tab="${t.key}" class="reward-tab py-2.5 rounded-xl font-black text-sm transition-all flex items-center justify-center gap-1.5 ${this.activeTab === t.key ? "reward-tab-active" : "text-white/60 hover:text-white hover:bg-white/10"}" data-speak="打开${t.label}">
             <span class="flex items-center">${t.iconSvg("w-4 h-4")}</span>
             <span>${t.label}</span>
           </button>

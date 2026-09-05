@@ -3,7 +3,7 @@ import { soundAndFX } from "../soundEngine.js";
 import { mountGameShell, showGameToast } from "../../components/SharedShell.js";
 import { GAME_ICONS } from "../gameIcons.js";
 import { EVENTS } from "../eventBus.js";
-import { renderPinyinGestureVisual } from "../pictogramRenderer.js";
+import { renderPinyinGestureVisual, getCharPictogramUrl } from "../pictogramRenderer.js";
 import {
   PINYIN_INITIALS,
   PINYIN_FINALS,
@@ -49,16 +49,17 @@ export function render() {
 
         <div class="flex items-center gap-2 bg-indigo-50 p-1.5 rounded-full border border-indigo-200">
           ${[
-            { key: "atlas", label: "声韵大地图" },
-            { key: "coaster", label: "声调过山车" },
-            { key: "collision", label: "声韵大碰撞" }
+            { key: "atlas", label: "声韵大地图", icon: GAME_ICONS.compass("w-4 h-4"), speak: "欢迎来到声韵大地图！" },
+            { key: "coaster", label: "声调过山车", icon: GAME_ICONS.sparkle("w-4 h-4"), speak: "出发！声调过山车！" },
+            { key: "collision", label: "声韵大碰撞", icon: GAME_ICONS.swords("w-4 h-4"), speak: "两车相撞，拼读大碰撞！" }
           ].map(tab => `
-            <button class="btn-pinyin-tab px-4 py-1.5 rounded-full text-xs font-black transition-all cursor-pointer ${
+            <button class="btn-pinyin-tab px-4 py-1.5 rounded-full text-xs font-black transition-all cursor-pointer flex items-center gap-1.5 ${
               this.currentTab === tab.key
                 ? "bg-indigo-700 text-white shadow-md scale-105"
                 : "text-indigo-900 hover:bg-indigo-100"
-            }" data-tab="${tab.key}">
-              ${tab.label}
+            }" data-tab="${tab.key}" data-speak="${tab.speak}" aria-label="${tab.label}">
+              <span class="flex items-center">${tab.icon}</span>
+              <span>${tab.label}</span>
             </button>
           `).join("")}
         </div>
@@ -154,15 +155,30 @@ export function _renderAtlasView() {
             </div>
 
             <div class="relative bg-gradient-to-b from-indigo-50 to-purple-50 rounded-2xl p-6 border-2 border-indigo-200 flex flex-col items-center justify-center my-2 shadow-inner">
-              <span class="text-7xl sm:text-8xl font-black text-indigo-950 font-mono tracking-wider drop-shadow">${cur.pinyin}</span>
-              <span class="text-xs font-bold text-indigo-600 mt-2">对应生字：【${cur.exampleChar}】</span>
+              <button id="btn-speak-big-pinyin" class="text-7xl sm:text-8xl font-black text-indigo-950 font-mono tracking-wider drop-shadow cursor-pointer hover:scale-105 active:scale-95 transition-transform" title="点击听发音">
+                ${cur.pinyin}
+              </button>
+              
+              <button id="btn-pinyin-example-char" class="mt-3 group flex items-center gap-2.5 bg-white/90 hover:bg-white px-4 py-2 rounded-2xl border-2 border-indigo-300 shadow-md active:scale-95 transition-all cursor-pointer" data-char="${cur.exampleChar || ''}" data-pinyin="${cur.pinyin}">
+                ${(() => {
+                  const pic = getCharPictogramUrl(cur.exampleChar);
+                  return pic ? `<img src="${pic}" class="w-8 h-8 rounded-lg object-cover shadow-sm border border-indigo-200" alt="${cur.exampleChar}" />` : "";
+                })()}
+                <span class="text-xl font-black text-indigo-950">${cur.exampleChar || ''}</span>
+                <span class="w-7 h-7 rounded-full bg-indigo-100 group-hover:bg-indigo-200 flex items-center justify-center text-indigo-700">
+                  ${GAME_ICONS.speaker("w-3.5 h-3.5")}
+                </span>
+              </button>
             </div>
 
-            <div class="bg-amber-50 border-2 border-amber-200 rounded-2xl p-3.5 my-3 flex items-start gap-2.5">
+            <div id="pinyin-mnemonic-card" class="bg-amber-50 border-2 border-amber-200 rounded-2xl p-3.5 my-3 flex items-start gap-2.5 cursor-pointer hover:bg-amber-100/80 active:scale-98 transition-all" data-speak="${cur.mnemonic}" title="轻点听口诀">
               <span class="flex items-center text-amber-600 shrink-0 mt-0.5">${GAME_ICONS.sparkle("w-4 h-4")}</span>
-              <div class="text-xs font-black text-amber-950 leading-relaxed">
+              <div class="flex-1 text-xs font-black text-amber-950 leading-relaxed">
                 ${cur.mnemonic}
               </div>
+              <span class="w-7 h-7 rounded-full bg-amber-200/80 flex items-center justify-center text-amber-800 shrink-0">
+                ${GAME_ICONS.speaker("w-3.5 h-3.5")}
+              </span>
             </div>
 
             ${renderPinyinGestureVisual(cur.pinyin) || (cur.mirrorTip ? `
@@ -450,10 +466,13 @@ export function _renderCollisionView() {
 
         </div>
 
-        <div id="collision-result-box" class="flex flex-col items-center my-3 opacity-0 transition-all duration-500 transform scale-75">
+        <div id="collision-result-box" class="flex flex-col items-center my-3 opacity-0 transition-all duration-500 transform scale-75 cursor-pointer group" title="轻点重新听拼读">
           <div class="flex items-baseline gap-3 mb-1">
             <span class="text-3xl font-black text-indigo-700 font-mono">${pair.syllable}</span>
             <span class="text-6xl font-black text-indigo-950 font-serif">${pair.char}</span>
+            <span class="w-8 h-8 rounded-full bg-indigo-100 group-hover:bg-indigo-200 flex items-center justify-center text-indigo-700 shadow-sm ml-1">
+              ${GAME_ICONS.speaker("w-4 h-4")}
+            </span>
           </div>
           ${pair.image ? `
             <div class="w-40 h-24 sm:w-48 sm:h-28 my-1.5 rounded-2xl overflow-hidden shadow-lg border-2 border-indigo-200">
@@ -529,6 +548,34 @@ export function _bindEvents(mainEl) {
   if (speakCurrentBtn && this.selectedPinyin) {
     this._on(speakCurrentBtn, "click", () => {
       soundAndFX.speakPriority(`${this.selectedPinyin.pinyin}，${this.selectedPinyin.mnemonic}`, { kind: "sentence", priority: 1 });
+    });
+  }
+
+  // 5a. 点击特大拼音字母直接发音
+  const speakBigPinyinBtn = mainEl.querySelector("#btn-speak-big-pinyin");
+  if (speakBigPinyinBtn && this.selectedPinyin) {
+    this._on(speakBigPinyinBtn, "click", () => {
+      soundAndFX.playPop();
+      soundAndFX.speakPriority(this.selectedPinyin.pinyin, { kind: "char", priority: 1 });
+    });
+  }
+
+  // 5b. 点击对应生字伴读卡
+  const exampleCharBtn = mainEl.querySelector("#btn-pinyin-example-char");
+  if (exampleCharBtn && this.selectedPinyin) {
+    this._on(exampleCharBtn, "click", () => {
+      soundAndFX.playPop();
+      const ch = this.selectedPinyin.exampleChar || "";
+      soundAndFX.speakPriority(`${ch}，${this.selectedPinyin.pinyin}！${this.selectedPinyin.mnemonic}`, { kind: "sentence", priority: 1 });
+    });
+  }
+
+  // 5c. 点击口诀卡片
+  const mnemonicCard = mainEl.querySelector("#pinyin-mnemonic-card");
+  if (mnemonicCard && this.selectedPinyin) {
+    this._on(mnemonicCard, "click", () => {
+      soundAndFX.playPop();
+      soundAndFX.speakPriority(this.selectedPinyin.mnemonic, { kind: "sentence", priority: 1 });
     });
   }
 
@@ -778,6 +825,18 @@ export function _bindEvents(mainEl) {
           soundAndFX.speakPriority(`${pair.initial}，${pair.final}，${pair.syllable}！${pair.char}，${pair.word}`, { kind: "sentence", priority: 1 });
         }, 200);
       }, 380);
+    });
+  }
+
+  // 9b. 点击碰撞结果卡片重新朗读
+  const collisionResultBox = mainEl.querySelector("#collision-result-box");
+  if (collisionResultBox) {
+    this._on(collisionResultBox, "click", () => {
+      const pair = PINYIN_COLLISION_PAIRS[this.collisionIndex % PINYIN_COLLISION_PAIRS.length];
+      if (pair) {
+        soundAndFX.playPop();
+        soundAndFX.speakPriority(`${pair.initial}，${pair.final}，${pair.syllable}！${pair.char}，${pair.word}`, { kind: "sentence", priority: 1 });
+      }
     });
   }
 

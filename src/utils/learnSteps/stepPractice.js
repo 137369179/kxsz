@@ -1,5 +1,6 @@
 /** LearnModule step — extracted from LearnModule.js */
 import { soundAndFX } from "../soundEngine.js";
+import { feedback } from "../feedbackHub.js";
 import { GAME_ICONS } from "../gameIcons.js";
 import { ebbinghausManager } from "../ebbinghaus.js";
 import { getCharPictogramUrl } from "../pictogramRenderer.js";
@@ -35,13 +36,13 @@ export function renderStepPractice(stage) {
           <div class="flex items-center gap-2">
             <div id="practice-star-slots" class="flex items-center gap-2">
               <div id="slot-star-0" class="w-8 h-8 rounded-full bg-white/10 border-2 border-white/30 flex items-center justify-center transition-all">
-                <span class="flex items-center text-white/30">${GAME_ICONS.star("w-4 h-4", true)}</span>
+                <span class="flex items-center text-white opacity-30">${GAME_ICONS.star("w-4 h-4", true)}</span>
               </div>
               <div id="slot-star-1" class="w-8 h-8 rounded-full bg-white/10 border-2 border-white/30 flex items-center justify-center transition-all">
-                <span class="flex items-center text-white/30">${GAME_ICONS.star("w-4 h-4", true)}</span>
+                <span class="flex items-center text-white opacity-30">${GAME_ICONS.star("w-4 h-4", true)}</span>
               </div>
               <div id="slot-star-2" class="w-8 h-8 rounded-full bg-white/10 border-2 border-white/30 flex items-center justify-center transition-all">
-                <span class="flex items-center text-white/30">${GAME_ICONS.star("w-4 h-4", true)}</span>
+                <span class="flex items-center text-white opacity-30">${GAME_ICONS.star("w-4 h-4", true)}</span>
               </div>
             </div>
             <span id="game-hit-progress" class="text-yellow-400 text-xs font-black hidden">0 / ${targetHits}</span>
@@ -174,7 +175,7 @@ export function renderStepPractice(stage) {
           try {
             ebbinghausManager.recordMistake(char.id, "similar_confuse", { targetChar: char.char, selectedChar: val });
           } catch {}
-          soundAndFX.playSoftError();
+          feedback.tryAgain(); // 该处已有 animate-shake 处理，不再重复抖动
           this._timeout(() => {
             soundAndFX.speakPriority(`这是“${val}”字，要找的是“${char.char}”字哦！`, { kind: "sentence", emotion: "correction" });
           }, 180);

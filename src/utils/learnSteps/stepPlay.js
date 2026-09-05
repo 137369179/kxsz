@@ -54,7 +54,7 @@ export function renderStepPlay(stage) {
           ${(_showChant || _showConfuse) ? `
           <div class="flex gap-2 sm:gap-3 mt-2 w-full max-w-3xl flex-wrap justify-center flex-shrink-0">
             ${_showChant ? `
-            <button id="btn-chant" class="bg-amber-100 text-amber-950 font-black text-xs sm:text-sm px-3 sm:px-5 py-2 rounded-full shadow-md border-2 border-amber-300 active:scale-95 transition-transform flex items-center gap-1.5 cursor-pointer">
+            <button id="btn-chant" class="bg-amber-100 text-amber-950 font-black text-xs sm:text-sm px-3 sm:px-5 py-2 rounded-full shadow-md border-2 border-amber-300 active:scale-95 transition-transform flex items-center gap-1.5 cursor-pointer" data-speak="跟我念口诀">
               ${GAME_ICONS.speaker("w-3.5 h-3.5")}
               <span>口诀：${_etym.mnemonic.chant}</span>
             </button>
@@ -71,7 +71,7 @@ export function renderStepPlay(stage) {
 
           <!-- 操作按钮 -->
           <div class="flex items-center gap-3 mt-3 flex-shrink-0">
-            <button id="btn-open-morph-play" class="bg-gradient-to-r from-amber-400 to-orange-500 text-white font-black text-xs sm:text-sm px-4 sm:px-6 py-2.5 sm:py-3 rounded-full shadow-2xl border-2 border-white active:scale-95 transition-transform flex items-center gap-2 cursor-pointer">
+            <button id="btn-open-morph-play" class="bg-gradient-to-r from-amber-400 to-orange-500 text-white font-black text-xs sm:text-sm px-4 sm:px-6 py-2.5 sm:py-3 rounded-full shadow-2xl border-2 border-white active:scale-95 transition-transform flex items-center gap-2 cursor-pointer" data-speak="看字形变身小剧场">
               ${GAME_ICONS.sparkle("w-4 h-4")} 动效微剧场
             </button>
             <button id="btn-next-to-rec" data-speak="进入认字环节" aria-label="进入认字环节" class="bg-gradient-to-r from-emerald-400 to-emerald-600 text-white font-black text-xs sm:text-sm px-6 sm:px-8 py-2.5 sm:py-3 rounded-full shadow-2xl border-2 border-white active:scale-95 transition-transform flex items-center gap-2 cursor-pointer">

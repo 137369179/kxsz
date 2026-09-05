@@ -98,11 +98,11 @@ export function openAirTracePrompt(charItem, onDone) {
         </div>
         <div id="air-trace-stroke-tip" class="text-xs font-black text-sky-700 h-4"></div>
         <div class="flex flex-wrap justify-center gap-2 w-full">
-          <button type="button" id="btn-air-replay" class="bg-sky-100 hover:bg-sky-200 text-sky-900 font-black text-sm px-5 py-2.5 rounded-full border border-sky-300 cursor-pointer active:scale-95 flex items-center gap-1">
+          <button type="button" id="btn-air-replay" class="bg-sky-100 hover:bg-sky-200 text-sky-900 font-black text-sm px-5 py-2.5 rounded-full border border-sky-300 cursor-pointer active:scale-95 flex items-center gap-1" data-speak="再看一遍示范">
             ${GAME_ICONS.back ? GAME_ICONS.back("w-4 h-4 inline-block") : ""}
             <span>再看一遍</span>
           </button>
-          <button type="button" id="btn-air-done" class="bg-gradient-to-r from-sky-500 to-cyan-500 hover:from-sky-400 hover:to-cyan-400 text-white font-black text-sm px-6 py-2.5 rounded-full shadow-md cursor-pointer active:scale-95">我比划好啦，开始写！</button>
+          <button type="button" id="btn-air-done" class="bg-gradient-to-r from-sky-500 to-cyan-500 hover:from-sky-400 hover:to-cyan-400 text-white font-black text-sm px-6 py-2.5 rounded-full shadow-md cursor-pointer active:scale-95" data-speak="太棒了，我比划好啦">我比划好啦，开始写！</button>
         </div>
         <div class="flex items-center gap-1.5 text-[10px] font-bold text-sky-700/70">
           ${GAME_ICONS.sparkle("w-3.5 h-3.5 inline-block")}

@@ -88,12 +88,12 @@ export function renderStepPrewrite(stage) {
           </div>
 
           <div class="flex flex-col gap-2.5">
-            <button id="btn-grip-guide" class="w-full bg-amber-50 hover:bg-amber-100 text-amber-900 font-black text-xs py-2 rounded-full border border-amber-300 shadow-sm active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer">
+            <button id="btn-grip-guide" class="w-full bg-amber-50 hover:bg-amber-100 text-amber-900 font-black text-xs py-2 rounded-full border border-amber-300 shadow-sm active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer" data-speak="看看怎么握笔">
               <span>${GAME_ICONS.hand("w-4 h-4")}</span>
               <span>握笔姿势教学</span>
             </button>
 
-            <button id="btn-skip-prewrite" class="w-full bg-amber-100 hover:bg-amber-200 text-amber-900 font-black text-xs py-2.5 rounded-full shadow-sm active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer">
+            <button id="btn-skip-prewrite" class="w-full bg-amber-100 hover:bg-amber-200 text-amber-900 font-black text-xs py-2.5 rounded-full shadow-sm active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer" data-speak="跳过这个形状">
               <span>${GAME_ICONS.sparkle("w-4 h-4")}</span>
               <span>跳过当前形状</span>
             </button>

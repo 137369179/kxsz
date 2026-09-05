@@ -51,6 +51,31 @@
   min-height: var(--touch-min);
 }
 
+/* H2 学字步骤视觉原语：喇叭波纹（读步骤） */
+.speaker-ripple {
+  position: relative;
+}
+.speaker-ripple .ripple-ring {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 100%;
+  height: 100%;
+  transform: translate(-50%, -50%);
+  border-radius: 9999px;
+  border: 2px solid rgba(255, 255, 255, 0.6);
+  animation: speakerRippleLoop 1.6s ease-out infinite;
+  pointer-events: none;
+}
+@keyframes speakerRippleLoop {
+  0%   { opacity: 0.85; transform: translate(-50%, -50%) scale(0.8); }
+  100% { opacity: 0;    transform: translate(-50%, -50%) scale(1.35); }
+}
+/* 减少动效偏好下关闭波纹（无障碍收口 L3） */
+@media (prefers-reduced-motion: reduce) {
+  .speaker-ripple .ripple-ring { animation: none; opacity: 0.5; }
+}
+
 /* P0-5 麦克风录音指示圆点 */
 .mic-rec-dot {
   width: 10px;
@@ -407,6 +432,14 @@ button:not([class*="btn-game"]):active, .cursor-pointer:not([class*="btn-game"])
   100% { transform: scale(1); }
 }
 
+.shell-nav-btn {
+  width: 3.25rem;
+  height: 3.25rem;
+  border-radius: 1rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
 .shell-nav-btn.btn-game-wood,
 .shell-nav-btn.btn-game-orange {
   width: 3.25rem;
@@ -417,6 +450,7 @@ button:not([class*="btn-game"]):active, .cursor-pointer:not([class*="btn-game"])
   justify-content: center;
 }
 @media (min-width: 640px) {
+  .shell-nav-btn,
   .shell-nav-btn.btn-game-wood,
   .shell-nav-btn.btn-game-orange {
     width: 3.5rem;

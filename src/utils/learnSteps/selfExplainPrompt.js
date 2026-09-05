@@ -58,8 +58,8 @@ export function openSelfExplainPrompt(charItem, onDone) {
             .join("")}
         </div>
         <div class="flex flex-wrap justify-center gap-2 w-full mt-1">
-          <button type="button" id="btn-self-said" class="btn-game-orange text-white font-black text-sm px-6 py-2.5 rounded-full cursor-pointer active:scale-95">我说了！</button>
-          <button type="button" id="btn-self-skip" class="bg-slate-200 hover:bg-slate-300 text-slate-800 font-black text-sm px-6 py-2.5 rounded-full cursor-pointer active:scale-95">跳过</button>
+          <button type="button" id="btn-self-said" class="btn-game-orange text-white font-black text-sm px-6 py-2.5 rounded-full cursor-pointer active:scale-95" data-speak="我讲好啦">我说了！</button>
+          <button type="button" id="btn-self-skip" class="bg-slate-200 hover:bg-slate-300 text-slate-800 font-black text-sm px-6 py-2.5 rounded-full cursor-pointer active:scale-95" data-speak="跳过这个小问题">跳过</button>
         </div>
         <div class="flex items-center gap-1 text-[10px] font-bold text-amber-700/70">
           ${GAME_ICONS.sparkle("w-3.5 h-3.5")}

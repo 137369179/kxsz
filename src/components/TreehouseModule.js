@@ -64,7 +64,7 @@ export class TreehouseModule extends BaseModule {
             </button>
             <div>
               <h1 class="text-base font-black text-emerald-950 flex items-center gap-2">
-                <span class="flex items-center">${GAME_ICONS.crown("w-5 h-5")}</span>
+                <span class="flex items-center"><img src="/assets/images/icon_crown.jpg" class="w-5 h-5 rounded-full" alt="Crown" /></span>
                 <span>凯茜伴学小树屋 · 养成家园</span>
               </h1>
               <p class="text-xs text-emerald-700 font-semibold">陪伴成长 · 浇水长成参天神木 · 与凯茜快乐互动</p>
@@ -73,11 +73,11 @@ export class TreehouseModule extends BaseModule {
 
           <div class="flex items-center gap-4 bg-emerald-50 px-5 py-2 rounded-full border border-emerald-200">
             <div class="flex items-center gap-1.5">
-              <span class="flex items-center">${GAME_ICONS.gem("w-5 h-5")}</span>
+              <span class="flex items-center"><img src="/assets/images/icon_gem.jpg" class="w-5 h-5 rounded-full" alt="Gem" /></span>
               <span id="tree-coin-display" class="text-xs font-black text-amber-700">${coins} 金币</span>
             </div>
             <div class="flex items-center gap-1.5">
-              <span class="flex items-center">${GAME_ICONS.book("w-5 h-5")}</span>
+              <span class="flex items-center"><img src="/assets/images/icon_book.jpg" class="w-5 h-5 rounded-full" alt="Book" /></span>
               <span class="text-xs font-black text-emerald-900">已学 ${learnedCount} 字</span>
             </div>
           </div>
@@ -89,7 +89,7 @@ export class TreehouseModule extends BaseModule {
 
           <div class="z-10 flex flex-col items-center bg-white/90 backdrop-blur-md px-6 py-2.5 rounded-2xl border-2 border-emerald-300 shadow-md">
             <span class="text-xs font-black text-emerald-900 flex items-center gap-1.5">
-              <span class="flex items-center">${GAME_ICONS.sparkle("w-4 h-4")}</span>
+              <span class="flex items-center"><img src="/assets/images/icon_sparkle.jpg" class="w-4 h-4 rounded-full" alt="Sparkle" /></span>
               <span>当前树木形态：第 ${stage.level} 阶 · 【${stage.name}】</span>
             </span>
             <span class="text-[11px] text-gray-500 font-bold mt-0.5">${stage.desc}</span>
@@ -132,7 +132,10 @@ export class TreehouseModule extends BaseModule {
               </div>
             </div>
 
-            <div id="cathy-companion-actor" class="mt-4 bg-white/95 backdrop-blur-md px-6 py-3.5 rounded-3xl border-2 border-emerald-300 shadow-xl flex items-center gap-4 cursor-pointer hover:scale-105 active:scale-95 transition-all">
+            <div id="cathy-companion-actor" class="mt-4 bg-white/95 backdrop-blur-md px-6 py-3.5 rounded-3xl border-2 border-emerald-300 shadow-xl flex items-center gap-4 cursor-pointer hover:scale-105 active:scale-95 transition-all relative">
+              <button id="btn-cathy-riddle" data-speak="听字谜" aria-label="听字谜" class="absolute -top-10 -right-6 w-16 h-16 rounded-full overflow-hidden shadow-2xl border-4 border-yellow-300 animate-bounce-slow hover:scale-110 active:scale-95 transition-all z-20 ring-4 ring-yellow-300">
+                <img src="/assets/images/icon_star.jpg" alt="字谜" class="w-full h-full object-cover" />
+              </button>
               <div class="flex flex-col items-center">
                 <img src="assets/images/cathy_mascot.webp" class="w-14 h-14 rounded-full border-2 border-white shadow-lg object-cover ring-2 ring-orange-400/80 aspect-square shrink-0 animate-bounce-slow" alt="凯茜" data-fallback="assets/images/icon_crown.png" />
                 <div class="w-full h-2 bg-gray-200 rounded-full mt-2 border border-gray-300 overflow-hidden relative">
@@ -143,7 +146,7 @@ export class TreehouseModule extends BaseModule {
               <div class="flex flex-col">
                 <span class="text-xs font-black text-emerald-950 flex items-center gap-1">
                   <span>伴学小精灵 · 凯茜</span>
-                  <span class="flex items-center text-amber-500">${GAME_ICONS.sparkle("w-3.5 h-3.5")}</span>
+                  <span class="flex items-center text-amber-500"><img src="/assets/images/icon_sparkle.jpg" class="w-4 h-4 rounded-full" alt="Sparkle" /></span>
                 </span>
                 <p id="cathy-speech-bubble" class="text-xs text-emerald-700 font-bold mt-0.5">
                   “你好呀！今天想和我一起给智慧大树浇水吗？”
@@ -180,20 +183,27 @@ export class TreehouseModule extends BaseModule {
 
           <div class="z-10 w-full max-w-xl bg-white/95 backdrop-blur-md p-4 rounded-3xl border-2 border-emerald-200 shadow-xl flex items-center justify-around gap-3">
             
-            <button id="btn-tree-water" data-speak="给大树浇水" aria-label="浇水培育" class="flex-shrink-0 rounded-2xl overflow-hidden shadow-lg border-4 border-amber-200 touch-target cursor-pointer transform transition-transform hover:scale-105 active:scale-95 flex-1 max-w-xs aspect-square relative">
+            <button id="btn-tree-water" data-speak="给大树浇水" aria-label="浇水培育" class="flex-shrink-0 rounded-3xl overflow-hidden shadow-lg border-4 border-amber-200 touch-target cursor-pointer transform transition-transform hover:scale-105 active:scale-95 flex-1 max-w-xs aspect-square relative group">
               <img src="/assets/images/icon_watering_can.jpg" alt="浇水" class="w-full h-full object-cover" />
+              <div class="absolute bottom-2 left-1/2 -translate-x-1/2 bg-black/60 backdrop-blur-md px-3 py-1 rounded-full border border-white/20 flex items-center gap-1 shadow-md">
+                <img src="/assets/images/icon_coin.jpg" class="w-4 h-4 rounded-full" alt="Coin" />
+                <span class="text-white font-black text-xs">5</span>
+              </div>
             </button>
 
-            <button id="btn-feed-cathy" data-speak="给凯茜点心" aria-label="给凯茜点心" class="flex-shrink-0 rounded-2xl overflow-hidden shadow-lg border-4 border-amber-200 touch-target cursor-pointer transform transition-transform hover:scale-105 active:scale-95 flex-1 max-w-xs aspect-square relative">
+            <button id="btn-feed-cathy" data-speak="给凯茜点心" aria-label="给凯茜点心" class="flex-shrink-0 rounded-3xl overflow-hidden shadow-lg border-4 border-amber-200 touch-target cursor-pointer transform transition-transform hover:scale-105 active:scale-95 flex-1 max-w-xs aspect-square relative group">
               <img src="/assets/images/icon_cake.jpg" alt="喂食" class="w-full h-full object-cover" />
+              <div class="absolute bottom-2 left-1/2 -translate-x-1/2 bg-black/60 backdrop-blur-md px-3 py-1 rounded-full border border-white/20 flex items-center gap-1 shadow-md">
+                <img src="/assets/images/icon_coin.jpg" class="w-4 h-4 rounded-full" alt="Coin" />
+                <span class="text-white font-black text-xs">10</span>
+              </div>
             </button>
 
-            <button id="btn-alchemy" data-speak="汉字炼金术" aria-label="汉字炼金术" class="flex-shrink-0 rounded-2xl overflow-hidden shadow-lg border-4 border-purple-400 touch-target cursor-pointer transform transition-transform hover:scale-105 active:scale-95 flex-1 max-w-xs aspect-square relative">
+            <button id="btn-alchemy" data-speak="汉字炼金术" aria-label="汉字炼金术" class="flex-shrink-0 rounded-3xl overflow-hidden shadow-lg border-4 border-purple-400 touch-target cursor-pointer transform transition-transform hover:scale-105 active:scale-95 flex-1 max-w-xs aspect-square relative group">
               <img src="/assets/images/icon_cauldron.jpg" alt="炼金" class="w-full h-full object-cover" />
-            </button>
-
-            <button id="btn-cathy-riddle" data-speak="听字谜" aria-label="听字谜" class="flex-shrink-0 rounded-2xl overflow-hidden shadow-lg border-4 border-emerald-300 touch-target cursor-pointer transform transition-transform hover:scale-105 active:scale-95 flex-1 max-w-xs aspect-square hidden sm:flex relative">
-              <img src="/assets/images/icon_mic.jpg" alt="字谜" class="w-full h-full object-cover" />
+              <div class="absolute bottom-2 left-1/2 -translate-x-1/2 bg-black/60 backdrop-blur-md px-3 py-1 rounded-full border border-white/20 flex items-center gap-1 shadow-md">
+                <span class="text-white font-black text-xs">炼金术</span>
+              </div>
             </button>
 
           </div>
@@ -344,7 +354,7 @@ export class TreehouseModule extends BaseModule {
           <button id="btn-close-alchemy" class="absolute top-4 right-4 w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center hover:bg-red-100 active:scale-90 transition-transform text-2xl font-black text-gray-600 cursor-pointer">&times;</button>
           
           <h2 class="text-2xl font-black text-purple-900 mb-2 flex items-center justify-center gap-2">
-            ${GAME_ICONS.sparkle("w-6 h-6")} 汉字炼金术
+            <img src="/assets/images/icon_sparkle.jpg" class="w-6 h-6 rounded-full" alt="Sparkle" /> 汉字炼金术
           </h2>
           <p class="text-xs text-center text-gray-500 font-bold mb-4">把两个字投入炼金炉，看看能不能合成新词！首次合成奖励 50 金币哦！</p>
 
@@ -449,7 +459,7 @@ export class TreehouseModule extends BaseModule {
             overlay.innerHTML = `
               <div class="bg-white/95 backdrop-blur-md rounded-3xl border-4 border-gray-300 p-8 shadow-2xl w-full max-w-sm flex flex-col items-center relative animate-scale-up">
                 <h2 class="text-2xl font-black text-gray-500 mb-4">炼金失败...</h2>
-                <div class="text-6xl mb-4 opacity-70">${GAME_ICONS.cloud("w-12 h-12")}</div>
+                <div class="mb-4"><img src="/assets/images/icon_speaker_muted.jpg" class="w-12 h-12 object-cover rounded-xl" alt="Cloud" /></div>
                 <p class="text-sm font-bold text-gray-500 text-center mb-6 px-4">“${slot1}” 和 “${slot2}” 似乎不能组成词语，再换个组合试试吧！</p>
                 <button id="btn-retry-alchemy" class="w-full bg-gray-200 text-gray-700 text-lg font-black py-3 rounded-2xl shadow-md active:scale-95 transition-transform cursor-pointer">再试一次</button>
               </div>

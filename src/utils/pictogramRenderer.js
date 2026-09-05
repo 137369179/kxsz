@@ -34,6 +34,19 @@ export const CHAR_PICTOGRAM_ASSETS = {
   "地": "assets/images/cathy_world_map.webp",
   "人": "assets/images/avatar_hero.webp",
   "手": "assets/images/icon_hand.webp",
+  "鹅": "assets/images/poem_yonge.webp",
+  "鱼": "assets/images/story_cat_fishing_p1.webp",
+  "叶": "assets/images/family_ye.webp",
+  "晴": "assets/images/family_qing.webp",
+  "阳": "assets/images/family_ri.webp",
+  "林": "assets/images/family_mu.webp",
+  "森": "assets/images/family_mu.webp",
+  "星": "assets/images/cover_space_rocket.webp",
+  "云": "assets/images/story_water_drop_p1.webp",
+  "牛": "assets/images/story_zodiac_p1.webp",
+  "羊": "assets/images/story_zodiac_p1.webp",
+  "马": "assets/images/story_zodiac_p2.webp",
+  "兔": "assets/images/story_zodiac_p3.webp"
 };
 
 /**

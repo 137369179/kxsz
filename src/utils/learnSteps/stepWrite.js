@@ -1,5 +1,6 @@
 /** LearnModule step — extracted from LearnModule.js */
 import { soundAndFX } from "../soundEngine.js";
+import { stepBadge } from "./stepVisuals.js";
 import { GAME_ICONS } from "../gameIcons.js";
 import { HanziEngine } from "../hanziEngine.js";
 import { HAZARD_PEEK_DURATION_MS } from "../learnScoring.js";
@@ -20,7 +21,8 @@ export function renderStepFreeWrite(stage) {
 
     stage.innerHTML = `
       <div class="relative w-full max-w-5xl h-[520px] sm:h-[560px] bg-gradient-to-b from-amber-50 via-yellow-50 to-orange-50 rounded-3xl overflow-hidden shadow-2xl border-4 border-amber-300 flex items-center justify-between p-8 animate-fade-in select-none">
-        
+        <div class="absolute top-3 left-4 z-20 flex items-center gap-2">${stepBadge("write")}</div>
+
         <div class="flex-1 flex flex-col items-center justify-center">
           <div class="mb-3 flex items-center gap-2 bg-black/40 px-4 py-1.5 rounded-full border border-white/20 shadow-md">
             <span class="text-xs font-black text-amber-300 flex items-center gap-1">${GAME_ICONS.pen("w-3.5 h-3.5")} <span>回忆笔画珠</span></span>

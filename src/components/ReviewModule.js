@@ -239,11 +239,11 @@ export class ReviewModule extends BaseModule {
         </header>
 
         <main class="relative z-10 flex-1 flex items-center justify-center p-6">
-          <div class="flex flex-col items-center text-center animate-scale-up bg-white/10 backdrop-blur-md p-8 sm:p-10 rounded-3xl border-2 border-white/20 shadow-2xl max-w-md">
+          <div class="parchment-empty flex flex-col items-center text-center animate-scale-up p-8 sm:p-10 rounded-3xl max-w-md text-amber-950">
             <div class="mb-4 flex items-center justify-center scale-125"><img src="/assets/images/icon_bell.jpg" class="w-20 h-20 object-cover rounded-3xl" alt="Bell" /></div>
-            <h2 class="text-2xl font-black text-yellow-300 mb-2">记忆状态极佳！</h2>
-            <p class="text-xs sm:text-sm text-white/80 mb-6 font-semibold leading-relaxed">
-              今天暂时没有要复习的老朋友啦！可以去大地图认识新字，或打一场难字突击战。
+            <h2 class="text-2xl font-black text-orange-700 mb-2">今天休息一下！</h2>
+            <p class="text-xs sm:text-sm text-amber-900/80 mb-6 font-semibold leading-relaxed">
+              暂时没有要复习的老朋友啦！可以去大地图认新字，或打一场难字突击战。
             </p>
             ${
               difficultIds.length > 0
@@ -257,7 +257,7 @@ export class ReviewModule extends BaseModule {
             </button>
             `
                 : `
-            <button id="btn-start-difficult-assault" class="bg-white/20 hover:bg-white/30 text-amber-200 font-bold text-xs px-6 py-2.5 rounded-full flex items-center gap-2 shadow-md active:scale-95 cursor-pointer mb-3 touch-target" data-speak="易错难字专项突击">
+            <button id="btn-start-difficult-assault" class="btn-game-wood text-white font-bold text-xs px-6 py-2.5 rounded-full flex items-center gap-2 cursor-pointer mb-3 touch-target" data-speak="易错难字专项突击">
               <span class="flex items-center"><img src="/assets/images/icon_swords.jpg" class="w-5 h-5 rounded-md" alt="Swords" /></span>
               <span>易错难字专项突击</span>
             </button>
@@ -363,9 +363,14 @@ export class ReviewModule extends BaseModule {
           </button>
 
           <div class="flex items-center gap-2">
-            <div class="candy-pill flex items-center gap-2 px-4 py-1.5 rounded-full border border-yellow-300/40">
-              <span class="text-xs text-amber-200 font-bold">${this.hasOvernightChars ? "昨晚的字:" : (this.isBedtime ? "睡前小复习:" : "复习老朋友:")}</span>
-              <span class="text-yellow-300 font-black text-sm font-mono">${progress} / ${this.queue.length}</span>
+            <div class="candy-pill flex flex-col gap-1 px-4 py-1.5 rounded-full border border-yellow-300/40 w-36">
+              <div class="flex items-center justify-between gap-2">
+                <span class="text-xs text-amber-200 font-bold">${this.hasOvernightChars ? "昨晚的字:" : (this.isBedtime ? "睡前小复习:" : "复习老朋友:")}</span>
+                <span class="text-yellow-300 font-black text-sm font-mono">${progress} / ${this.queue.length}</span>
+              </div>
+              <div class="progress-candy-bar ${progress >= this.queue.length ? "is-done" : ""}" aria-hidden="true">
+                <span class="progress-candy-bar-fill" style="width:${Math.round((progress / Math.max(1, this.queue.length)) * 100)}%"></span>
+              </div>
             </div>
             <button id="btn-review-assault-mode" class="candy-pill hidden sm:flex items-center gap-1.5 text-rose-300 hover:text-rose-200 font-black text-xs px-3 py-1.5 rounded-full border border-rose-400/40 cursor-pointer active:scale-95 touch-target" title="难字消灭战" data-speak="难字消灭战">
               <span class="flex items-center"><img src="/assets/images/icon_swords.jpg" class="w-5 h-5 rounded-md" alt="Swords" /></span>
@@ -662,7 +667,7 @@ export class ReviewModule extends BaseModule {
           </div>
 
           <div class="flex flex-col sm:flex-row items-center gap-3 w-full justify-center">
-            <button id="btn-review-print" class="bg-rose-500 hover:bg-rose-600 text-white font-black text-xs sm:text-sm px-6 py-3.5 rounded-full flex items-center gap-2 shadow-xl active:scale-95 cursor-pointer">
+            <button id="btn-review-print" class="bg-rose-500 hover:bg-rose-600 text-white font-black text-xs sm:text-sm px-6 py-3.5 rounded-full flex items-center gap-2 shadow-xl active:scale-95 cursor-pointer" data-speak="打印复习字帖">
               <span class="flex items-center"><img src="/assets/images/icon_print.jpg" class="w-5 h-5 rounded-md" alt="Print" /></span>
               <span>打印复习字帖</span>
             </button>

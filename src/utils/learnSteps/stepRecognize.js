@@ -1,5 +1,6 @@
 /** LearnModule step — extracted from LearnModule.js */
 import { soundAndFX } from "../soundEngine.js";
+import { stepBadge } from "./stepVisuals.js";
 import { GAME_ICONS } from "../gameIcons.js";
 import { escapeHtml } from "../BaseModule.js";
 import { openMorphTheater } from "../morphEngine.js";
@@ -20,7 +21,8 @@ export function renderStepRecognize(stage) {
 
     stage.innerHTML = `
       <div class="relative w-full max-w-5xl h-[520px] sm:h-[560px] bg-gradient-to-b from-purple-900 via-indigo-900 to-slate-950 rounded-3xl overflow-hidden shadow-2xl border-4 border-amber-300 flex items-center justify-between p-8 animate-fade-in select-none">
-        
+        <div class="absolute top-3 left-4 z-20 flex items-center gap-2">${stepBadge("recognize")}</div>
+
         <div class="flex-1 flex flex-col items-center justify-center">
           <div class="text-4xl text-yellow-300 font-black tracking-widest mb-3 bg-black/40 px-6 py-1.5 rounded-full border border-white/20 animate-pulse">
             ${char.pinyin}
@@ -53,11 +55,11 @@ export function renderStepRecognize(stage) {
           </div>
 
           <div class="flex items-center gap-2.5 mt-4">
-            <button id="btn-open-morph-rec" class="bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 text-white text-xs font-black px-4 py-2 rounded-full shadow-lg border-2 border-white/40 active:scale-95 transition-transform flex items-center gap-1.5 cursor-pointer touch-target" data-speak="看看这个字是怎么来的" aria-label="字源微剧场">
+            <button id="btn-open-morph-rec" class="btn-game-orange text-white text-xs font-black px-4 py-2 rounded-full flex items-center gap-1.5 cursor-pointer touch-target" data-speak="看看这个字是怎么来的" aria-label="字源微剧场">
               <span class="flex items-center">${GAME_ICONS.sparkle("w-4 h-4")}</span>
               <span>字源故事</span>
             </button>
-            <button id="btn-goto-pinyin-island" class="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white text-xs font-black px-4 py-2 rounded-full shadow-lg border-2 border-white/40 active:scale-95 transition-transform flex items-center gap-1.5 cursor-pointer touch-target" title="前往拼音乐园复习此拼音" data-speak="去拼音岛复习" aria-label="拼音岛复习">
+            <button id="btn-goto-pinyin-island" class="btn-game-blue text-white text-xs font-black px-4 py-2 rounded-full flex items-center gap-1.5 cursor-pointer touch-target" title="前往拼音乐园复习此拼音" data-speak="去拼音岛复习" aria-label="拼音岛复习">
               <span class="flex items-center">${GAME_ICONS.mic("w-4 h-4")}</span>
               <span>拼音乐园</span>
             </button>
@@ -139,7 +141,7 @@ export function renderStepRecognize(stage) {
             </div>
           </div>
 
-          <button id="btn-finish-rec-step" data-speak="认字完成，下一步" aria-label="认字完成，下一步" class="mt-4 w-full bg-gradient-to-r from-orange-500 via-amber-500 to-yellow-400 text-white font-black text-base py-3.5 rounded-full shadow-[0_8px_25px_rgba(245,158,11,0.5)] border-2 border-white active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer hover:brightness-105">
+          <button id="btn-finish-rec-step" data-speak="认字完成，下一步" aria-label="认字完成，下一步" class="mt-4 w-full btn-game-orange text-white font-black text-base py-3.5 rounded-full flex items-center justify-center gap-2 cursor-pointer">
             <span class="flex items-center">${GAME_ICONS.star("w-5 h-5", false)}</span>
             <span>认好啦！去跟读</span>
           </button>

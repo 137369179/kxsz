@@ -1,5 +1,7 @@
 /** LearnModule step — extracted from LearnModule.js */
 import { soundAndFX } from "../soundEngine.js";
+import { feedback } from "../feedbackHub.js";
+import { stepBadge } from "./stepVisuals.js";
 import { GAME_ICONS } from "../gameIcons.js";
 import { pronunciationEval } from "../pronunciationEval.js";
 import { scoreToStars, RECORD_MAX_DURATION_MS, RECORD_SILENCE_TIMEOUT_MS } from "../learnScoring.js";
@@ -13,7 +15,8 @@ export function renderStepRead(stage) {
 
     stage.innerHTML = `
       <div class="relative w-full max-w-5xl h-[520px] sm:h-[560px] bg-gradient-to-b from-indigo-950 via-purple-900 to-slate-950 rounded-3xl overflow-hidden shadow-2xl border-4 border-sky-300 flex items-center justify-between p-8 animate-fade-in select-none">
-        
+        <div class="absolute top-3 left-4 z-20 flex items-center gap-2">${stepBadge("read")}</div>
+
         <div class="flex-1 flex flex-col items-center justify-center pr-6 border-r border-white/10">
           <div class="text-3xl text-yellow-300 font-black tracking-widest mb-3 bg-black/40 px-6 py-1.5 rounded-full border border-white/20 animate-pulse">
             ${char.pinyin}
@@ -100,43 +103,43 @@ export function renderStepRead(stage) {
               <p id="manual-rating-status" class="mt-2 text-xs font-black text-yellow-300 h-5"></p>
             </div>
 
-            <div id="read-result-box" class="hidden w-full flex flex-col items-center animate-scale-up bg-black/30 backdrop-blur-md rounded-2xl p-4 border border-white/20 shadow-xl">
+            <div id="read-result-box" class="hidden w-full flex flex-col items-center animate-scale-up parchment-empty rounded-2xl p-4 text-amber-950 shadow-xl">
               <div id="read-stars-container" class="flex items-center justify-center gap-2 mb-1.5">
-                <div class="star-item text-3xl animate-bounce" style="animation-delay: 0.1s">${GAME_ICONS.star(false)}</div>
-                <div class="star-item text-4xl animate-bounce" style="animation-delay: 0.2s">${GAME_ICONS.star(false)}</div>
-                <div class="star-item text-3xl animate-bounce" style="animation-delay: 0.3s">${GAME_ICONS.star(false)}</div>
+                <div class="star-item animate-stamp" style="animation-delay: 0.05s">${GAME_ICONS.star("w-10 h-10", false)}</div>
+                <div class="star-item animate-stamp" style="animation-delay: 0.15s">${GAME_ICONS.star("w-12 h-12", false)}</div>
+                <div class="star-item animate-stamp" style="animation-delay: 0.25s">${GAME_ICONS.star("w-10 h-10", false)}</div>
               </div>
-              <div class="text-3xl font-black text-yellow-300 drop-shadow-md">
+              <div class="text-3xl font-black text-orange-600 drop-shadow-md">
                 <span id="read-score-num">100</span> <span class="text-sm font-bold">分</span>
               </div>
-              <div id="read-praise-text" class="text-xs font-black text-white/90 mt-1 leading-relaxed text-center">
+              <div id="read-praise-text" class="text-xs font-black text-amber-900 mt-1 leading-relaxed text-center">
                 发音真标准，太厉害了！
               </div>
               
-              <div id="read-diagnostics-bar" class="w-full grid grid-cols-3 gap-2 my-2.5 bg-black/40 p-2 rounded-xl border border-white/15 text-center">
+              <div id="read-diagnostics-bar" class="w-full grid grid-cols-3 gap-2 my-2.5 bg-white/50 p-2 rounded-xl border border-amber-200 text-center">
                 <div class="flex flex-col items-center">
-                  <span class="text-[10px] text-gray-300 font-bold">拼音准确</span>
-                  <span id="diag-score-accuracy" class="text-xs font-black text-amber-300">--%</span>
+                  <span class="text-[10px] text-amber-800 font-bold">读得准</span>
+                  <span id="diag-score-accuracy" class="text-xs font-black text-orange-600">--%</span>
                 </div>
-                <div class="flex flex-col items-center border-x border-white/20">
-                  <span class="text-[10px] text-gray-300 font-bold">声调饱满</span>
-                  <span id="diag-score-tone" class="text-xs font-black text-emerald-300">--%</span>
+                <div class="flex flex-col items-center border-x border-amber-200">
+                  <span class="text-[10px] text-amber-800 font-bold">声调好</span>
+                  <span id="diag-score-tone" class="text-xs font-black text-emerald-600">--%</span>
                 </div>
                 <div class="flex flex-col items-center">
-                  <span class="text-[10px] text-gray-300 font-bold">吐字流利</span>
-                  <span id="diag-score-fluency" class="text-xs font-black text-cyan-300">--%</span>
+                  <span class="text-[10px] text-amber-800 font-bold">说得顺</span>
+                  <span id="diag-score-fluency" class="text-xs font-black text-sky-600">--%</span>
                 </div>
               </div>
 
               <div class="flex items-center gap-2.5 mt-3 w-full justify-center">
-                <button id="btn-replay-my-voice" class="bg-amber-400 hover:bg-amber-300 text-amber-950 text-xs font-black px-3.5 py-1.5 rounded-full shadow-md border border-white flex items-center gap-1 active:scale-95 transition-all cursor-pointer" title="听听刚刚录下的发音">
+                <button id="btn-replay-my-voice" class="btn-game-orange text-white text-xs font-black px-3.5 py-1.5 rounded-full flex items-center gap-1 cursor-pointer" title="听听刚刚录下的发音" data-speak="听我刚才读的">
                   <span id="replay-voice-icon" class="w-3.5 h-3.5 inline-block">${GAME_ICONS.speaker("w-3.5 h-3.5")}</span>
                   <span id="replay-voice-text">听我的声音</span>
                 </button>
-                <button id="btn-play-standard-voice" class="bg-sky-500 hover:bg-sky-400 text-white text-xs font-black px-3 py-1.5 rounded-full border border-white/50 flex items-center gap-1 active:scale-95 transition-all cursor-pointer" title="听老师标准发音">
-                  <span>${GAME_ICONS.speaker("w-3.5 h-3.5 inline-block")} 听示范</span>
+                <button id="btn-play-standard-voice" class="speaker-ripple btn-game-blue text-white text-xs font-black px-3 py-1.5 rounded-full flex items-center gap-1 cursor-pointer" title="听老师标准发音" data-speak="听老师读一遍">
+                  <span class="ripple-ring"></span><span>${GAME_ICONS.speaker("w-3.5 h-3.5 inline-block")} 听示范</span>
                 </button>
-                <button id="btn-retry-record" class="bg-white/20 hover:bg-white/30 text-white text-xs font-black px-3 py-1.5 rounded-full border border-white/30 active:scale-95 transition-all cursor-pointer">
+                <button id="btn-retry-record" class="btn-game-wood text-white text-xs font-black px-3 py-1.5 rounded-full cursor-pointer" data-speak="重新录一遍">
                   <span>重录</span>
                 </button>
               </div>
@@ -145,7 +148,7 @@ export function renderStepRead(stage) {
           </div>
 
           <div class="z-10">
-            <button id="btn-finish-read-step" data-speak="朗读完成，下一步" aria-label="朗读完成，下一步" class="w-full bg-gradient-to-r from-orange-500 via-amber-500 to-yellow-400 text-white font-black text-sm py-3 rounded-full shadow-lg border-2 border-white active:scale-95 transition-all flex items-center justify-center gap-2 opacity-50 pointer-events-none cursor-pointer">
+            <button id="btn-finish-read-step" data-speak="朗读完成，下一步" aria-label="朗读完成，下一步" class="w-full btn-game-orange text-white font-black text-sm py-3 rounded-full flex items-center justify-center gap-2 opacity-50 pointer-events-none cursor-pointer">
               <span class="w-4 h-4 inline-block">${GAME_ICONS.sparkle("w-4 h-4")}</span>
               <span>开启特训练字 (+5 金币)</span> 
             </button>
@@ -252,7 +255,7 @@ export function renderStepRead(stage) {
     // 完成读字，按跟读星级发币并进入第 4 步（练字）— P2 跟读得星闭环
     if (finishBtn) {
       this._on(finishBtn, "click", () => {
-        soundAndFX.playSuccessSound();
+        feedback.ok(finishBtn);
         const stars = Math.max(0, Math.min(3, Number(this._evalStars) || 0));
         const coins = stars >= 3 ? 5 : stars >= 2 ? 3 : stars >= 1 ? 1 : 0;
         if (coins > 0) {
@@ -560,7 +563,7 @@ export function _showMicPermissionModal(stage) {
           <button id="btn-retry-mic" class="flex-1 btn-game-orange text-white font-black text-xs py-3 rounded-2xl shadow-md active:scale-95 cursor-pointer" data-speak="听示范发音" aria-label="听示范发音">
             重新尝试授权
           </button>
-          <button id="btn-fallback-manual" class="px-4 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-black text-xs rounded-2xl active:scale-95 cursor-pointer">
+          <button id="btn-fallback-manual" class="px-4 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-black text-xs rounded-2xl active:scale-95 cursor-pointer" data-speak="换成手动打分">
             切换手动打分
           </button>
         </div>
@@ -669,7 +672,7 @@ export function _showEvalResult(stage, res) {
       if (praiseTxt) {
         praiseTxt.innerHTML = `<span class="text-amber-300 font-bold">读得很棒！声音再清晰一点就满分啦！</span><br/><span class="text-white/80 text-[11px]">获得 2 颗星，再练一次可拿满分哦！</span>`;
       }
-      soundAndFX.playSuccessSound();
+      feedback.ok();
       this._timeout(() => {
         soundAndFX.speakPriority(`读得不错！得到 2 颗星，再练一次可以拿 3 颗星哦！`, { kind: "sentence", emotion: "happy" });
       }, 200);
@@ -692,7 +695,7 @@ export function _showEvalResult(stage, res) {
           : "";
         praiseTxt.innerHTML = `<div class="bg-rose-950/60 border border-rose-400/40 rounded-xl px-3 py-1.5 mb-1"><span class="text-yellow-300 text-sm font-bold">识别到读音：“${heard}”</span></div><span class="text-rose-200 text-sm font-semibold">好像是麦克风没听清，点击【听示范】大声跟读「${char.char}」，一定可以的！</span>${gentle}`;
       }
-      soundAndFX.playSoftError();
+      feedback.tryAgain();
       this._timeout(() => {
         soundAndFX.speakPriority(`没关系，请听老师读“${char.char}”，再试一次吧！`, {
           kind: "sentence",
@@ -708,21 +711,21 @@ export function _showEvalResult(stage, res) {
         });
       }, 180);
       if (retryBtn) {
-        retryBtn.className = "bg-gradient-to-r from-amber-400 to-yellow-400 text-amber-950 text-xs font-black px-3.5 py-1.5 rounded-full shadow-lg border border-white active:scale-95 transition-all cursor-pointer ring-4 ring-yellow-400 animate-pulse";
+        retryBtn.className = "btn-game-orange text-white text-xs font-black px-3.5 py-1.5 rounded-full cursor-pointer ring-2 ring-yellow-300";
         retryBtn.textContent = this._readFailCount >= 2 ? "跟读示范后再试一次" : "再试一次";
       }
       if (finishBtn) {
         finishBtn.innerHTML = `<span>跳过此步 (0 金币)</span>`;
         finishBtn.classList.remove("opacity-50", "pointer-events-none");
-        finishBtn.className = "w-full bg-white/20 hover:bg-white/30 text-white font-bold py-2.5 rounded-full border border-white/30 text-xs active:scale-95 transition-all cursor-pointer mt-1";
+        finishBtn.className = "w-full btn-game-wood text-white font-bold py-2.5 rounded-full text-xs cursor-pointer mt-1";
       }
     }
 
-    // 更新 3 颗金色大星星（逐颗旋转弹入动画）
+    // 更新 3 颗金色大星星（盖章弹入）
     if (starsContainer) {
       starsContainer.innerHTML = Array.from({ length: 3 }).map((_, i) => `
-        <div class="star-item text-4xl animate-bounce" style="animation-delay: ${0.15 * i}s">
-          ${GAME_ICONS.star(i >= stars)}
+        <div class="star-item animate-stamp ${i >= stars ? "grayscale opacity-40" : ""}" style="animation-delay: ${0.08 * i}s">
+          ${GAME_ICONS.star(i === 1 ? "w-12 h-12" : "w-10 h-10", i >= stars)}
         </div>
       `).join("");
     }

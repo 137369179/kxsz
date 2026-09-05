@@ -146,7 +146,7 @@ export class LearnModule extends BaseModule {
     this.destroy();
 
     const __lnProgress = ebbinghausManager.progress;
-    const __lnSpeakerIcon = soundAndFX.isMuted ? GAME_ICONS.speaker(true) : GAME_ICONS.speaker(false);
+    const __lnSpeakerIcon = soundAndFX.isMuted ? `<img src="/assets/images/icon_speaker_muted.jpg" class="w-5 h-5 rounded-full" alt="Muted" />` : `<img src="/assets/images/icon_speaker.jpg" class="w-5 h-5 rounded-full" alt="Speaker" />`;
 
     this.container.innerHTML = `
       <div class="relative w-full h-full min-h-[640px] flex flex-col justify-between select-none overflow-hidden bg-gradient-to-br from-indigo-950 via-purple-950 to-slate-950">
@@ -157,25 +157,27 @@ export class LearnModule extends BaseModule {
             <img src="/assets/images/icon_red_door.jpg" alt="返回" class="w-12 h-12 sm:w-14 sm:h-14 object-cover" />
           </button>
 
-          <div class="flex items-center gap-2 sm:gap-3 bg-black/60 backdrop-blur-md px-4 sm:px-6 py-2 rounded-full border-2 border-white/30 shadow-[0_8px_30px_rgba(0,0,0,0.6)]">
+          <div class="flex items-center gap-2 sm:gap-3 candy-pill px-4 sm:px-6 py-2 rounded-full">
             ${this.stepSequence
               .map(
                 (stepNum) => {
                   const stepInfo = getLearnStepMeta(stepNum);
                   const isLast = stepNum === this.stepSequence[this.stepSequence.length - 1];
+                  const isCurrent = stepNum === this.currentStep;
+                  const isDone = this.completedSteps.includes(stepNum) || stepNum < this.currentStep;
                   return `
               <div class="flex items-center gap-1 sm:gap-1.5 cursor-pointer touch-target" data-speak="${escapeHtml(stepInfo.announcement)}" aria-label="${escapeHtml(stepInfo.announcement)}" title="${escapeHtml(stepInfo.announcement)}">
                 <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center font-black text-xs transition-all duration-500 border-2 ${
-                  stepNum === this.currentStep
-                    ? "bg-gradient-to-tr from-yellow-300 via-orange-500 to-red-500 text-white border-white shadow-[0_0_20px_rgba(255,180,0,1)] scale-115 ring-4 ring-yellow-300 animate-pulse"
-                    : stepNum < this.currentStep
+                  isCurrent
+                    ? "learn-step-current bg-gradient-to-tr from-yellow-300 via-orange-500 to-red-500 text-white border-white shadow-[0_0_20px_rgba(255,180,0,1)] scale-125 ring-4 ring-yellow-300 animate-pulse z-10 relative"
+                    : isDone
                     ? "bg-gradient-to-tr from-emerald-500 to-teal-400 text-white border-white/80 shadow-md"
                     : "bg-white/15 text-white/40 border-white/20"
                 }">
-                  ${stepNum < this.currentStep ? `<span class="flex items-center">${GAME_ICONS.star("w-4 h-4", false)}</span>` : `<span class="flex items-center">${stepInfo.iconSvg("w-4 h-4")}</span>`}
+                  ${isDone && !isCurrent ? `<span class="flex items-center"><img src="/assets/images/icon_check.jpg" class="w-4 h-4 rounded-full" alt="Check" /></span>` : `<span class="flex items-center"><img src="${stepInfo.image}" class="w-5 h-5 rounded-full" alt="${stepInfo.name}" /></span>`}
                 </div>
-                <span class="text-xs sm:text-sm font-black ${stepNum === this.currentStep ? "text-yellow-300 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]" : "text-white/70"}">${stepInfo.name}</span>
-                ${!isLast ? `<div class="w-2 sm:w-3 h-1 rounded-full ${stepNum < this.currentStep ? "bg-gradient-to-r from-emerald-400 to-teal-300 shadow-[0_0_8px_rgba(52,211,153,0.8)]" : "bg-white/20"}"></div>` : ""}
+                <span class="text-xs sm:text-sm font-black ${isCurrent ? "text-yellow-300 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]" : "text-white/70"}">${stepInfo.name}</span>
+                ${!isLast ? `<div class="w-2 sm:w-3 h-1 rounded-full ${isDone ? "bg-gradient-to-r from-emerald-400 to-teal-300 shadow-[0_0_8px_rgba(52,211,153,0.8)]" : "bg-white/20"}"></div>` : ""}
               </div>
             `;
                 }
@@ -187,21 +189,21 @@ export class LearnModule extends BaseModule {
             ${(() => {
               const picUrl = getCharPictogramUrl(this.charData.char);
               return `
-              <button id="btn-learn-current-char" data-speak="${escapeHtml(this.charData.char)}" aria-label="${escapeHtml(this.charData.char)}" class="flex items-center gap-2 bg-gradient-to-r from-orange-500 via-amber-500 to-yellow-400 text-white font-black text-xs sm:text-sm px-3.5 py-1.5 rounded-full border-2 border-white shadow-xl active:scale-95 transition-transform cursor-pointer touch-target" title="点击听发音">
+              <button id="btn-learn-current-char" data-speak="${escapeHtml(this.charData.char)}" aria-label="${escapeHtml(this.charData.char)}" class="btn-game-orange flex items-center gap-2 text-white font-black text-xs sm:text-sm px-3.5 py-1.5 rounded-full cursor-pointer touch-target" title="点击听发音">
                 ${picUrl ? `<img src="${picUrl}" alt="${escapeHtml(this.charData.char)}" class="w-7 h-7 rounded-full object-cover border border-white/80 shrink-0" />` : ""}
                 <span class="text-xl sm:text-2xl text-yellow-100 font-serif leading-none drop-shadow">${escapeHtml(this.charData.char)}</span>
-                <span class="w-3.5 h-3.5 shrink-0 flex items-center text-yellow-200">${GAME_ICONS.speaker("w-3.5 h-3.5")}</span>
+                <span class="w-4 h-4 shrink-0 flex items-center text-yellow-200"><img src="/assets/images/icon_speaker.jpg" class="w-4 h-4 rounded-full" alt="Speaker" /></span>
               </button>
               `;
             })()}
-            <button id="btn-learn-sound" data-speak="声音开关" aria-label="声音开关" class="w-10 h-10 sm:w-11 sm:h-11 bg-black/40 backdrop-blur-md rounded-full text-white flex items-center justify-center hover:bg-black/60 transition-transform active:scale-90 border-2 border-white/40 shadow-lg cursor-pointer" title="声音开关">
+            <button id="btn-learn-sound" data-speak="声音开关" aria-label="声音开关" class="shell-nav-btn btn-game-wood w-10 h-10 sm:w-11 sm:h-11 rounded-full text-white flex items-center justify-center cursor-pointer" title="声音开关">
               ${__lnSpeakerIcon}
             </button>
-            <div class="candy-pill flex items-center gap-1.5 text-yellow-300 font-black text-xs sm:text-sm px-3.5 py-1.5 rounded-full bg-black/40 border-2 border-white/30 shadow-md">
-              ${GAME_ICONS.coin("w-4 h-4")}<span>${__lnProgress.coins}</span>
+            <div class="candy-pill shimmer-badge flex items-center gap-1.5 text-yellow-300 font-black text-xs sm:text-sm px-3.5 py-1.5 rounded-full">
+              <img src="/assets/images/icon_coin.jpg" class="w-4 h-4 rounded-full" alt="Coin" /><span>${__lnProgress.coins}</span>
             </div>
-            <div class="candy-pill flex items-center gap-1.5 text-amber-300 font-black text-xs sm:text-sm px-3.5 py-1.5 rounded-full bg-black/40 border-2 border-white/30 shadow-md">
-              ${GAME_ICONS.star("w-4 h-4", false)}<span>${__lnProgress.stars}</span>
+            <div class="candy-pill shimmer-badge flex items-center gap-1.5 text-amber-300 font-black text-xs sm:text-sm px-3.5 py-1.5 rounded-full">
+              <img src="/assets/images/icon_star.jpg" class="w-4 h-4 rounded-full" alt="Star" /><span>${__lnProgress.stars}</span>
             </div>
           </div>
 
@@ -273,7 +275,7 @@ export class LearnModule extends BaseModule {
     this.container.innerHTML = `
       <div class="relative w-full h-full min-h-[640px] flex flex-col items-center justify-center bg-gradient-to-br from-indigo-950 via-purple-950 to-slate-950">
         <div class="bg-black/60 backdrop-blur-md px-10 py-12 rounded-3xl border border-yellow-400 shadow-2xl flex flex-col items-center text-center max-w-lg">
-          <div class="mb-6 animate-bounce-slow">${GAME_ICONS.trophy("w-32 h-32")}</div>
+          <div class="mb-6 animate-bounce-slow"><img src="/assets/images/icon_trophy.jpg" class="w-32 h-32 rounded-full object-cover border-4 border-yellow-400 shadow-2xl" alt="Trophy" /></div>
           <h2 class="text-4xl font-black text-yellow-300 mb-4">微课完成！</h2>
           <p class="text-lg text-white font-bold mb-8">太棒了，你已经坚持学习了一段时间，进度已自动保存。让眼睛休息一下吧！</p>
           <div class="flex gap-4 w-full">
@@ -331,7 +333,7 @@ export class LearnModule extends BaseModule {
     if (soundBtn) {
       this._on(soundBtn, "click", () => {
         const muted = soundAndFX.toggleMute();
-        soundBtn.innerHTML = muted ? GAME_ICONS.speaker(true) : GAME_ICONS.speaker(false);
+        soundBtn.innerHTML = muted ? `<img src="/assets/images/icon_speaker_muted.jpg" class="w-5 h-5 rounded-full" alt="Muted" />` : `<img src="/assets/images/icon_speaker.jpg" class="w-5 h-5 rounded-full" alt="Speaker" />`;
       });
     }
   }
