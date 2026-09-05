@@ -327,6 +327,29 @@ export class TreehouseModule extends BaseModule {
       });
     }
 
+    // 4b. 点击凯茜伴学小精灵互动问候
+    const cathyCompanionActor = mainEl.querySelector("#cathy-companion-actor");
+    if (cathyCompanionActor) {
+      const greetings = [
+        "你好呀！我是小鹿凯茜，今天我们要一起认识更多汉字好朋友哦！",
+        "你真棒！每认识一个字，我们的小树就会多一片神奇绿叶！",
+        "大树口渴啦，记得常常用小水壶给大树浇浇水哦！",
+        "字谜藏在小金星里，点一点右上角的小金星听字谜吧！"
+      ];
+      this._on(cathyCompanionActor, "click", (e) => {
+        if (e.target.closest("#btn-cathy-riddle")) return;
+        soundAndFX.playPop();
+        const g = greetings[Math.floor(Math.random() * greetings.length)];
+        const speechBubble = mainEl.querySelector("#cathy-speech-bubble");
+        if (speechBubble) {
+          speechBubble.textContent = `“${g}”`;
+        }
+        cathyCompanionActor.classList.add("scale-105");
+        setTimeout(() => cathyCompanionActor.classList.remove("scale-105"), 300);
+        soundAndFX.speakPriority(g, { kind: "sentence", emotion: "excited", priority: 1 });
+      });
+    }
+
     // 5. 汉字炼金术
     const alchemyBtn = mainEl.querySelector("#btn-alchemy");
     if (alchemyBtn) {

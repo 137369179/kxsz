@@ -3,6 +3,7 @@ import { ebbinghausManager } from "../ebbinghaus.js";
 import { mountGameShell } from "../../components/SharedShell.js";
 import { GAME_ICONS } from "../gameIcons.js";
 import { RADICAL_ORIGINS } from "./cardConstants.js";
+import { getCharPictogramUrl } from "../pictogramRenderer.js";
 
 export function render() {
   const prevViewport = this.container.querySelector("#cards-page-viewport");
@@ -157,6 +158,10 @@ export function render() {
                         ? '<span class="absolute top-1.5 right-1.5 text-[9px] bg-emerald-500 text-white font-black px-1.5 py-0.5 rounded-full shadow">已掌握</span>'
                         : ""
                     }
+                    ${(() => {
+                      const pic = getCharPictogramUrl(c.char);
+                      return pic ? `<img src="${pic}" class="absolute top-1.5 left-1.5 w-5 h-5 rounded-md object-cover border border-amber-300 shadow-sm" alt="" />` : "";
+                    })()}
 
                     <span class="text-[11px] font-bold text-amber-700">${c.pinyin}</span>
                     

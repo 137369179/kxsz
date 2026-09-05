@@ -4,10 +4,10 @@
 | ---------------------- | -------------------------- |
 | 版本                     | **v2.9.7**                 |
 | Date                   | 2026-09-05                 |
-| Commits                | **19**                     |
-| Files changed          | **121**                    |
-| Insertions / Deletions | **+12,032 / -955**         |
-| Tests                  | **726 / 726** ✅ (90 files) |
+| Commits                | **20**                     |
+| Files changed          | **124**                    |
+| Insertions / Deletions | **+12,472 / -1,038**       |
+| Tests                  | **734 / 734** ✅ (91 files) |
 | Smoke                  | **28 / 28** ✅              |
 | Build                  | ✅ vite build pass          |
 | **E2E 浏览器验证**          | ✅ 通过（headless Chrome）      |
@@ -16,7 +16,7 @@
 
 ## 一句话摘要
 
-**"AI agent 协作的真实世界考验"** — 8 个并发 agent 在同一会话里向凯茜识字追加 **19 个新模块**、修复 5 个不同层级的 bug（从生产构建完全不可用，到 FSRS 调度漏调，到 API 命名不匹配），最后全部收敛到 **726 tests / 0 failed / E2E 浏览器验证通过**。交付 P0 语音指令层、P0-5 麦克风合规、象形具象渲染引擎、汉字探险队、汉字炼金术、易错难字消灭战、偏旁家族、meteorDefense、字源时间轴等 10 大新能力。
+**"AI agent 协作的真实世界考验"** — 8 个并发 agent 在同一会话里向凯茜识字追加 **20 个新模块**、修复 5 个不同层级的 bug（从生产构建完全不可用，到 FSRS 调度漏调，到 API 命名不匹配），最后全部收敛到 **726 tests / 0 failed / E2E 浏览器验证通过**。交付 P0 语音指令层、P0-5 麦克风合规、象形具象渲染引擎、汉字探险队、汉字炼金术、易错难字消灭战、偏旁家族、meteorDefense、字源时间轴等 11 大新能力。
 
 ***
 
@@ -128,6 +128,18 @@ checkSynthesis("太", "好") // → { success: false, reason: "太和好不能�
 
 playHelpers 的到期/写回操作统一经过 `schedulerFacade`，Boss 自适应难度不再散落在各 play 模块里。
 
+### 11. 💬 H3 儿童即时反馈集中化 (`src/utils/feedbackHub.js`)
+
+3-8 岁认知科学：**行为后必须 < 100ms 内给出反馈**（多巴胺强化），否则儿童注意力流失。
+
+- **多通道同发**：声音 + 动效 + 触感（任一通道缺失可降级）
+
+- **零惩罚**：答错只做温和抖动 + 鼓励，不出现红叉/负分
+
+- **动效时长预算**：微反馈 120ms · 成功 400ms · 奖励 800ms · 庆祝 1000ms
+
+- **全模块接入**：LearnModule / PlayModule / ReviewModule / TreehouseModule / rewardViews / Learn step 4 步骤
+
 ***
 
 ## 🧪 无障碍自动化审计 (`tools/_axe_audit.cjs`)
@@ -200,7 +212,7 @@ node tools/_axe_audit.cjs http://127.0.0.1:5174/
 | Shell 导航 3 按钮（home / parent / sound） | 统一用新类 + `touch-target`                                                                           |
 | Coin 动画终点锚点                          | 优先 `#shell-coins-target-anchor`（不再硬编码 `innerWidth - 110`）                                        |
 | 全局 Q 弹加 `:not([class*="btn-game"])`  | 避免覆盖立体按钮的 active 压感                                                                              |
-| `style.css` 细节工具类 200+ 行             | progress-bar / empty-state / HUD / mode-card / tab / pictogram-rune / gesture-hint / nature-card |
+| `style.css` 细节工具类 234+ 行             | progress-bar / empty-state / HUD / mode-card / tab / pictogram-rune / gesture-hint / nature-card |
 | haptics 引擎 4 档语义                     | success / error / tap / fanfare                                                                  |
 | haptics iOS fallback                 | Vibration API 不可用时走 Web Audio 25ms 听觉微阻尼                                                         |
 
@@ -306,6 +318,7 @@ node tools/_axe_audit.cjs http://127.0.0.1:5174/
 ## 📜 Commit 链（19 个，按时间倒序）
 
 ```
+9180ffe  feat(h3): feedbackHub 儿童即时反馈集中化 + 全模块接入
 2a81144  feat(play): PlayModule 集成 pictogramRenderer + 探险队图标接线
 f07e46f  feat(ui): 象形具象渲染全场景集成 + 8 新图标资源 (+ CI axe-audit job)
 8f8425a  feat(p0-5): 麦克风合规中心 + 象形具象渲染引擎 + axe 无障碍审计工具 + stepPractice 集成
@@ -328,6 +341,7 @@ d319e91  feat(a11y): 为关键按钮补 data-speak + aria-label
 baea6fa  fix(stepTest): 星星动画期间点返回导致 completeCharacter 漏调
 6445cbb  fix(appNavigation): 删除 startLearnFlow 重构残留死代码
 ```
+9180ffe  feat(h3): feedbackHub 儿童即时反馈集中化 + 全模块接入
 
 ***
 

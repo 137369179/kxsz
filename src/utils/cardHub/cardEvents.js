@@ -567,7 +567,17 @@ export function openFlashcardSlideshowModal(chars) {
 
             <div class="flex flex-col items-center justify-center flex-1 my-2">
               <span class="text-3xl sm:text-4xl font-black text-amber-700 mb-1 font-mono">${c.pinyin}</span>
-              <span class="text-8xl sm:text-9xl font-black text-amber-950 drop-shadow-md font-serif">${c.char}</span>
+              <div class="flex items-center justify-center gap-4">
+                <span class="text-8xl sm:text-9xl font-black text-amber-950 drop-shadow-md font-serif">${c.char}</span>
+                ${(() => {
+                  const pic = getCharPictogramUrl(c.char);
+                  return pic ? `
+                    <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl overflow-hidden border-2 border-amber-400 shadow-md bg-amber-100 shrink-0">
+                      <img src="${pic}" alt="${c.char}" class="w-full h-full object-cover select-none pointer-events-none" />
+                    </div>
+                  ` : "";
+                })()}
+              </div>
               ${
                 c.oracleGlyph
                   ? `<div class="mt-2 text-xs font-bold text-amber-800 bg-amber-200/60 px-3 py-1 rounded-full">甲骨文: ${c.oracleGlyph}</div>`
@@ -620,27 +630,31 @@ export function openFlashcardSlideshowModal(chars) {
       </main>
 
       <footer class="w-full max-w-lg flex items-center justify-between gap-2 border-t border-white/10 pt-3">
-        <button id="btn-slideshow-prev" class="btn-game-wood text-white font-black text-xs px-4 py-2 rounded-full cursor-pointer active:scale-95 disabled:opacity-40 disabled:pointer-events-none" ${
+        <button id="btn-slideshow-prev" class="btn-game-wood text-white font-black text-xs px-4 py-2 rounded-full cursor-pointer active:scale-95 disabled:opacity-40 disabled:pointer-events-none flex items-center gap-1.5" ${
           currentIndex === 0 ? "disabled" : ""
         }>
-          ← 上一张
+          <span class="flex items-center">${GAME_ICONS.back("w-3.5 h-3.5")}</span>
+          <span>上一张</span>
         </button>
 
         <div class="flex items-center gap-2">
-          <button id="btn-slideshow-flip" class="bg-amber-400 hover:bg-amber-300 text-amber-950 font-black text-xs px-4 py-2 rounded-full shadow-md active:scale-95 cursor-pointer">
-            翻转卡片
+          <button id="btn-slideshow-flip" class="bg-amber-400 hover:bg-amber-300 text-amber-950 font-black text-xs px-4 py-2 rounded-full shadow-md active:scale-95 cursor-pointer flex items-center gap-1">
+            <span class="flex items-center">${GAME_ICONS.cards("w-3.5 h-3.5")}</span>
+            <span>翻转</span>
           </button>
-          <button id="btn-slideshow-diff" class="text-xs font-black px-3.5 py-2 rounded-full shadow-md active:scale-95 cursor-pointer ${
+          <button id="btn-slideshow-diff" class="text-xs font-black px-3.5 py-2 rounded-full shadow-md active:scale-95 cursor-pointer flex items-center gap-1 ${
             isDiff ? "bg-rose-500 text-white" : "bg-white/10 text-white hover:bg-white/20"
           }">
-            ${isDiff ? "已标难字" : "标为难字"}
+            <span class="flex items-center">${isDiff ? GAME_ICONS.shieldLock("w-3.5 h-3.5") : GAME_ICONS.sparkle("w-3.5 h-3.5")}</span>
+            <span>${isDiff ? "已标难字" : "标为难字"}</span>
           </button>
         </div>
 
-        <button id="btn-slideshow-next" class="btn-game-orange text-white font-black text-xs px-5 py-2 rounded-full shadow-lg cursor-pointer active:scale-95 disabled:opacity-40 disabled:pointer-events-none" ${
+        <button id="btn-slideshow-next" class="btn-game-orange text-white font-black text-xs px-5 py-2 rounded-full shadow-lg cursor-pointer active:scale-95 disabled:opacity-40 disabled:pointer-events-none flex items-center gap-1.5" ${
           currentIndex === chars.length - 1 ? "disabled" : ""
         }>
-          下一张 →
+          <span>下一张</span>
+          <span class="flex items-center" style="transform:rotate(180deg)">${GAME_ICONS.back("w-3.5 h-3.5")}</span>
         </button>
       </footer>
     `;

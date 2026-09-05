@@ -47,6 +47,81 @@ export function getSessionConfig(age) {
 }
 
 // ──────────────────────────────────────────────────────────
+// M4 节奏自适应：按近期表现微调单关长度（只影响本会话，不改 FSRS 调度）
+//
+// 教育学依据：
+//   - 注意力时长分龄（3-4 岁 5-10 分钟），疲劳期连续错误会放大挫败感
+//   - 近发展区（维果茨基）：任务难度略高于当前水平，连续受挫则下调
+//
+// 规则（保守，只在有足够信号量时生效）：
+//   - learnedCount < 10：信号不足，原样返回
+//   - difficultRatio > 0.25（难字占比高）→ 复习 +1、新字 -1（新字下限 1）
+//   - difficultRatio < 0.08 且 lowMasteryRatio < 0.15 → 新字 +1（新字上限 = 基准+1）
+//   - total 永不超过 max(基准 total, 7)
+// ──────────────────────────────────────────────────────────
+
+/**
+ * 从 ebbinghaus 注入依赖收集表现统计（信号量不足返回 null）
+ * @returns {{difficultRatio:number, lowMasteryRatio:number, learnedCount:number}|null}
+ */
+export function collectPerformanceStats() {
+  const records = _ebbinghaus?.progress?.charRecords || {};
+  const learnedCount = Object.keys(records).length;
+  if (learnedCount < 10) return null;
+  let difficult = 0;
+  let lowMastery = 0;
+  for (const r of Object.values(records)) {
+    if (r?.isDifficult) difficult += 1;
+    if ((r?.masteryRate ?? 100) < 60) lowMastery += 1;
+  }
+  return {
+    difficultRatio: difficult / learnedCount,
+    lowMasteryRatio: lowMastery / learnedCount,
+    learnedCount,
+  };
+}
+
+/**
+ * 纯函数：按表现统计对基准会话配置做保守微调
+ * @param {{total:number,newChars:number,reviews:number}} base getSessionConfig 的结果
+ * @param {{difficultRatio?:number, lowMasteryRatio?:number, learnedCount?:number}|null} stats
+ * @returns {{total:number,newChars:number,reviews:number, adapted:boolean, reason:string}}
+ */
+export function adaptSessionConfig(base, stats) {
+  if (!stats || (stats.learnedCount ?? 0) < 10) {
+    return { ...base, adapted: false, reason: "信号不足（已学 < 10 字）" };
+  }
+  const { difficultRatio = 0, lowMasteryRatio = 0 } = stats;
+  const maxTotal = Math.max(base.total, 7);
+  let { total, newChars, reviews } = base;
+
+  if (difficultRatio > 0.25) {
+    // 难字占比高：巩固优先——减一个新字、加一个复习
+    newChars = Math.max(1, newChars - 1);
+    reviews = Math.min(maxTotal - newChars, reviews + 1);
+    total = newChars + reviews;
+    return { total, newChars, reviews, adapted: true, reason: "近期难字较多，本关以巩固为主" };
+  }
+  if (difficultRatio < 0.08 && lowMasteryRatio < 0.15) {
+    // 表现轻松：可加一个新字挑战（总量不破米勒上限）
+    if (total + 1 <= maxTotal) {
+      newChars += 1;
+      total += 1;
+      return { total, newChars, reviews, adapted: true, reason: "状态很好，加一个新字挑战" };
+    }
+    return { ...base, adapted: false, reason: "已达工作量上限，维持不变" };
+  }
+  return { ...base, adapted: false, reason: "表现平稳，维持基准" };
+}
+
+/**
+ * 便捷组合：基准配置 + 自适应微调（stats 由 collectPerformanceStats 提供）
+ */
+export function getAdaptiveSessionConfig(age, stats) {
+  return adaptSessionConfig(getSessionConfig(age), stats);
+}
+
+// ──────────────────────────────────────────────────────────
 // 数据来源（通过依赖注入避免硬编码 import）
 // ──────────────────────────────────────────────────────────
 let _ebbinghaus = null;
