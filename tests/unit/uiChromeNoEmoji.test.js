@@ -22,6 +22,7 @@ const CHROME_FILES = [
   "src/utils/rewardHub/rewardViews.js",
   "src/utils/parentHub/parentTabs.js",
   "src/utils/reviewHub/interleaveView.js",
+  "src/utils/reviewHub/mistakeAssault.js",
 ];
 
 describe("stripEmoji helper", () => {

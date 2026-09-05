@@ -31,6 +31,7 @@ import {
   mapSelfReportToRating,
   buildInterleavePack,
   runInterleaveSession,
+  runMistakeAssaultSession,
 } from "../utils/reviewHub/index.js";
 import {
   getOvernightChars,
@@ -157,6 +158,10 @@ export class ReviewModule extends BaseModule {
   }
 
   destroy() {
+    if (this._mistakeAssault?.destroy) {
+      this._mistakeAssault.destroy();
+      this._mistakeAssault = null;
+    }
     if (this._freeRecall?.destroy) {
       this._freeRecall.destroy();
       this._freeRecall = null;
@@ -166,6 +171,24 @@ export class ReviewModule extends BaseModule {
       this._interleave = null;
     }
     super.destroy();
+  }
+
+  startDifficultAssault() {
+    this.destroy();
+    this._mistakeAssault = runMistakeAssaultSession({
+      containerEl: this.container,
+      ebbinghaus: ebbinghausManager,
+      characterDB: CHARACTER_DATABASE,
+      onFinish: () => {
+        this.destroy();
+        this.initQueue();
+        this.render();
+      },
+      onQuit: () => {
+        this.destroy();
+        this._busEmit(EVENTS.SWITCH_MODE, { mode: "map" });
+      },
+    });
   }
 
   render() {
@@ -183,6 +206,10 @@ export class ReviewModule extends BaseModule {
   renderEmpty() {
     const __rvProgress = ebbinghausManager.progress;
     const __rvSpeakerIcon = soundAndFX.isMuted ? GAME_ICONS.speaker("w-5 h-5", true) : GAME_ICONS.speaker("w-5 h-5", false);
+    const learnedRecords = ebbinghausManager.progress.charRecords || {};
+    const difficultIds = (ebbinghausManager.getDifficultCharIds ? ebbinghausManager.getDifficultCharIds() : []).filter(
+      (id) => Object.prototype.hasOwnProperty.call(learnedRecords, id)
+    );
     
     this.container.innerHTML = `
       <div class="relative w-full h-full min-h-[640px] flex flex-col select-none overflow-hidden bg-gradient-to-b from-indigo-900 via-purple-900 to-indigo-950 text-white animate-fade-in">
@@ -194,11 +221,11 @@ export class ReviewModule extends BaseModule {
         
         <header class="relative z-30 w-full px-6 py-3 flex items-center justify-between bg-black/40 backdrop-blur-md border-b border-white/20">
           <div class="flex items-center gap-2">
-            <button id="btn-review-empty-header-back" data-speak="返回大地图" aria-label="返回大地图" class="btn-game-wood text-white font-black text-xs px-4 py-2 rounded-full flex items-center gap-1.5 cursor-pointer active:scale-95">
+            <button id="btn-review-empty-header-back" data-speak="返回大地图" aria-label="返回大地图" class="btn-game-wood text-white font-black text-xs px-4 py-2 rounded-full flex items-center gap-1.5 cursor-pointer active:scale-95 touch-target">
               <span class="flex items-center">${GAME_ICONS.home("w-4 h-4")}</span>
               <span>返回地图</span>
             </button>
-            <button id="btn-review-empty-sound" class="w-10 h-10 bg-black/40 backdrop-blur-md rounded-full text-white flex items-center justify-center hover:bg-black/60 transition-transform active:scale-90 border border-white/30 shadow-lg cursor-pointer" title="声音开关">
+            <button id="btn-review-empty-sound" class="w-10 h-10 bg-black/40 backdrop-blur-md rounded-full text-white flex items-center justify-center hover:bg-black/60 transition-transform active:scale-90 border border-white/30 shadow-lg cursor-pointer touch-target" title="声音开关">
               ${__rvSpeakerIcon}
             </button>
           </div>
@@ -217,16 +244,44 @@ export class ReviewModule extends BaseModule {
             <div class="mb-4 flex items-center justify-center scale-125">${GAME_ICONS.reviewBell("w-20 h-20")}</div>
             <h2 class="text-2xl font-black text-yellow-300 mb-2">记忆状态极佳！</h2>
             <p class="text-xs sm:text-sm text-white/80 mb-6 font-semibold leading-relaxed">
-              当前没有待复习的薄弱生字，艾宾浩斯记忆库饱满，继续去大地图探索新汉字吧！
+              今天暂时没有要复习的老朋友啦！可以去大地图认识新字，或打一场难字突击战。
             </p>
-            <button id="btn-review-empty-back" data-speak="返回大地图" aria-label="返回大地图" class="btn-game-orange text-white font-black text-sm sm:text-base px-10 py-3 rounded-full flex items-center gap-2 shadow-xl active:scale-95 cursor-pointer">
+            ${
+              difficultIds.length > 0
+                ? `
+            <button id="btn-start-difficult-assault" class="btn-game-orange text-white font-black text-xs sm:text-sm px-8 py-3 rounded-full flex items-center gap-2 shadow-xl active:scale-95 cursor-pointer mb-3 touch-target" data-speak="开始难字消灭突击战">
+              <span class="flex items-center">${GAME_ICONS.swords("w-4 h-4")}</span>
+              <span>难字消灭突击战 (${difficultIds.length})</span>
+            </button>
+            <button id="btn-review-empty-back" data-speak="返回大地图" aria-label="返回大地图" class="bg-white/20 hover:bg-white/30 text-white font-bold text-xs px-6 py-2 rounded-full flex items-center gap-1.5 shadow-md active:scale-95 cursor-pointer touch-target">
+              <span class="flex items-center">${GAME_ICONS.home("w-4 h-4")}</span>
+              <span>返回大地图</span>
+            </button>
+            `
+                : `
+            <button id="btn-start-difficult-assault" class="bg-white/20 hover:bg-white/30 text-amber-200 font-bold text-xs px-6 py-2.5 rounded-full flex items-center gap-2 shadow-md active:scale-95 cursor-pointer mb-3 touch-target" data-speak="易错难字专项突击">
+              <span class="flex items-center">${GAME_ICONS.swords("w-4 h-4")}</span>
+              <span>易错难字专项突击</span>
+            </button>
+            <button id="btn-review-empty-back" data-speak="返回大地图" aria-label="返回大地图" class="btn-game-orange text-white font-black text-sm sm:text-base px-10 py-3 rounded-full flex items-center gap-2 shadow-xl active:scale-95 cursor-pointer touch-target">
               <span class="flex items-center">${GAME_ICONS.home("w-5 h-5")}</span>
               <span>返回大地图</span>
             </button>
+            `
+            }
           </div>
         </main>
       </div>
     `;
+
+    const assaultBtn = this.container.querySelector("#btn-start-difficult-assault");
+    if (assaultBtn) {
+      this._on(assaultBtn, "click", () => {
+        soundAndFX.playPop();
+        try { soundAndFX.stopSpeaking?.(); } catch {}
+        this.startDifficultAssault();
+      });
+    }
 
     const backBtn = this.container.querySelector("#btn-review-empty-back");
     if (backBtn) {
@@ -311,9 +366,15 @@ export class ReviewModule extends BaseModule {
             <span>返回地图</span>
           </button>
 
-          <div class="candy-pill flex items-center gap-2 px-5 py-1.5 rounded-full border border-yellow-300/40">
-            <span class="text-xs text-amber-200 font-bold">${this.hasOvernightChars ? "隔夜巩固:" : (this.isBedtime ? "睡前轻复习:" : "艾宾浩斯复习:")}</span>
-            <span class="text-yellow-300 font-black text-sm font-mono">${progress} / ${this.queue.length}</span>
+          <div class="flex items-center gap-2">
+            <div class="candy-pill flex items-center gap-2 px-4 py-1.5 rounded-full border border-yellow-300/40">
+              <span class="text-xs text-amber-200 font-bold">${this.hasOvernightChars ? "昨晚的字:" : (this.isBedtime ? "睡前小复习:" : "复习老朋友:")}</span>
+              <span class="text-yellow-300 font-black text-sm font-mono">${progress} / ${this.queue.length}</span>
+            </div>
+            <button id="btn-review-assault-mode" class="candy-pill hidden sm:flex items-center gap-1.5 text-rose-300 hover:text-rose-200 font-black text-xs px-3 py-1.5 rounded-full border border-rose-400/40 cursor-pointer active:scale-95 touch-target" title="难字消灭战" data-speak="难字消灭战">
+              <span class="flex items-center">${GAME_ICONS.swords("w-4 h-4")}</span>
+              <span>难字突击</span>
+            </button>
           </div>
 
           <div class="flex items-center gap-2">
@@ -341,6 +402,15 @@ export class ReviewModule extends BaseModule {
         try { soundAndFX.stopSpeaking?.(); } catch {}
         this._busEmit(EVENTS.REVIEW_FINISH, { correct: this.correctCount, total: this.queue.length });
         this._busEmit(EVENTS.SWITCH_MODE, { mode: "map" });
+      });
+    }
+
+    const assaultModeBtn = this.container.querySelector("#btn-review-assault-mode");
+    if (assaultModeBtn) {
+      this._on(assaultModeBtn, "click", () => {
+        soundAndFX.playPop();
+        try { soundAndFX.stopSpeaking?.(); } catch {}
+        this.startDifficultAssault();
       });
     }
 

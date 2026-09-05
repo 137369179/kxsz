@@ -84,3 +84,12 @@ export function haptic(type = "tap") {
     playAudioHapticThump(type);
   }
 }
+
+export function triggerHapticSuccess() {
+  haptic("success");
+}
+
+export function triggerHapticWarning() {
+  haptic("error");
+}
+

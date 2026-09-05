@@ -16,6 +16,7 @@ export function renderMap() {
   const sessionCfg = getSessionConfig(age);
   setDeps({ ebbinghaus: ebbinghausManager, characterDB: CHARACTER_DATABASE });
   const questSnap = getQuestProgressSnapshot(planDailySession());
+  const isQuestCompleted = questSnap.total > 0 && questSnap.completed >= questSnap.total;
   const questPct = questSnap.total > 0 ? Math.round((questSnap.completed / questSnap.total) * 100) : 0;
 
   // 智能定位当前正在学的主题岛屿（若用户未手动切换过岛屿）
@@ -43,11 +44,15 @@ export function renderMap() {
     <div class="relative w-full h-full min-h-[640px] flex flex-col justify-between overflow-hidden select-none bg-slate-950">
       
       <div class="absolute top-20 left-6 z-20 flex items-center gap-2.5 bg-black/60 backdrop-blur-md p-2 rounded-full border border-white/30 shadow-2xl">
-        <button id="btn-daily-quest" class="px-4 py-2 rounded-full text-xs sm:text-sm font-black transition-all flex items-center gap-2 bg-gradient-to-r from-rose-500 via-pink-500 to-amber-500 text-white shadow-lg ring-2 ring-pink-300 hover:scale-105 active:scale-95 cursor-pointer touch-target" title="今天的小冒险" aria-label="打开今天的小冒险，已完成${questSnap.completed}项共${questSnap.total}项" data-speak="开始今天的小冒险！">
-          <span class="flex items-center">${GAME_ICONS.sparkle('w-5 h-5')}</span>
-          <span>今日学练</span>
+        <button id="btn-daily-quest" class="px-4 py-2 rounded-full text-xs sm:text-sm font-black transition-all flex items-center gap-2 ${
+          isQuestCompleted
+            ? "bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 text-white shadow-lg ring-2 ring-emerald-300 hover:scale-105 active:scale-95 animate-pulse"
+            : "bg-gradient-to-r from-rose-500 via-pink-500 to-amber-500 text-white shadow-lg ring-2 ring-pink-300 hover:scale-105 active:scale-95"
+        } cursor-pointer touch-target" title="${isQuestCompleted ? "今天的小冒险已全部达成！" : "今天的小冒险"}" aria-label="打开今天的小冒险，${isQuestCompleted ? "今日任务已全部达成！" : `已完成${questSnap.completed}项共${questSnap.total}项`}" data-speak="${isQuestCompleted ? "今天的冒险已经全部完成啦，太棒了！" : "开始今天的小冒险！"}">
+          <span class="flex items-center">${isQuestCompleted ? GAME_ICONS.trophy('w-5 h-5') : GAME_ICONS.sparkle('w-5 h-5')}</span>
+          <span>${isQuestCompleted ? "今日通关" : "今日学练"}</span>
           <span class="bg-white/25 px-2 py-0.5 rounded-full text-[10px] font-mono" aria-hidden="true">${questSnap.completed}/${questSnap.total || sessionCfg.newChars + sessionCfg.reviews}</span>
-          <span class="hidden sm:inline-flex w-10 h-2 rounded-full bg-white/30 overflow-hidden" aria-hidden="true"><span class="h-full bg-white rounded-full" style="width:${questPct}%"></span></span>
+          <span class="hidden sm:inline-flex w-10 h-2 rounded-full bg-white/30 overflow-hidden" aria-hidden="true"><span class="h-full bg-white rounded-full transition-all duration-500" style="width:${isQuestCompleted ? 100 : questPct}%"></span></span>
         </button>
 
         <div class="w-[1px] h-6 bg-white/30 mx-1"></div>
