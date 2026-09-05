@@ -2,6 +2,7 @@
  * PlayModule 共享纯函数 / DOM 小工具
  */
 import { CHARACTER_DATABASE } from "../../data/characters.js";
+import { getDueReviewCharIds, completeReview } from "../schedulerFacade.js";
 import { ebbinghausManager } from "../ebbinghaus.js";
 
 export function shuffle(arr) {
@@ -14,12 +15,12 @@ export function shuffle(arr) {
 }
 
 // ------------------------------------------------------------
-// 动态取题工具：优先艾宾浩斯待复习/难字，不足则从字库随机，
+// 动态取题工具：优先待复习/难字，不足则从字库随机，
 // 并按字库的 confusingChars 自动生成干扰选项（游乐场均由此出题）
 // ------------------------------------------------------------
 export function pickReviewChars(count = 4) {
   // 1) 待复习队列（到期 + 难字）优先
-  const dueIds = ebbinghausManager.getDueReviewCharIds();
+  const dueIds = getDueReviewCharIds();
   const due = dueIds.map((id) => CHARACTER_DATABASE.find((c) => c.id === id)).filter(Boolean);
   // 2) 难度加权补充（低掌握度者优先）
   const rest = CHARACTER_DATABASE.filter((c) => !dueIds.includes(c.id));
@@ -43,14 +44,19 @@ export function pickReviewChars(count = 4) {
   return taken;
 }
 
-/** 生成一道题的选项：正确字 + 其 confusingChars（不足随机补字库其他字） */
-export function buildOptions(curChar) {
+/**
+ * 生成一道题的选项：正确字 + 其 confusingChars（不足随机补字库其他字）
+ * @param {object} curChar
+ * @param {{ distractorCount?: number }} [opts] — P2 自适应：easy=2 干扰(共3选项) / medium=3 / hard=3
+ */
+export function buildOptions(curChar, opts = {}) {
+  const distractorCount = Math.max(1, Math.min(3, opts.distractorCount ?? 3));
   const distractors = (curChar.confusingChars || []).filter((c) => c !== curChar.char);
   const pool = [...CHARACTER_DATABASE.filter((c) => c.char !== curChar.char)];
-  for (let i = 0; distractors.length < 3 && i < pool.length; i++) {
+  for (let i = 0; distractors.length < distractorCount && i < pool.length; i++) {
     if (!distractors.includes(pool[i].char)) distractors.push(pool[i].char);
   }
-  return shuffle([curChar.char, ...distractors.slice(0, 3)]);
+  return shuffle([curChar.char, ...distractors.slice(0, distractorCount)]);
 }
 
 /** 从字库生成「字 + 拼音」配对卡（消消乐用） */
@@ -72,7 +78,7 @@ export function writeKnownCharsReview(chars, success) {
     const rec = CHARACTER_DATABASE.find((c) => c.char === ch);
     if (!rec || !records[rec.id]) continue;
     try {
-      ebbinghausManager.completeReview(rec.id, !!success);
+      completeReview(rec.id, !!success);
     } catch {}
   }
 }

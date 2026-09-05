@@ -243,13 +243,20 @@ export function renderStepRead(stage) {
       });
     }
 
-    // 完成读字，奖励金币并进入第 4 步（练字）
+    // 完成读字，按跟读星级发币并进入第 4 步（练字）— P2 跟读得星闭环
     if (finishBtn) {
       this._on(finishBtn, "click", () => {
         soundAndFX.playSuccessSound();
-        ebbinghausManager.addCoins(5);
-        ebbinghausManager.save();
-        soundAndFX.triggerCoinFly(finishBtn, 5);
+        const stars = Math.max(0, Math.min(3, Number(this._evalStars) || 0));
+        const coins = stars >= 3 ? 5 : stars >= 2 ? 3 : stars >= 1 ? 1 : 0;
+        if (coins > 0) {
+          ebbinghausManager.addCoins(coins);
+          ebbinghausManager.save();
+          soundAndFX.triggerCoinFly(finishBtn, coins);
+        }
+        if (stars > 0) {
+          soundAndFX.speakPriority(`跟读得到${stars}颗星，继续加油！`, { kind: "sentence", emotion: "happy" });
+        }
         this._timeout(() => {
           if (typeof this.nextStep === "function") this.nextStep();
         }, 500);
@@ -641,10 +648,11 @@ export function _showEvalResult(stage, res) {
       soundAndFX.playVictoryFanfare();
       soundAndFX.triggerConfetti(stage);
       this._timeout(() => {
-        soundAndFX.speakPriority(`太棒啦！“${char.char}”字读得真准，得到${score}分！`, { kind: "sentence", emotion: "excited" });
+        soundAndFX.speakPriority(`太棒啦！“${char.char}”字读得真准，得到 3 颗星！`, { kind: "sentence", emotion: "excited" });
       }, 250);
       if (finishBtn) {
-        finishBtn.innerHTML = `<span>${GAME_ICONS.sparkle("w-4 h-4 inline-block")} 开启特训练字 (+5 金币)</span>`;
+        finishBtn.innerHTML = `<span>${GAME_ICONS.sparkle("w-4 h-4 inline-block")} 跟读得 3 星 · 继续练字 (+5 金币)</span>`;
+        finishBtn.setAttribute("data-speak", "跟读得了三颗星，继续练字");
         finishBtn.classList.remove("opacity-50", "pointer-events-none");
         finishBtn.className = "w-full bg-gradient-to-r from-amber-400 to-yellow-400 hover:from-amber-300 hover:to-yellow-300 text-amber-950 font-black py-3 rounded-full shadow-lg border-2 border-white flex items-center justify-center gap-2 active:scale-95 transition-all text-sm cursor-pointer ring-4 ring-yellow-300 animate-pulse";
       }
@@ -657,10 +665,11 @@ export function _showEvalResult(stage, res) {
       }
       soundAndFX.playSuccessSound();
       this._timeout(() => {
-        soundAndFX.speakPriority(`读得不错！得到${score}分，再练一次拿3颗星吧！`, { kind: "sentence", emotion: "happy" });
+        soundAndFX.speakPriority(`读得不错！得到 2 颗星，再练一次可以拿 3 颗星哦！`, { kind: "sentence", emotion: "happy" });
       }, 200);
       if (finishBtn) {
-        finishBtn.innerHTML = `<span>${GAME_ICONS.sparkle("w-4 h-4 inline-block")} 开启特训练字 (+3 金币)</span>`;
+        finishBtn.innerHTML = `<span>${GAME_ICONS.sparkle("w-4 h-4 inline-block")} 跟读得 2 星 · 继续练字 (+3 金币)</span>`;
+        finishBtn.setAttribute("data-speak", "跟读得了两颗星，继续练字");
         finishBtn.classList.remove("opacity-50", "pointer-events-none");
         finishBtn.className = "w-full bg-gradient-to-r from-amber-400 to-yellow-400 text-amber-950 font-black py-3 rounded-full shadow border border-white text-sm active:scale-95 transition-all cursor-pointer";
       }

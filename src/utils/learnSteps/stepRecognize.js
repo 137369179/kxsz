@@ -41,15 +41,38 @@ export function renderStepRecognize(stage) {
           </div>
 
           <div class="flex items-center gap-2.5 mt-4">
-            <button id="btn-open-morph-rec" class="bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 text-white text-xs font-black px-4 py-2 rounded-full shadow-lg border-2 border-white/40 active:scale-95 transition-transform flex items-center gap-1.5 cursor-pointer">
+            <button id="btn-open-morph-rec" class="bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 text-white text-xs font-black px-4 py-2 rounded-full shadow-lg border-2 border-white/40 active:scale-95 transition-transform flex items-center gap-1.5 cursor-pointer touch-target" data-speak="看看这个字是怎么来的" aria-label="字源微剧场">
               <span class="flex items-center">${GAME_ICONS.sparkle("w-4 h-4")}</span>
-              <span>字源微剧场</span>
+              <span>字源小故事</span>
             </button>
-            <button id="btn-goto-pinyin-island" class="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white text-xs font-black px-4 py-2 rounded-full shadow-lg border-2 border-white/40 active:scale-95 transition-transform flex items-center gap-1.5 cursor-pointer" title="前往拼音乐园复习此拼音">
+            <button id="btn-goto-pinyin-island" class="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white text-xs font-black px-4 py-2 rounded-full shadow-lg border-2 border-white/40 active:scale-95 transition-transform flex items-center gap-1.5 cursor-pointer touch-target" title="前往拼音乐园复习此拼音" data-speak="去拼音岛复习" aria-label="拼音岛复习">
               <span class="flex items-center">${GAME_ICONS.mic("w-4 h-4")}</span>
               <span>拼音岛复习</span>
             </button>
           </div>
+
+          ${(() => {
+            const evo = char.evolution || {};
+            const stages = [
+              { label: "象形", glyph: char.oracleGlyph || char.emoji || "·", tip: evo.oracleDesc || "" },
+              { label: "甲骨", glyph: char.oracleGlyph || char.char, tip: evo.oracleDesc || "" },
+              { label: "金文", glyph: char.bronzeGlyph || char.char, tip: evo.bronzeDesc || evo.sealDesc || "" },
+              { label: "今天", glyph: char.char, tip: evo.modernDesc || "" },
+            ];
+            return `
+          <div id="evo-mini-strip" class="mt-4 w-full max-w-sm bg-black/35 border border-amber-300/40 rounded-2xl px-3 py-2.5" aria-live="polite">
+            <div class="text-[10px] font-black text-amber-300 mb-1.5 flex items-center gap-1">${GAME_ICONS.sparkle("w-3.5 h-3.5")}<span>字是怎么来的（点一下听故事）</span></div>
+            <div class="flex items-center justify-between gap-1">
+              ${stages.map((s, i) => `
+                <button type="button" class="evo-mini-stage flex-1 flex flex-col items-center gap-0.5 py-1 rounded-xl hover:bg-white/10 active:scale-95 transition-all cursor-pointer" data-evo-idx="${i}" data-speak="${escapeHtml(s.label)}：${escapeHtml((s.tip || s.label).slice(0, 24))}" aria-label="${escapeHtml(s.label)}">
+                  <span class="text-lg sm:text-xl font-black text-yellow-100 font-serif leading-none">${escapeHtml(String(s.glyph).slice(0, 2))}</span>
+                  <span class="text-[9px] font-bold text-amber-200/90">${s.label}</span>
+                </button>
+                ${i < stages.length - 1 ? `<span class="text-amber-400/70 text-xs font-black" aria-hidden="true">→</span>` : ""}
+              `).join("")}
+            </div>
+          </div>`;
+          })()}
         </div>
 
         <div class="w-88 sm:w-96 flex flex-col justify-between h-full bg-white/10 backdrop-blur-md rounded-3xl p-6 border-2 border-white/30">
@@ -176,6 +199,34 @@ export function renderStepRecognize(stage) {
           },
         });
       });
+    }
+
+    // P2：字源迷你时间轴 — 点阶段听解说；首次进入轻播一句故事开头
+    const evoStages = stage.querySelectorAll(".evo-mini-stage");
+    const evoStory = (char.evolution && char.evolution.story) || "";
+    evoStages.forEach((btn) => {
+      this._on(btn, "click", () => {
+        const idx = Number(btn.dataset.evoIdx || 0);
+        const tips = [
+          char.evolution?.oracleDesc,
+          char.evolution?.oracleDesc,
+          char.evolution?.bronzeDesc || char.evolution?.sealDesc,
+          char.evolution?.modernDesc,
+        ];
+        const line = tips[idx] || evoStory || `${char.char}字是怎么来的呢？`;
+        soundAndFX.speakPriority(line, { kind: "sentence", emotion: "gentle" });
+        evoStages.forEach((b) => b.classList.remove("ring-2", "ring-amber-300", "bg-white/15"));
+        btn.classList.add("ring-2", "ring-amber-300", "bg-white/15");
+      });
+    });
+    if (evoStory && !this._evoIntroSpoken) {
+      this._evoIntroSpoken = true;
+      this._timeout(() => {
+        soundAndFX.speakPriority(`小秘密：${evoStory.slice(0, 36)}${evoStory.length > 36 ? "…" : ""}`, {
+          kind: "sentence",
+          emotion: "gentle",
+        });
+      }, 900);
     }
 
     const pinyinIslandBtn = stage.querySelector("#btn-goto-pinyin-island");

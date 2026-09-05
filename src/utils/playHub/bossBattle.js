@@ -18,6 +18,7 @@ import {
   spawnFloatingText,
   startCountdown,
 } from "./playHelpers.js";
+import { computeAdaptiveProfile, realtimeAdjust } from "../difficultyEngine.js";
 
 export function renderBossBattle() {
     // ===== 动态出题：优先待复习/难字，每次进入题目不同 =====
@@ -34,6 +35,18 @@ export function renderBossBattle() {
     let maxStreak = 0;    // 本场最高连击
     let stopTimer = null;
     let roundTimeoutHappened = false; // 每题是否已超时
+    // P2：自适应难度（ZPD）— 选项数量 / 倒计时随实时正确率调节
+    const age = ebbinghausManager.getAge();
+    let recentResults = [];
+    let difficultyLevel = computeAdaptiveProfile(
+      ebbinghausManager.progress?.charRecords || {},
+      age,
+      [],
+      0
+    ).effectiveLevel || "medium";
+
+    const distractorCountFor = (level) => (level === "easy" ? 2 : 3);
+    const roundSecondsFor = (level) => (level === "easy" ? 14 : level === "hard" ? 8 : 11);
 
     const bossDead = () => bossHp <= 0;
 
@@ -59,8 +72,8 @@ export function renderBossBattle() {
       const curChar = chars[targetIndex % chars.length];
       const __pmProgress = ebbinghausManager.progress;
       const __pmSpeakerIcon = soundAndFX.isMuted ? GAME_ICONS.speaker("w-5 h-5", true) : GAME_ICONS.speaker("w-5 h-5", false);
-      // 动态干扰项：正确字 + confusingChars
-      const options = buildOptions(curChar);
+      // 动态干扰项：正确字 + confusingChars；选项数随难度变化
+      const options = buildOptions(curChar, { distractorCount: distractorCountFor(difficultyLevel) });
       roundTimeoutHappened = false;
 
       soundAndFX.speakPriority(`消灭怪兽！找出汉字：“${curChar.char}”`, { kind: "sentence", priority: 1 });
@@ -188,11 +201,11 @@ export function renderBossBattle() {
 
       let answered = false;
 
-      // ===== 限时倒计时：6 秒未答 → Boss 反扑咬回 8% 血 =====
+      // ===== 限时倒计时：难度越高越短；未答 → Boss 反扑 =====
       if (stopTimer) stopTimer();
       this._addCleanup(() => { if (stopTimer) stopTimer(); });
       const startRoundTimer = () => {
-        let sec = 6;
+        let sec = roundSecondsFor(difficultyLevel);
         if (timerVal) timerVal.textContent = sec;
         if (timerEl) timerEl.classList.add("ticking");
         stopTimer = startCountdown(sec, (remain) => {
@@ -206,6 +219,8 @@ export function renderBossBattle() {
           if (tipText) tipText.textContent = `超时！Boss 反扑咬回 8% 血量…`;
           // 超时视同答错：标记难字复习失败
           ebbinghausManager.completeReview(curChar.id, false);
+          recentResults = [...recentResults.slice(-7), false];
+          difficultyLevel = realtimeAdjust(recentResults, difficultyLevel, 0).nextLevel || difficultyLevel;
           roundCorrect = 0;
           bossHp = Math.min(100, bossHp + 8);
           if (bossBar) { bossBar.style.width = `${bossHp}%`; bossBar.classList.add("hp-heal"); setTimeout(() => bossBar.classList.remove("hp-heal"), 500); }
@@ -232,6 +247,8 @@ export function renderBossBattle() {
             roundCorrect++;
             maxStreak = Math.max(maxStreak, roundCorrect);
             ebbinghausManager.completeReview(curChar.id, true);
+            recentResults = [...recentResults.slice(-7), true];
+            difficultyLevel = realtimeAdjust(recentResults, difficultyLevel, roundCorrect).nextLevel || difficultyLevel;
 
             // ===== 随机暴击：伤害 35/45/55（连击加成暴击率）=====
             const roll = Math.random();
@@ -305,6 +322,8 @@ export function renderBossBattle() {
             // ===== 艾宾浩斯闭环：答错 → 标记难字 + 形近混淆画像，Boss 回血 =====
             roundCorrect = 0;
             ebbinghausManager.completeReview(curChar.id, false);
+            recentResults = [...recentResults.slice(-7), false];
+            difficultyLevel = realtimeAdjust(recentResults, difficultyLevel, 0).nextLevel || difficultyLevel;
             try {
               ebbinghausManager.recordMistake(curChar.id, "similar_confuse", {
                 targetChar: curChar.char,
