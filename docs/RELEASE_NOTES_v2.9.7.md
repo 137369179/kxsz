@@ -4,10 +4,10 @@
 | ---------------------- | -------------------------- |
 | 版本                     | **v2.9.7**                 |
 | Date                   | 2026-09-05                 |
-| Commits                | **25**                     |
-| Files changed          | **126**                    |
-| Insertions / Deletions | **+12,796 / -1,047**       |
-| Tests                  | **734 / 734** ✅ (91 files) |
+| Commits                | **27**                     |
+| Files changed          | **128**                    |
+| Insertions / Deletions | **+12,990 / -1,063**       |
+| Tests                  | **737 / 737** ✅ (91 files) |
 | Smoke                  | **28 / 28** ✅              |
 | Build                  | ✅ vite build pass          |
 | **E2E 浏览器验证**          | ✅ 通过（headless Chrome）      |
@@ -16,7 +16,7 @@
 
 ## 一句话摘要
 
-\*\*"AI agent 协作的真实世界考验" — 8 个并发 agent 在同一会话里向凯茜识字追加 **25 个新模块**、修复 5 个不同层级的 bug（从生产构建完全不可用，到 FSRS 调度漏调，到 API 命名不匹配），最后全部收敛到 **734 tests / 0 failed / E2E 浏览器验证通过**。交付 P0 语音指令层、P0-5 麦克风合规、象形具象渲染引擎、汉字探险队、汉字炼金术、易错难字消灭战、偏旁家族、meteorDefense、字源时间轴、feedbackHub 反馈集中化、节奏自适应规划器等 13 大新能力。
+**AI agent 协作的真实世界考验** — 8 个并发 agent 在同一会话里向凯茜识字追加 **27 个新模块**、修复 5 个不同层级的 bug（从生产构建完全不可用，到 FSRS 调度漏调，到 API 命名不匹配），最后全部收敛到 **737 tests / 0 failed / E2E 浏览器验证通过**。交付 P0 语音指令层、P0-5 麦克风合规、象形具象渲染引擎、汉字探险队、汉字炼金术、易错难字消灭战、偏旁家族、meteorDefense、字源时间轴、feedbackHub 反馈集中化、节奏自适应规划器、motionBudget 动效预算等 **14 大新能力**。
 
 ***
 
@@ -159,6 +159,22 @@ feedbackHub 全链路延伸：
 - `parentDashboardEvents.js` · `parentTabs.js`：家长面板反馈
 
 - `uiChromeNoEmoji.test.js`：emoji 扫描扩展覆盖新文件
+
+### 14. 🎛️ motionBudget 动效预算分级 (`src/utils/motionBudget.js`)
+
+按设备能力分级限制装饰性动效，不约束功能性反馈：
+
+- **low**：内存 < 4GB / CPU ≤ 4 核 / `prefers-reduced-motion` → 粒子最少、无涟漪
+
+- **medium**：默认 → 减半粒子
+
+- **high**：高配 → 完整动效
+
+- `appFx.js` 接入 `fxLimit` 限幅
+
+- reviewHub 全模块（freeRecall / interleavePack / interleaveView）接入 pictogramRenderer
+
+- **测试**：`motionBudget.test.js`（3 tests）
 
 ***
 
@@ -335,9 +351,10 @@ node tools/_axe_audit.cjs http://127.0.0.1:5174/
 
 ***
 
-## 📜 Commit 链（25 个，按时间倒序）
+## 📜 Commit 链（27 个，按时间倒序）
 
 ```
+1ad19a1  feat(m2): motionBudget 动效预算分级 + pictogramRenderer 全 review 接线
 5689336  feat(map): feedbackHub map 事件接线 + parentHub 接入 + emoji 扫描更新
 460fca3  feat(reward): RewardModule 象形点缀 + shop 扩展 + rewardViews 反馈接线
 71037d6  feat(ux): 节奏自适应规划器 + 卡册象形点缀 + 树屋凯茜问候
