@@ -230,6 +230,7 @@ export function renderShelf() {
         // B10: 超过一半没学 → 引导去学
         soundAndFX.playErrorSound?.();
         showGameToast(this.container, readiness.message, { duration: 2800 });
+        soundAndFX.speakPriority?.(readiness.message || "这本书还有生字没学过，先去岛屿上探索吧！", { kind: "sentence", emotion: "gentle" });
         return;
       }
 
@@ -243,8 +244,10 @@ export function renderShelf() {
       if (readiness.status === READING_STATUS.PARTIAL) {
         this.showPinyin = true;
         showGameToast(this.container, readiness.message, { duration: 2500 });
+        soundAndFX.speakPriority?.(readiness.message, { kind: "sentence", emotion: "gentle" });
       } else if (readiness.message) {
         showGameToast(this.container, readiness.message, { duration: 1800 });
+        soundAndFX.speakPriority?.(`打开绘本，《${this.currentBook.title}》`, { kind: "sentence", emotion: "gentle" });
       }
 
       soundAndFX.playSuccessSound();

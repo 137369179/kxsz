@@ -5,6 +5,8 @@
  * Does NOT require mutual confuse lists.
  */
 
+import { getCharPictogramUrl } from "../pictogramRenderer.js";
+
 function resolveInChars(ref, chars) {
   if (!ref) return null;
   return chars.find((c) => c.id === ref || c.char === ref) || null;
@@ -125,7 +127,8 @@ export function buildInterleavePack({
     if (options.length < 2) continue;
 
     const canCloze = !!(target.sentence && target.sentence.includes(target.char));
-    const canPic = !!(target.oracleGlyph || target.meaning || (target.words && target.words[0]));
+    const picAsset = getCharPictogramUrl(target.char);
+    const canPic = !!(picAsset || target.oracleGlyph || target.meaning || (target.words && target.words[0]));
     const canPinyin = !!(target.pinyin && target.char);
 
     let questionType = "similar_pick";
@@ -139,8 +142,8 @@ export function buildInterleavePack({
       promptSubtitle = "句子填空 · 把生字宝宝送回句子中";
     } else if (slot === 2 && canPic) {
       questionType = "picture_write";
-      promptTitle = target.oracleGlyph || (target.words && target.words[0]?.word) || target.char;
-      promptSubtitle = target.meaning ? `字义认知 · ${target.meaning}` : "观察图象，找出对应的汉字";
+      promptTitle = picAsset ? target.char : (target.oracleGlyph || (target.words && target.words[0]?.word) || target.char);
+      promptSubtitle = target.meaning ? `看图认字 · ${target.meaning}` : "看生动图片，选出对应的汉字";
     } else if (slot === 3 && canPinyin) {
       questionType = "pinyin_link";
       promptTitle = target.pinyin;
@@ -155,6 +158,7 @@ export function buildInterleavePack({
       type: questionType,
       promptTitle,
       promptSubtitle,
+      pictogramUrl: picAsset || null,
     });
   }
 

@@ -56,6 +56,11 @@ const CHROME_FILES = [
   "src/utils/cardHub/cardEvents.js",
   "src/components/TreehouseModule.js",
   "src/components/RewardModule.js",
+  "src/utils/reviewHub/freeRecallView.js",
+  "src/utils/drillTypes.js",
+  "src/utils/reviewHub/interleavePack.js",
+  "src/data/shop.js",
+  "src/utils/motionBudget.js",
 ];
 
 describe("stripEmoji helper", () => {

@@ -711,6 +711,21 @@ export function renderAiLogTab(progress, charCount, settings, diffCount) {
           </button>
         </div>
 
+        <!-- M3: 今日目标完成环（图形化，一眼看懂进度） -->
+        <div class="flex items-center gap-4 bg-black/30 rounded-2xl p-4 my-4 border border-white/15">
+          <svg viewBox="0 0 84 84" class="w-20 h-20 shrink-0" role="img" aria-label="今日学习目标完成环">
+            <circle cx="42" cy="42" r="34" fill="none" stroke="rgba(255,255,255,.15)" stroke-width="9"></circle>
+            <circle cx="42" cy="42" r="34" fill="none" stroke="#fbbf24" stroke-width="9" stroke-linecap="round"
+              stroke-dasharray="213.6" stroke-dashoffset="${(213.6 * (1 - Math.min(1, (settings?.dailyCharTarget || 5) ? todayCount / (settings?.dailyCharTarget || 5) : 0))).toFixed(1)}"
+              transform="rotate(-90 42 42)"></circle>
+            <text x="42" y="47" text-anchor="middle" font-size="15" font-weight="900" fill="#fde68a">${Math.min(100, Math.round((settings?.dailyCharTarget || 5) ? (todayCount / (settings?.dailyCharTarget || 5)) * 100 : 0))}%</text>
+          </svg>
+          <div>
+            <div class="text-sm font-black text-yellow-200">今日学习目标</div>
+            <div class="text-[11px] text-cyan-100 font-bold mt-0.5">已学 ${todayCount} / 目标 ${settings?.dailyCharTarget || 5} 字 · 完成后记得休息眼睛哦</div>
+          </div>
+        </div>
+
         <!-- 诊断核心数据指标（P1-3：全部为真实计算值） -->
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 my-4">
           <div class="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/15 text-center">

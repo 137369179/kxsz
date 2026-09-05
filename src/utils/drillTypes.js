@@ -16,6 +16,7 @@
  */
 
 import { GAME_ICONS } from "./gameIcons.js";
+import { getCharPictogramUrl } from "./pictogramRenderer.js";
 
 /** Cloze 填空 — 难度分级 */
 const CLOZE_DIFFICULTY = {
@@ -138,13 +139,20 @@ export function pictureWrite(char, allChars = []) {
   const distractorChars = [...confusing, ...randoms];
   const options = shuffle([char.char, ...distractorChars]);
   const correctIndex = options.indexOf(char.char);
+  const picUrl = getCharPictogramUrl(char?.char);
 
   const promptHTML = `
-    <div class="bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/30 dark:to-orange-900/30
+    <div class="bg-gradient-to-br from-amber-50 to-orange-50
                 border-2 border-amber-300 rounded-2xl px-6 py-4 flex flex-col items-center gap-3">
       <div class="text-xs font-bold text-amber-700 uppercase tracking-wider">看图写字</div>
-      <div class="text-8xl font-bold text-gray-800 dark:text-gray-100">${escapeHtml(pictureHint)}</div>
-      <div class="text-sm text-amber-600">${escapeHtml(meaning)}</div>
+      ${picUrl ? `
+        <div class="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl overflow-hidden shadow-lg border-2 border-amber-300 bg-white/40 p-1 animate-scale-up">
+          <img src="${escapeHtml(picUrl)}" alt="${escapeHtml(pictureHint)}" class="w-full h-full object-cover rounded-xl" />
+        </div>
+      ` : `
+        <div class="text-8xl font-bold text-gray-800">${escapeHtml(pictureHint)}</div>
+      `}
+      ${meaning ? `<div class="text-sm text-amber-600 font-bold">${escapeHtml(meaning)}</div>` : ""}
     </div>
   `;
 

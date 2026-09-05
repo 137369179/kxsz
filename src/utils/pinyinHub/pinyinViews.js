@@ -130,12 +130,18 @@ export function _renderAtlasView() {
           <div class="grid grid-cols-4 sm:grid-cols-6 gap-3">
             ${currentList.map(item => {
               const isSelected = item.id === cur.id;
+              const pic = getCharPictogramUrl(item.exampleChar);
               return `
-                <button class="btn-pinyin-card group relative p-3 rounded-2xl border-2 transition-all flex flex-col items-center justify-center cursor-pointer active:scale-95 ${
+                <button class="btn-pinyin-card group relative p-2.5 rounded-2xl border-2 transition-all flex flex-col items-center justify-center cursor-pointer active:scale-95 ${
                   isSelected
                     ? "bg-gradient-to-tr from-indigo-600 to-purple-600 text-white border-indigo-400 shadow-lg scale-105"
                     : "bg-indigo-50/70 hover:bg-indigo-100 text-indigo-950 border-indigo-200"
                 }" data-pid="${item.id}">
+                  ${pic ? `
+                    <div class="absolute top-1 right-1 w-4 h-4 rounded-full overflow-hidden border border-white shadow-sm pointer-events-none">
+                      <img src="${pic}" class="w-full h-full object-cover" alt="" />
+                    </div>
+                  ` : ""}
                   <span class="text-2xl sm:text-3xl font-black font-mono leading-none mb-1">${item.pinyin}</span>
                   <span class="text-[9px] font-bold opacity-75 truncate">${item.exampleChar || ""}</span>
                 </button>

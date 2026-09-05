@@ -2,6 +2,7 @@
 import { soundAndFX } from "../soundEngine.js";
 import { neuralVoice } from "../neuralVoice.js";
 import { CHARACTER_DATABASE } from "../../data/characters.js";
+import { fxLimit } from "../motionBudget.js";
 
 export function initGlobalListeners() {
   const cleanupPointer = () => window.removeEventListener("pointerdown", this._pointerHandler);
@@ -29,27 +30,32 @@ export function initGlobalListeners() {
 
 export function sparkleAt(x, y) {
   const now = Date.now();
-  if (now - (this._lastSparkleTime || 0) < 240) return;
+  // M2 动效预算：按设备分级限流（low 级设备减少粒子与频率）
+  const limit = fxLimit();
+  if (now - (this._lastSparkleTime || 0) < limit.throttleMs) return;
   this._lastSparkleTime = now;
 
   const existing = document.querySelectorAll(".magic-particle");
-  // P1-4: 限制粒子上限 30 个，防止 DOM 膨胀和视觉噪音
-  if (existing.length > 30) {
-    for (let i = 0; i < existing.length - 30; i++) {
+  // P1-4: 限制粒子上限，防止 DOM 膨胀和视觉噪音
+  if (existing.length > limit.maxParticles) {
+    for (let i = 0; i < existing.length - limit.maxParticles; i++) {
       existing[i].remove();
     }
   }
 
-  const ripple = document.createElement("div");
-  ripple.className = "magic-ripple";
-  ripple.style.left = x + "px";
-  ripple.style.top = y + "px";
-  document.body.appendChild(ripple);
-  setTimeout(() => ripple.remove(), 450);
+  if (limit.allowRipple) {
+    const ripple = document.createElement("div");
+    ripple.className = "magic-ripple";
+    ripple.style.left = x + "px";
+    ripple.style.top = y + "px";
+    document.body.appendChild(ripple);
+    setTimeout(() => ripple.remove(), 450);
+  }
 
   // 柔和视觉风格 (Khan Academy Kids 风格)
   const colors = ["#FDE68A", "#FCD34D", "#FBCFE8", "#BAE6FD", "#86EFAC"];
-  const particleCount = 1 + Math.floor(Math.random() * 2); // 减少粒子数量
+  const particleCount = Math.min(limit.burstMax, 1 + Math.floor(Math.random() * 2)); // 减少粒子数量
+  if (particleCount <= 0) return;
   for (let i = 0; i < particleCount; i++) {
     const particle = document.createElement("div");
     const angle = (Math.PI * 2 * i) / particleCount + (Math.random() - 0.5) * 0.4;

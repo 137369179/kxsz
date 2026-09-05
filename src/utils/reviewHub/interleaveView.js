@@ -109,10 +109,17 @@ export function runInterleaveSession({
       subtitle = question.promptSubtitle || "句子填空 · 选字把句子补充完整";
       title = `<span class="text-xl sm:text-2xl font-bold leading-relaxed">${escapeHtml(question.promptTitle)}</span>`;
       speakPrompt = "句子填空：请选出合适的字填入括号中";
-    } else if (question.type === "picture_write" && question.promptTitle) {
-      subtitle = question.promptSubtitle || "字义与字象 · 选出匹配的字";
-      title = `<span class="text-3xl sm:text-4xl font-serif text-amber-300 font-black">${escapeHtml(question.promptTitle)}</span>`;
-      speakPrompt = "字象挑战：请找出匹配的汉字";
+    } else if (question.type === "picture_write") {
+      subtitle = question.promptSubtitle || "看图选字 · 选出匹配的字";
+      if (question.pictogramUrl) {
+        title = `<div class="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl overflow-hidden shadow-xl border-2 border-amber-300 bg-white/20 backdrop-blur-sm p-1 mx-auto my-1 animate-scale-up">
+          <img src="${escapeHtml(question.pictogramUrl)}" alt="看图选字" class="w-full h-full object-cover rounded-xl" loading="lazy" />
+        </div>`;
+        speakPrompt = "看图选字：请观察图片，找出对应的汉字";
+      } else if (question.promptTitle) {
+        title = `<span class="text-3xl sm:text-4xl font-serif text-amber-300 font-black">${escapeHtml(question.promptTitle)}</span>`;
+        speakPrompt = "字象挑战：请找出匹配的汉字";
+      }
     } else if (question.type === "pinyin_link" && question.promptTitle) {
       subtitle = question.promptSubtitle || "拼音找字 · 选出对应汉字";
       title = `<span class="text-3xl sm:text-4xl font-black text-sky-300 tracking-wide">${escapeHtml(question.promptTitle)}</span>`;

@@ -3,6 +3,7 @@ const ISLAND_CONFIG = {
   1: {
     id: 1,
     name: "奇幻森林岛",
+    motto: "跟着小鹿找藏在图画里的字！",
     sub: "象形本源 · 阶段一 (1-200字)",
     bgImg: "assets/images/cathy_island_forest.webp",
     bgFallback: "assets/images/cathy_world_map.webp",
@@ -14,6 +15,7 @@ const ISLAND_CONFIG = {
   2: {
     id: 2,
     name: "缤纷生活岛",
+    motto: "生活里到处都是会说话的字！",
     sub: "生活认知 · 阶段二 (201-600字)",
     bgImg: "assets/images/cathy_island_life.webp",
     bgFallback: "assets/images/cathy_world_map.webp",
@@ -25,6 +27,7 @@ const ISLAND_CONFIG = {
   3: {
     id: 3,
     name: "星际探索岛",
+    motto: "坐上飞船，去认更多了不起的字！",
     sub: "科学智慧 · 阶段三 (601-1490字)",
     bgImg: "assets/images/cathy_island_space.webp",
     bgFallback: "assets/images/cathy_world_map.webp",

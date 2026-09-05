@@ -113,6 +113,9 @@ export function bindEvents(mainEl) {
       this.selectedCard = CHARACTER_DATABASE.find((c) => c.id === charId);
       this.isCardFlipped = false;
       soundAndFX.playCardFlip();
+      if (this.selectedCard?.char) {
+        soundAndFX.speakPriority?.(`${this.selectedCard.char}，${this.selectedCard.pinyin || ""}`, { kind: "char", priority: 1 });
+      }
       this.render();
     });
   });

@@ -326,13 +326,14 @@ export function renderMap() {
                     <div class="w-16 h-16 rounded-full overflow-hidden border-2 border-white/40 shadow-md mb-2">
                       <img src="${cfg.bgImg}" class="w-full h-full object-cover" alt="${cfg.name}" />
                     </div>
-                    <h3 class="text-sm font-black text-white mb-0.5">${cfg.name}</h2>
-                    <p class="text-[10px] text-white/60 font-bold mb-3">${cfg.sub}</p>
+                    <h3 class="text-sm font-black text-white mb-0.5">${cfg.name}</h3>
+                    <p class="text-[10px] text-white/60 font-bold mb-1">${cfg.sub}</p>
+                    <p class="text-[10px] text-amber-200/90 font-bold mb-3">${cfg.motto || ""}</p>
                     <button class="w-full py-2 rounded-xl text-xs font-black ${
                       isCurrent
                         ? "bg-amber-400 text-amber-950 font-black shadow-md"
                         : "bg-gradient-to-r " + cfg.btnGrad + " text-white shadow"
-                    } active:scale-95 transition-transform pointer-events-none">
+                    } active:scale-95 transition-transform pointer-events-none" data-speak="${isCurrent ? "你已经在这个岛啦" : "传送到" + (cfg.name || "下一个岛")}">
                       ${isCurrent ? "当前所在岛屿" : "传送前往"}
                     </button>
                   </div>
