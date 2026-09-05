@@ -206,7 +206,7 @@ export async function _openGlyphTheater(charId, anchorEl = null) {
   backdrop.id = "glyph-theater";
   backdrop.style.cssText = "position:fixed;inset:0;z-index:99990;background:rgba(2,6,23,.72);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center";
   backdrop.innerHTML = `
-    <div class="glyph-theater-card relative w-[300px] max-w-[86vw] rounded-3xl bg-gradient-to-b from-amber-50 to-orange-100 border-4 border-amber-300 shadow-2xl p-6 flex flex-col items-center gap-3 animate-scale-up" role="dialog" aria-label="汉字字源小剧场">
+    <div class="glyph-theater-card relative w-[300px] max-w-xs rounded-3xl bg-gradient-to-b from-amber-50 to-orange-100 border-4 border-amber-300 shadow-2xl p-6 flex flex-col items-center gap-3 animate-scale-up" role="dialog" aria-label="汉字字源小剧场">
       <button id="btn-theater-close" class="absolute -top-3 -right-3 w-9 h-9 rounded-full bg-white text-gray-700 font-black border-2 border-amber-300 shadow-md active:scale-90 cursor-pointer flex items-center justify-center" data-speak="关闭小剧场" aria-label="关闭小剧场">${GAME_ICONS.back("w-4 h-4")}</button>
       <div class="flex items-center gap-3">
         <div class="flex flex-col items-center gap-1">
@@ -219,7 +219,7 @@ export async function _openGlyphTheater(charId, anchorEl = null) {
           <span class="text-[10px] font-black text-amber-600 opacity-0" id="theater-label-modern">今天这样写</span>
         </div>
       </div>
-      ${story ? `<p class="text-[11px] leading-relaxed text-amber-900/90 font-bold text-center bg-white/70 rounded-xl px-3 py-2 border border-amber-200">${escapeHtml(story)}${String(c.evolution?.story || "").length > 90 ? "…" : ""}</p>` : ""}
+      ${story ? `<p class="text-[11px] leading-relaxed text-amber-900/80 font-bold text-center bg-white/70 rounded-xl px-3 py-2 border border-amber-200">${escapeHtml(story)}${String(c.evolution?.story || "").length > 90 ? "…" : ""}</p>` : ""}
       <div class="flex items-center gap-2">
         <button id="btn-theater-story" class="btn-game-blue text-white text-[11px] font-black px-4 py-1.5 rounded-full shadow-md active:scale-95 cursor-pointer flex items-center gap-1" aria-label="朗读演变故事">
           <span class="flex items-center">${GAME_ICONS.speaker("w-3.5 h-3.5")}</span>

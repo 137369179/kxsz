@@ -19,8 +19,11 @@ import { soundAndFX } from "./soundEngine.js";
 import { haptic } from "./haptics.js";
 import { sparkleAt } from "./appHub/appFx.js";
 
-/** 是否处于“减少动效”环境（系统偏好） */
+/** 是否处于“减少动效”环境（系统偏好 或 家长开关 L3） */
 export function prefersReducedMotion() {
+  try {
+    if (typeof localStorage !== "undefined" && localStorage.getItem("cathy_reduced_motion") === "1") return true;
+  } catch {}
   try {
     return typeof window !== "undefined" && window.matchMedia
       ? window.matchMedia("(prefers-reduced-motion: reduce)").matches

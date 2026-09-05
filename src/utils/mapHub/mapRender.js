@@ -6,6 +6,7 @@ import { GAME_ICONS } from "../gameIcons.js";
 import { ISLAND_CONFIG } from "./islandConfig.js";
 import { getSessionConfig, planDailySession, setDeps } from "../sessionPlanner.js";
 import { getQuestProgressSnapshot } from "./dailyQuestModal.js";
+import { getCharPictogramUrl } from "../pictogramRenderer.js";
 
 export function renderMap() {
   this.destroy();
@@ -186,6 +187,11 @@ export function renderMap() {
                       ? "bg-gradient-to-b from-orange-400 via-amber-500 to-orange-600 border-4 border-white text-white ring-8 ring-orange-400/60 animate-pulse"
                       : "bg-slate-700/80 border-4 border-slate-600 text-slate-400 opacity-60"
                   }">
+                    ${(() => {
+                      if (isLocked) return "";
+                      const pic = getCharPictogramUrl(charItem.char);
+                      return pic ? `<img src="${pic}" class="absolute -top-3 -right-3 w-10 h-10 rounded-xl object-cover border-2 border-white shadow-lg bg-amber-100 z-10 animate-bounce-slow" alt="" />` : "";
+                    })()}
 
                     <span class="text-8xl sm:text-9xl font-black drop-shadow-2xl tracking-wider flex items-center justify-center leading-none select-none">${isLocked ? GAME_ICONS.lock('w-16 h-16 sm:w-20 sm:h-20') : charItem.char}</span>
                     

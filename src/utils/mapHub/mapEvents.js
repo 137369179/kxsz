@@ -34,6 +34,7 @@ export function bindEvents(mainEl) {
       const charData = CHARACTER_DATABASE.find((c) => c.id === charId);
       if (charData) {
         soundAndFX.playPop();
+        soundAndFX.speakPriority(`${charData.char}，${charData.pinyin}`, { kind: "char", priority: 1 });
         this._busEmit(EVENTS.START_LEARN, { charData });
       }
     });

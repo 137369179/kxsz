@@ -289,10 +289,14 @@ export function bindDashboardEvents(mainEl) {
       // P0-4 / P0-5：触感反馈 与 麦克风（语音评测）总开关
       const voiceEvalOn = mainEl.querySelector("#check-voice-eval")?.checked ?? true;
       const hapticsOn = mainEl.querySelector("#check-haptics")?.checked ?? true;
+      const reduceMotionOn = mainEl.querySelector("#check-reduce-motion")?.checked ?? false;
       ebbinghausManager.progress.settings.voiceEval = voiceEvalOn;
       ebbinghausManager.progress.settings.haptics = hapticsOn;
+      ebbinghausManager.progress.settings.reduceMotion = reduceMotionOn;
       setVoiceEvalEnabled(voiceEvalOn);
       setHapticsEnabled(hapticsOn);
+      // L3：减少动效 → feedbackHub 读取同一 localStorage 开关（立即生效）
+      try { localStorage.setItem("cathy_reduced_motion", reduceMotionOn ? "1" : "0"); } catch {}
       ebbinghausManager.save();
 
       // E7 专注模式：读复选框并桥接 focusMode.js（减弱动画/大字模式/装饰屏蔽）

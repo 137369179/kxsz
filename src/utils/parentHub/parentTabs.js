@@ -508,6 +508,15 @@ export function renderActiveTabContent(progress, charCount, settings, diffCount)
             <input type="checkbox" id="check-haptics" ${settings.haptics !== false ? "checked" : ""} class="w-5 h-5 accent-orange-500 rounded" />
           </div>
 
+          <!-- L3: 减少动效开关（家长可关动画装饰，保留声音） -->
+          <div class="flex items-center justify-between bg-slate-50 p-3 rounded-2xl border border-slate-200">
+            <div class="flex flex-col gap-1">
+              <span class="text-xs font-bold text-slate-800">减少动效</span>
+              <span class="text-[10px] text-gray-500 leading-tight">关闭装饰动画与粒子（保留声音与触感），适合容易分心或低配置设备</span>
+            </div>
+            <input type="checkbox" id="check-reduce-motion" ${settings.reduceMotion === true ? "checked" : ""} class="w-5 h-5 accent-orange-500 rounded cursor-pointer" />
+          </div>
+
         </div>
 
         <div class="mt-6 pt-4 border-t border-amber-100 flex items-center justify-end">

@@ -605,6 +605,17 @@ export class EbbinghausManager {
     this.progress.todayLearnedCount = (this.progress.todayLearnedCount || 0) + 1;
     this.progress.currentLevelIndex = Math.min(1490, Math.max(this.progress.currentLevelIndex, Object.keys(this.progress.charRecords).length + 1));
     this.save();
+    // L2 预载策略：预取下一个字的象形图，避免学习切换时图片闪烁
+    try {
+      const idx = CHARACTER_DATABASE.findIndex((x) => x.id === charId);
+      const next = idx >= 0 ? CHARACTER_DATABASE[idx + 1] : null;
+      if (next && typeof Image !== "undefined") {
+        import("./pictogramRenderer.js").then(({ getCharPictogramUrl }) => {
+          const url = getCharPictogramUrl(next);
+          if (url) { const img = new Image(); img.src = url; }
+        }).catch(() => {});
+      }
+    } catch {}
     eventBus.emit(EVENTS.PROGRESS_CHANGED, { progress: this.progress });
     return updated;
   }

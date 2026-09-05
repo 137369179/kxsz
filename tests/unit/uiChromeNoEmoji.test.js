@@ -51,6 +51,11 @@ const CHROME_FILES = [
   "src/components/PinyinModule.js",
   "src/utils/pinyinHub/pinyinViews.js",
   "src/utils/pictogramRenderer.js",
+  "src/components/CardModule.js",
+  "src/utils/cardHub/cardRender.js",
+  "src/utils/cardHub/cardEvents.js",
+  "src/components/TreehouseModule.js",
+  "src/components/RewardModule.js",
 ];
 
 describe("stripEmoji helper", () => {
