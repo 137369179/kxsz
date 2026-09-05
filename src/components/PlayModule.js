@@ -89,7 +89,7 @@ export class PlayModule extends BaseModule {
         </div>
 
         <!-- 新增探险队入口 -->
-        <div class="mode-card group relative w-full h-auto rounded-3xl overflow-hidden shadow-2xl border-4 border-yellow-300 hover:border-yellow-400 mb-6 bg-gradient-to-r from-yellow-400 via-amber-500 to-orange-500 flex flex-col justify-end p-6 cursor-pointer hover:scale-[1.02] transition-transform duration-300" data-mode="expedition">
+        <div class="mode-card group relative w-full rounded-3xl overflow-hidden shadow-2xl border-4 border-yellow-300 hover:border-yellow-400 mb-6 bg-gradient-to-r from-yellow-400 via-amber-500 to-orange-500 flex flex-col justify-end p-6 cursor-pointer hover:scale-[1.02] transition-transform duration-300" data-mode="expedition">
           <div class="absolute -right-10 -bottom-10 opacity-30 transform scale-150">
             ${GAME_ICONS.swords("w-40 h-40 text-white")}
           </div>
@@ -103,7 +103,7 @@ export class PlayModule extends BaseModule {
                 全新深度挑战！穿越神秘地图，挑选你的局内专属增益，连续闯关战胜大魔王！
               </p>
             </div>
-            <button class="bg-white text-amber-600 font-black px-8 py-3 rounded-full shadow-lg group-hover:shadow-xl active:scale-95 transition-all flex items-center justify-center gap-2 whitespace-nowrap self-start sm:self-auto">
+            <button class="bg-white text-amber-600 font-black px-8 py-3 rounded-full shadow-lg group-hover:shadow-xl active:scale-95 transition-all flex items-center justify-center gap-2 whitespace-nowrap">
               ${GAME_ICONS.swords("w-5 h-5")} 开启冒险
             </button>
           </div>

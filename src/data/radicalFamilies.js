@@ -125,6 +125,26 @@ export const RADICAL_FAMILIES = [
         word: "困境",
         effect: "box",
         sceneDesc: "树木四周建起一道保护围栏"
+      },
+      {
+        radical: "乔",
+        radicalName: "乔木高",
+        char: "桥",
+        pinyin: "qiáo",
+        mnemonic: "木+乔 = 桥，木头架起平安桥！",
+        word: "木桥",
+        effect: "bridge",
+        sceneDesc: "横跨溪流的结实木桥"
+      },
+      {
+        radical: "支",
+        radicalName: "分支旁",
+        char: "枝",
+        pinyin: "zhī",
+        mnemonic: "木+支 = 枝，绿树枝头鸟儿啼！",
+        word: "树枝",
+        effect: "branch",
+        sceneDesc: "迎风招展的翠绿树枝"
       }
     ]
   },
@@ -278,6 +298,433 @@ export const RADICAL_FAMILIES = [
         word: "水晶",
         effect: "crystal",
         sceneDesc: "闪烁着璀璨光芒的宝石"
+      }
+    ]
+  },
+  {
+    id: "fam_shui",
+    name: "水字家族",
+    image: "assets/images/cathy_island_forest.webp",
+    desc: "三点水儿聚江海，江河湖海浪滔滔",
+    rootChar: "水",
+    pinyin: "shuǐ",
+    story: "‘水’字像流动的水波，变成偏旁‘氵’（三点水）后，组成的字都和江河湖海、水流液体紧密相关！",
+    members: [
+      {
+        radical: "工",
+        radicalName: "工字偏旁",
+        char: "江",
+        pinyin: "jiāng",
+        mnemonic: "氵+工 = 江，大江奔腾向大海！",
+        word: "长江",
+        effect: "river",
+        sceneDesc: "滚滚长江奔流不息"
+      },
+      {
+        radical: "可",
+        radicalName: "可字偏旁",
+        char: "河",
+        pinyin: "hé",
+        mnemonic: "氵+可 = 河，碧波荡漾小清河！",
+        word: "小河",
+        effect: "water",
+        sceneDesc: "清清流水绕村过"
+      },
+      {
+        radical: "每",
+        radicalName: "每字偏旁",
+        char: "海",
+        pinyin: "hǎi",
+        mnemonic: "氵+每 = 海，辽阔无边大海洋！",
+        word: "大海",
+        effect: "sea",
+        sceneDesc: "辽阔深邃的大海浪花翻滚"
+      },
+      {
+        radical: "先",
+        radicalName: "先字偏旁",
+        char: "洗",
+        pinyin: "xǐ",
+        mnemonic: "氵+先 = 洗，清水洗手讲卫生！",
+        word: "洗手",
+        effect: "bubble",
+        sceneDesc: "彩色肥皂泡泡飞舞"
+      },
+      {
+        radical: "干",
+        radicalName: "干字偏旁",
+        char: "汗",
+        pinyin: "hàn",
+        mnemonic: "氵+干 = 汗，辛勤汗水湿衣衫！",
+        word: "汗水",
+        effect: "drop",
+        sceneDesc: "劳动的小朋友流下勤劳汗水"
+      }
+    ]
+  },
+  {
+    id: "fam_cao",
+    name: "草字家族",
+    image: "assets/images/cathy_island_forest.webp",
+    desc: "草字头上两小草，花草芬芳绿茸茸",
+    rootChar: "草",
+    pinyin: "cǎo",
+    story: "‘艹’像两棵破土而出的小草芽。凡是带有草字头的字，大多都和花草、植物、芳香有关！",
+    members: [
+      {
+        radical: "化",
+        radicalName: "化字偏旁",
+        char: "花",
+        pinyin: "huā",
+        mnemonic: "艹+化 = 花，春暖花开百花香！",
+        word: "花朵",
+        effect: "flower",
+        sceneDesc: "五彩斑斓的花朵盛开"
+      },
+      {
+        radical: "田",
+        radicalName: "田字偏旁",
+        char: "苗",
+        pinyin: "miáo",
+        mnemonic: "艹+田 = 苗，田间禾苗绿油油！",
+        word: "禾苗",
+        effect: "sprout",
+        sceneDesc: "农田里迎风茁壮的秧苗"
+      },
+      {
+        radical: "牙",
+        radicalName: "牙字偏旁",
+        char: "芽",
+        pinyin: "yá",
+        mnemonic: "艹+牙 = 芽，种子发芽伸懒腰！",
+        word: "发芽",
+        effect: "leaf",
+        sceneDesc: "嫩绿的新芽破土而出"
+      },
+      {
+        radical: "早",
+        radicalName: "早字偏旁",
+        char: "草",
+        pinyin: "cǎo",
+        mnemonic: "艹+早 = 草，小草青青连成片！",
+        word: "青草",
+        effect: "grass",
+        sceneDesc: "辽阔翠绿的原野草地"
+      },
+      {
+        radical: "监",
+        radicalName: "监字偏旁",
+        char: "蓝",
+        pinyin: "lán",
+        mnemonic: "艹+监 = 蓝，蓝草染色如晴空！",
+        word: "蓝色",
+        effect: "sky",
+        sceneDesc: "蔚蓝无云的晴朗天空"
+      }
+    ]
+  },
+  {
+    id: "fam_shou",
+    name: "手字家族",
+    image: "assets/images/cathy_island_life.webp",
+    desc: "提手旁儿伸出手，抓拉推打样样通",
+    rootChar: "手",
+    pinyin: "shǒu",
+    story: "‘手’字变身为‘扌’（提手旁），像一只灵巧有力的小手。凡是带有提手旁的字，大多和手的动作有关！",
+    members: [
+      {
+        radical: "丁",
+        radicalName: "丁字偏旁",
+        char: "打",
+        pinyin: "dǎ",
+        mnemonic: "扌+丁 = 打，挥起球拍把球打！",
+        word: "打球",
+        effect: "strike",
+        sceneDesc: "活力满满的小伙伴在打球"
+      },
+      {
+        radical: "白",
+        radicalName: "白字偏旁",
+        char: "拍",
+        pinyin: "pāi",
+        mnemonic: "扌+白 = 拍，小手拍拍齐欢笑！",
+        word: "拍手",
+        effect: "clap",
+        sceneDesc: "大家欢聚一堂拍手欢笑"
+      },
+      {
+        radical: "是",
+        radicalName: "是字偏旁",
+        char: "提",
+        pinyin: "tí",
+        mnemonic: "扌+是 = 提，提桶浇花真勤劳！",
+        word: "提水",
+        effect: "lift",
+        sceneDesc: "勤快的小勇士提起水桶"
+      },
+      {
+        radical: "隹",
+        radicalName: "隹字偏旁",
+        char: "推",
+        pinyin: "tuī",
+        mnemonic: "扌+隹 = 推，齐心协力向前推！",
+        word: "推车",
+        effect: "push",
+        sceneDesc: "推着载满丰收果实的小推车"
+      },
+      {
+        radical: "爪",
+        radicalName: "爪字偏旁",
+        char: "抓",
+        pinyin: "zhuā",
+        mnemonic: "扌+爪 = 抓，小手抓紧不放松！",
+        word: "抓紧",
+        effect: "grab",
+        sceneDesc: "小猫敏捷伸爪抓住毛线球"
+      }
+    ]
+  },
+  {
+    id: "fam_kou",
+    name: "口字家族",
+    image: "assets/images/cathy_island_life.webp",
+    desc: "口字方方张大嘴，吃喝唱叫笑哈哈",
+    rootChar: "口",
+    pinyin: "kǒu",
+    story: "‘口’字就像张开的嘴巴，带有口字旁的字，大多和说话、进食、发出声音等动作紧密相连！",
+    members: [
+      {
+        radical: "乞",
+        radicalName: "乞字偏旁",
+        char: "吃",
+        pinyin: "chī",
+        mnemonic: "口+乞 = 吃，大口吃果真香甜！",
+        word: "吃饭",
+        effect: "eat",
+        sceneDesc: "津津有味品尝甜美水果"
+      },
+      {
+        radical: "曷",
+        radicalName: "曷字偏旁",
+        char: "喝",
+        pinyin: "hē",
+        mnemonic: "口+曷 = 喝，大口喝水解烦渴！",
+        word: "喝水",
+        effect: "drink",
+        sceneDesc: "喝上一杯甘甜的清泉水"
+      },
+      {
+        radical: "昌",
+        radicalName: "昌字偏旁",
+        char: "唱",
+        pinyin: "chàng",
+        mnemonic: "口+昌 = 唱，高声歌唱迎朝阳！",
+        word: "唱歌",
+        effect: "sing",
+        sceneDesc: "百鸟啼鸣合奏大自然交响曲"
+      },
+      {
+        radical: "丩",
+        radicalName: "丩字偏旁",
+        char: "叫",
+        pinyin: "jiào",
+        mnemonic: "口+丩 = 叫，雄鸡破晓大声叫！",
+        word: "大叫",
+        effect: "call",
+        sceneDesc: "晨光中雄鸡高唱报晓"
+      },
+      {
+        radical: "斤",
+        radicalName: "斤字偏旁",
+        char: "听",
+        pinyin: "tīng",
+        mnemonic: "口+斤 = 听，侧耳细听林涛声！",
+        word: "听讲",
+        effect: "listen",
+        sceneDesc: "静心聆听大自然的美妙天籁"
+      }
+    ]
+  },
+  {
+    id: "fam_huo",
+    name: "火字家族",
+    image: "assets/images/cathy_island_guofeng.webp",
+    desc: "火光熊熊热气腾，点火烧烤照通明",
+    rootChar: "火",
+    pinyin: "huǒ",
+    story: "‘火’是跳动的火苗，变成偏旁‘火’或‘灬’（四点底）后，都和热量、燃烧、烹饪有关！",
+    members: [
+      {
+        radical: "尧",
+        radicalName: "尧字偏旁",
+        char: "烧",
+        pinyin: "shāo",
+        mnemonic: "火+尧 = 烧，篝火燃烧暖融融！",
+        word: "燃烧",
+        effect: "flame",
+        sceneDesc: "温暖明亮的篝火在夜晚跳跃"
+      },
+      {
+        radical: "执",
+        radicalName: "执字偏旁",
+        char: "热",
+        pinyin: "rè",
+        mnemonic: "执+灬 = 热，盛夏炎炎真温热！",
+        word: "炎热",
+        effect: "heat",
+        sceneDesc: "夏日金光灿灿热力四射"
+      },
+      {
+        radical: "占",
+        radicalName: "占字偏旁",
+        char: "点",
+        pinyin: "diǎn",
+        mnemonic: "占+灬 = 点，点亮明灯照四方！",
+        word: "点灯",
+        effect: "spark",
+        sceneDesc: "一盏明灯照亮静谧夜晚"
+      },
+      {
+        radical: "少",
+        radicalName: "少字偏旁",
+        char: "炒",
+        pinyin: "chǎo",
+        mnemonic: "火+少 = 炒，大勺快炒蔬菜香！",
+        word: "炒菜",
+        effect: "cook",
+        sceneDesc: "厨房飘出阵阵诱人饭菜香"
+      },
+      {
+        radical: "丁",
+        radicalName: "丁字偏旁",
+        char: "灯",
+        pinyin: "dēng",
+        mnemonic: "火+丁 = 灯，万家灯火闪星光！",
+        word: "台灯",
+        effect: "light",
+        sceneDesc: "温馨的书桌台灯洒下柔光"
+      }
+    ]
+  },
+  {
+    id: "fam_xin",
+    name: "心字家族",
+    image: "assets/images/cathy_island_guofeng.webp",
+    desc: "一颗真心跳得欢，喜怒哀乐在心间",
+    rootChar: "心",
+    pinyin: "xīn",
+    story: "‘心’代表我们跳动的心脏与丰富情感，化作‘忄’（竖心旁）或心字底，都和心情、思考、情绪有关！",
+    members: [
+      {
+        radical: "夬",
+        radicalName: "夬字偏旁",
+        char: "快",
+        pinyin: "kuài",
+        mnemonic: "忄+夬 = 快，身手敏捷跑得快！",
+        word: "快乐",
+        effect: "fast",
+        sceneDesc: "快乐奔跑的小小少年"
+      },
+      {
+        radical: "曼",
+        radicalName: "曼字偏旁",
+        char: "慢",
+        pinyin: "màn",
+        mnemonic: "忄+曼 = 慢，遇事沉着慢慢来！",
+        word: "慢步",
+        effect: "slow",
+        sceneDesc: "悠然漫步在宁静林间道"
+      },
+      {
+        radical: "亡",
+        radicalName: "亡字偏旁",
+        char: "忙",
+        pinyin: "máng",
+        mnemonic: "忄+亡 = 忙，勤劳忙碌丰收年！",
+        word: "忙碌",
+        effect: "busy",
+        sceneDesc: "勤劳小蜜蜂在花间采蜜忙"
+      },
+      {
+        radical: "相",
+        radicalName: "相字偏旁",
+        char: "想",
+        pinyin: "xiǎng",
+        mnemonic: "相+心 = 想，开动脑筋想妙计！",
+        word: "思考",
+        effect: "think",
+        sceneDesc: "智慧小火花在脑海闪烁"
+      },
+      {
+        radical: "田",
+        radicalName: "田字偏旁",
+        char: "思",
+        pinyin: "sī",
+        mnemonic: "田+心 = 思，静心思索学问深！",
+        word: "深思",
+        effect: "ponder",
+        sceneDesc: "沉浸在知识海洋的小学者"
+      }
+    ]
+  },
+  {
+    id: "fam_yan",
+    name: "言字家族",
+    image: "assets/images/cathy_island_guofeng.webp",
+    desc: "言字偏旁吐真言，说话读讲有礼貌",
+    rootChar: "言",
+    pinyin: "yán",
+    story: "‘言’代表说话与语言。化为‘讠’（言字旁）后，所有的字都和说话、阅读、计谋、语言交流有关！",
+    members: [
+      {
+        radical: "兑",
+        radicalName: "兑字偏旁",
+        char: "说",
+        pinyin: "shuō",
+        mnemonic: "讠+兑 = 说，言之有理把话说！",
+        word: "说话",
+        effect: "talk",
+        sceneDesc: "绘声绘色地讲故事"
+      },
+      {
+        radical: "舌",
+        radicalName: "舌字偏旁",
+        char: "话",
+        pinyin: "huà",
+        mnemonic: "讠+舌 = 话，真心真意说真话！",
+        word: "话语",
+        effect: "chat",
+        sceneDesc: "伙伴之间亲切谈心交流"
+      },
+      {
+        radical: "卖",
+        radicalName: "卖字偏旁",
+        char: "读",
+        pinyin: "dú",
+        mnemonic: "讠+卖 = 读，晨光熹微朗声读！",
+        word: "读书",
+        effect: "read",
+        sceneDesc: "朗朗书声回荡在学堂"
+      },
+      {
+        radical: "井",
+        radicalName: "井字偏旁",
+        char: "讲",
+        pinyin: "jiǎng",
+        mnemonic: "讠+井 = 讲，精彩故事娓娓讲！",
+        word: "讲述",
+        effect: "tell",
+        sceneDesc: "小老师在黑板前生动讲解"
+      },
+      {
+        radical: "人",
+        radicalName: "人字偏旁",
+        char: "认",
+        pinyin: "rèn",
+        mnemonic: "讠+人 = 认，认真识字顶呱呱！",
+        word: "认识",
+        effect: "know",
+        sceneDesc: "小勇士自信认出新的汉字"
       }
     ]
   }

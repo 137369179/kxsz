@@ -19,6 +19,7 @@ import {
   startCountdown,
   writeKnownCharsReview,
 } from "./playHelpers.js";
+import { triggerHapticSuccess, triggerHapticWarning } from "../haptics.js";
 
 export function renderFusionLab() {
     const FUSION_RECIPES = [
@@ -85,7 +86,7 @@ export function renderFusionLab() {
               <span class="text-xs font-bold text-purple-300">(${escapeHtml(cur.pinyin)})</span>
             </div>
 
-            <div class="relative w-56 h-56 sm:w-64 sm:h-64 mb-4 flex flex-col items-center justify-center">
+            <div id="cauldron-dropzone" class="relative w-56 h-56 sm:w-64 sm:h-64 mb-4 flex flex-col items-center justify-center transition-all duration-300">
               <div id="cauldron-glow" class="absolute inset-0 rounded-full bg-gradient-to-tr from-purple-500/40 via-fuchsia-500/40 to-cyan-500/40 blur-2xl animate-pulse"></div>
               
               <!-- 3D 东方炼金八卦铜炉背景 -->
@@ -94,16 +95,16 @@ export function renderFusionLab() {
               <div class="relative z-10 w-44 h-44 sm:w-52 sm:h-52 rounded-full bg-black/65 backdrop-blur-sm border-2 border-amber-300/80 shadow-[0_0_40px_rgba(168,85,247,0.5)] flex flex-col items-center justify-center p-4">
                 
                 <div class="flex items-center gap-2 mb-2">
-                  <div id="slot-1" class="w-14 h-14 rounded-2xl bg-black/70 border-2 border-dashed border-purple-300 flex items-center justify-center text-2xl font-black text-yellow-300 cursor-pointer transition-all hover:scale-105" title="点击取消选择">
+                  <div id="slot-1" class="w-14 h-14 rounded-2xl bg-black/70 border-2 border-dashed border-purple-300 flex items-center justify-center text-2xl font-black text-yellow-300 cursor-pointer transition-all hover:scale-105 select-none" title="点击取消选择">
                     ?
                   </div>
                   <span class="text-xl font-black text-purple-300">+</span>
-                  <div id="slot-2" class="w-14 h-14 rounded-2xl bg-black/70 border-2 border-dashed border-purple-300 flex items-center justify-center text-2xl font-black text-yellow-300 cursor-pointer transition-all hover:scale-105" title="点击取消选择">
+                  <div id="slot-2" class="w-14 h-14 rounded-2xl bg-black/70 border-2 border-dashed border-purple-300 flex items-center justify-center text-2xl font-black text-yellow-300 cursor-pointer transition-all hover:scale-105 select-none" title="点击取消选择">
                     ?
                   </div>
                 </div>
 
-                <span class="text-[10px] text-purple-200 font-bold">请点击下方 2 个部件投入炉中（点击槽位可撤回）</span>
+                <span class="text-[10px] text-purple-200 font-bold">可点击或拖拽 2 个部件入炉（点击槽位可撤回）</span>
               </div>
             </div>
 
@@ -111,7 +112,7 @@ export function renderFusionLab() {
               ${options
                 .map(
                   (part) => `
-                <button class="fusion-part-btn h-16 sm:h-20 rounded-2xl bg-gradient-to-br from-purple-500/80 to-indigo-600/80 border-2 border-purple-300 hover:border-yellow-300 text-white font-black text-3xl sm:text-4xl shadow-xl active:scale-90 transition-all flex items-center justify-center cursor-pointer hover:scale-105" data-part="${part}">
+                <button class="fusion-part-btn h-16 sm:h-20 rounded-2xl bg-gradient-to-br from-purple-500 to-indigo-600 border-2 border-purple-300 hover:border-yellow-300 text-white font-black text-3xl sm:text-4xl shadow-xl active:scale-90 transition-all flex items-center justify-center cursor-pointer hover:scale-105 select-none touch-none" data-part="${part}" draggable="true">
                   ${part}
                 </button>
               `
@@ -166,6 +167,8 @@ export function renderFusionLab() {
         });
       }
 
+      const cauldronDropzone = this.container.querySelector("#cauldron-dropzone");
+      const cauldronGlow = this.container.querySelector("#cauldron-glow");
       const slot1 = this.container.querySelector("#slot-1");
       const slot2 = this.container.querySelector("#slot-2");
       const successModal = this.container.querySelector("#fusion-success-modal");
@@ -174,59 +177,170 @@ export function renderFusionLab() {
       const claimBtn = this.container.querySelector("#btn-claim-fusion");
       const againBtn = this.container.querySelector("#btn-fusion-again");
 
-      // 支持点击槽位撤回部件
-      if (slot1) {
-        this._on(slot1, "click", () => {
-          if (selectedParts.length === 1) {
-            soundAndFX.playPop();
-            const removed = selectedParts.pop();
-            slot1.textContent = "?";
-            slot1.classList.remove("bg-purple-600/60", "border-solid", "border-yellow-300");
-            const btn = this.container.querySelector(`.fusion-part-btn[data-part="${removed}"]`);
-            if (btn) btn.classList.remove("opacity-40", "pointer-events-none");
+      // 撤回部件处理（点击槽位即可退回对应部件）
+      const withdrawPartAt = (index) => {
+        if (index >= selectedParts.length || index < 0) return;
+        triggerHapticWarning();
+        soundAndFX.playPop();
+        const removed = selectedParts.splice(index, 1)[0];
+        const btn = this.container.querySelector(`.fusion-part-btn[data-part="${removed}"]`);
+        if (btn) btn.classList.remove("opacity-40", "pointer-events-none");
+
+        if (selectedParts.length === 0) {
+          if (slot1) { slot1.textContent = "?"; slot1.classList.remove("bg-purple-600/60", "border-solid", "border-yellow-300"); }
+          if (slot2) { slot2.textContent = "?"; slot2.classList.remove("bg-purple-600/60", "border-solid", "border-yellow-300"); }
+        } else if (selectedParts.length === 1) {
+          if (slot1) { slot1.textContent = selectedParts[0]; slot1.classList.add("bg-purple-600/60", "border-solid", "border-yellow-300"); }
+          if (slot2) { slot2.textContent = "?"; slot2.classList.remove("bg-purple-600/60", "border-solid", "border-yellow-300"); }
+        }
+      };
+
+      if (slot1) this._on(slot1, "click", () => withdrawPartAt(0));
+      if (slot2) this._on(slot2, "click", () => withdrawPartAt(1));
+
+      // 投入部件入炉并判定合成
+      const addPartToSlot = (part) => {
+        if (selectedParts.length >= 2 || selectedParts.includes(part)) {
+          triggerHapticWarning();
+          return;
+        }
+
+        soundAndFX.speakPriority(part, { kind: "char", priority: 1 });
+        soundAndFX.playPop();
+        triggerHapticSuccess();
+        selectedParts.push(part);
+
+        const btn = this.container.querySelector(`.fusion-part-btn[data-part="${part}"]`);
+        if (btn) btn.classList.add("opacity-40", "pointer-events-none");
+
+        if (selectedParts.length === 1) {
+          if (slot1) {
+            slot1.textContent = part;
+            slot1.classList.add("bg-purple-600/60", "border-solid", "border-yellow-300");
+          }
+        } else if (selectedParts.length === 2) {
+          if (slot2) {
+            slot2.textContent = part;
+            slot2.classList.add("bg-purple-600/60", "border-solid", "border-yellow-300");
+          }
+
+          // 判定是否匹配当前公式（顺序不限）
+          const isCorrect = (selectedParts[0] === cur.parts[0] && selectedParts[1] === cur.parts[1]) ||
+                            (selectedParts[0] === cur.parts[1] && selectedParts[1] === cur.parts[0]);
+
+          if (isCorrect) {
+            score += 20;
+            triggerHapticSuccess();
+            if (cauldronGlow) cauldronGlow.classList.add("scale-125");
+            soundAndFX.playStarPopCombo();
+            soundAndFX.triggerConfetti(this.container);
+            this._timeout(() => {
+              soundAndFX.speakPriority(`${cur.target}，${cur.pinyin}。${cur.desc}`, { kind: "sentence", priority: 1 });
+            }, 250);
+            writeKnownCharsReview([cur.target], true);
+            if (successModal) successModal.classList.remove("hidden");
+          } else {
+            triggerHapticWarning();
+            soundAndFX.playSoftError();
+            const arena = this.container.querySelector("#fusion-lab-arena");
+            if (arena) spawnFloatingText(arena, "差一点，再试一次！", "fusion-err", { color: "#f87171", top: 40 });
+            writeKnownCharsReview([cur.target], false);
+            this._timeout(() => {
+              selectedParts = [];
+              if (slot1) { slot1.textContent = "?"; slot1.classList.remove("bg-purple-600/60", "border-solid", "border-yellow-300"); }
+              if (slot2) { slot2.textContent = "?"; slot2.classList.remove("bg-purple-600/60", "border-solid", "border-yellow-300"); }
+              this.container.querySelectorAll(".fusion-part-btn").forEach((b) => b.classList.remove("opacity-40", "pointer-events-none"));
+            }, 800);
+          }
+        }
+      };
+
+      // HTML5 Drag & Drop 支持
+      if (cauldronDropzone) {
+        this._on(cauldronDropzone, "dragover", (e) => {
+          e.preventDefault();
+          cauldronDropzone.classList.add("scale-105");
+        });
+        this._on(cauldronDropzone, "dragleave", () => {
+          cauldronDropzone.classList.remove("scale-105");
+        });
+        this._on(cauldronDropzone, "drop", (e) => {
+          e.preventDefault();
+          cauldronDropzone.classList.remove("scale-105");
+          const part = e.dataTransfer ? e.dataTransfer.getData("text/plain") : "";
+          if (part && !selectedParts.includes(part)) {
+            addPartToSlot(part);
           }
         });
       }
 
+      // 绑定每个部件的点击与触摸拖拽手势
       this.container.querySelectorAll(".fusion-part-btn").forEach((btn) => {
-        this._on(btn, "click", () => {
-          const part = btn.dataset.part;
+        const part = btn.dataset.part;
 
-          if (selectedParts.length === 0) {
-            soundAndFX.playPop();
-            selectedParts.push(part);
-            if (slot1) { slot1.textContent = part; slot1.classList.add("bg-purple-600/60", "border-solid", "border-yellow-300"); }
-            btn.classList.add("opacity-40", "pointer-events-none");
-          } else if (selectedParts.length === 1) {
-            selectedParts.push(part);
-            if (slot2) { slot2.textContent = part; slot2.classList.add("bg-purple-600/60", "border-solid", "border-yellow-300"); }
-            btn.classList.add("opacity-40", "pointer-events-none");
-
-            // 判定是否匹配当前公式（顺序不限）
-            const isCorrect = (selectedParts[0] === cur.parts[0] && selectedParts[1] === cur.parts[1]) ||
-                              (selectedParts[0] === cur.parts[1] && selectedParts[1] === cur.parts[0]);
-
-            if (isCorrect) {
-              score += 20;
-              soundAndFX.playStarPopCombo();
-              soundAndFX.triggerConfetti(this.container);
-              this._timeout(() => {
-                soundAndFX.speakPriority(`${cur.target}，${cur.pinyin}。${cur.desc}`, { kind: "sentence", priority: 1 });
-              }, 250);
-              writeKnownCharsReview([cur.target], true);
-              if (successModal) successModal.classList.remove("hidden");
-            } else {
-              soundAndFX.playSoftError();
-              spawnFloatingText(this.container.querySelector("#fusion-lab-arena"), "差一点，再试一次！", "fusion-err", { color: "#f87171", top: 40 });
-              writeKnownCharsReview([cur.target], false);
-              this._timeout(() => {
-                selectedParts = [];
-                if (slot1) { slot1.textContent = "?"; slot1.classList.remove("bg-purple-600/60", "border-solid", "border-yellow-300"); }
-                if (slot2) { slot2.textContent = "?"; slot2.classList.remove("bg-purple-600/60", "border-solid", "border-yellow-300"); }
-                this.container.querySelectorAll(".fusion-part-btn").forEach((b) => b.classList.remove("opacity-40", "pointer-events-none"));
-              }, 800);
-            }
+        this._on(btn, "dragstart", (e) => {
+          if (e.dataTransfer) {
+            e.dataTransfer.setData("text/plain", part);
           }
+        });
+
+        this._on(btn, "pointerdown", (e) => {
+          if (selectedParts.includes(part) || selectedParts.length >= 2) return;
+          const startX = e.clientX;
+          const startY = e.clientY;
+          let hasMoved = false;
+          let ghostEl = null;
+
+          const onPointerMove = (moveEvt) => {
+            const dx = moveEvt.clientX - startX;
+            const dy = moveEvt.clientY - startY;
+            if (!hasMoved && Math.hypot(dx, dy) > 8) {
+              hasMoved = true;
+              ghostEl = document.createElement("div");
+              ghostEl.className = "fixed pointer-events-none z-50 w-16 h-16 rounded-2xl bg-purple-500 border-2 border-yellow-300 text-white font-black text-3xl flex items-center justify-center shadow-2xl scale-110";
+              ghostEl.textContent = part;
+              document.body.appendChild(ghostEl);
+            }
+            if (ghostEl) {
+              ghostEl.style.left = `${moveEvt.clientX - 32}px`;
+              ghostEl.style.top = `${moveEvt.clientY - 32}px`;
+              if (cauldronDropzone) {
+                const rect = cauldronDropzone.getBoundingClientRect();
+                const inZone = moveEvt.clientX >= rect.left && moveEvt.clientX <= rect.right &&
+                               moveEvt.clientY >= rect.top && moveEvt.clientY <= rect.bottom;
+                if (inZone) {
+                  cauldronDropzone.classList.add("scale-105");
+                } else {
+                  cauldronDropzone.classList.remove("scale-105");
+                }
+              }
+            }
+          };
+
+          const onPointerUp = (upEvt) => {
+            window.removeEventListener("pointermove", onPointerMove);
+            window.removeEventListener("pointerup", onPointerUp);
+            if (cauldronDropzone) cauldronDropzone.classList.remove("scale-105");
+            if (ghostEl) {
+              ghostEl.remove();
+              ghostEl = null;
+            }
+            if (hasMoved) {
+              if (cauldronDropzone) {
+                const rect = cauldronDropzone.getBoundingClientRect();
+                const inZone = upEvt.clientX >= rect.left && upEvt.clientX <= rect.right &&
+                               upEvt.clientY >= rect.top && upEvt.clientY <= rect.bottom;
+                if (inZone) {
+                  addPartToSlot(part);
+                }
+              }
+            } else {
+              addPartToSlot(part);
+            }
+          };
+
+          window.addEventListener("pointermove", onPointerMove);
+          window.addEventListener("pointerup", onPointerUp);
         });
       });
 

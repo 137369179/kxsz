@@ -18,10 +18,10 @@
 // 4 阶段定义
 // ──────────────────────────────────────────────────────────
 export const EVOLUTION_STAGES = Object.freeze([
-  { key: "oracle", label: "甲骨文", glyphField: "oracleGlyph",  descField: "oracleDesc",  age: "3500年前", color: "#b45309", emoji: "🐢" },
-  { key: "bronze", label: "金文",   glyphField: "bronzeGlyph",  descField: "bronzeDesc",  age: "3000年前", color: "#92400e", emoji: "🔔" },
-  { key: "seal",   label: "小篆",   glyphField: null,           descField: "sealDesc",    age: "2200年前", color: "#78350f", emoji: "📜" },
-  { key: "modern", label: "楷书",   glyphField: "char",         descField: "modernDesc",  age: "约2000年", color: "#1c1917", emoji: "✏️" },
+  { key: "oracle", label: "甲骨文", glyphField: "oracleGlyph",  descField: "oracleDesc",  age: "3500年前", color: "#b45309", iconKey: "oracle" },
+  { key: "bronze", label: "金文",   glyphField: "bronzeGlyph",  descField: "bronzeDesc",  age: "3000年前", color: "#92400e", iconKey: "bronze" },
+  { key: "seal",   label: "小篆",   glyphField: null,           descField: "sealDesc",    age: "2200年前", color: "#78350f", iconKey: "seal" },
+  { key: "modern", label: "楷书",   glyphField: "char",         descField: "modernDesc",  age: "约2000年", color: "#1c1917", iconKey: "modern" },
 ]);
 
 // ──────────────────────────────────────────────────────────
@@ -51,7 +51,7 @@ export function buildEvolutionStages(charItem) {
       glyph,
       desc,
       color: stage.color,
-      emoji: stage.emoji,
+      iconKey: stage.iconKey,
       isFallback: stage.key !== "modern" && !charItem[stage.glyphField],
     };
   });

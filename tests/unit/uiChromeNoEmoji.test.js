@@ -23,6 +23,10 @@ const CHROME_FILES = [
   "src/utils/parentHub/parentTabs.js",
   "src/utils/reviewHub/interleaveView.js",
   "src/utils/reviewHub/mistakeAssault.js",
+  "src/utils/playHub/wordExpedition.js",
+  "src/utils/morphEngine.js",
+  "src/utils/etymologyEngine.js",
+  "src/data/radicalFamilies.js",
 ];
 
 describe("stripEmoji helper", () => {

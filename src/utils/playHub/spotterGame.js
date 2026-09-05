@@ -18,33 +18,50 @@ import {
   spawnFloatingText,
   startCountdown,
 } from "./playHelpers.js";
+import { triggerHapticSuccess, triggerHapticWarning } from "../haptics.js";
 
 export function renderSpotterGame() {
     const { content: mainEl, destroy: destroyShell } = mountGameShell(this.container, {
       activeMode: "play",
-      heading: "\u706b\u773c\u91d1\u775b\u8fa8\u5f02\u540c"
+      heading: "火眼金睛辨异同"
     });
     this._addCleanup(destroyShell);
 
     const CONFUSED_PAIRS_BANK = [
-      { a: "\u5927", b: "\u592a", target: "\u592a", diffDesc: "\"\u592a\"\u5b57\u5e95\u4e0b\u591a\u4e86\u4e00\u70b9", hint: "\u50cf\u4e00\u9897\u95ea\u4eae\u7684\u5c0f\u6263\u5b50\uff01" },
-      { a: "\u65e5", b: "\u76ee", target: "\u76ee", diffDesc: "\"\u76ee\"\u5b57\u4e2d\u95f4\u6709\u4e24\u6a2a", hint: "\u5c31\u50cf\u4e24\u53ea\u5927\u773c\u775b\u770b\u4e16\u754c\uff01" },
-      { a: "\u6728", b: "\u79be", target: "\u79be", diffDesc: "\"\u79be\"\u5b57\u5934\u9876\u591a\u4e86\u4e00\u6487", hint: "\u5c31\u50cf\u6c89\u7538\u7538\u91d1\u9ec4\u7684\u5c0f\u9ea6\u7a57\uff01" },
-      { a: "\u4eba", b: "\u5165", target: "\u4eba", diffDesc: "\"\u4eba\"\u5b57\u6487\u5728\u6368\u4e0a\u5934", hint: "\u4e00\u6487\u4e00\u6368\u7ad9\u5f97\u76f4\uff0c\u9876\u5929\u7acb\u5730\uff01" },
-      { a: "\u5200", b: "\u529b", target: "\u529b", diffDesc: "\"\u529b\"\u5b57\u4e00\u6487\u51fa\u4e86\u5934", hint: "\u6709\u529b\u91cf\u6709\u51b2\u52b2\uff0c\u51b2\u51fa\u5934\u6765\uff01" },
-      { a: "\u571f", b: "\u58eb", target: "\u571f", diffDesc: "\"\u571f\"\u5b57\u4e0a\u6a2a\u77ed\u4e0b\u6a2a\u957f", hint: "\u6ce5\u571f\u5728\u5927\u5730\u7a33\u7a33\u6258\u4f4f\u4e07\u7269\uff01" },
-      { a: "\u725b", b: "\u5348", target: "\u725b", diffDesc: "\"\u725b\"\u5b57\u4e00\u7ad9\u4f38\u51fa\u5934", hint: "\u5c31\u50cf\u53ef\u7231\u5c0f\u725b\u957f\u51fa\u728a\u89d2\uff01" }
+      { a: "大", b: "太", target: "太", diffDesc: "\"太\"字底下多了一点", hint: "像一颗闪亮的小扣子！" },
+      { a: "日", b: "目", target: "目", diffDesc: "\"目\"字中间有两横", hint: "就像两只大眼睛看世界！" },
+      { a: "木", b: "禾", target: "禾", diffDesc: "\"禾\"字头顶多了一撇", hint: "就像沉甸甸金黄的小麦穗！" },
+      { a: "人", b: "入", target: "人", diffDesc: "\"人\"字撇在捺上头", hint: "一撇一捺站得直，顶天立地！" },
+      { a: "刀", b: "力", target: "力", diffDesc: "\"力\"字一撇出了头", hint: "有力量有冲劲，冲出头来！" },
+      { a: "土", b: "士", target: "土", diffDesc: "\"土\"字上横短下横长", hint: "泥土在大地稳稳托住万物！" },
+      { a: "牛", b: "午", target: "牛", diffDesc: "\"牛\"字一竖伸出头", hint: "就像可爱小牛长出犄角！" },
+      { a: "白", b: "百", target: "百", diffDesc: "\"百\"字头上多了一横", hint: "数字一百圆溜溜，头戴一顶平平帽！" },
+      { a: "贝", b: "见", target: "见", diffDesc: "\"见\"字底下是竖弯钩", hint: "睁大眼睛看世界，小脚欢快向前跑！" },
+      { a: "门", b: "问", target: "问", diffDesc: "\"问\"字肚里藏个口", hint: "敲开大门张开口，不懂就要多请教！" },
+      { a: "夫", b: "天", target: "天", diffDesc: "\"天\"字一横在头顶", hint: "蓝天白云在头顶，宽广无边望不到头！" },
+      { a: "鸟", b: "乌", target: "鸟", diffDesc: "\"鸟\"字眼睛亮闪闪", hint: "小鸟眼里有神采，展翅高飞上云端！" },
+      { a: "兔", b: "免", target: "兔", diffDesc: "\"兔\"字右下多一点", hint: "就像小兔子毛茸茸的短尾巴！" },
+      { a: "王", b: "玉", target: "玉", diffDesc: "\"玉\"字右下有一点", hint: "国王腰间配美玉，温润光芒闪闪亮！" },
+      { a: "晴", b: "睛", target: "晴", diffDesc: "\"晴\"字左边是日字旁", hint: "太阳出来天空晴，眼睛明亮看分明！" }
     ];
 
     let questions = shuffle([...CONFUSED_PAIRS_BANK]);
     try {
-      const topPair = ebbinghausManager.getTopConfusedPair();
-      if (topPair && topPair.target && topPair.confused) {
-        questions.unshift({
-          a: topPair.target, b: topPair.confused, target: topPair.target,
-          diffDesc: `"${topPair.target}"\u4e0e"${topPair.confused}"\u4ed4\u7ec6\u8fa8\u522b`,
-          hint: `AI \u9519\u56e0\u753b\u50cf\u6355\u6349\u5230\u4f60\u7ecf\u5e38\u6df7\u6de1\u8fd9\u4e00\u7ec4\uff0c\u7279\u8bad\u653b\u514b\uff01`
-        });
+      const ep = ebbinghausManager.progress.errorProfiles?.confusedPairs;
+      if (ep && typeof ep === "object") {
+        for (const [target, map] of Object.entries(ep)) {
+          for (const [confused, count] of Object.entries(map)) {
+            if (count > 0 && target !== confused) {
+              questions.unshift({
+                a: target,
+                b: confused,
+                target,
+                diffDesc: `"${target}"与"${confused}"仔细辨别`,
+                hint: `AI 错因画像捕捉到你经常混淆这一组（错误 ${count} 次），特训攻克！`
+              });
+            }
+          }
+        }
       }
     } catch {}
 
@@ -79,8 +96,8 @@ export function renderSpotterGame() {
             <span>获得 ${totalCoins} 凯茜星币</span>
           </div>
           <div class="flex gap-4">
-            ${this.isExpeditionActive ? '' : '<button id="btn-spotter-again" class="btn-game-orange text-white font-black px-8 py-3 rounded-full cursor-pointer shadow-lg active:scale-95">\u518d\u73a9\u4e00\u5c40</button>'}
-            <button id="btn-spotter-home" class="btn-game-wood text-white font-black px-8 py-3 rounded-full cursor-pointer shadow-lg active:scale-95">${this.isExpeditionActive ? '继续探险 \u2192' : '\u8fd4\u56de\u6e38\u4e50\u573a'}</button>
+            ${this.isExpeditionActive ? '' : '<button id="btn-spotter-again" class="btn-game-orange text-white font-black px-8 py-3 rounded-full cursor-pointer shadow-lg active:scale-95">再玩一局</button>'}
+            <button id="btn-spotter-home" class="btn-game-wood text-white font-black px-8 py-3 rounded-full cursor-pointer shadow-lg active:scale-95">${this.isExpeditionActive ? '继续探险 →' : '返回游乐场'}</button>
           </div>
         </div>
       `;
@@ -137,7 +154,7 @@ export function renderSpotterGame() {
         <div class="relative w-full max-w-3xl mx-auto flex flex-col items-center select-none animate-fade-in pb-8">
           <div class="w-full flex items-center justify-between mb-3">
             <button id="btn-spotter-back" class="bg-white/10 hover:bg-white/20 text-white font-black text-xs sm:text-sm px-4 py-2 rounded-full border border-white/20 active:scale-95 transition-transform flex items-center gap-1.5 cursor-pointer shadow">
-              <span>\u2190 \u8fd4\u56de\u5927\u5385</span>
+              <span>← 返回大厅</span>
             </button>
             <div class="flex items-center gap-4">
               <div class="text-sm font-black text-white bg-black/40 px-4 py-1.5 rounded-full border border-white/20 shadow-inner flex items-center gap-2">
@@ -239,6 +256,7 @@ export function renderSpotterGame() {
           const ch = btn.dataset.char;
           if (ch === q.target) {
             roundActive = false;
+            triggerHapticSuccess();
             soundAndFX.playSuccessSound();
             soundAndFX.triggerConfetti(this.container);
             btn.classList.add("ring-8", "ring-emerald-400", "scale-110");
@@ -267,6 +285,7 @@ export function renderSpotterGame() {
           } else {
             // Wrong answer penalizes time
             globalRemain = Math.max(0, globalRemain - 3);
+            triggerHapticWarning();
             soundAndFX.playSoftError();
             btn.classList.add("animate-shake", "border-red-500", "ring-4", "ring-red-400");
             

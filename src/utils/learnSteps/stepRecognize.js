@@ -60,7 +60,7 @@ export function renderStepRecognize(stage) {
               { label: "今天", glyph: char.char, tip: evo.modernDesc || "" },
             ];
             return `
-          <div id="evo-mini-strip" class="mt-4 w-full max-w-sm bg-black/35 border border-amber-300/40 rounded-2xl px-3 py-2.5" aria-live="polite">
+          <div id="evo-mini-strip" class="mt-4 w-full max-w-sm bg-black/40 border border-amber-300/40 rounded-2xl px-3 py-2.5" aria-live="polite">
             <div class="text-[10px] font-black text-amber-300 mb-1.5 flex items-center gap-1">${GAME_ICONS.sparkle("w-3.5 h-3.5")}<span>字是怎么来的（点一下听故事）</span></div>
             <div class="flex items-center justify-between gap-1">
               ${stages.map((s, i) => `
@@ -68,7 +68,7 @@ export function renderStepRecognize(stage) {
                   <span class="text-lg sm:text-xl font-black text-yellow-100 font-serif leading-none">${escapeHtml(String(s.glyph).slice(0, 2))}</span>
                   <span class="text-[9px] font-bold text-amber-200/90">${s.label}</span>
                 </button>
-                ${i < stages.length - 1 ? `<span class="text-amber-400/70 text-xs font-black" aria-hidden="true">→</span>` : ""}
+                ${i < stages.length - 1 ? `<span class="text-amber-300 text-xs font-black" aria-hidden="true">→</span>` : ""}
               `).join("")}
             </div>
           </div>`;

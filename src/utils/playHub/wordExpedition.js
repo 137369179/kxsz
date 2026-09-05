@@ -14,9 +14,9 @@ const STAGES = [
 ];
 
 const BUFF_POOL = [
-  { id: "TIME_WARP", label: "时间怀表", desc: "加时卡：倒计时游戏初始时间增加 15 秒", icon: "⏳" },
-  { id: "SLOW_MOTION", label: "缓慢光环", desc: "减速：陨石等动态元素速度降低 20%", icon: "🐢" },
-  { id: "COIN_MULT", label: "招财猫", desc: "双倍奖励：本次探险结束时获得双倍金币", icon: "💰" }
+  { id: "TIME_WARP", label: "时间怀表", desc: "加时卡：倒计时游戏初始时间增加 15 秒", iconRender: () => GAME_ICONS.compass("w-12 h-12") },
+  { id: "SLOW_MOTION", label: "缓慢光环", desc: "减速：陨石等动态元素速度降低 20%", iconRender: () => GAME_ICONS.gem("w-12 h-12") },
+  { id: "COIN_MULT", label: "招财猫", desc: "双倍奖励：本次探险结束时获得双倍金币", iconRender: () => GAME_ICONS.coin("w-12 h-12") }
 ];
 
 export function renderWordExpedition() {
@@ -48,7 +48,7 @@ export function renderWordExpedition() {
       <h2 class="text-3xl font-black text-amber-600 mb-2 drop-shadow-sm">探险路线图</h2>
       <p class="text-sm text-gray-500 font-bold mb-8">第 ${stage} 关：${currentStageInfo.label}</p>
       
-      <div class="flex items-center justify-between w-full max-w-2xl relative mb-12">
+      <div class="flex items-center justify-between w-full max-w-2xl relative mb-10">
         <!-- Connecting Line -->
         <div class="absolute top-1/2 left-0 right-0 h-2 bg-amber-200 -z-10 rounded-full transform -translate-y-1/2"></div>
         <div class="absolute top-1/2 left-0 h-2 bg-amber-500 -z-10 rounded-full transform -translate-y-1/2 transition-all duration-1000" style="width: ${(stage - 1) / (STAGES.length - 1) * 100}%"></div>
@@ -102,8 +102,8 @@ export function renderWordExpedition() {
     `;
     buffs.forEach(b => {
       mapHtml += `
-        <div class="bg-amber-50 rounded-xl px-3 py-1.5 text-xs font-bold text-amber-800 border border-amber-200 flex items-center gap-1 shadow-sm tooltip" title="${b.desc}">
-          <span>${b.icon}</span> ${b.label}
+        <div class="bg-amber-50 rounded-xl px-3 py-1.5 text-xs font-bold text-amber-800 border border-amber-200 flex items-center gap-1.5 shadow-sm tooltip" title="${b.desc}">
+          <span class="inline-flex items-center w-4 h-4">${b.iconRender ? b.iconRender() : (b.icon || "")}</span> ${b.label}
         </div>
       `;
     });
@@ -161,8 +161,8 @@ export function renderExpeditionTreasure() {
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-4xl">
         ${BUFF_POOL.map(buff => `
           <div class="buff-card bg-white rounded-3xl p-6 shadow-xl border-4 border-amber-200 hover:border-amber-400 cursor-pointer transition-all duration-300 hover:scale-105 hover:-translate-y-2 flex flex-col items-center text-center group" data-buff-id="${buff.id}">
-            <div class="w-20 h-20 rounded-full bg-amber-50 flex items-center justify-center text-4xl mb-4 shadow-inner group-hover:bg-amber-100 transition-colors">
-              ${buff.icon}
+            <div class="w-20 h-20 rounded-full bg-amber-50 flex items-center justify-center mb-4 shadow-inner group-hover:bg-amber-100 transition-colors">
+              ${buff.iconRender ? buff.iconRender() : GAME_ICONS.gem("w-12 h-12")}
             </div>
             <h3 class="text-xl font-black text-gray-800 mb-2">${buff.label}</h3>
             <p class="text-sm text-gray-500 font-bold leading-relaxed">${buff.desc}</p>
@@ -210,7 +210,7 @@ export function renderExpeditionVictory() {
   mainEl.innerHTML = `
     <div class="relative w-full h-full flex flex-col items-center justify-center p-6 animate-fade-in text-center">
       <div class="w-48 h-48 rounded-full bg-gradient-to-tr from-amber-400 to-yellow-300 flex items-center justify-center shadow-2xl mb-8 animate-bounce-slow">
-        <span class="text-8xl">🏆</span>
+        ${GAME_ICONS.trophy("w-28 h-28")}
       </div>
       <h1 class="text-5xl font-black text-amber-600 mb-4 drop-shadow-md">探险成功！</h1>
       <p class="text-xl text-gray-600 font-bold mb-8">恭喜你通过了所有关卡，你真是太棒了！</p>
@@ -219,12 +219,12 @@ export function renderExpeditionVictory() {
         <div class="text-sm text-gray-500 font-bold mb-2">本次探险奖励</div>
         <div class="flex items-center gap-3">
           ${GAME_ICONS.coin("w-10 h-10")}
-          <span class="text-4xl font-black text-yellow-500">+${rewardCoins}</span>
+          <span class="text-4xl font-black text-yellow-400">+${rewardCoins}</span>
         </div>
         ${hasCoinMult ? '<div class="text-xs text-amber-600 font-bold mt-2 bg-amber-50 px-3 py-1 rounded-full">已应用双倍金币增益</div>' : ''}
       </div>
 
-      <button id="expedition-done-btn" class="bg-gradient-to-r from-blue-500 to-indigo-500 text-white font-black text-xl py-4 px-16 rounded-full shadow-lg hover:shadow-xl active:scale-95 transition-all">
+      <button id="expedition-done-btn" class="bg-gradient-to-r from-blue-500 to-indigo-500 text-white font-black text-xl py-4 px-12 rounded-full shadow-lg hover:shadow-xl active:scale-95 transition-all">
         返回游乐场
       </button>
     </div>
