@@ -105,7 +105,7 @@ export function renderPkArena() {
                   (opt) => {
                     const isHint = isFamilyMode && p2Score > p1Score && opt === r.char;
                     return `
-                      <button class="pk-opt-btn h-24 rounded-3xl btn-game-orange text-white font-black text-5xl shadow-2xl active:scale-90 transition-all flex items-center justify-center ${isHint ? "ring-4 ring-amber-300 shadow-amber-400/50" : ""}" data-char="${opt}">
+                      <button class="pk-opt-btn h-24 rounded-3xl btn-game-orange text-white font-black text-5xl shadow-2xl active:scale-90 transition-all flex items-center justify-center touch-target ${isHint ? "ring-4 ring-amber-300 shadow-amber-400/50" : ""}" data-char="${opt}" data-speak="选择${opt}" aria-label="选择${opt}">
                         ${opt}
                       </button>
                     `;
@@ -124,10 +124,10 @@ export function renderPkArena() {
               ${GAME_ICONS.coin("w-5 h-5")}<span>获得星币奖励</span>
             </div>
             <div class="flex gap-4">
-              <button id="btn-pk-again" class="btn-game-orange text-white font-black text-base px-8 py-3 rounded-full cursor-pointer shadow-lg active:scale-95">
+              <button id="btn-pk-again" class="btn-game-orange text-white font-black text-base px-8 py-3 rounded-full cursor-pointer shadow-lg active:scale-95" data-speak="再战一局" aria-label="再战一局">
                 再战一局
               </button>
-              <button id="btn-pk-claim" class="btn-game-wood text-white font-black text-base px-8 py-3 rounded-full cursor-pointer shadow-lg active:scale-95">
+              <button id="btn-pk-claim" class="btn-game-wood text-white font-black text-base px-8 py-3 rounded-full cursor-pointer shadow-lg active:scale-95" data-speak="领取星币返回" aria-label="领取星币返回">
                 领取星币返回
               </button>
             </div>

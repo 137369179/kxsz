@@ -97,7 +97,7 @@ export function renderStepPrewrite(stage) {
               <span>跳过当前形状</span>
             </button>
 
-            <button id="btn-finish-prewrite" class="w-full bg-gradient-to-r from-amber-400 to-orange-500 text-white font-black text-sm py-3 rounded-full shadow-lg border-2 border-white active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer opacity-40 pointer-events-none">
+            <button id="btn-finish-prewrite" data-speak="控笔完成，下一步" aria-label="控笔完成，下一步" class="w-full bg-gradient-to-r from-amber-400 to-orange-500 text-white font-black text-sm py-3 rounded-full shadow-lg border-2 border-white active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer opacity-40 pointer-events-none">
               <span>${nextStepAfterPrewrite === 8 ? GAME_ICONS.chest("w-4 h-4") : GAME_ICONS.brush("w-4 h-4")}</span>
               <span id="txt-prewrite-next">完成训练去${nextStepAfterPrewrite === 8 ? "领宝箱" : "描红"}</span>
             </button>

@@ -94,10 +94,10 @@ export class PlayModule extends BaseModule {
               </div>
               <h3 class="text-xl font-black text-gray-900 group-hover:text-rose-600 transition-colors">难字歼灭战</h3>
               <p class="text-xs text-gray-500 mt-1.5 leading-relaxed font-semibold">
-                针对艾宾浩斯遗忘曲线薄弱生字，挑战 Boss 怪兽！
+                把难记的字变成小怪兽，打败它们就能记住啦！
               </p>
             </div>
-            <button class="mt-4 bg-gradient-to-r from-rose-500 to-red-500 text-white text-xs sm:text-sm font-black py-3 rounded-full shadow-md active:scale-95 transition-transform flex items-center justify-center gap-1.5 cursor-pointer">
+            <button class="mt-4 bg-gradient-to-r from-rose-500 to-red-500 text-white text-xs sm:text-sm font-black py-3 rounded-full shadow-md active:scale-95 transition-transform flex items-center justify-center gap-1.5 cursor-pointer" data-speak="进入难字歼灭战" aria-label="进入难字歼灭战">
               <span>进入挑战</span>
             </button>
           </div>
@@ -109,10 +109,10 @@ export class PlayModule extends BaseModule {
               </div>
               <h3 class="text-xl font-black text-gray-900 group-hover:text-amber-600 transition-colors">汉字消消乐</h3>
               <p class="text-xs text-gray-500 mt-1.5 leading-relaxed font-semibold">
-                听音辨形，拼音与汉字 3D 翻转对对碰快速消除！
+                听一听、翻一翻，把拼音和汉字配对消掉！
               </p>
             </div>
-            <button class="mt-4 bg-gradient-to-r from-amber-500 to-yellow-500 text-white text-xs sm:text-sm font-black py-3 rounded-full shadow-md active:scale-95 transition-transform flex items-center justify-center gap-1.5 cursor-pointer">
+            <button class="mt-4 bg-gradient-to-r from-amber-500 to-yellow-500 text-white text-xs sm:text-sm font-black py-3 rounded-full shadow-md active:scale-95 transition-transform flex items-center justify-center gap-1.5 cursor-pointer" data-speak="开始汉字消消乐" aria-label="开始汉字消消乐">
               <span>开始消除</span>
             </button>
           </div>
@@ -127,7 +127,7 @@ export class PlayModule extends BaseModule {
                 偏旁部首魔法合成！投入神奇炼金锅，合成目标汉字！
               </p>
             </div>
-            <button class="mt-4 bg-gradient-to-r from-purple-500 to-indigo-500 text-white text-xs sm:text-sm font-black py-3 rounded-full shadow-md active:scale-95 transition-transform flex items-center justify-center gap-1.5 cursor-pointer">
+            <button class="mt-4 bg-gradient-to-r from-purple-500 to-indigo-500 text-white text-xs sm:text-sm font-black py-3 rounded-full shadow-md active:scale-95 transition-transform flex items-center justify-center gap-1.5 cursor-pointer" data-speak="开始汉字拼拼乐" aria-label="开始汉字拼拼乐">
               <span>开启炼金</span>
             </button>
           </div>
@@ -142,7 +142,7 @@ export class PlayModule extends BaseModule {
                 双人极速对决 & 亲子让步欢乐PK，听发音抢拍汉字！
               </p>
             </div>
-            <button class="mt-4 bg-gradient-to-r from-blue-500 to-cyan-500 text-white text-xs sm:text-sm font-black py-3 rounded-full shadow-md active:scale-95 transition-transform flex items-center justify-center gap-1.5 cursor-pointer">
+            <button class="mt-4 bg-gradient-to-r from-blue-500 to-cyan-500 text-white text-xs sm:text-sm font-black py-3 rounded-full shadow-md active:scale-95 transition-transform flex items-center justify-center gap-1.5 cursor-pointer" data-speak="进入双人竞技场" aria-label="进入双人竞技场">
               <span>发起对决</span>
             </button>
           </div>
@@ -157,7 +157,7 @@ export class PlayModule extends BaseModule {
                 80+ 经典成语趣味微课堂，生动典故与互动小问答！
               </p>
             </div>
-            <button class="mt-4 bg-gradient-to-r from-emerald-500 to-green-500 text-white text-xs sm:text-sm font-black py-3 rounded-full shadow-md active:scale-95 transition-transform flex items-center justify-center gap-1.5 cursor-pointer">
+            <button class="mt-4 bg-gradient-to-r from-emerald-500 to-green-500 text-white text-xs sm:text-sm font-black py-3 rounded-full shadow-md active:scale-95 transition-transform flex items-center justify-center gap-1.5 cursor-pointer" data-speak="进入成语馆" aria-label="进入成语馆">
               <span>探索成语</span>
             </button>
           </div>
@@ -172,7 +172,7 @@ export class PlayModule extends BaseModule {
                 20 首幼儿必背启蒙古诗，逐句有声点读、意境画卷与诗意闯关！
               </p>
             </div>
-            <button class="mt-4 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-xs sm:text-sm font-black py-3 rounded-full shadow-md active:scale-95 transition-transform flex items-center justify-center gap-1.5 cursor-pointer">
+            <button class="mt-4 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-xs sm:text-sm font-black py-3 rounded-full shadow-md active:scale-95 transition-transform flex items-center justify-center gap-1.5 cursor-pointer" data-speak="开始诵读古诗" aria-label="开始诵读古诗">
               <span>品读古诗</span>
             </button>
           </div>
@@ -187,7 +187,7 @@ export class PlayModule extends BaseModule {
                 字族同偏旁魔法拼插！一字生万字，轻松化解形近字混淆！
               </p>
             </div>
-            <button class="mt-4 bg-gradient-to-r from-emerald-500 to-teal-500 text-white text-xs sm:text-sm font-black py-3 rounded-full shadow-md active:scale-95 transition-transform flex items-center justify-center gap-1.5 cursor-pointer">
+            <button class="mt-4 bg-gradient-to-r from-emerald-500 to-teal-500 text-white text-xs sm:text-sm font-black py-3 rounded-full shadow-md active:scale-95 transition-transform flex items-center justify-center gap-1.5 cursor-pointer" data-speak="进入汉字积木屋" aria-label="进入汉字积木屋">
               <span>拼插积木</span>
             </button>
           </div>
@@ -202,7 +202,7 @@ export class PlayModule extends BaseModule {
                 AI 错因画像形近字克星！大 vs 太、日 vs 目，特征笔画光晕高亮破解混淆！
               </p>
             </div>
-            <button class="mt-4 bg-gradient-to-r from-rose-500 to-amber-500 text-white text-xs sm:text-sm font-black py-3 rounded-full shadow-md active:scale-95 transition-transform flex items-center justify-center gap-1.5 cursor-pointer">
+            <button class="mt-4 bg-gradient-to-r from-rose-500 to-amber-500 text-white text-xs sm:text-sm font-black py-3 rounded-full shadow-md active:scale-95 transition-transform flex items-center justify-center gap-1.5 cursor-pointer" data-speak="开始火眼金睛" aria-label="开始火眼金睛">
               <span>开始辨字</span>
             </button>
           </div>
@@ -217,7 +217,7 @@ export class PlayModule extends BaseModule {
                 听音辨形拦截汉字陨石！保护凯茜星球，挑战极速反应与抗压能力！
               </p>
             </div>
-            <button class="mt-4 bg-gradient-to-r from-cyan-500 to-blue-500 text-white text-xs sm:text-sm font-black py-3 rounded-full shadow-md active:scale-95 transition-transform flex items-center justify-center gap-1.5 cursor-pointer">
+            <button class="mt-4 bg-gradient-to-r from-cyan-500 to-blue-500 text-white text-xs sm:text-sm font-black py-3 rounded-full shadow-md active:scale-95 transition-transform flex items-center justify-center gap-1.5 cursor-pointer" data-speak="开始陨石防御" aria-label="开始陨石防御">
               <span>立即迎战</span>
             </button>
           </div>

@@ -114,20 +114,20 @@ export function mountFreeRecallRound(ctx) {
       <div class="free-recall-round flex flex-col items-center justify-center gap-5 w-full max-w-md mx-auto text-center px-4">
         <div class="text-8xl sm:text-9xl font-black font-serif text-white drop-shadow-lg leading-none select-none">${escapeHtml(charData.char)}</div>
         <div class="text-3xl sm:text-4xl font-black text-yellow-300 tracking-wide">${escapeHtml(charData.pinyin || "")}</div>
-        <button type="button" id="btn-recall-speak" class="bg-white/15 hover:bg-white/25 text-white font-bold text-sm px-5 py-2 rounded-full border border-white/30 cursor-pointer active:scale-95 flex items-center gap-1.5 mx-auto">
+        <button type="button" id="btn-recall-speak" data-speak="听示范发音" aria-label="听示范发音" class="bg-white/15 hover:bg-white/25 text-white font-bold text-sm px-5 py-2 rounded-full border border-white/30 cursor-pointer active:scale-95 flex items-center gap-1.5 mx-auto">
           ${GAME_ICONS.speaker("w-3.5 h-3.5 inline-block")}
           <span>听示范</span>
         </button>
         <div class="flex flex-wrap items-center justify-center gap-3 mt-2">
           ${isDirectListen ? `
-            <button type="button" id="btn-recall-ack" class="btn-game-orange text-white font-black text-sm sm:text-base px-8 py-3 rounded-full shadow-xl active:scale-95 cursor-pointer">
+            <button type="button" id="btn-recall-ack" data-speak="记住了，继续" aria-label="记住了，继续" class="btn-game-orange text-white font-black text-sm sm:text-base px-8 py-3 rounded-full shadow-xl active:scale-95 cursor-pointer">
               记住了，继续
             </button>
           ` : `
-            <button type="button" id="btn-recall-knew" class="btn-game-orange text-white font-black text-sm sm:text-base px-8 py-3 rounded-full shadow-xl active:scale-95 cursor-pointer">
+            <button type="button" id="btn-recall-knew" data-speak="对了，继续" aria-label="对了" class="btn-game-orange text-white font-black text-sm sm:text-base px-8 py-3 rounded-full shadow-xl active:scale-95 cursor-pointer">
               对了
             </button>
-            <button type="button" id="btn-recall-notyet" class="bg-slate-600/80 hover:bg-slate-500 text-white font-black text-sm sm:text-base px-8 py-3 rounded-full border border-white/20 shadow-xl active:scale-95 cursor-pointer">
+            <button type="button" id="btn-recall-notyet" data-speak="还不会，再听一遍" aria-label="还不会" class="bg-slate-600/80 hover:bg-slate-500 text-white font-black text-sm sm:text-base px-8 py-3 rounded-full border border-white/20 shadow-xl active:scale-95 cursor-pointer">
               还不会
             </button>
           `}
@@ -184,7 +184,7 @@ export function mountFreeRecallRound(ctx) {
     containerEl.innerHTML = `
       <div class="free-recall-round flex flex-col items-center justify-center gap-5 w-full max-w-lg mx-auto text-center px-4">
         <p class="text-sm sm:text-base text-white/90 font-bold">听一听，选出正确的字</p>
-        <button type="button" id="btn-recall-replay" class="bg-white/15 hover:bg-white/25 text-white font-bold text-sm px-5 py-2 rounded-full border border-white/30 cursor-pointer active:scale-95 flex items-center gap-1.5 mx-auto">
+        <button type="button" id="btn-recall-replay" data-speak="再听一遍" aria-label="再听一遍" class="bg-white/15 hover:bg-white/25 text-white font-bold text-sm px-5 py-2 rounded-full border border-white/30 cursor-pointer active:scale-95 flex items-center gap-1.5 mx-auto">
           ${GAME_ICONS.speaker("w-3.5 h-3.5 inline-block")}
           <span>再听一遍</span>
         </button>
@@ -192,7 +192,7 @@ export function mountFreeRecallRound(ctx) {
           ${options
             .map(
               (ch) => `
-            <button type="button" class="btn-recall-option bg-white/15 hover:bg-white/25 text-white text-4xl font-black font-serif py-6 rounded-2xl border border-white/25 shadow-lg active:scale-95 cursor-pointer" data-char="${escapeHtml(ch)}">
+            <button type="button" class="btn-recall-option bg-white/15 hover:bg-white/25 text-white text-4xl font-black font-serif py-6 rounded-2xl border border-white/25 shadow-lg active:scale-95 cursor-pointer touch-target" data-char="${escapeHtml(ch)}" data-speak="选择${escapeHtml(ch)}" aria-label="选择${escapeHtml(ch)}">
               ${escapeHtml(ch)}
             </button>`
             )

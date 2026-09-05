@@ -80,4 +80,20 @@ describe("buildInterleavePack", () => {
     expect(pack.length).toBeGreaterThan(0);
     expect(pack[0].targetId).toBe("c");
   });
+
+  it("can emit pinyin_link questions when target has pinyin (slot % 4 === 3)", () => {
+    const withPy = DB.map((c, i) => ({ ...c, pinyin: ["ri", "mu", "bai", "wei"][i] }));
+    const pack = buildInterleavePack({
+      chars: withPy,
+      learnedIds: new Set(["a", "b", "c"]),
+      errorProfiles: {},
+      limit: 8,
+    });
+    const pyQs = pack.filter((q) => q.type === "pinyin_link");
+    expect(pyQs.length).toBeGreaterThan(0);
+    for (const q of pyQs) {
+      expect(q.promptTitle).toBeTruthy();
+      expect(q.options).toContain(q.targetChar);
+    }
+  });
 });

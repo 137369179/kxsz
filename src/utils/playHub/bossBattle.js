@@ -129,7 +129,7 @@ export function renderBossBattle() {
               ${options
                 .map(
                   (opt) => `
-                <button class="boss-spell-btn h-20 rounded-3xl btn-game-orange text-white font-black text-4xl shadow-2xl active:scale-90 transition-all flex items-center justify-center" data-char="${opt}">
+                <button class="boss-spell-btn h-20 rounded-3xl btn-game-orange text-white font-black text-4xl shadow-2xl active:scale-90 transition-all flex items-center justify-center touch-target" data-char="${opt}" data-speak="选择${opt}" aria-label="选择${opt}">
                   ${opt}
                 </button>
               `
@@ -148,7 +148,7 @@ export function renderBossBattle() {
               <span id="boss-win-reward">获得 20 凯茜星币 + 难字封印勋章</span>
             </div>
             <div id="boss-win-stats" class="text-xs text-gray-400 mb-6 font-semibold"></div>
-            <button id="btn-boss-claim" class="btn-game-orange text-white font-black text-base px-10 py-3 rounded-full">
+            <button id="btn-boss-claim" class="btn-game-orange text-white font-black text-base px-10 py-3 rounded-full" data-speak="领取奖励并返回游乐场" aria-label="领取奖励并返回游乐场">
               领取奖励并返回游乐场
             </button>
           </div>

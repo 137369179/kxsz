@@ -139,7 +139,7 @@ export function renderStepRead(stage) {
           </div>
 
           <div class="z-10">
-            <button id="btn-finish-read-step" class="w-full bg-gradient-to-r from-orange-500 via-amber-500 to-yellow-400 text-white font-black text-sm py-3 rounded-full shadow-lg border-2 border-white active:scale-95 transition-all flex items-center justify-center gap-2 opacity-50 pointer-events-none cursor-pointer">
+            <button id="btn-finish-read-step" data-speak="朗读完成，下一步" aria-label="朗读完成，下一步" class="w-full bg-gradient-to-r from-orange-500 via-amber-500 to-yellow-400 text-white font-black text-sm py-3 rounded-full shadow-lg border-2 border-white active:scale-95 transition-all flex items-center justify-center gap-2 opacity-50 pointer-events-none cursor-pointer">
               <span class="w-4 h-4 inline-block">${GAME_ICONS.sparkle("w-4 h-4")}</span>
               <span>开启特训练字 (+5 金币)</span> 
             </button>

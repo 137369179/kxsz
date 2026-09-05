@@ -74,7 +74,7 @@ export function renderStepPlay(stage) {
             <button id="btn-open-morph-play" class="bg-gradient-to-r from-amber-400 to-orange-500 text-white font-black text-xs sm:text-sm px-4 sm:px-6 py-2.5 sm:py-3 rounded-full shadow-2xl border-2 border-white active:scale-95 transition-transform flex items-center gap-2 cursor-pointer">
               ${GAME_ICONS.sparkle("w-4 h-4")} 动效微剧场
             </button>
-            <button id="btn-next-to-rec" class="bg-gradient-to-r from-emerald-400 to-emerald-600 text-white font-black text-xs sm:text-sm px-6 sm:px-8 py-2.5 sm:py-3 rounded-full shadow-2xl border-2 border-white active:scale-95 transition-transform flex items-center gap-2 cursor-pointer">
+            <button id="btn-next-to-rec" data-speak="进入认字环节" aria-label="进入认字环节" class="bg-gradient-to-r from-emerald-400 to-emerald-600 text-white font-black text-xs sm:text-sm px-6 sm:px-8 py-2.5 sm:py-3 rounded-full shadow-2xl border-2 border-white active:scale-95 transition-transform flex items-center gap-2 cursor-pointer">
               ${GAME_ICONS.sparkle("w-4 h-4")} 去认字
             </button>
           </div>

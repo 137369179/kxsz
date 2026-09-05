@@ -48,7 +48,7 @@ export function renderStepTestAndChest(stage) {
             <span id="chest-reward-stars" class="flex items-center gap-1">${GAME_ICONS.star("w-5 h-5", false)} 凯茜之星结算中…</span>
           </p>
 
-          <button id="btn-confirm-return-map" class="bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 hover:from-yellow-300 hover:to-red-400 text-white font-black text-base sm:text-lg px-12 py-3.5 rounded-full shadow-[0_0_40px_rgba(255,107,0,0.9)] border-2 border-white active:scale-95 transition-transform flex items-center justify-center gap-2 cursor-pointer">
+          <button id="btn-confirm-return-map" data-speak="领取奖励，返回大地图" aria-label="领取奖励，返回大地图" class="bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 hover:from-yellow-300 hover:to-red-400 text-white font-black text-base sm:text-lg px-12 py-3.5 rounded-full shadow-[0_0_40px_rgba(255,107,0,0.9)] border-2 border-white active:scale-95 transition-transform flex items-center justify-center gap-2 cursor-pointer">
             <span class="flex items-center">${GAME_ICONS.home("w-5 h-5")}</span>
             <span>收入生词本，返回大地图</span>
           </button>

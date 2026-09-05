@@ -59,7 +59,7 @@ export function renderStepPractice(stage) {
           </div>
           <h2 class="text-2xl sm:text-3xl font-black text-yellow-300 mb-2">神枪手！射击挑战大满贯！</h2>
           <p class="text-xs sm:text-sm text-gray-300 mb-6 font-semibold">你已经彻底掌握了“${char.char}”字的辨识与发音！</p>
-          <button id="btn-next-to-write" class="bg-gradient-to-r from-emerald-400 to-emerald-600 hover:from-emerald-300 hover:to-emerald-500 text-white font-black text-base px-12 py-3.5 rounded-full shadow-[0_8px_25px_rgba(16,185,129,0.6)] border-2 border-white active:scale-95 transition-transform flex items-center gap-2 cursor-pointer">
+          <button id="btn-next-to-write" data-speak="进入写字环节" aria-label="进入写字环节" class="bg-gradient-to-r from-emerald-400 to-emerald-600 hover:from-emerald-300 hover:to-emerald-500 text-white font-black text-base px-12 py-3.5 rounded-full shadow-[0_8px_25px_rgba(16,185,129,0.6)] border-2 border-white active:scale-95 transition-transform flex items-center gap-2 cursor-pointer">
             <span class="flex items-center">${GAME_ICONS.hand("w-5 h-5")}</span>
             <span>小手热身 · 控笔训练</span>
           </button>

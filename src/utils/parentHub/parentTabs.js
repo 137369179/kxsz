@@ -114,8 +114,11 @@ export function renderActiveTabContent(progress, charCount, settings, diffCount)
           </div>
           <div class="flex items-center gap-3">
             <span class="text-xs sm:text-sm text-amber-700 font-bold">本周总计: ${history.reduce((a,b) => a + b.count, 0)} 字</span>
-            <button id="btn-gen-report-poster" class="btn-game-orange text-white font-black text-xs px-3.5 py-1.5 rounded-full shadow-md active:scale-95 flex items-center gap-1.5 cursor-pointer">
+            <button id="btn-gen-report-poster" class="btn-game-orange text-white font-black text-xs px-3.5 py-1.5 rounded-full shadow-md active:scale-95 flex items-center gap-1.5 cursor-pointer" data-speak="生成成长周报海报" aria-label="生成成长周报海报">
               <span>生成成长周报海报</span>
+            </button>
+            <button id="btn-dash-print-worksheet" class="bg-emerald-500 hover:bg-emerald-400 text-white font-black text-xs px-3.5 py-1.5 rounded-full shadow-md active:scale-95 flex items-center gap-1.5 cursor-pointer" data-speak="打印今日练习字帖" aria-label="打印今日练习字帖">
+              <span>打印练习卷</span>
             </button>
             <button id="btn-gen-champion-cert" class="bg-gradient-to-r from-amber-500 to-rose-500 hover:from-amber-600 hover:to-rose-600 text-white font-black text-xs px-3.5 py-1.5 rounded-full shadow-md active:scale-95 flex items-center gap-1.5 cursor-pointer">
               <span class="flex items-center">${GAME_ICONS.crown("w-3.5 h-3.5")}</span>

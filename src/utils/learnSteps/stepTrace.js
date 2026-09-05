@@ -90,7 +90,7 @@ export function renderStepTrace(stage) {
               <span>重新临摹这一字</span>
             </button>
 
-            <button id="btn-finish-write-step" class="w-full bg-gradient-to-r from-orange-500 via-amber-500 to-yellow-400 text-white font-black text-base py-3.5 rounded-full shadow-[0_8px_25px_rgba(245,158,11,0.6)] border-2 border-white active:scale-95 transition-all flex items-center justify-center gap-2 hidden animate-bounce-slow cursor-pointer hover:brightness-105">
+            <button id="btn-finish-write-step" data-speak="描红完成，下一步" aria-label="描红完成，下一步" class="w-full bg-gradient-to-r from-orange-500 via-amber-500 to-yellow-400 text-white font-black text-base py-3.5 rounded-full shadow-[0_8px_25px_rgba(245,158,11,0.6)] border-2 border-white active:scale-95 transition-all flex items-center justify-center gap-2 hidden animate-bounce-slow cursor-pointer hover:brightness-105">
               <span class="flex items-center">${GAME_ICONS.pen("w-5 h-5")}</span>
               <span>描红达标！去独立书写</span>
             </button>

@@ -148,6 +148,21 @@ export function bindDashboardEvents(mainEl) {
   });
 
   // 打印字帖与棋盘
+  // 数据罗盘快捷：打印今日练习卷（复用字帖引擎）
+  const dashPrintBtn = mainEl.querySelector("#btn-dash-print-worksheet");
+  if (dashPrintBtn) {
+    this._on(dashPrintBtn, "click", () => {
+      soundAndFX.playPop();
+      const charsToPrint = getTodayWorksheetChars() || getQuestWorksheetChars() || [];
+      if (!charsToPrint.length) {
+        showGameToast(this.container, "今天还没有可打印的字，先去学几个新字吧", "warn");
+        return;
+      }
+      printWorksheet(charsToPrint, "今日练习卷", { gridType: this.printGridType || "tian" });
+      showGameToast(this.container, "正在打开打印预览…", "success");
+    });
+  }
+
   const printBtn = mainEl.querySelector("#btn-trigger-print");
   if (printBtn) {
     this._on(printBtn, "click", () => {

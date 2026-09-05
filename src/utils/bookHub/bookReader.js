@@ -25,12 +25,12 @@ export function renderReader() {
       <div class="w-full flex items-center justify-between bg-white/95 backdrop-blur-md px-4 sm:px-5 py-2.5 rounded-2xl shadow-xl border-2 border-amber-200/90 mb-3 flex-wrap gap-2">
         
         <div class="flex items-center gap-2">
-          <button id="btn-back-shelf" class="flex items-center gap-1.5 text-amber-900 hover:text-orange-600 font-black text-xs px-3 py-1.5 rounded-full hover:bg-amber-100 transition-all cursor-pointer">
+          <button id="btn-back-shelf" data-speak="返回书架" aria-label="返回书架" class="flex items-center gap-1.5 text-amber-900 hover:text-orange-600 font-black text-xs px-3 py-1.5 rounded-full hover:bg-amber-100 transition-all cursor-pointer">
             <span class="flex items-center">${GAME_ICONS.home("w-4 h-4")}</span>
             <span>书架</span>
           </button>
 
-          <button id="btn-open-catalog" class="flex items-center gap-1 text-amber-900 hover:text-orange-600 font-black text-xs px-3 py-1.5 rounded-full hover:bg-amber-100 transition-all cursor-pointer border border-amber-200" title="打开全书目录与快速跳页">
+          <button id="btn-open-catalog" data-speak="打开目录" aria-label="打开目录" class="flex items-center gap-1 text-amber-900 hover:text-orange-600 font-black text-xs px-3 py-1.5 rounded-full hover:bg-amber-100 transition-all cursor-pointer border border-amber-200" title="打开全书目录与快速跳页">
             <span class="flex items-center">${GAME_ICONS.cards("w-3.5 h-3.5")}</span>
             <span>目录</span>
           </button>
@@ -63,7 +63,7 @@ export function renderReader() {
             <span>我来读</span>
           </button>
 
-          <button id="btn-play-karaoke" class="btn-game-orange text-white font-black text-xs px-3.5 sm:px-4 py-1.5 rounded-full shadow-md flex items-center gap-1 active:scale-95 cursor-pointer">
+          <button id="btn-play-karaoke" data-speak="开始伴读" aria-label="开始伴读" class="btn-game-orange text-white font-black text-xs px-3.5 sm:px-4 py-1.5 rounded-full shadow-md flex items-center gap-1 active:scale-95 cursor-pointer">
             <span class="flex items-center">${GAME_ICONS.speaker("w-3.5 h-3.5")}</span>
             <span>伴读</span>
           </button>
@@ -153,7 +153,7 @@ export function renderReader() {
       </div>
 
       <div class="w-full flex items-center justify-between px-2 sm:px-6">
-        <button id="btn-prev-page" class="bg-white hover:bg-amber-50 text-amber-900 font-black text-xs px-6 py-2.5 rounded-full shadow-lg border-2 border-amber-200 transition-all active:scale-95 cursor-pointer ${
+        <button id="btn-prev-page" data-speak="上一页" aria-label="上一页" class="bg-white hover:bg-amber-50 text-amber-900 font-black text-xs px-6 py-2.5 rounded-full shadow-lg border-2 border-amber-200 transition-all active:scale-95 cursor-pointer ${
           this.currentPageIndex === 0 ? "opacity-40 pointer-events-none" : ""
         }">
           上一页
@@ -169,7 +169,7 @@ export function renderReader() {
             .join("")}
         </div>
 
-        <button id="btn-next-page" class="btn-game-orange text-white font-black text-xs px-7 py-2.5 rounded-full shadow-lg transition-all active:scale-95 cursor-pointer">
+        <button id="btn-next-page" data-speak="下一页或完成阅读" aria-label="下一页或完成阅读" class="btn-game-orange text-white font-black text-xs px-7 py-2.5 rounded-full shadow-lg transition-all active:scale-95 cursor-pointer">
           ${this.currentPageIndex === totalPages - 1 ? "完成阅读 · 测验" : "下一页"}
         </button>
       </div>

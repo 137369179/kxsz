@@ -194,7 +194,7 @@ export class ReviewModule extends BaseModule {
         
         <header class="relative z-30 w-full px-6 py-3 flex items-center justify-between bg-black/40 backdrop-blur-md border-b border-white/20">
           <div class="flex items-center gap-2">
-            <button id="btn-review-empty-header-back" class="btn-game-wood text-white font-black text-xs px-4 py-2 rounded-full flex items-center gap-1.5 cursor-pointer active:scale-95">
+            <button id="btn-review-empty-header-back" data-speak="返回大地图" aria-label="返回大地图" class="btn-game-wood text-white font-black text-xs px-4 py-2 rounded-full flex items-center gap-1.5 cursor-pointer active:scale-95">
               <span class="flex items-center">${GAME_ICONS.home("w-4 h-4")}</span>
               <span>返回地图</span>
             </button>
@@ -219,7 +219,7 @@ export class ReviewModule extends BaseModule {
             <p class="text-xs sm:text-sm text-white/80 mb-6 font-semibold leading-relaxed">
               当前没有待复习的薄弱生字，艾宾浩斯记忆库饱满，继续去大地图探索新汉字吧！
             </p>
-            <button id="btn-review-empty-back" class="btn-game-orange text-white font-black text-sm sm:text-base px-10 py-3 rounded-full flex items-center gap-2 shadow-xl active:scale-95 cursor-pointer">
+            <button id="btn-review-empty-back" data-speak="返回大地图" aria-label="返回大地图" class="btn-game-orange text-white font-black text-sm sm:text-base px-10 py-3 rounded-full flex items-center gap-2 shadow-xl active:scale-95 cursor-pointer">
               <span class="flex items-center">${GAME_ICONS.home("w-5 h-5")}</span>
               <span>返回大地图</span>
             </button>
@@ -306,7 +306,7 @@ export class ReviewModule extends BaseModule {
         </div>
         
         <header class="relative z-30 w-full px-6 py-3 flex items-center justify-between bg-black/40 backdrop-blur-md border-b border-white/20">
-          <button id="btn-review-quit" class="btn-game-wood text-white font-black text-xs px-4 py-2 rounded-full flex items-center gap-1.5 cursor-pointer active:scale-95">
+          <button id="btn-review-quit" data-speak="退出复习，返回大地图" aria-label="退出复习，返回大地图" class="btn-game-wood text-white font-black text-xs px-4 py-2 rounded-full flex items-center gap-1.5 cursor-pointer active:scale-95">
             <span class="flex items-center">${GAME_ICONS.home("w-4 h-4")}</span>
             <span>返回地图</span>
           </button>
@@ -600,7 +600,7 @@ export class ReviewModule extends BaseModule {
               <span class="flex items-center">${GAME_ICONS.print("w-4 h-4")}</span>
               <span>打印复习字帖</span>
             </button>
-            <button id="btn-review-done" class="btn-game-orange text-white font-black text-xs sm:text-sm px-8 py-3.5 rounded-full flex items-center gap-2 shadow-2xl active:scale-95 cursor-pointer">
+            <button id="btn-review-done" data-speak="领取奖励，返回大地图" aria-label="领取奖励，返回大地图" class="btn-game-orange text-white font-black text-xs sm:text-sm px-8 py-3.5 rounded-full flex items-center gap-2 shadow-2xl active:scale-95 cursor-pointer">
               <span class="flex items-center">${GAME_ICONS.home("w-4 h-4")}</span>
               <span>领取奖励 · 返回大地图</span>
             </button>

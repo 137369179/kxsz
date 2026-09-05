@@ -64,7 +64,7 @@ export function renderStepFreeWrite(stage) {
               <span>重写这一字</span>
             </button>
 
-            <button id="btn-finish-freewrite-step" class="w-full bg-gradient-to-r from-orange-500 via-amber-500 to-yellow-400 text-white font-black text-base py-3.5 rounded-full shadow-[0_8px_25px_rgba(245,158,11,0.6)] border-2 border-white active:scale-95 transition-all flex items-center justify-center gap-2 hidden animate-bounce-slow cursor-pointer hover:brightness-105">
+            <button id="btn-finish-freewrite-step" data-speak="自由书写完成" aria-label="自由书写完成" class="w-full bg-gradient-to-r from-orange-500 via-amber-500 to-yellow-400 text-white font-black text-base py-3.5 rounded-full shadow-[0_8px_25px_rgba(245,158,11,0.6)] border-2 border-white active:scale-95 transition-all flex items-center justify-center gap-2 hidden animate-bounce-slow cursor-pointer hover:brightness-105">
               <span class="flex items-center">${GAME_ICONS.chest("w-5 h-5")}</span>
               <span>独立书写大成功！去领通关宝箱</span>
             </button>

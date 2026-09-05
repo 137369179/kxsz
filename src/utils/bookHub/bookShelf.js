@@ -76,7 +76,7 @@ export function renderShelf() {
               this.currentFilterStage === tab.key
                 ? "bg-amber-500 text-white shadow-md ring-2 ring-amber-300 scale-105"
                 : "bg-white/80 text-amber-950 hover:bg-white border border-amber-200 shadow-sm"
-            }" data-stage="${tab.key}">
+            }" data-stage="${tab.key}" data-speak="筛选${tab.label}" aria-label="筛选${tab.label}">
               <span>${tab.label}</span>
               <span class="text-[10px] opacity-75">(${tab.count})</span>
             </button>
@@ -191,7 +191,7 @@ export function renderShelf() {
                     `).join("")}
                   </div>
                   
-                  <button class="btn-game-orange text-white font-black text-xs px-4 py-1.5 rounded-full shadow-md active:scale-95 transition-transform cursor-pointer shrink-0">
+                  <button class="btn-game-orange text-white font-black text-xs px-4 py-1.5 rounded-full shadow-md active:scale-95 transition-transform cursor-pointer shrink-0 touch-target" data-speak="${isRead ? "重温绘本" : "开始阅读"}" aria-label="${isRead ? "重温绘本" : "开始阅读"}">
                     ${isRead ? "重温" : "阅读"}
                   </button>
                 </div>

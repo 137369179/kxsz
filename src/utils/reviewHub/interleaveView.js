@@ -113,6 +113,10 @@ export function runInterleaveSession({
       subtitle = question.promptSubtitle || "字义与字象 · 选出匹配的字";
       title = `<span class="text-3xl sm:text-4xl font-serif text-amber-300 font-black">${escapeHtml(question.promptTitle)}</span>`;
       speakPrompt = "字象挑战：请找出匹配的汉字";
+    } else if (question.type === "pinyin_link" && question.promptTitle) {
+      subtitle = question.promptSubtitle || "拼音找字 · 选出对应汉字";
+      title = `<span class="text-3xl sm:text-4xl font-black text-sky-300 tracking-wide">${escapeHtml(question.promptTitle)}</span>`;
+      speakPrompt = `拼音找字：请找出 ${question.promptTitle} 对应的汉字`;
     }
 
     try {
@@ -124,12 +128,12 @@ export function runInterleaveSession({
     containerEl.innerHTML = `
       <div class="interleave-session relative w-full h-full min-h-[640px] flex flex-col select-none overflow-hidden bg-gradient-to-b from-indigo-950 via-purple-950 to-slate-950 text-white">
         <header class="relative z-30 w-full px-6 py-3 flex items-center justify-between bg-black/40 backdrop-blur-md border-b border-white/20">
-          <button type="button" id="btn-interleave-quit" class="btn-game-wood text-white font-black text-xs px-4 py-2 rounded-full cursor-pointer active:scale-95">跳过 · 看结果</button>
+          <button type="button" id="btn-interleave-quit" data-speak="跳过练习，看结果" aria-label="跳过练习，看结果" class="btn-game-wood text-white font-black text-xs px-4 py-2 rounded-full cursor-pointer active:scale-95">跳过 · 看结果</button>
           <div class="candy-pill flex items-center gap-2 px-5 py-1.5 rounded-full border border-yellow-300/40">
-            <span class="text-xs text-amber-200 font-bold">${question.type === "cloze_fill" ? "填句子" : question.type === "picture_write" ? "看图选字" : "找不同"}</span>
+            <span class="text-xs text-amber-200 font-bold">${question.type === "cloze_fill" ? "填句子" : question.type === "picture_write" ? "看图选字" : question.type === "pinyin_link" ? "拼音找字" : "找不同"}</span>
             <span class="text-yellow-300 font-black text-sm font-mono">${index + 1} / ${pack.length}</span>
           </div>
-          <button type="button" id="btn-interleave-replay-prompt" class="px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-xs font-black text-amber-300 cursor-pointer active:scale-95 flex items-center gap-1" aria-label="再听一遍提示">
+          <button type="button" id="btn-interleave-replay-prompt" data-speak="再听一遍提示" class="px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-xs font-black text-amber-300 cursor-pointer active:scale-95 flex items-center gap-1" aria-label="再听一遍提示">
             ${GAME_ICONS.speaker("w-3.5 h-3.5")}
             <span>听提示</span>
           </button>

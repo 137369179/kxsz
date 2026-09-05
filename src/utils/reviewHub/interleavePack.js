@@ -126,19 +126,25 @@ export function buildInterleavePack({
 
     const canCloze = !!(target.sentence && target.sentence.includes(target.char));
     const canPic = !!(target.oracleGlyph || target.meaning || (target.words && target.words[0]));
+    const canPinyin = !!(target.pinyin && target.char);
 
     let questionType = "similar_pick";
     let promptTitle = "";
     let promptSubtitle = "";
 
-    if (i % 3 === 1 && canCloze) {
+    const slot = i % 4;
+    if (slot === 1 && canCloze) {
       questionType = "cloze_fill";
       promptTitle = target.sentence.split(target.char).join("（　）");
       promptSubtitle = "句子填空 · 把生字宝宝送回句子中";
-    } else if (i % 3 === 2 && canPic) {
+    } else if (slot === 2 && canPic) {
       questionType = "picture_write";
       promptTitle = target.oracleGlyph || (target.words && target.words[0]?.word) || target.char;
       promptSubtitle = target.meaning ? `字义认知 · ${target.meaning}` : "观察图象，找出对应的汉字";
+    } else if (slot === 3 && canPinyin) {
+      questionType = "pinyin_link";
+      promptTitle = target.pinyin;
+      promptSubtitle = "拼音找字 · 选出对应的汉字宝宝";
     }
 
     pack.push({

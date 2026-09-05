@@ -57,8 +57,8 @@ export function mountGameShell(container, { activeMode, heading }) {
 
         </div>
 
-        <main class="shell-content relative z-10 flex-1 w-full overflow-hidden no-scrollbar" role="main" aria-label="学习内容区域">
-        </main>
+        <!-- P0-3: 顶层 main 已上移至 index.html #game-app-viewport，此处降级为普通容器避免 landmark 嵌套 -->
+        <div class="shell-content relative z-10 flex-1 w-full overflow-hidden no-scrollbar"></div>
 
       </div>
     `;

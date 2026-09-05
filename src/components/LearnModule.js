@@ -152,7 +152,7 @@ export class LearnModule extends BaseModule {
         
         <header class="relative z-30 w-full px-4 sm:px-8 py-3 flex items-center justify-between bg-black/40 backdrop-blur-md border-b-2 border-white/20 flex-wrap gap-2">
           
-          <button id="btn-learn-back-map" class="flex items-center gap-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-white font-black text-xs sm:text-sm px-5 py-2.5 rounded-full shadow-[0_6px_20px_rgba(245,158,11,0.5)] border-2 border-white active:translate-y-0.5 active:scale-95 transition-all cursor-pointer">
+          <button id="btn-learn-back-map" data-speak="返回大地图" aria-label="返回大地图" class="flex items-center gap-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-white font-black text-xs sm:text-sm px-5 py-2.5 rounded-full shadow-[0_6px_20px_rgba(245,158,11,0.5)] border-2 border-white active:translate-y-0.5 active:scale-95 transition-all cursor-pointer">
             <span class="flex items-center">${GAME_ICONS.home("w-4 h-4")}</span>
             <span>返回大地图</span>
           </button>
@@ -188,7 +188,7 @@ export class LearnModule extends BaseModule {
               <span class="text-white/90">正在学:</span>
               <span class="text-xl sm:text-2xl text-yellow-100 font-serif leading-none drop-shadow">${escapeHtml(this.charData.char)}</span>
             </div>
-            <button id="btn-learn-sound" class="w-10 h-10 sm:w-11 sm:h-11 bg-black/40 backdrop-blur-md rounded-full text-white flex items-center justify-center hover:bg-black/60 transition-transform active:scale-90 border-2 border-white/40 shadow-lg cursor-pointer" title="声音开关">
+            <button id="btn-learn-sound" data-speak="声音开关" aria-label="声音开关" class="w-10 h-10 sm:w-11 sm:h-11 bg-black/40 backdrop-blur-md rounded-full text-white flex items-center justify-center hover:bg-black/60 transition-transform active:scale-90 border-2 border-white/40 shadow-lg cursor-pointer" title="声音开关">
               ${__lnSpeakerIcon}
             </button>
             <div class="candy-pill flex items-center gap-1.5 text-yellow-300 font-black text-xs sm:text-sm px-3.5 py-1.5 rounded-full bg-black/40 border-2 border-white/30 shadow-md">
@@ -271,10 +271,10 @@ export class LearnModule extends BaseModule {
           <h2 class="text-4xl font-black text-yellow-300 mb-4">微课完成！</h2>
           <p class="text-lg text-white font-bold mb-8">太棒了，你已经坚持学习了一段时间，进度已自动保存。让眼睛休息一下吧！</p>
           <div class="flex gap-4 w-full">
-             <button id="btn-micro-continue" class="flex-1 btn-game-orange text-white font-black text-xl px-6 py-4 rounded-full shadow-lg active:scale-95 cursor-pointer">
+             <button id="btn-micro-continue" data-speak="继续学习" aria-label="继续学习" class="flex-1 btn-game-orange text-white font-black text-xl px-6 py-4 rounded-full shadow-lg active:scale-95 cursor-pointer">
                继续学习
              </button>
-             <button id="btn-micro-back" class="flex-1 btn-game-wood text-white font-black text-xl px-6 py-4 rounded-full shadow-lg active:scale-95 cursor-pointer">
+             <button id="btn-micro-back" data-speak="返回地图" aria-label="返回地图" class="flex-1 btn-game-wood text-white font-black text-xl px-6 py-4 rounded-full shadow-lg active:scale-95 cursor-pointer">
                返回地图
              </button>
           </div>
